@@ -72,3 +72,5 @@ server-picker/.classpath
 game/electron/.classpath
 
 game/matchmaker/.classpath
+Backend/src/main/resources/
+Backend/src/test/
