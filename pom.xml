@@ -10,9 +10,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>bukkit</module>
         <module>api</module>
-        <module>TeamBackend</module>
+        <module>tgm</module>
         <module>backend</module>
     </modules>
 
