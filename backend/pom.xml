@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>TeamAPI</artifactId>
+    <artifactId>TeamBackend</artifactId>
 
     <dependencies>
         <dependency>

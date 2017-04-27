@@ -12,6 +12,8 @@
     <modules>
         <module>bukkit</module>
         <module>api</module>
+        <module>TeamBackend</module>
+        <module>backend</module>
     </modules>
 
     <repositories>
