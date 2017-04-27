@@ -42,11 +42,12 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public UserProfile login(String name, String uuid) {
+    public UserProfile login(String name, String uuid, String ip) {
         try {
             HttpResponse<UserProfile> userProfileResponse = Unirest.post(baseUrl + "/player/login")
                     .queryString("name", name)
                     .queryString("uuid", uuid)
+                    .queryString("ip", ip)
                     .asObject(UserProfile.class);
             return userProfileResponse.getBody();
         } catch (UnirestException e) {

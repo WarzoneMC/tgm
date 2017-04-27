@@ -14,6 +14,7 @@ public class UserProfile {
     @Getter private String name;
     @Getter private String nameLower;
     @Getter private String uuid;
+    @Getter private List<String> ips;
     @Getter private List<ObjectId> tournaments;
     @Getter private ObjectId team;
     @Getter private TeamRole teamRole;

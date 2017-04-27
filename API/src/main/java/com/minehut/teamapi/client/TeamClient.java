@@ -7,5 +7,5 @@ import com.minehut.teamapi.models.UserProfile;
  */
 public interface TeamClient {
 
-    public UserProfile login(String name, String uuid);
+    public UserProfile login(String name, String uuid, String ip);
 }

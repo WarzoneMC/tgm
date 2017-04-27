@@ -5,6 +5,7 @@ import com.minehut.teamapi.models.TeamRole;
 import com.minehut.teamapi.models.UserProfile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by luke on 4/27/17.
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 public class OfflineClient implements TeamClient {
 
     @Override
-    public UserProfile login(String name, String uuid) {
-        return new UserProfile(name, name.toLowerCase(), uuid, new ArrayList<>(), null, TeamRole.DEFAULT, 0, 0, new ArrayList<>());
+    public UserProfile login(String name, String uuid, String ip) {
+        return new UserProfile(name, name.toLowerCase(), uuid, Arrays.asList(ip), new ArrayList<>(), null, TeamRole.DEFAULT, 0, 0, new ArrayList<>());
     }
 }
