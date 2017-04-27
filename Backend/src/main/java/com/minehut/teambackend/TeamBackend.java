@@ -1,4 +1,4 @@
-package com.minehut.web;
+package com.minehut.teambackend;
 import static spark.Spark.*;
 
 /**
@@ -21,7 +21,7 @@ public class TeamBackend {
 		 * 
 		 * @see UserProfile
 		 */
-		post("/login", (request, response) -> {
+		post("/player/login", (request, response) -> {
 			//TODO login logic
 			
 			
