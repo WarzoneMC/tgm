@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.UUID;
 
 /**
@@ -63,25 +64,27 @@ public class JoinManager implements Listener {
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
-        UserProfile userProfile = getQueuedUserProfile(event.getPlayer());
-        if(userProfile == null) {
+        QueuedJoin queuedJoin = getQueuedUserProfile(event.getPlayer());
+        if(queuedJoin == null) {
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             event.setKickMessage(ChatColor.RED + "Unable to load user profile. Please try again.");
             return;
         }
 
-        PlayerContext playerContext = new PlayerContext(event.getPlayer(), userProfile);
+        PlayerContext playerContext = new PlayerContext(event.getPlayer(), queuedJoin.getUserProfile());
         TGM.getPlayerManager().addPlayer(playerContext);
 
         for (LoginService loginService : loginServices) {
             loginService.login(playerContext);
         }
+
+        queuedJoins.remove(queuedJoin);
     }
 
-    private UserProfile getQueuedUserProfile(Player player) {
+    private QueuedJoin getQueuedUserProfile(Player player) {
         for (QueuedJoin queuedJoin : queuedJoins) {
             if (player.getUniqueId().equals(queuedJoin.getUuid())) {
-                return queuedJoin.getUserProfile();
+                return queuedJoin;
             }
         }
         return null;
