@@ -1,5 +1,6 @@
 package com.minehut.tgm.map;
 
+import com.google.gson.JsonObject;
 import com.minehut.tgm.gametype.GameType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,4 +17,5 @@ public class MapInfo {
     @Getter private List<String> authors;
     @Getter private GameType gametype;
     @Getter private List<ParsedTeam> teams;
+    @Getter private JsonObject jsonObject;
 }

@@ -32,7 +32,7 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
             parsedTeams.add(new ParsedTeam(teamName, teamColor, teamMax, teamMin));
         }
 
-        MapInfo mapInfo = new MapInfo(name, version, authors, gameType, parsedTeams);
+        MapInfo mapInfo = new MapInfo(name, version, authors, gameType, parsedTeams, json);
         return mapInfo;
     }
 }
