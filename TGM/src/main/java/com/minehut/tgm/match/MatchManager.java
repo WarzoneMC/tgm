@@ -28,12 +28,6 @@ public class MatchManager {
     public MatchManager(FileConfiguration fileConfiguration) {
         mapLibrary = new MapLibrary(fileConfiguration, new MapLoaderImpl());
         mapRotation = new MapRotationFile(fileConfiguration, mapLibrary);
-
-        try {
-            cycleNextMatch();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void cycleNextMatch() throws IOException {

@@ -14,6 +14,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+
 /**
  * Created by luke on 4/27/17.\
  *
@@ -31,6 +33,7 @@ public class TGM extends JavaPlugin {
     public void onEnable() {
         tgm = this;
         FileConfiguration fileConfiguration = getConfig();
+        saveDefaultConfig();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(MapInfo.class, new MapInfoDeserializer());
@@ -54,6 +57,12 @@ public class TGM extends JavaPlugin {
         }
 
         matchManager = new MatchManager(fileConfiguration);
+
+        try {
+            matchManager.cycleNextMatch();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static MatchManager getMatchManager() {
