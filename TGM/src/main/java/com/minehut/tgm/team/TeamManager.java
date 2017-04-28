@@ -1,7 +1,6 @@
 package com.minehut.tgm.team;
 
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.join.LoginService;
 import com.minehut.tgm.join.MatchJoinEvent;
 import com.minehut.tgm.map.ParsedTeam;
 import com.minehut.tgm.match.MatchLoadEvent;
@@ -55,6 +54,15 @@ public class TeamManager implements Listener {
         Bukkit.getPluginManager().callEvent(new TeamJoinEvent(playerContext, matchTeam));
     }
 
+    public MatchTeam getTeam(String id) {
+        for (MatchTeam matchTeam : teams) {
+            if (matchTeam.getId().equalsIgnoreCase(id)) {
+                return matchTeam;
+            }
+        }
+        return null;
+    }
+
     public MatchTeam getTeam(Player player) {
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.containsPlayer(player)) {
@@ -66,7 +74,7 @@ public class TeamManager implements Listener {
 
     public MatchTeam getSpectators() {
         for (MatchTeam matchTeam : teams) {
-            if (matchTeam.isObserver()) {
+            if (matchTeam.isSpectator()) {
                 return matchTeam;
             }
         }

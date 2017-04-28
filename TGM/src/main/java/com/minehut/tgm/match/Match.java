@@ -16,13 +16,20 @@ import java.util.UUID;
 /**
  * Created by luke on 4/27/17.
  */
-@AllArgsConstructor
 public class Match {
     @Getter private final UUID uuid;
     @Getter private final MatchManifest matchManifest;
     @Getter private final List<MatchModule> modules = new ArrayList<>();
     @Getter private final World world;
     @Getter private final MapContainer mapContainer;
+    @Getter private MatchStatus matchStatus = MatchStatus.PRE;
+
+    public Match(UUID uuid, MatchManifest matchManifest, World world, MapContainer mapContainer) {
+        this.uuid = uuid;
+        this.matchManifest = matchManifest;
+        this.world = world;
+        this.mapContainer = mapContainer;
+    }
 
     /**
      * Called right after the world has loaded.
@@ -86,5 +93,22 @@ public class Match {
                 HandlerList.unregisterAll((Listener) module);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends MatchModule> T getModule(Class<T> clazz) {
+        for (MatchModule module : modules) {
+            if (clazz.isInstance(module)) return ((T) module);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends MatchModule> List<T> getModules(Class<T> clazz) {
+        List<T> results = new ArrayList<T>();
+        for (MatchModule module : modules) {
+            if (clazz.isInstance(module)) results.add((T) module);
+        }
+        return results;
     }
 }

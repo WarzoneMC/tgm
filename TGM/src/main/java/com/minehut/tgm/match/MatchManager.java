@@ -41,7 +41,7 @@ public class MatchManager {
         World world = worldCreator.createWorld();
 
         //parse locations now that we have the world object.
-        mapContainer.parseLocations(world);
+        mapContainer.parseWorldDependentContent(world);
 
         /**
          * Initialize a match manifest based on the map's gametype.
