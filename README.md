@@ -15,17 +15,19 @@ As an example, a map should be able to provide different spawn points as the mat
 "spawns": [
 		{ 
 			"teams": ["blue"], "x": 54.6, "y": 83.4, "z": 93.4, "yaw": 90,
-			"conditions": ["if $time <= 120"]
+			"conditions": ["time <= 120"]
 		},
 		{ 
 			"teams": ["blue"], "x": 54.6, "y": 83.4, "z": 93.4, "yaw": 90,
-			"conditions": ["if $time > 120", "if time < 240"]
+			"conditions": ["time > 120", "time < 240"]
 		},
 		{ 
 			"teams": ["blue"], "x": 54.6, "y": 83.4, "z": 93.4, "yaw": 90,
-			"conditions": ["if $time >= 240"]
+			"conditions": ["time >= 240"]
+		},
+		{ 
+			"teams": ["yellow"], "x": 54.6, "y": 83.4, "z": 93.4, "yaw": 90,
+			"conditions": ["points yellow >= 10"]
 		}
 	]
   ```
-  
-  3. 
