@@ -43,7 +43,20 @@
             <artifactId>commons-io</artifactId>
             <version>1.3.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>command-framework-bukkit</artifactId>
+            <version>1.9-SNAPSHOT</version>
+        </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>pa-snapshots</id>
+            <url>https://repo.extension.ws/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>

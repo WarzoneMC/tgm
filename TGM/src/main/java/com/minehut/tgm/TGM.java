@@ -12,10 +12,19 @@ import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.player.PlayerManager;
 import com.minehut.tgm.team.TeamManager;
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.minecraft.util.commands.CommandsManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +34,9 @@ public class TGM extends JavaPlugin {
     @Getter public static TGM tgm;
     @Getter private Gson gson;
     @Getter private TeamClient teamClient;
+
+    private CommandsManager<CommandSender> commands;
+    private CommandsManagerRegistration commandManager;
 
     @Getter private MatchManager matchManager;
     @Getter private PlayerManager playerManager;
@@ -60,6 +72,14 @@ public class TGM extends JavaPlugin {
             teamClient = new OfflineClient();
         }
 
+        this.commands = new CommandsManager<CommandSender>() {
+            @Override
+            public boolean hasPermission(CommandSender sender, String perm) {
+                return sender instanceof ConsoleCommandSender || sender.hasPermission(perm);
+            }
+        };
+        this.commandManager = new CommandsManagerRegistration(this, this.commands);
+
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
@@ -70,6 +90,25 @@ public class TGM extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        try {
+            this.commands.execute(commandLabel, args, sender, sender);
+        } catch (CommandPermissionsException e) {
+            if (sender instanceof Player) {
+                sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+            } else {
+                sender.sendMessage(ChatColor.RED + "You do not have permission.");
+            }
+        } catch (com.sk89q.minecraft.util.commands.CommandUsageException e) {
+            sender.sendMessage(ChatColor.RED + e.getMessage());
+            sender.sendMessage(ChatColor.RED + e.getUsage());
+        } catch (CommandException e) {
+            sender.sendMessage(e.getMessage());
+        }
+        return true;
     }
 
     public static void registerEvents(Listener listener) {
