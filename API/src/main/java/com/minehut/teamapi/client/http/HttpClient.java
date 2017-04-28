@@ -14,10 +14,10 @@ import lombok.Getter;
  * Created by luke on 4/27/17.
  */
 public class HttpClient implements TeamClient {
-    @Getter private String baseUrl;
+    @Getter private HttpClientConfig config;
 
-    public HttpClient(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public HttpClient(HttpClientConfig config) {
+        this.config = config;
 
         //serialize objects using gson
         Unirest.setObjectMapper(new ObjectMapper() {
@@ -44,7 +44,7 @@ public class HttpClient implements TeamClient {
     @Override
     public UserProfile login(String name, String uuid, String ip) {
         try {
-            HttpResponse<UserProfile> userProfileResponse = Unirest.post(baseUrl + "/player/login")
+            HttpResponse<UserProfile> userProfileResponse = Unirest.post(config.getBaseUrl() + "/player/login")
                     .queryString("name", name)
                     .queryString("uuid", uuid)
                     .queryString("ip", ip)
