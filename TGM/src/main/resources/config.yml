@@ -1,0 +1,9 @@
+api:
+  enabled: true
+  url: api.team.gg
+  auth: secret
+rotation: rotation
+map:
+  sources:
+    public:
+      path: maps
