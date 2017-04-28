@@ -12,8 +12,10 @@ import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.player.PlayerManager;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -72,6 +74,10 @@ public class TGM extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void registerEvents(Listener listener) {
+        Bukkit.getPluginManager().registerEvents(listener, TGM.getTgm());
     }
 
     public static MatchManager getMatchManager() {

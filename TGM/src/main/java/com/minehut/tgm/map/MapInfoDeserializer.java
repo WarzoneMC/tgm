@@ -25,11 +25,12 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
         List<ParsedTeam> parsedTeams = new ArrayList<>();
         for (JsonElement teamElement : json.getAsJsonArray("teams")) {
             JsonObject teamJson = teamElement.getAsJsonObject();
+            String teamId = teamJson.get("id").getAsString();
             String teamName = teamJson.get("name").getAsString();
             ChatColor teamColor = ChatColor.valueOf(teamJson.get("color").getAsString().toUpperCase().replace(" ", "_"));
             int teamMax = teamJson.get("max").getAsInt();
             int teamMin = teamJson.get("min").getAsInt();
-            parsedTeams.add(new ParsedTeam(teamName, teamColor, teamMax, teamMin));
+            parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamMax, teamMin));
         }
 
         MapInfo mapInfo = new MapInfo(name, version, authors, gameType, parsedTeams, json);

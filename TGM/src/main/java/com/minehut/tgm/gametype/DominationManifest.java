@@ -12,7 +12,7 @@ import java.util.List;
 public class DominationManifest extends MatchManifest {
 
     @Override
-    public List<MatchModule> selectModules() {
+    public List<MatchModule> allocateGameModules() {
         List<MatchModule> matchModules = new ArrayList<>();
 
         return matchModules;

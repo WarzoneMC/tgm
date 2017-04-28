@@ -1,6 +1,5 @@
 package com.minehut.tgm.match;
 
-import com.google.common.io.Files;
 import com.minehut.tgm.map.*;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
@@ -12,8 +11,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,10 +54,9 @@ public class MatchManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        List<MatchModule> modules = matchManifest.selectModules();
 
         //create and load the match.
-        Match createdMatch = new Match(matchUuid, modules, world, mapContainer);
+        Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
         createdMatch.load();
 
         //transport all players to the new world so we can unload the old one.
