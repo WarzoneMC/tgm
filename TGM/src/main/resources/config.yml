@@ -5,5 +5,4 @@ api:
 rotation: rotation
 map:
   sources:
-    public:
-      path: maps
+  - maps

@@ -3,6 +3,8 @@ package com.minehut.tgm.map;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.minehut.tgm.TGM;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,19 +23,21 @@ public class MapLoaderImpl implements MapLoader {
         List<MapContainer> maps = new ArrayList<>();
 
         for (File child : folder.listFiles()) {
-            if (child.isDirectory() && isMapFolder(child)) {
-                File mapJsonFile = new File(child, "map.json");
-                try {
-                    JsonReader reader = new JsonReader(new FileReader(mapJsonFile));
-                    MapInfo mapInfo = TGM.getTgm().getGson().fromJson(reader, MapInfo.class);
-                    maps.add(new MapContainer(child, mapInfo));
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                //recursively loop through directories
-                for (MapContainer mapContainer : loadMaps(child)) {
-                    maps.add(mapContainer);
+            if (child.isDirectory()) {
+                if (isMapFolder(child)) {
+                    File mapJsonFile = new File(child, "map.json");
+                    try {
+                        JsonReader reader = new JsonReader(new FileReader(mapJsonFile));
+                        MapInfo mapInfo = TGM.getTgm().getGson().fromJson(reader, MapInfo.class);
+                        maps.add(new MapContainer(child, mapInfo));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    //recursively loop through directories
+                    for (MapContainer mapContainer : loadMaps(child)) {
+                        maps.add(mapContainer);
+                    }
                 }
             }
         }

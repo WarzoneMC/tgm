@@ -27,6 +27,8 @@ public class MatchManager {
 
     public MatchManager(FileConfiguration fileConfiguration) {
         mapLibrary = new MapLibrary(fileConfiguration, new MapLoaderImpl());
+        mapLibrary.refreshMaps();
+
         mapRotation = new MapRotationFile(fileConfiguration, mapLibrary);
     }
 

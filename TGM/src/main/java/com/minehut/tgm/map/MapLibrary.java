@@ -2,6 +2,8 @@ package com.minehut.tgm.map;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -18,9 +20,9 @@ public class MapLibrary {
     @Getter private final MapLoader mapLoader;
 
     public MapLibrary(FileConfiguration fileConfiguration, MapLoader mapLoader) {
-        for (Object o : fileConfiguration.getConfigurationSection("map").getList("sources")) {
-            FileConfiguration sourceConfig = (FileConfiguration) o;
-            sources.add(new File(sourceConfig.getString("path")));
+        for (String s : fileConfiguration.getConfigurationSection("map").getStringList("sources")) {
+            sources.add(new File(s));
+            Bukkit.getLogger().info("Added map source: " + s);
         }
 
         this.mapLoader = mapLoader;
@@ -29,8 +31,11 @@ public class MapLibrary {
     public void refreshMaps() {
         maps.clear();
         for (File source : sources) {
-            for (MapContainer mapContainer : mapLoader.loadMaps(source)) {
+            List<MapContainer> loaded = mapLoader.loadMaps(source);
+            Bukkit.getLogger().info("Found " + loaded.size() + " maps in source " + source);
+            for (MapContainer mapContainer : loaded) {
                 maps.add(mapContainer);
+                Bukkit.getLogger().info(ChatColor.AQUA + "Loaded " + mapContainer.getMapInfo().getName() + " (" + mapContainer.getMapInfo().getVersion() + ")");
             }
         }
     }
