@@ -1,20 +1,16 @@
 package com.minehut.tgm.map;
 
-import com.avaje.ebean.text.json.JsonElement;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonParseException;
+import com.minehut.tgm.gametype.GameType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.bukkit.ChatColor;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
  * Created by luke on 4/27/17.
  */
 @AllArgsConstructor
-public class TGMMap {
+public class MapInfo {
     @Getter private String name;
     @Getter private String version;
     @Getter private List<String> authors;

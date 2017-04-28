@@ -1,4 +1,4 @@
-package com.minehut.tgm.map;
+package com.minehut.tgm.gametype;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,8 +8,9 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 public enum GameType {
-    TDM("TDM"),
-    CUSTOM("Custom");
+    TDM("TDM", TDMManifest.class),
+    DOMINATION("Domination", DominationManifest.class);
 
     @Getter private String name;
+    @Getter private Class manifest;
 }

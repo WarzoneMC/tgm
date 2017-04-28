@@ -1,6 +1,7 @@
 package com.minehut.tgm.map;
 
 import com.google.gson.*;
+import com.minehut.tgm.gametype.GameType;
 import org.bukkit.ChatColor;
 
 import java.lang.reflect.Type;
@@ -10,9 +11,9 @@ import java.util.List;
 /**
  * Created by luke on 4/27/17.
  */
-public class TGMMapDeserializer implements JsonDeserializer<TGMMap> {
+public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
     @Override
-    public TGMMap deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public MapInfo deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject json = jsonElement.getAsJsonObject();
         String name = json.get("name").getAsString();
         String version = json.get("version").getAsString();
@@ -31,7 +32,7 @@ public class TGMMapDeserializer implements JsonDeserializer<TGMMap> {
             parsedTeams.add(new ParsedTeam(teamName, teamColor, teamMax, teamMin));
         }
 
-        TGMMap tgmMap = new TGMMap(name, version, authors, gameType, parsedTeams);
-        return tgmMap;
+        MapInfo mapInfo = new MapInfo(name, version, authors, gameType, parsedTeams);
+        return mapInfo;
     }
 }

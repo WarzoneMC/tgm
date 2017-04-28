@@ -7,5 +7,9 @@ import java.util.List;
  */
 public abstract class MatchManifest {
 
-    public abstract List<MatchModule> getUnloadedModules();
+    /**
+     * Determines which modules to load based on the
+     * given gametype.
+     */
+    public abstract List<MatchModule> selectModules();
 }
