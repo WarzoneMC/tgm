@@ -2,10 +2,16 @@ package com.minehut.tgm;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.minehut.teamapi.client.TeamClient;
+import com.minehut.teamapi.client.http.HttpClient;
+import com.minehut.teamapi.client.http.HttpClientConfig;
+import com.minehut.teamapi.client.offline.OfflineClient;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import lombok.Getter;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -18,17 +24,36 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class TGM extends JavaPlugin {
     @Getter public static TGM tgm;
     @Getter private Gson gson;
+    @Getter private TeamClient teamClient;
     @Getter private MatchManager matchManager;
 
     @Override
     public void onEnable() {
         tgm = this;
+        FileConfiguration fileConfiguration = getConfig();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(MapInfo.class, new MapInfoDeserializer());
         this.gson = gsonBuilder.create();
 
-        matchManager = new MatchManager(getConfig());
+        ConfigurationSection apiConfig = fileConfiguration.getConfigurationSection("api");
+        if (apiConfig.getBoolean("enabled")) {
+            teamClient = new HttpClient(new HttpClientConfig() {
+                @Override
+                public String getBaseUrl() {
+                    return apiConfig.getString("url");
+                }
+
+                @Override
+                public String getAuthToken() {
+                    return apiConfig.getString("auth");
+                }
+            });
+        } else {
+            teamClient = new OfflineClient();
+        }
+
+        matchManager = new MatchManager(fileConfiguration);
     }
 
     public static MatchManager getMatchManager() {
