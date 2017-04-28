@@ -11,6 +11,7 @@ import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.player.PlayerManager;
+import com.minehut.tgm.team.TeamManager;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -35,6 +36,7 @@ public class TGM extends JavaPlugin {
     @Getter private MatchManager matchManager;
     @Getter private PlayerManager playerManager;
     @Getter private JoinManager joinManager;
+    @Getter private TeamManager teamManager;
 
     @Override
     public void onEnable() {
@@ -68,6 +70,7 @@ public class TGM extends JavaPlugin {
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
+        teamManager = new TeamManager();
 
         try {
             matchManager.cycleNextMatch();
