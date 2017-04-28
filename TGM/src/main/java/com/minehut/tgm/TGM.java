@@ -21,13 +21,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 
-/**
- * Created by luke on 4/27/17.\
- *
- * Team Game Manager
- */
-
-
 public class TGM extends JavaPlugin {
     @Getter public static TGM tgm;
     @Getter private Gson gson;
