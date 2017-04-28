@@ -117,7 +117,7 @@ public class TGM extends JavaPlugin {
     }
 
     public static MatchManager getMatchManager() {
-        return getTgm().getMatchManager();
+        return getTgm().matchManager;
     }
-    public static PlayerManager getPlayerManager() { return getTgm().getPlayerManager(); }
+    public static PlayerManager getPlayerManager() { return getTgm().playerManager; }
 }

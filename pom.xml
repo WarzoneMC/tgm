@@ -20,11 +20,6 @@
             <id>spigotmc-public</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
-
-        <repository>
-            <id>pa-snapshots</id>
-            <url>https://repo.extension.ws/content/repositories/snapshots</url>
-        </repository>
     </repositories>
 
     <build>

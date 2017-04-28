@@ -49,14 +49,13 @@
             <artifactId>command-framework-bukkit</artifactId>
             <version>1.9-SNAPSHOT</version>
         </dependency>
-    </dependencies>
 
-    <repositories>
-        <repository>
-            <id>pa-snapshots</id>
-            <url>https://repo.extension.ws/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -69,6 +68,7 @@
                     <artifactSet>
                         <includes>
                             <include>com.minehut:TeamAPI</include>
+                            <include>com.sk89q:command-framework-bukkit</include>
                         </includes>
                     </artifactSet>
                 </configuration>

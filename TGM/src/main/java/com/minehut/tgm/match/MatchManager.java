@@ -35,7 +35,7 @@ public class MatchManager {
 
         //create the new world under a random uuid in the matches folder.
         UUID matchUuid = UUID.randomUUID();
-        FileUtils.copyDirectory(mapContainer.getSourceFolder(), new File(matchUuid.toString()));
+        FileUtils.copyDirectory(mapContainer.getSourceFolder(), new File("matches/" + matchUuid.toString()));
         WorldCreator worldCreator = new WorldCreator("matches/" + matchUuid.toString());
         worldCreator.generator(new NullChunkGenerator());
         World world = worldCreator.createWorld();

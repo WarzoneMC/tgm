@@ -23,7 +23,7 @@ public class MapContainer {
     @Getter @Setter private MapInfo mapInfo;
 
     @Getter
-    private HashMap<String, Location> locations = new HashMap<>();
+    private final HashMap<String, Location> locations = new HashMap<>();
 
     public void parseLocations(World world) {
         JsonArray jsonArray = mapInfo.getJsonObject().getAsJsonArray("locations");
