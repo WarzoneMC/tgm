@@ -41,14 +41,18 @@ public class TeamManager implements Listener {
 
     @EventHandler
     public void onMatchJoin(MatchJoinEvent event) {
-        MatchTeam oldTeam = getTeam(event.getPlayerContext().getPlayer());
+        MatchTeam matchTeam = teamJoinController.determineTeam(event.getPlayerContext());
+        joinTeam(event.getPlayerContext(), matchTeam);
+    }
+
+    public void joinTeam(PlayerContext playerContext, MatchTeam matchTeam) {
+        MatchTeam oldTeam = getTeam(playerContext.getPlayer());
         if (oldTeam != null) {
-            oldTeam.removePlayer(event.getPlayerContext());
+            oldTeam.removePlayer(playerContext);
         }
 
-        MatchTeam matchTeam = teamJoinController.determineTeam(event.getPlayerContext());
-        matchTeam.addPlayer(event.getPlayerContext());
-        Bukkit.getPluginManager().callEvent(new TeamJoinEvent(event.getPlayerContext(), matchTeam));
+        matchTeam.addPlayer(playerContext);
+        Bukkit.getPluginManager().callEvent(new TeamJoinEvent(playerContext, matchTeam));
     }
 
     public MatchTeam getTeam(Player player) {
