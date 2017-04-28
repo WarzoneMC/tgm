@@ -6,9 +6,11 @@ import com.minehut.teamapi.client.TeamClient;
 import com.minehut.teamapi.client.http.HttpClient;
 import com.minehut.teamapi.client.http.HttpClientConfig;
 import com.minehut.teamapi.client.offline.OfflineClient;
+import com.minehut.tgm.join.JoinManager;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
+import com.minehut.tgm.player.PlayerManager;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -27,7 +29,10 @@ public class TGM extends JavaPlugin {
     @Getter public static TGM tgm;
     @Getter private Gson gson;
     @Getter private TeamClient teamClient;
+
     @Getter private MatchManager matchManager;
+    @Getter private PlayerManager playerManager;
+    @Getter private JoinManager joinManager;
 
     @Override
     public void onEnable() {
@@ -38,6 +43,8 @@ public class TGM extends JavaPlugin {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(MapInfo.class, new MapInfoDeserializer());
         this.gson = gsonBuilder.create();
+
+
 
         ConfigurationSection apiConfig = fileConfiguration.getConfigurationSection("api");
         if (apiConfig.getBoolean("enabled")) {
@@ -57,6 +64,8 @@ public class TGM extends JavaPlugin {
         }
 
         matchManager = new MatchManager(fileConfiguration);
+        playerManager = new PlayerManager();
+        joinManager = new JoinManager();
 
         try {
             matchManager.cycleNextMatch();
@@ -68,4 +77,5 @@ public class TGM extends JavaPlugin {
     public static MatchManager getMatchManager() {
         return getTgm().getMatchManager();
     }
+    public static PlayerManager getPlayerManager() { return getTgm().getPlayerManager(); }
 }
