@@ -6,6 +6,7 @@ import com.minehut.teamapi.client.TeamClient;
 import com.minehut.teamapi.client.http.HttpClient;
 import com.minehut.teamapi.client.http.HttpClientConfig;
 import com.minehut.teamapi.client.offline.OfflineClient;
+import com.minehut.tgm.command.CycleCommands;
 import com.minehut.tgm.join.JoinManager;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
@@ -53,8 +54,6 @@ public class TGM extends JavaPlugin {
         gsonBuilder.registerTypeAdapter(MapInfo.class, new MapInfoDeserializer());
         this.gson = gsonBuilder.create();
 
-
-
         ConfigurationSection apiConfig = fileConfiguration.getConfigurationSection("api");
         if (apiConfig.getBoolean("enabled")) {
             teamClient = new HttpClient(new HttpClientConfig() {
@@ -79,6 +78,8 @@ public class TGM extends JavaPlugin {
             }
         };
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
+
+        commandManager.register(CycleCommands.class);
 
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
