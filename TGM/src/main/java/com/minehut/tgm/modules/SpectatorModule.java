@@ -3,6 +3,8 @@ package com.minehut.tgm.modules;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
+import com.minehut.tgm.match.ModuleData;
+import com.minehut.tgm.match.ModuleLoadTime;
 import com.minehut.tgm.team.MatchTeam;
 import com.minehut.tgm.team.TeamChangeEvent;
 import com.minehut.tgm.user.PlayerContext;
@@ -25,6 +27,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.Arrays;
 
+@ModuleData(load = ModuleLoadTime.EARLIER)
 public class SpectatorModule extends MatchModule implements Listener {
     @Getter private MatchTeam spectators;
     @Getter private PublicMenu teamSelectionMenu;

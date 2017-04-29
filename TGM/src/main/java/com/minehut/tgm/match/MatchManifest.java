@@ -4,6 +4,7 @@ import com.minehut.tgm.modules.SpawnPointHandlerModule;
 import com.minehut.tgm.modules.SpawnPointLoaderModule;
 import com.minehut.tgm.modules.SpectatorModule;
 import com.minehut.tgm.modules.TeamJoinNotificationsModule;
+import com.minehut.tgm.modules.visibility.VisibilityModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public abstract class MatchManifest {
         modules.add(new SpectatorModule());
         modules.add(new SpawnPointHandlerModule());
         modules.add(new SpawnPointLoaderModule());
+        modules.add(new VisibilityModule());
 
         return modules;
     }
