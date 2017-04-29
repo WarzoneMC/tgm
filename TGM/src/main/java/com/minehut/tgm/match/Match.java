@@ -35,7 +35,7 @@ public class Match {
      * Called right after the world has loaded.
      * No players are in the world at this point.
      */
-    public void load() {
+    public void load(Match match) {
         for (MatchModule module : matchManifest.allocateCoreModules()) {
             modules.add(module);
         }
@@ -51,17 +51,21 @@ public class Match {
 
         //now load all the modules.
         int listenerCount = 0;
-        for (MatchModule module : modules) {
-            module.load();
+        for (ModuleLoadTime moduleLoadTime : ModuleLoadTime.values()) {
+            for (MatchModule matchModule : getModules(moduleLoadTime)) {
+                matchModule.load(match);
 
-            //automatically register modules that implement listener.
-            if (module instanceof Listener) {
-                listenerCount++;
-                TGM.registerEvents((Listener) module);
+                //automatically register modules that implement listener.
+                if (matchModule instanceof Listener) {
+                    TGM.registerEvents((Listener) matchModule);
+                    listenerCount++;
+                }
             }
         }
 
-        Bukkit.getLogger().info("Loaded " + modules.size() + " modules (" + listenerCount + " listeners).");
+        Bukkit.getLogger().info("Loaded " + modules.size() + " modules (" + listenerCount + " listeners)");
+
+        Bukkit.getPluginManager().callEvent(new MatchPostLoadEvent(this));
     }
 
     /**
@@ -112,5 +116,19 @@ public class Match {
             if (clazz.isInstance(module)) results.add((T) module);
         }
         return results;
+    }
+
+    public List<MatchModule> getModules(ModuleLoadTime moduleLoadTime) {
+        List<MatchModule> selected = new ArrayList<>();
+        for (MatchModule matchModule : modules) {
+            if (matchModule.getClass().isAnnotationPresent(ModuleData.class)) {
+                if (matchModule.getClass().getAnnotation(ModuleData.class).load() == moduleLoadTime) {
+                    selected.add(matchModule);
+                }
+            } else if (moduleLoadTime == ModuleLoadTime.NORMAL) {
+                selected.add(matchModule);
+            }
+        }
+        return selected;
     }
 }

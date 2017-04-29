@@ -3,6 +3,7 @@ package com.minehut.tgm.join;
 import com.minehut.teamapi.models.UserProfile;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchLoadEvent;
+import com.minehut.tgm.match.MatchPostLoadEvent;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -98,8 +100,8 @@ public class JoinManager implements Listener {
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
     }
 
-    @EventHandler
-    public void onCycle(MatchLoadEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCycle(MatchPostLoadEvent event) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerContext playerContext = TGM.getPlayerManager().getPlayerContext(player);
             Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));

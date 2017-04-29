@@ -1,6 +1,7 @@
 package com.minehut.tgm.match;
 
 import com.minehut.tgm.modules.SpawnPointHandlerModule;
+import com.minehut.tgm.modules.SpawnPointLoaderModule;
 import com.minehut.tgm.modules.SpectatorModule;
 import com.minehut.tgm.modules.TeamJoinNotificationsModule;
 
@@ -31,6 +32,7 @@ public abstract class MatchManifest {
         modules.add(new TeamJoinNotificationsModule());
         modules.add(new SpectatorModule());
         modules.add(new SpawnPointHandlerModule());
+        modules.add(new SpawnPointLoaderModule());
 
         return modules;
     }

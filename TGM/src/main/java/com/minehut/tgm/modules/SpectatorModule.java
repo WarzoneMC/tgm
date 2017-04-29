@@ -1,6 +1,7 @@
 package com.minehut.tgm.modules;
 
 import com.minehut.tgm.TGM;
+import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.team.MatchTeam;
 import com.minehut.tgm.team.TeamChangeEvent;
@@ -34,7 +35,6 @@ public class SpectatorModule extends MatchModule implements Listener {
     @Getter private final int teamSelectionRunnable;
 
     public SpectatorModule() {
-        this.spectators = TGM.getTgm().getTeamManager().getSpectators();
         this.teamSelectionMenu = new PublicMenu(TGM.getTgm(), ChatColor.UNDERLINE + "Team Selection", 9);
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
@@ -110,6 +110,11 @@ public class SpectatorModule extends MatchModule implements Listener {
         }, 0L, 20L);
     }
 
+    @Override
+    public void load(Match match) {
+        this.spectators = TGM.getTgm().getTeamManager().getSpectators();
+    }
+
     private void applySpectatorKit(PlayerContext playerContext) {
         Players.reset(playerContext.getPlayer(), false);
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -139,5 +144,6 @@ public class SpectatorModule extends MatchModule implements Listener {
     @Override
     public void unload() {
         Bukkit.getScheduler().cancelTask(teamSelectionRunnable);
+        teamSelectionMenu.disable();
     }
 }

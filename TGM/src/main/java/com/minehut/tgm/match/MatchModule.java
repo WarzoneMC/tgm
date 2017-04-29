@@ -2,6 +2,7 @@ package com.minehut.tgm.match;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import java.util.logging.Logger;
 
@@ -15,7 +16,7 @@ public abstract class MatchModule {
      * Called immediately after a match is loaded.
      * The map is loaded but no players have been added yet.
      */
-    public void load() {
+    public void load(Match match) {
 
     }
 

@@ -52,21 +52,25 @@ public class MatchManager {
             e.printStackTrace();
         }
 
-        //create and load the match.
-        Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
-        createdMatch.load();
-
-        //parse locations now that we have the world object.
-        mapContainer.parseWorldDependentContent(world);
+        //unload the existing match modules before we move any players.
+        if (match != null) {
+            match.unload();
+        }
 
         //transport all players to the new world so we can unload the old one.
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.teleport(world.getSpawnLocation());
         }
 
+        //create and load the match.
+        Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
+        createdMatch.load(createdMatch);
+
+        //parse locations now that we have the world object.
+        mapContainer.parseWorldDependentContent(world);
+
         //if a match is currently running, unload it.
         if (match != null) {
-            match.unload();
             File worldFolder = match.getWorld().getWorldFolder();
             Bukkit.unloadWorld(match.getWorld(), false);
             FileUtils.deleteDirectory(worldFolder);
