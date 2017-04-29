@@ -40,9 +40,6 @@ public class MatchManager {
         worldCreator.generator(new NullChunkGenerator());
         World world = worldCreator.createWorld();
 
-        //parse locations now that we have the world object.
-        mapContainer.parseWorldDependentContent(world);
-
         /**
          * Initialize a match manifest based on the map's gametype.
          * The match manifest will handle which match modules should
@@ -58,6 +55,9 @@ public class MatchManager {
         //create and load the match.
         Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
         createdMatch.load();
+
+        //parse locations now that we have the world object.
+        mapContainer.parseWorldDependentContent(world);
 
         //transport all players to the new world so we can unload the old one.
         for (Player player : Bukkit.getOnlinePlayers()) {

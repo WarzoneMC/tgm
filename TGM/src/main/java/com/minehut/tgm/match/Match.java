@@ -50,16 +50,18 @@ public class Match {
         Bukkit.getPluginManager().callEvent(new MatchLoadEvent(this));
 
         //now load all the modules.
+        int listenerCount = 0;
         for (MatchModule module : modules) {
             module.load();
 
             //automatically register modules that implement listener.
             if (module instanceof Listener) {
+                listenerCount++;
                 TGM.registerEvents((Listener) module);
             }
         }
 
-        Bukkit.getLogger().info("Loaded " + modules.size() + " modules.");
+        Bukkit.getLogger().info("Loaded " + modules.size() + " modules (" + listenerCount + " listeners).");
     }
 
     /**

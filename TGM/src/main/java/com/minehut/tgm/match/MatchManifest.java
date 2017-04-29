@@ -1,5 +1,7 @@
 package com.minehut.tgm.match;
 
+import com.minehut.tgm.modules.SpawnPointHandlerModule;
+import com.minehut.tgm.modules.SpectatorModule;
 import com.minehut.tgm.modules.TeamJoinNotificationsModule;
 
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public abstract class MatchManifest {
         List<MatchModule> modules = new ArrayList<>();
 
         modules.add(new TeamJoinNotificationsModule());
+        modules.add(new SpectatorModule());
+        modules.add(new SpawnPointHandlerModule());
 
         return modules;
     }

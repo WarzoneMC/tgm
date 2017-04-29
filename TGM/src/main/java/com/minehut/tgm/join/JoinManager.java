@@ -2,6 +2,7 @@ package com.minehut.tgm.join;
 
 import com.minehut.teamapi.models.UserProfile;
 import com.minehut.tgm.TGM;
+import com.minehut.tgm.match.MatchLoadEvent;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -29,7 +31,7 @@ public class JoinManager implements Listener {
     private List<LoginService> loginServices = new ArrayList<>();
 
     public JoinManager() {
-        Bukkit.getPluginManager().registerEvents(this, TGM.getTgm());
+        TGM.registerEvents(this);
 
         //empty queued joins when the connection didn't follow through for an unknown reason.
         Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.getTgm(), new Runnable() {
@@ -88,6 +90,20 @@ public class JoinManager implements Listener {
             }
         }
         return null;
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        PlayerContext playerContext = TGM.getPlayerManager().getPlayerContext(event.getPlayer());
+        Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
+    }
+
+    @EventHandler
+    public void onCycle(MatchLoadEvent event) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerContext playerContext = TGM.getPlayerManager().getPlayerContext(player);
+            Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
+        }
     }
 
     @EventHandler

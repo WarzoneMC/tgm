@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class TeamManager implements Listener {
         TGM.registerEvents(this);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onMatchLoad(MatchLoadEvent event) {
         teams.clear();
 
@@ -51,7 +52,7 @@ public class TeamManager implements Listener {
         }
 
         matchTeam.addPlayer(playerContext);
-        Bukkit.getPluginManager().callEvent(new TeamJoinEvent(playerContext, matchTeam));
+        Bukkit.getPluginManager().callEvent(new TeamChangeEvent(playerContext, matchTeam, oldTeam));
     }
 
     public MatchTeam getTeam(String id) {

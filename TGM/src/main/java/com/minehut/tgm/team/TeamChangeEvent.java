@@ -15,11 +15,12 @@ import org.bukkit.event.HandlerList;
  */
 
 @AllArgsConstructor
-public class TeamJoinEvent extends Event {
+public class TeamChangeEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     @Getter PlayerContext playerContext;
     @Getter MatchTeam team;
+    @Getter MatchTeam oldTeam;
 
     @Override
     public HandlerList getHandlers() {

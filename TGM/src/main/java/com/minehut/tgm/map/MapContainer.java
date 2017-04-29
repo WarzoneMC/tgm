@@ -10,6 +10,7 @@ import com.minehut.tgm.team.TeamManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -67,6 +68,7 @@ public class MapContainer {
             Location location = convertLocation(world, spawnJson);
             SpawnPoint spawnPoint = new SpawnPoint(location);
             for (MatchTeam matchTeam : teams) {
+                Bukkit.getLogger().info("Added spawnpoint for " + matchTeam.getAlias());
                 matchTeam.addSpawnPoint(spawnPoint);
             }
         }
