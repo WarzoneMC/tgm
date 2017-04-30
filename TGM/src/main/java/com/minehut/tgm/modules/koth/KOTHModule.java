@@ -109,6 +109,13 @@ public class KOTHModule extends MatchModule implements Listener {
     }
 
     @Override
+    public void disable() {
+        for (ControlPoint controlPoint : controlPoints) {
+            controlPoint.unload();
+        }
+    }
+
+    @Override
     public void unload() {
         for (ControlPoint controlPoint : controlPoints) {
             controlPoint.unload();
