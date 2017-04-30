@@ -1,6 +1,7 @@
 package com.minehut.tgm.match;
 
 import com.minehut.tgm.modules.*;
+import com.minehut.tgm.modules.MatchResultModule;
 import com.minehut.tgm.modules.visibility.VisibilityModule;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public abstract class MatchManifest {
         modules.add(new TimeModule());
         modules.add(new TabListModule());
         modules.add(new MatchProgressNotifications());
+        modules.add(new MatchResultModule());
 
         return modules;
     }

@@ -1,6 +1,8 @@
 package com.minehut.tgm.match;
 
+import com.minehut.tgm.TGM;
 import com.minehut.tgm.map.*;
+import com.minehut.tgm.team.MatchTeam;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -11,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,7 +36,15 @@ public class MatchManager {
         match.enable();
     }
 
-    public void endMatch() {
+    public void endMatch(MatchTeam winningTeam) {
+        List<MatchTeam> losers = new ArrayList<>();
+        for (MatchTeam matchTeam : TGM.getTgm().getTeamManager().getTeams()) {
+            if (!matchTeam.isSpectator() && matchTeam != winningTeam) {
+                losers.add(matchTeam);
+            }
+        }
+        Bukkit.getPluginManager().callEvent(new MatchResultEvent(match, winningTeam, losers));
+
         match.disable();
     }
 

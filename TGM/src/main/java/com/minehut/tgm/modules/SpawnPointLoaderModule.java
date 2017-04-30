@@ -14,7 +14,6 @@ import com.minehut.tgm.team.MatchTeam;
 import com.minehut.tgm.util.Parser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class SpawnPointLoaderModule extends MatchModule {
             List<MatchTeam> teams = new ArrayList<>();
             for (Object o : spawnJson.getAsJsonArray("teams")) {
                 String teamId = ((JsonPrimitive) o).getAsString();
-                MatchTeam team = TGM.getTgm().getTeamManager().getTeam(teamId);
+                MatchTeam team = TGM.getTgm().getTeamManager().getTeamById(teamId);
                 if (team != null) {
                     teams.add(team);
                 }

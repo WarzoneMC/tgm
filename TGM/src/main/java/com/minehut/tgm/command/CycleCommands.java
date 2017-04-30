@@ -2,6 +2,7 @@ package com.minehut.tgm.command;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchStatus;
+import com.minehut.tgm.team.MatchTeam;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -39,7 +40,16 @@ public class CycleCommands {
     public static void end(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.MID) {
-            TGM.getMatchManager().endMatch();
+            if (cmd.argsLength() > 0) {
+                MatchTeam matchTeam = TGM.getTgm().getTeamManager().getTeamFromInput(cmd.getJoinedStrings(0));
+                if (matchTeam == null) {
+                    sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
+                    return;
+                }
+                TGM.getMatchManager().endMatch(matchTeam);
+            } else {
+                TGM.getMatchManager().endMatch(TGM.getTgm().getTeamManager().getTeams().get(1));
+            }
         } else {
             sender.sendMessage(ChatColor.RED + "No match in progress.");
         }

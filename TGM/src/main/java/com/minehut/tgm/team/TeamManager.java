@@ -55,13 +55,56 @@ public class TeamManager implements Listener {
         Bukkit.getPluginManager().callEvent(new TeamChangeEvent(playerContext, matchTeam, oldTeam));
     }
 
-    public MatchTeam getTeam(String id) {
+    public MatchTeam getTeamById(String id) {
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.getId().equalsIgnoreCase(id)) {
                 return matchTeam;
             }
         }
         return null;
+    }
+
+    public MatchTeam getTeamByAlias(String alias) {
+        for (MatchTeam matchTeam : teams) {
+            if (matchTeam.getId().equalsIgnoreCase(alias)) {
+                return matchTeam;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Method designed to be used when teams are specified in a command.
+     *
+     * Example: A user could join the "Blue Team" with any of the following.
+     * 1. /join blue
+     * 2. /join blue team
+     * 3. /join b
+     */
+    public MatchTeam getTeamFromInput(String input) {
+        MatchTeam found = getTeamById(input);
+        if (found == null) {
+            found = getTeamByAlias(input);
+        } else {
+            return found;
+        }
+
+        if (found == null) {
+            for (MatchTeam matchTeam : teams) {
+                if (matchTeam.getId().startsWith(input)) {
+                    return matchTeam;
+                }
+            }
+
+            for (MatchTeam matchTeam : teams) {
+                if (matchTeam.getAlias().startsWith(input)) {
+                    return matchTeam;
+                }
+            }
+        } else {
+            return found;
+        }
+        return found;
     }
 
     public MatchTeam getTeam(Player player) {
