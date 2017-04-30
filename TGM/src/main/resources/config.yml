@@ -1,5 +1,5 @@
 api:
-  enabled: true
+  enabled: false
   url: api.team.gg
   auth: secret
 rotation: rotation
