@@ -31,8 +31,8 @@ public class TabListModule extends MatchModule implements Listener {
         refreshTab(event.getPlayer());
     }
 
-    @EventHandler
-    public void onEnable() {
+    @Override
+    public void enable() {
         refreshAllTabs();
 
         runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.getTgm(), new Runnable() {

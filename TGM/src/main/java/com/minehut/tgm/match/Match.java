@@ -4,6 +4,7 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.map.MapContainer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
@@ -22,7 +23,7 @@ public class Match {
     @Getter private final List<MatchModule> modules = new ArrayList<>();
     @Getter private final World world;
     @Getter private final MapContainer mapContainer;
-    @Getter private MatchStatus matchStatus = MatchStatus.PRE;
+    @Getter @Setter private MatchStatus matchStatus = MatchStatus.PRE;
 
     public Match(UUID uuid, MatchManifest matchManifest, World world, MapContainer mapContainer) {
         this.uuid = uuid;
@@ -72,6 +73,8 @@ public class Match {
      * Called when the match starts.
      */
     public void enable() {
+        setMatchStatus(MatchStatus.MID);
+
         for (MatchModule module : modules) {
             module.enable();
         }
@@ -82,6 +85,8 @@ public class Match {
      * Called when the match ends.
      */
     public void disable() {
+        setMatchStatus(MatchStatus.POST);
+
         for (MatchModule module : modules) {
             module.disable();
         }

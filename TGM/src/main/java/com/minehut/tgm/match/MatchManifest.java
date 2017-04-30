@@ -33,6 +33,7 @@ public abstract class MatchManifest {
         modules.add(new SpawnPointLoaderModule());
         modules.add(new VisibilityModule());
         modules.add(new TimeModule());
+        modules.add(new TabListModule());
 
         return modules;
     }

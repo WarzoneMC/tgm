@@ -29,6 +29,14 @@ public class MatchManager {
         mapRotation = new MapRotationFile(fileConfiguration, mapLibrary);
     }
 
+    public void startMatch() {
+        match.enable();
+    }
+
+    public void endMatch() {
+        match.disable();
+    }
+
     public void cycleNextMatch() throws IOException {
         //find a new map to cycle to.
         MapContainer mapContainer = mapRotation.cycle();
