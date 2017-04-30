@@ -1,4 +1,4 @@
-package com.minehut.tgm.tab;
+package com.minehut.tgm.playerList;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.team.MatchTeam;

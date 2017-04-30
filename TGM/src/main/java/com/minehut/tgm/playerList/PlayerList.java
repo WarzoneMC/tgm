@@ -1,4 +1,4 @@
-package com.minehut.tgm.tab;
+package com.minehut.tgm.playerList;
 
 
 import java.lang.reflect.*;
@@ -6,7 +6,6 @@ import java.util.*;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.minecraft.server.v1_11_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -108,7 +107,7 @@ public class PlayerList {
     }
 
     /**
-     * Returns the name of the tab at ID "id".
+     * Returns the name of the playerList at ID "id".
      * @param id
      *
      * @return
@@ -252,7 +251,7 @@ public class PlayerList {
     }
 
     /**
-     * Use this for changing a value at a specific tab.
+     * Use this for changing a value at a specific playerList.
      *
      * @param id
      * @param newName
@@ -270,7 +269,7 @@ public class PlayerList {
     }
 
     /**
-     * Use this for changing a value at a specific tab.
+     * Use this for changing a value at a specific playerList.
      *
      * @param id
      * @param newName
@@ -342,7 +341,7 @@ public class PlayerList {
     }
 
     /**
-     * Removes a custom tab from a player's tablist.
+     * Removes a custom playerList from a player's tablist.
      *
      * @param id
      */
@@ -394,7 +393,7 @@ public class PlayerList {
      *
      * Use this to add an existing offline player to a player's tablist. The
      * reason there is a name variable is so you can modify a player's name in
-     * the tablist. If you want the player-tab to be the same as the player's
+     * the tablist. If you want the player-playerList to be the same as the player's
      * name, provide the offline player's name.
      *
      * @param id

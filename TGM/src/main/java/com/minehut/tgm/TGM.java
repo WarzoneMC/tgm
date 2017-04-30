@@ -12,7 +12,7 @@ import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.player.PlayerManager;
-import com.minehut.tgm.tab.PlayerListManager;
+import com.minehut.tgm.playerList.PlayerListManager;
 import com.minehut.tgm.team.TeamManager;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;

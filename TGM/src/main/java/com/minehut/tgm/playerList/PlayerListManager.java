@@ -1,4 +1,4 @@
-package com.minehut.tgm.tab;
+package com.minehut.tgm.playerList;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.join.MatchJoinEvent;
@@ -33,8 +33,8 @@ public class PlayerListManager implements Listener {
     }
 
     /**
-     * Stops vanilla tab items from displaying.
-     * Only our custom tab items should be displayed.
+     * Stops vanilla playerList items from displaying.
+     * Only our custom playerList items should be displayed.
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
@@ -47,10 +47,10 @@ public class PlayerListManager implements Listener {
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     PlayerList otherPlayerList = getPlayerList(other);
 
-                    //remove the joining player from everyone else's tab list.
+                    //remove the joining player from everyone else's playerList list.
                     otherPlayerList.removePlayer(event.getPlayer());
 
-                    //remove everyone from the joining players tab.
+                    //remove everyone from the joining players playerList.
                     playerList.removePlayer(other);
                 }
 
