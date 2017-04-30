@@ -34,8 +34,9 @@ public class KOTHModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().getAsJsonObject("koth");
+        JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("koth").getAsJsonObject();
         pointsToWin = kothJson.get("points").getAsInt();
+
         for (JsonElement capturePointElement : kothJson.getAsJsonArray("hills")) {
             JsonObject capturePointJson = capturePointElement.getAsJsonObject();
             Region region = match.getModule(RegionManagerModule.class).getRegion(match, capturePointJson.get("region"));
@@ -60,7 +61,7 @@ public class KOTHModule extends MatchModule implements Listener {
 
                 @Override
                 public void capturing(MatchTeam matchTeam, int progress, int maxProgress, boolean upward) {
-
+                    Bukkit.broadcastMessage(matchTeam.getAlias() + " is capturing " + name + " (" + progress + "/" + maxProgress + ")");
                 }
 
                 @Override
@@ -85,7 +86,8 @@ public class KOTHModule extends MatchModule implements Listener {
 
                 @Override
                 public void lost(MatchTeam matchTeam) {
-
+                    Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE
+                            + " lost control of " + ChatColor.AQUA + ChatColor.BOLD.toString() + name);
                 }
 
                 //returns true if winner was called

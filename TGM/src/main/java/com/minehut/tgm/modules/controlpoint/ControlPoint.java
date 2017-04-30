@@ -5,6 +5,7 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.modules.SpectatorModule;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamChangeEvent;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
@@ -13,8 +14,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,11 +71,31 @@ public class ControlPoint implements Listener {
     private void handlePlayerMove(Player player, Location to) {
         if(TGM.get().getModule(SpectatorModule.class).isSpectating(player)) return;
 
-        if (player.isDead() && region.contains(to)) {
+        if (!player.isDead() && region.contains(to)) {
             playersOnPoint.add(player);
         } else {
             playersOnPoint.remove(player);
         }
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        handlePlayerMove(event.getPlayer(), event.getTo());
+    }
+
+    @EventHandler
+    public void onTeamChange(TeamChangeEvent event) {
+        this.playersOnPoint.remove(event.getPlayerContext().getPlayer());
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        this.playersOnPoint.remove(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onKick(PlayerKickEvent event) {
+        this.playersOnPoint.remove(event.getPlayer());
     }
 
     public void enable() {
@@ -90,7 +115,7 @@ public class ControlPoint implements Listener {
 
                 List<MatchTeam> most = new ArrayList<>();
                 for (MatchTeam matchTeam : holding.keySet()) {
-                    if (most == null) {
+                    if (most.isEmpty()) {
                         most.add(matchTeam);
                     } else {
                         if (holding.get(matchTeam) >= holding.get(most)) {
@@ -104,6 +129,8 @@ public class ControlPoint implements Listener {
                 }
             }
         }, TICK_RATE, TICK_RATE);
+
+        TGM.registerEvents(this);
     }
 
     private void handleCap(MatchTeam matchTeam) {
@@ -124,11 +151,13 @@ public class ControlPoint implements Listener {
 
             if (progress == 0) {
                 progressingTowardsTeam = matchTeam; //change directions
-                controller = null;
-                callServiceLost(matchTeam);
+
+                if (controller != null) {
+                    callServiceLost(controller);
+                    controller = null;
+                }
             } else if (progress >= progressToCap && matchTeam == progressingTowardsTeam) {
-                if (controller == null || controller != matchTeam) {
-                    callServiceLost(matchTeam);
+                if (controller == null) {
                     controller = matchTeam;
                     callServiceCaptured(matchTeam);
                 } else {

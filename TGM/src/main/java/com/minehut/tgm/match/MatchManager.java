@@ -84,19 +84,20 @@ public class MatchManager {
 
         //create and load the match.
         Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
-        createdMatch.load(createdMatch);
+        Match oldMatch = match;
+        match = createdMatch;
+
+        createdMatch.load();
 
         //parse locations now that we have the world object.
         mapContainer.parseWorldDependentContent(world);
 
         //if a match is currently running, unload it.
-        if (match != null) {
-            File worldFolder = match.getWorld().getWorldFolder();
-            Bukkit.unloadWorld(match.getWorld(), false);
+        if (oldMatch != null) {
+            File worldFolder = oldMatch.getWorld().getWorldFolder();
+            Bukkit.unloadWorld(oldMatch.getWorld(), false);
             FileUtils.deleteDirectory(worldFolder);
         }
 
-        //we are done with the old match, set the created one as the current.
-        match = createdMatch;
     }
 }

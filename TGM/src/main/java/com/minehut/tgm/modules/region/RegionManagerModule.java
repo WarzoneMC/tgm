@@ -57,8 +57,9 @@ public class RegionManagerModule extends MatchModule {
                 default:
                     Bukkit.broadcastMessage("cuboid region");
                     region = new CuboidRegion(
+                            match.getWorld(),
                             Parser.convertLocation(match.getWorld(), regionJson.getAsJsonObject("min")),
-                            Parser.convertLocation(match.getWorld(), regionJson.getAsJsonObject("min"))
+                            Parser.convertLocation(match.getWorld(), regionJson.getAsJsonObject("max"))
                     );
                     break;
             }
