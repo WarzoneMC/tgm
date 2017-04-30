@@ -29,6 +29,10 @@ public class Players {
         player.setWalkSpeed(0.2F);
         player.setFlySpeed(0.1F);
 
+        player.setInvulnerable(false);
+        player.setCanPickupItems(true);
+        player.setCollidable(true);
+
         player.resetTitle();
 
         for (Attribute attribute : Attribute.values()) {
@@ -37,6 +41,6 @@ public class Players {
                 player.getAttribute(attribute).removeModifier(modifier);
             }
         }
-        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 4.001D, AttributeModifier.Operation.ADD_SCALAR));
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 4.000D, AttributeModifier.Operation.ADD_SCALAR));
     }
 }

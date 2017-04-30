@@ -21,6 +21,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -84,20 +85,21 @@ public class SpectatorModule extends MatchModule implements Listener {
 
                 int i = 1;
                 for (MatchTeam matchTeam : TGM.getTgm().getTeamManager().getTeams()) {
-                    totalMatchSize += matchTeam.getMembers().size();
-                    totalMatchMaxSize += matchTeam.getMax();
-
                     if (matchTeam.isSpectator()) {
                         ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
-                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                        leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
-                                + "/" + matchTeam.getMax() + " playing."));
+                        leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
+//                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
+                        leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match."));
                         itemStack.setItemMeta(leatherArmorMeta);
                         teamSelectionMenu.setItem(8, itemStack);
                     } else {
+                        totalMatchSize += matchTeam.getMembers().size();
+                        totalMatchMaxSize += matchTeam.getMax();
+
                         ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+                        leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
                         leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
                         leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
                                 + "/" + matchTeam.getMax() + " playing."));
@@ -124,6 +126,10 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().setAllowFlight(true);
         playerContext.getPlayer().setFlying(true);
 
+        playerContext.getPlayer().setInvulnerable(true);
+        playerContext.getPlayer().setCanPickupItems(false);
+        playerContext.getPlayer().setCollidable(false);
+
         playerContext.getPlayer().getInventory().setItem(0, compassItem);
         playerContext.getPlayer().getInventory().setItem(2, teamSelectionItem);
     }
@@ -133,7 +139,16 @@ public class SpectatorModule extends MatchModule implements Listener {
         if (event.getItem() != null) {
             if (event.getItem().isSimilar(teamSelectionItem)) {
                 teamSelectionMenu.open(event.getPlayer());
+                event.setCancelled(true);
+                event.getPlayer().updateInventory(); //client side glitch shows hat on head until this is called.
             }
+        }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        if (spectators.containsPlayer(event.getPlayer())) {
+            event.setCancelled(true);
         }
     }
 
