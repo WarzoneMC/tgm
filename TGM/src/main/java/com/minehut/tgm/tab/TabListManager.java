@@ -38,17 +38,23 @@ public class TabListManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerList playerList = new PlayerList(event.getPlayer(), PlayerList.SIZE_FOUR);
         playerLists.add(playerList);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(TGM.getTgm(), new Runnable() {
+            @Override
+            public void run() {
+                for (Player other : Bukkit.getOnlinePlayers()) {
+                    PlayerList otherPlayerList = getPlayerList(other);
+
+                    //remove the joining player from everyone else's tab list.
+                    otherPlayerList.removePlayer(event.getPlayer());
+
+                    //remove everyone from the joining players tab.
+                    playerList.removePlayer(other);
+                }
+            }
+        }, 0L);
+
         playerList.initTable();
-
-        for (Player other : Bukkit.getOnlinePlayers()) {
-            PlayerList otherPlayerList = getPlayerList(other);
-
-            //remove the joining player from everyone else's tab list.
-            otherPlayerList.removePlayer(event.getPlayer());
-
-            //remove everyone from the joining players tab.
-            playerList.removePlayer(other);
-        }
 
         refreshAllTabs();
     }

@@ -4,7 +4,11 @@ package com.minehut.tgm.tab;
 import java.lang.reflect.*;
 import java.util.*;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import net.minecraft.server.v1_11_R1.PacketPlayOutPlayerInfo;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class PlayerList {
@@ -143,8 +147,9 @@ public class PlayerList {
             for (Player player2 : new ArrayList<Player>(
                     (Collection<? extends Player>) ReflectionUtil.invokeMethod(
                             Bukkit.getServer(), "getOnlinePlayers", null))) {
-                Object gameProfile = GAMEPROFILECLASS.cast(ReflectionUtil
-                        .invokeMethod(player2, "getProfile", new Class[0]));
+//                Object gameProfile = GAMEPROFILECLASS.cast(ReflectionUtil
+//                        .invokeMethod(player2, "getProfile", new Class[0]));
+                GameProfile gameProfile = ((CraftPlayer) player2).getProfile();
 
                 Object craftChatMessage;
                 {
@@ -159,9 +164,13 @@ public class PlayerList {
                         craftChatMessage);
 
                 players.add(data);
+
+                Bukkit.broadcastMessage("added player to remove: " + ((GameProfile) gameProfile).getName() + " (" + ((GameProfile) gameProfile).getId().toString() + ")");
             }
-            sendNEWPackets(Bukkit.getPlayer(uuid), packet, players,
+            sendNEWPackets(Bukkit.getPlayer(this.uuid), packet, players,
                     PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
+
+            Bukkit.broadcastMessage("send remove player packet!");
         } else {
             Object olp = ReflectionUtil.invokeMethod(Bukkit.getServer(),
                     "getOnlinePlayers", null);
@@ -178,7 +187,7 @@ public class PlayerList {
                     error();
                     e.printStackTrace();
                 }
-                sendOLDPackets(Bukkit.getPlayer(uuid), packet, players[i].getName(), false);
+                sendOLDPackets(Bukkit.getPlayer(this.uuid), packet, players[i].getName(), false);
             }
         }
     }
@@ -205,7 +214,7 @@ public class PlayerList {
                 players.add(playerData);
             }
             datas.clear();
-            sendNEWPackets(Bukkit.getPlayer(uuid), packet, players,
+            sendNEWPackets(Bukkit.getPlayer(this.uuid), packet, players,
                     PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
 
         } else {
@@ -222,7 +231,7 @@ public class PlayerList {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                sendOLDPackets(Bukkit.getPlayer(uuid), packet, datasOLD.get(i), false);
+                sendOLDPackets(Bukkit.getPlayer(this.uuid), packet, datasOLD.get(i), false);
                 tabs[i] = null;
             }
             datasOLD.clear();
@@ -274,8 +283,12 @@ public class PlayerList {
                             .get());
             List<Object> players = (List<Object>) ReflectionUtil
                     .getInstanceField(packet, "b");
-            Object gameProfile = GAMEPROFILECLASS.cast(ReflectionUtil
-                    .invokeMethod(player, "getProfile", new Class[0]));
+//            Object gameProfile = GAMEPROFILECLASS.cast(ReflectionUtil
+//                    .invokeMethod(player, "getProfile", new Class[0]));
+
+//            Object gameProfile = ReflectionUtil.instantiate(
+//                    GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id));
+            GameProfile gameProfile = ((CraftPlayer) player).getProfile();
             Object craftChatMessage;
             {
                 Object[] array = (Object[]) ReflectionUtil.invokeMethod(
@@ -288,7 +301,7 @@ public class PlayerList {
                     gameProfile, 1, WORLD_GAME_MODE_NOT_SET,
                     craftChatMessage);
             players.add(data);
-            sendNEWPackets(player, packet, players,
+            sendNEWPackets(Bukkit.getPlayer(this.uuid), packet, players,
                     PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
         } else {
             Object packet = null;
@@ -337,7 +350,7 @@ public class PlayerList {
                     break;
                 }
             }
-            sendNEWPackets(Bukkit.getPlayer(uuid), packet, players,
+            sendNEWPackets(Bukkit.getPlayer(this.uuid), packet, players,
                     PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
         } else {
             Object packet = null;
@@ -351,7 +364,7 @@ public class PlayerList {
                 error();
                 e.printStackTrace();
             }
-            sendOLDPackets(Bukkit.getPlayer(uuid), packet, datasOLD.get(id), false);
+            sendOLDPackets(Bukkit.getPlayer(this.uuid), packet, datasOLD.get(id), false);
             if (remove) {
                 tabs[id] = null;
                 datasOLD.remove(id);
@@ -386,11 +399,11 @@ public class PlayerList {
     @Deprecated
     public void addValue(int id, String name) {
         UUID uuid;
-        OfflinePlayer p = Bukkit.getOfflinePlayer(name);
-        if(p.hasPlayedBefore())
-            uuid = p.getUniqueId();
-        else
+        if(name.length() > 0 && Bukkit.getOfflinePlayer(name).hasPlayedBefore()) {
+            uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
+        }else{
             uuid=UUID.randomUUID();
+        }
         this.addValue(id, name,uuid);
     }
 
@@ -413,8 +426,13 @@ public class PlayerList {
                             .get());
             List<Object> players = (List<Object>) ReflectionUtil
                     .getInstanceField(packet, "b");
-            Object gameProfile = ReflectionUtil.instantiate(
-                    GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id));
+//            Object gameProfile = ReflectionUtil.instantiate(
+//                    GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id));
+            GameProfile gameProfile = new GameProfile(uuid, getNameFromID(id));
+            if (name.equals("")) {
+                gameProfile.getProperties().put("textures", new Property("textures", "eyJ0aW1lc3RhbXAiOjE0MTEyNjg3OTI3NjUsInByb2ZpbGVJZCI6IjNmYmVjN2RkMGE1ZjQwYmY5ZDExODg1YTU0NTA3MTEyIiwicHJvZmlsZU5hbWUiOiJsYXN0X3VzZXJuYW1lIiwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzg0N2I1Mjc5OTg0NjUxNTRhZDZjMjM4YTFlM2MyZGQzZTMyOTY1MzUyZTNhNjRmMzZlMTZhOTQwNWFiOCJ9fX0=", "u8sG8tlbmiekrfAdQjy4nXIcCfNdnUZzXSx9BE1X5K27NiUvE1dDNIeBBSPdZzQG1kHGijuokuHPdNi/KXHZkQM7OJ4aCu5JiUoOY28uz3wZhW4D+KG3dH4ei5ww2KwvjcqVL7LFKfr/ONU5Hvi7MIIty1eKpoGDYpWj3WjnbN4ye5Zo88I2ZEkP1wBw2eDDN4P3YEDYTumQndcbXFPuRRTntoGdZq3N5EBKfDZxlw4L3pgkcSLU5rWkd5UH4ZUOHAP/VaJ04mpFLsFXzzdU4xNZ5fthCwxwVBNLtHRWO26k/qcVBzvEXtKGFJmxfLGCzXScET/OjUBak/JEkkRG2m+kpmBMgFRNtjyZgQ1w08U6HHnLTiAiio3JswPlW5v56pGWRHQT5XWSkfnrXDalxtSmPnB5LmacpIImKgL8V9wLnWvBzI7SHjlyQbbgd+kUOkLlu7+717ySDEJwsFJekfuR6N/rpcYgNZYrxDwe4w57uDPlwNL6cJPfNUHV7WEbIU1pMgxsxaXe8WSvV87qLsR7H06xocl2C0JFfe2jZR4Zh3k9xzEnfCeFKBgGb4lrOWBu1eDWYgtKV67M2Y+B3W5pjuAjwAxn0waODtEn/3jKPbc/sxbPvljUCw65X+ok0UUN1eOwXV5l2EGzn05t3Yhwq19/GxARg63ISGE8CKw="));
+            }
+
             Object craftChatMessage;
             Object[] array = (Object[]) ReflectionUtil.invokeMethod(
                     CRAFT_CHAT_MESSAGE_CLASS, null, "fromString",
@@ -433,7 +451,7 @@ public class PlayerList {
             players.add(data);
             datas.add(data);
 
-            sendNEWPackets(Bukkit.getPlayer(uuid), packet, players,
+            sendNEWPackets(Bukkit.getPlayer(this.uuid), packet, players,
                     PACKET_PLAYER_INFO_ACTION_ADD_PLAYER);
         } else {
             Object packet = null;
@@ -447,7 +465,7 @@ public class PlayerList {
                 error();
                 e.printStackTrace();
             }
-            sendOLDPackets(Bukkit.getPlayer(uuid), packet, getNameFromID(id) + name, true);
+            sendOLDPackets(Bukkit.getPlayer(this.uuid), packet, getNameFromID(id) + name, true);
             tabs[id] = name;
             datasOLD.put(id, getNameFromID(id) + name);
         }
