@@ -11,6 +11,8 @@ The project should strive to make new gametype development as straightforward as
 2. **Map.json scripting language.**
 Maps need access to a baseline scripting service that allow for map-specific dynamic content.
 As an example, a map should be able to provide different spawn points as the match time progresses.
+
+3. This project is heavily influenced by [PGM](https://github.com/OvercastNetwork/ProjectAres). Our goal with TGM is to shift more of the game logic to Java as opposed to map configuration files. This allows for rapid development and modernization of gamemodes over time. 
 ```
 "spawns": [
 		{ 
