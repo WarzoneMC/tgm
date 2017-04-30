@@ -23,7 +23,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.Arrays;
@@ -70,8 +72,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                         player.performCommand("join " + matchTeam.getId());
                     }
                 });
+                slot++;
             }
-            slot++;
         }
 
         /**
@@ -90,7 +92,9 @@ public class SpectatorModule extends MatchModule implements Listener {
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
                         leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
 //                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                        leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match."));
+                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                        leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match.", "", ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString() + " spectating."));
                         itemStack.setItemMeta(leatherArmorMeta);
                         teamSelectionMenu.setItem(8, itemStack);
                     } else {
@@ -101,16 +105,23 @@ public class SpectatorModule extends MatchModule implements Listener {
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
                         leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
                         leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
+                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                         leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
-                                + "/" + matchTeam.getMax() + " playing."));
+                                + "/" + matchTeam.getMax() + " playing.", "", ChatColor.LIGHT_PURPLE +  "Only premium users can choose their team.", ChatColor.LIGHT_PURPLE + "Everyone can use " + ChatColor.WHITE + "Auto Join " + ChatColor.LIGHT_PURPLE + "to play."));
                         itemStack.setItemMeta(leatherArmorMeta);
                         teamSelectionMenu.setItem(i, itemStack);
                     }
                     i++;
                 }
 
-                teamSelectionMenu.setItem(0, ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.GRAY + "Auto Join",
-                        Arrays.asList(ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing.")));
+                ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + "Auto Join",
+                        Arrays.asList(ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
+                ItemMeta autoJoinHelmetMeta = autoJoinHelmet.getItemMeta();
+                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                autoJoinHelmet.setItemMeta(autoJoinHelmetMeta);
+                teamSelectionMenu.setItem(0, autoJoinHelmet);
             }
         }, 0L, 20L);
     }
