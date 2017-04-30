@@ -3,6 +3,7 @@ package com.minehut.tgm.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.minehut.tgm.modules.region.Region;
 import org.bukkit.Location;
 import org.bukkit.World;
 
