@@ -19,7 +19,6 @@ import org.bukkit.Location;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleData(load = ModuleLoadTime.EARLIEST)
 public class SpawnPointLoaderModule extends MatchModule {
 
     @Override
@@ -35,7 +34,7 @@ public class SpawnPointLoaderModule extends MatchModule {
             List<MatchTeam> teams = new ArrayList<>();
             for (Object o : spawnJson.getAsJsonArray("teams")) {
                 String teamId = ((JsonPrimitive) o).getAsString();
-                MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeamById(teamId);
+                MatchTeam team = match.getModule(TeamManagerModule.class).getTeamById(teamId);
                 if (team != null) {
                     teams.add(team);
                 }

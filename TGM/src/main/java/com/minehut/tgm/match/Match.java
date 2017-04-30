@@ -36,7 +36,7 @@ public class Match {
      * Called right after the world has loaded.
      * No players are in the world at this point.
      */
-    public void load(Match match) {
+    public void load() {
         for (MatchModule module : matchManifest.allocateCoreModules()) {
             modules.add(module);
         }
@@ -54,7 +54,7 @@ public class Match {
         int listenerCount = 0;
         for (ModuleLoadTime moduleLoadTime : ModuleLoadTime.values()) {
             for (MatchModule matchModule : getModules(moduleLoadTime)) {
-                matchModule.load(match);
+                matchModule.load(this);
 
                 //automatically register modules that implement listener.
                 if (matchModule instanceof Listener) {

@@ -37,13 +37,20 @@ public class SpectatorModule extends MatchModule implements Listener {
     @Getter private final ItemStack compassItem;
     @Getter private final ItemStack teamSelectionItem;
 
-    @Getter private final int teamSelectionRunnable;
+    @Getter private int teamSelectionRunnable;
 
     public SpectatorModule() {
         this.teamSelectionMenu = new PublicMenu(TGM.get(), ChatColor.UNDERLINE + "Team Selection", 9);
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Team Selection");
+    }
+
+
+
+    @Override
+    public void load(Match match) {
+        this.spectators = match.getModule(TeamManagerModule.class).getSpectators();
 
         /**
          * Only assign the menu actions once. No need to update these every second.
@@ -56,7 +63,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         });
 
         int slot = 2;
-        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+        for (MatchTeam matchTeam : match.getModule(TeamManagerModule.class).getTeams()) {
             if (matchTeam.isSpectator()) {
                 teamSelectionMenu.setItem(8, null, new MenuAction() {
                     @Override
@@ -92,7 +99,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 int totalMatchMaxSize = 0;
 
                 int i = 2;
-                for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+                for (MatchTeam matchTeam : match.getModule(TeamManagerModule.class).getTeams()) {
                     if (matchTeam.isSpectator()) {
                         ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
@@ -131,11 +138,6 @@ public class SpectatorModule extends MatchModule implements Listener {
                 teamSelectionMenu.setItem(0, autoJoinHelmet);
             }
         }, 0L, 20L);
-    }
-
-    @Override
-    public void load(Match match) {
-        this.spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
     }
 
     private void applySpectatorKit(PlayerContext playerContext) {
