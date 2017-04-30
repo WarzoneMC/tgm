@@ -257,15 +257,33 @@ public class PlayerList {
      * @param id
      * @param newName
      */
-    public void updateSlot(int id, String newName) {
+    public void updateSlot(int id, String newName, Property texture) {
         if (ReflectionUtil.isVersionHigherThan(1, 8)) {
             removeCustomTab(id, true);
-            addValue(id, newName);
+            addValue(id, newName, texture);
         } else {
             for (int i = id; i < size; i++)
                 removeCustomTab(i, false);
             for (int i = id; i < size; i++)
-                addValue(i, (i == id) ? newName : datasOLD.get(i).substring(2));
+                addValue(i, (i == id) ? newName : datasOLD.get(i).substring(2), texture);
+        }
+    }
+
+    /**
+     * Use this for changing a value at a specific tab.
+     *
+     * @param id
+     * @param newName
+     */
+    public void updateSlot(int id, String newName, UUID uuid, Property texture) {
+        if (ReflectionUtil.isVersionHigherThan(1, 8)) {
+            removeCustomTab(id, true);
+            addValue(id, newName, uuid, texture);
+        } else {
+            for (int i = id; i < size; i++)
+                removeCustomTab(i, false);
+            for (int i = id; i < size; i++)
+                addValue(i, (i == id) ? newName : datasOLD.get(i).substring(2), texture);
         }
     }
 
@@ -384,7 +402,7 @@ public class PlayerList {
      * @param player
      */
     public void addExistingPlayer(int id, String name, OfflinePlayer player) {
-        addValue(id, name, player.getUniqueId());
+        addValue(id, name, player.getUniqueId(), null);
     }
 
     /**
@@ -397,14 +415,14 @@ public class PlayerList {
      *             bounds. Use the "updateSlot" method to change a slot.
      */
     @Deprecated
-    public void addValue(int id, String name) {
+    public void addValue(int id, String name, Property texture) {
         UUID uuid;
         if(name.length() > 0 && Bukkit.getOfflinePlayer(name).hasPlayedBefore()) {
             uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
         }else{
             uuid=UUID.randomUUID();
         }
-        this.addValue(id, name,uuid);
+        this.addValue(id, name, uuid, texture);
     }
 
     /**
@@ -418,7 +436,7 @@ public class PlayerList {
      */
     @SuppressWarnings("unchecked")
     @Deprecated
-    public void addValue(int id, String name, UUID uuid) {
+    public void addValue(int id, String name, UUID uuid, Property texture) {
         if (ReflectionUtil.isVersionHigherThan(1, 8)) {
             Object packet = ReflectionUtil
                     .instantiate((Constructor<?>) ReflectionUtil
@@ -429,8 +447,8 @@ public class PlayerList {
 //            Object gameProfile = ReflectionUtil.instantiate(
 //                    GAMEPROPHILECONSTRUCTOR, uuid, getNameFromID(id));
             GameProfile gameProfile = new GameProfile(uuid, getNameFromID(id));
-            if (name.equals("")) {
-                gameProfile.getProperties().put("textures", new Property("textures", "eyJ0aW1lc3RhbXAiOjE0MTEyNjg3OTI3NjUsInByb2ZpbGVJZCI6IjNmYmVjN2RkMGE1ZjQwYmY5ZDExODg1YTU0NTA3MTEyIiwicHJvZmlsZU5hbWUiOiJsYXN0X3VzZXJuYW1lIiwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzg0N2I1Mjc5OTg0NjUxNTRhZDZjMjM4YTFlM2MyZGQzZTMyOTY1MzUyZTNhNjRmMzZlMTZhOTQwNWFiOCJ9fX0=", "u8sG8tlbmiekrfAdQjy4nXIcCfNdnUZzXSx9BE1X5K27NiUvE1dDNIeBBSPdZzQG1kHGijuokuHPdNi/KXHZkQM7OJ4aCu5JiUoOY28uz3wZhW4D+KG3dH4ei5ww2KwvjcqVL7LFKfr/ONU5Hvi7MIIty1eKpoGDYpWj3WjnbN4ye5Zo88I2ZEkP1wBw2eDDN4P3YEDYTumQndcbXFPuRRTntoGdZq3N5EBKfDZxlw4L3pgkcSLU5rWkd5UH4ZUOHAP/VaJ04mpFLsFXzzdU4xNZ5fthCwxwVBNLtHRWO26k/qcVBzvEXtKGFJmxfLGCzXScET/OjUBak/JEkkRG2m+kpmBMgFRNtjyZgQ1w08U6HHnLTiAiio3JswPlW5v56pGWRHQT5XWSkfnrXDalxtSmPnB5LmacpIImKgL8V9wLnWvBzI7SHjlyQbbgd+kUOkLlu7+717ySDEJwsFJekfuR6N/rpcYgNZYrxDwe4w57uDPlwNL6cJPfNUHV7WEbIU1pMgxsxaXe8WSvV87qLsR7H06xocl2C0JFfe2jZR4Zh3k9xzEnfCeFKBgGb4lrOWBu1eDWYgtKV67M2Y+B3W5pjuAjwAxn0waODtEn/3jKPbc/sxbPvljUCw65X+ok0UUN1eOwXV5l2EGzn05t3Yhwq19/GxARg63ISGE8CKw="));
+            if (texture != null) {
+                gameProfile.getProperties().put("textures", texture);
             }
 
             Object craftChatMessage;
@@ -476,10 +494,10 @@ public class PlayerList {
      * then this should be called right after the playlist instance has been
      * created.
      */
-    public void initTable() {
+    public void initTable(Property texture) {
         clearAll();
         for (int i = 0; i < size; i++)
-            addValue(i, "");
+            addValue(i, "", texture);
     }
 
     private static void sendNEWPackets(Player player, Object packet,

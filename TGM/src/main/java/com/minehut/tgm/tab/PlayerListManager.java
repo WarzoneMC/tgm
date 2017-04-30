@@ -15,18 +15,20 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TabListManager implements Listener {
+public class PlayerListManager implements Listener {
     @Getter
     private final List<PlayerList> playerLists = new ArrayList<>();
 
-    public TabListManager() {
+    @Getter private PlayerListController playerListController;
+
+    public PlayerListManager() {
+        this.playerListController = new PlayerListControllerImpl(this);
+
         TGM.registerEvents(this);
     }
 
     @EventHandler
     public void onMatchJoin(MatchJoinEvent event) {
-
-
         refreshAllTabs();
     }
 
@@ -51,12 +53,11 @@ public class TabListManager implements Listener {
                     //remove everyone from the joining players tab.
                     playerList.removePlayer(other);
                 }
+
+                playerList.initTable(playerListController.getBlankTexture());
+                refreshAllTabs();
             }
         }, 0L);
-
-        playerList.initTable();
-
-        refreshAllTabs();
     }
 
     @EventHandler
@@ -65,9 +66,7 @@ public class TabListManager implements Listener {
     }
 
     public void refreshPlayerTab(PlayerContext playerContext) {
-        PlayerList playerList = getPlayerList(playerContext.getPlayer());
-        playerList.updateSlot(0,"Top Left tab");
-        playerList.updateSlot(79,"Top Right tab");
+        playerListController.refreshView(playerContext);
     }
 
     public void refreshAllTabs() {

@@ -12,7 +12,7 @@ import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.player.PlayerManager;
-import com.minehut.tgm.tab.TabListManager;
+import com.minehut.tgm.tab.PlayerListManager;
 import com.minehut.tgm.team.TeamManager;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -44,7 +44,7 @@ public class TGM extends JavaPlugin {
     @Getter private PlayerManager playerManager;
     @Getter private JoinManager joinManager;
     @Getter private TeamManager teamManager;
-    @Getter private TabListManager tabListManager;
+    @Getter private PlayerListManager playerListManager;
 
     @Override
     public void onEnable() {
@@ -87,7 +87,7 @@ public class TGM extends JavaPlugin {
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
         teamManager = new TeamManager();
-        tabListManager = new TabListManager();
+        playerListManager = new PlayerListManager();
 
         try {
             matchManager.cycleNextMatch();
