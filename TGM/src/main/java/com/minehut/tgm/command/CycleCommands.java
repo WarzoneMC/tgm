@@ -3,11 +3,13 @@ package com.minehut.tgm.command;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchStatus;
 import com.minehut.tgm.team.MatchTeam;
+import com.minehut.tgm.user.PlayerContext;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.io.IOException;
 
@@ -53,6 +55,39 @@ public class CycleCommands {
         } else {
             sender.sendMessage(ChatColor.RED + "No match in progress.");
         }
+    }
+
+    @Command(aliases = {"join"}, desc = "Join a team.")
+    public static void join(CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() == 0) {
+            MatchTeam matchTeam = TGM.getTgm().getTeamManager().getSmallestTeam();
+            attemptJoinTeam((Player) sender, matchTeam, true);
+        } else {
+            MatchTeam matchTeam = TGM.getTgm().getTeamManager().getTeamFromInput(cmd.getJoinedStrings(0));
+            if (matchTeam == null) {
+                sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
+                return;
+            }
+
+            attemptJoinTeam((Player) sender, matchTeam, false);
+        }
+    }
+
+    public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin) {
+        if (matchTeam.getMembers().size() >= matchTeam.getMax()) {
+            player.sendMessage(ChatColor.RED + "Team full! Wait for a spot to open up.");
+            return;
+        }
+
+        if (!autoJoin) {
+            if (!player.hasPermission("tgm.pickteam")) {
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can choose their team. Use " + ChatColor.WHITE + "Auto Join " + ChatColor.LIGHT_PURPLE + "instead.");
+                return;
+            }
+        }
+
+        PlayerContext playerContext = TGM.getPlayerManager().getPlayerContext(player);
+        TGM.getTgm().getTeamManager().joinTeam(playerContext, matchTeam);
     }
 
 }

@@ -6,11 +6,15 @@ import java.util.*;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class PlayerList {
+    @Getter
+    private final Property blankTexture = new Property("textures", "eyJ0aW1lc3RhbXAiOjE0MTEyNjg3OTI3NjUsInByb2ZpbGVJZCI6IjNmYmVjN2RkMGE1ZjQwYmY5ZDExODg1YTU0NTA3MTEyIiwicHJvZmlsZU5hbWUiOiJsYXN0X3VzZXJuYW1lIiwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzg0N2I1Mjc5OTg0NjUxNTRhZDZjMjM4YTFlM2MyZGQzZTMyOTY1MzUyZTNhNjRmMzZlMTZhOTQwNWFiOCJ9fX0=", "u8sG8tlbmiekrfAdQjy4nXIcCfNdnUZzXSx9BE1X5K27NiUvE1dDNIeBBSPdZzQG1kHGijuokuHPdNi/KXHZkQM7OJ4aCu5JiUoOY28uz3wZhW4D+KG3dH4ei5ww2KwvjcqVL7LFKfr/ONU5Hvi7MIIty1eKpoGDYpWj3WjnbN4ye5Zo88I2ZEkP1wBw2eDDN4P3YEDYTumQndcbXFPuRRTntoGdZq3N5EBKfDZxlw4L3pgkcSLU5rWkd5UH4ZUOHAP/VaJ04mpFLsFXzzdU4xNZ5fthCwxwVBNLtHRWO26k/qcVBzvEXtKGFJmxfLGCzXScET/OjUBak/JEkkRG2m+kpmBMgFRNtjyZgQ1w08U6HHnLTiAiio3JswPlW5v56pGWRHQT5XWSkfnrXDalxtSmPnB5LmacpIImKgL8V9wLnWvBzI7SHjlyQbbgd+kUOkLlu7+717ySDEJwsFJekfuR6N/rpcYgNZYrxDwe4w57uDPlwNL6cJPfNUHV7WEbIU1pMgxsxaXe8WSvV87qLsR7H06xocl2C0JFfe2jZR4Zh3k9xzEnfCeFKBgGb4lrOWBu1eDWYgtKV67M2Y+B3W5pjuAjwAxn0waODtEn/3jKPbc/sxbPvljUCw65X+ok0UUN1eOwXV5l2EGzn05t3Yhwq19/GxARg63ISGE8CKw=");
+
     private static final Class<?> PACKET_PLAYER_INFO_CLASS = ReflectionUtil
             .isVersionHigherThan(1, 7) ? ReflectionUtil
             .getNMSClass("PacketPlayOutPlayerInfo") : ReflectionUtil
@@ -362,13 +366,16 @@ public class PlayerList {
                     tabs[getIDFromName(((String) ReflectionUtil.invokeMethod(
                             gameProfile, "getName", null)))] = "";
                     players.add(playerData);
-                    if (remove)
+                    if (remove) {
                         datas.remove(playerData);
+                    }
                     break;
                 }
             }
             sendNEWPackets(Bukkit.getPlayer(this.uuid), packet, players,
                     PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
+
+//            addValue(id, "", blankTexture);
         } else {
             Object packet = null;
             try {
@@ -415,13 +422,13 @@ public class PlayerList {
      */
     @Deprecated
     public void addValue(int id, String name, Property texture) {
-        UUID uuid;
-        if(name.length() > 0 && Bukkit.getOfflinePlayer(name).hasPlayedBefore()) {
-            uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
-        }else{
-            uuid=UUID.randomUUID();
-        }
-        this.addValue(id, name, uuid, texture);
+//        UUID uuid;
+//        if(name.length() > 0 && Bukkit.getOfflinePlayer(name).hasPlayedBefore()) {
+//            uuid = Bukkit.getOfflinePlayer(name).getUniqueId();
+//        }else{
+//            uuid=UUID.randomUUID();
+//        }
+        this.addValue(id, name, UUID.randomUUID(), texture);
     }
 
     /**

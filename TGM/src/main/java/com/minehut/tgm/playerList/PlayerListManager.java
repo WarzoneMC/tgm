@@ -32,6 +32,11 @@ public class PlayerListManager implements Listener {
         refreshAllTabs();
     }
 
+    @EventHandler
+    public void onTeamChange(TeamChangeEvent event) {
+        refreshAllTabs();
+    }
+
     /**
      * Stops vanilla playerList items from displaying.
      * Only our custom playerList items should be displayed.
@@ -58,11 +63,6 @@ public class PlayerListManager implements Listener {
                 refreshAllTabs();
             }
         }, 0L);
-    }
-
-    @EventHandler
-    public void onTeamChange(TeamChangeEvent event) {
-        refreshAllTabs();
     }
 
     public void refreshPlayerTab(PlayerContext playerContext) {

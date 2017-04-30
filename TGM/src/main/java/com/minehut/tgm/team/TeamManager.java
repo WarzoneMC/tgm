@@ -124,4 +124,23 @@ public class TeamManager implements Listener {
         }
         return null;
     }
+
+    public MatchTeam getSmallestTeam() {
+        MatchTeam smallest = null;
+
+        for (MatchTeam matchTeam : teams) {
+            if (!matchTeam.isSpectator()) {
+                if (smallest == null) {
+                    smallest = matchTeam;
+                    continue;
+                }
+
+                if (((double) matchTeam.getMembers().size()) / matchTeam.getMax() < ((double) smallest.getMembers().size()) / smallest.getMax()) {
+                    smallest = matchTeam;
+                }
+            }
+        }
+
+        return smallest;
+    }
 }

@@ -19,7 +19,7 @@ public class MatchResultModule extends MatchModule implements Listener {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (spectators.containsPlayer(player)) {
-                player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1f);
+                player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, 1f, 1f);
             } else {
                 if (event.getWinningTeam() == null) {
                     player.sendTitle("", ChatColor.YELLOW + "The result was a tie!", 10, 40, 10);

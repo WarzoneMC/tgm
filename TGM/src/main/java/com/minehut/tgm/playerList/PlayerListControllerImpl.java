@@ -61,7 +61,7 @@ public class PlayerListControllerImpl implements PlayerListController {
 
                 for(int i = 0; i < matchTeam.getMembers().size(); i++) {
                     Player player = matchTeam.getMembers().get(i).getPlayer();
-                    playerList.updateSlot(teamTitleSlot + i + 1, matchTeam.getColor() + ChatColor.BOLD.toString() + player.getName(), player.getUniqueId(), null);
+                    playerList.updateSlot(teamTitleSlot + i + 1, matchTeam.getColor() + player.getName(), player.getUniqueId(), null);
                 }
 
                 currentTeamIndex++;
