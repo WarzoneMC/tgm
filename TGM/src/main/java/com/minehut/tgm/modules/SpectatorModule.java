@@ -56,7 +56,7 @@ public class SpectatorModule extends MatchModule implements Listener {
             }
         });
 
-        int slot = 1;
+        int slot = 2;
         for (MatchTeam matchTeam : TGM.getTgm().getTeamManager().getTeams()) {
             if (matchTeam.isSpectator()) {
                 teamSelectionMenu.setItem(8, null, new MenuAction() {
@@ -76,6 +76,13 @@ public class SpectatorModule extends MatchModule implements Listener {
             }
         }
 
+        teamSelectionMenu.setItem(0, null, new MenuAction() {
+            @Override
+            public void run(Player player) {
+                player.performCommand("join spectators");
+            }
+        });
+
         /**
          * Update the item values every second to keep player counts accurate.
          */
@@ -85,7 +92,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 int totalMatchSize = 0;
                 int totalMatchMaxSize = 0;
 
-                int i = 1;
+                int i = 2;
                 for (MatchTeam matchTeam : TGM.getTgm().getTeamManager().getTeams()) {
                     if (matchTeam.isSpectator()) {
                         ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
@@ -111,8 +118,9 @@ public class SpectatorModule extends MatchModule implements Listener {
                                 + "/" + matchTeam.getMax() + " playing.", "", ChatColor.LIGHT_PURPLE +  "Only premium users can choose their team.", ChatColor.LIGHT_PURPLE + "Everyone can use " + ChatColor.WHITE + "Auto Join " + ChatColor.LIGHT_PURPLE + "to play."));
                         itemStack.setItemMeta(leatherArmorMeta);
                         teamSelectionMenu.setItem(i, itemStack);
+
+                        i++;
                     }
-                    i++;
                 }
 
                 ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
