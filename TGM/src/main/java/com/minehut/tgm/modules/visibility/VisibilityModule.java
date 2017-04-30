@@ -2,6 +2,7 @@ package com.minehut.tgm.modules.visibility;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.join.MatchJoinEvent;
+import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.modules.SpectatorModule;
 import com.minehut.tgm.team.TeamChangeEvent;
@@ -13,10 +14,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class VisibilityModule extends MatchModule implements Listener {
-    @Getter private final VisibilityController visibilityController;
+    @Getter private VisibilityController visibilityController;
 
     public VisibilityModule() {
-        visibilityController = new VisibilityControllerImpl(TGM.getMatchManager().getMatch().getModule(SpectatorModule.class));
+
+    }
+
+    @Override
+    public void load(Match match) {
+        visibilityController = new VisibilityControllerImpl(match.getModule(SpectatorModule.class));
     }
 
     @EventHandler
@@ -30,6 +36,7 @@ public class VisibilityModule extends MatchModule implements Listener {
     }
 
     public void refreshPlayer(Player player) {
+        if(player == null) return;
 
         //update who can see the player.
         for (Player eyes : Bukkit.getOnlinePlayers()) {
