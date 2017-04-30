@@ -49,6 +49,8 @@ public class PlayerListManager implements Listener {
         Bukkit.getScheduler().scheduleSyncDelayedTask(TGM.getTgm(), new Runnable() {
             @Override
             public void run() {
+                playerList.initTable(playerListController.getBlankTexture());
+
                 for (Player other : Bukkit.getOnlinePlayers()) {
                     PlayerList otherPlayerList = getPlayerList(other);
 
@@ -58,8 +60,6 @@ public class PlayerListManager implements Listener {
                     //remove everyone from the joining players playerList.
                     playerList.removePlayer(other);
                 }
-
-                playerList.initTable(playerListController.getBlankTexture());
                 refreshAllTabs();
             }
         }, 0L);

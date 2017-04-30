@@ -38,6 +38,8 @@ public class MapContainer {
     }
 
     private void parseLocations(World world) {
+        if(!mapInfo.getJsonObject().has("locations")) return;
+
         JsonArray jsonArray = mapInfo.getJsonObject().getAsJsonArray("locations");
         for (JsonElement locationElement : jsonArray) {
             JsonObject locationJson = locationElement.getAsJsonObject();

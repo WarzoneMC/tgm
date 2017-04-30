@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by luke on 4/27/17.
  */
-public class DominationManifest extends MatchManifest {
+public class KOTHManifest extends MatchManifest {
 
     @Override
     public List<MatchModule> allocateGameModules() {

@@ -9,7 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum GameType {
     TDM("TDM", TDMManifest.class),
-    DOMINATION("Domination", DominationManifest.class);
+    KOTH("King of the Hill", KOTHManifest.class);
 
     @Getter private String name;
     @Getter private Class manifest;

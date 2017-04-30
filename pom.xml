@@ -12,7 +12,6 @@
     <modules>
         <module>api</module>
         <module>tgm</module>
-        <module>backend</module>
     </modules>
 
     <repositories>

@@ -1,10 +1,7 @@
 package com.minehut.tgm.modules;
 
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.match.Match;
-import com.minehut.tgm.match.MatchModule;
-import com.minehut.tgm.match.ModuleData;
-import com.minehut.tgm.match.ModuleLoadTime;
+import com.minehut.tgm.match.*;
 import com.minehut.tgm.team.MatchTeam;
 import com.minehut.tgm.team.TeamChangeEvent;
 import com.minehut.tgm.user.PlayerContext;
@@ -21,6 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -153,6 +151,23 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().getInventory().setItem(2, teamSelectionItem);
     }
 
+    /**
+     * Players who are on an actual team during pre/post
+     * should still be counted as spectating.
+     *
+     * We also may need to count players as spectators
+     * when we implement a death timer system.
+     *
+     */
+    public boolean isSpectating(Player player) {
+        MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
+        if (matchStatus == MatchStatus.MID) {
+            return spectators.containsPlayer(player);
+        } else {
+            return true;
+        }
+    }
+
     @EventHandler
     public void onHotbarClick(PlayerInteractEvent event) {
         if (event.getItem() != null) {
@@ -166,8 +181,16 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        if (spectators.containsPlayer(event.getPlayer())) {
+        if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onHunger(FoodLevelChangeEvent event) {
+        if (isSpectating((Player) event.getEntity())) {
+            event.setCancelled(true);
+            event.setFoodLevel(20);
         }
     }
 
