@@ -23,7 +23,7 @@ public class TabListModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         //todo: show all authors.
-        header = match.getMapContainer().getMapInfo().getName() + ChatColor.YELLOW + " by " + match.getMapContainer().getMapInfo().getAuthors().get(0);
+        header = ChatColor.WHITE + ChatColor.BOLD.toString() + match.getMapContainer().getMapInfo().getName() + ChatColor.YELLOW + " by " + match.getMapContainer().getMapInfo().getAuthors().get(0);
     }
 
     @EventHandler

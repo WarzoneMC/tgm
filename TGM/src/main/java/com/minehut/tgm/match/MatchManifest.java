@@ -34,6 +34,7 @@ public abstract class MatchManifest {
         modules.add(new VisibilityModule());
         modules.add(new TimeModule());
         modules.add(new TabListModule());
+        modules.add(new MatchProgressNotifications());
 
         return modules;
     }
