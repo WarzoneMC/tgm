@@ -1,7 +1,8 @@
 package com.minehut.tgm.playerList;
 
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.team.MatchTeam;
+import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import com.mojang.authlib.properties.Property;
 import com.sk89q.minecraft.util.commands.ChatColor;
@@ -26,7 +27,7 @@ public class PlayerListControllerImpl implements PlayerListController {
     public void refreshView(PlayerContext playerContext) {
         PlayerList playerList = playerListManager.getPlayerList(playerContext.getPlayer());
 
-        List<MatchTeam> teams = TGM.getTgm().getTeamManager().getTeams();
+        List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
         int currentTeamIndex = 0;
         int amountOfTeams = teams.size() - 1; //subtract one to not count spectators.

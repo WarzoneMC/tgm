@@ -2,7 +2,7 @@ package com.minehut.tgm.playerList;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.join.MatchJoinEvent;
-import com.minehut.tgm.team.TeamChangeEvent;
+import com.minehut.tgm.modules.team.TeamChangeEvent;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -46,7 +46,7 @@ public class PlayerListManager implements Listener {
         PlayerList playerList = new PlayerList(event.getPlayer(), PlayerList.SIZE_FOUR);
         playerLists.add(playerList);
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(TGM.getTgm(), new Runnable() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(TGM.get(), new Runnable() {
             @Override
             public void run() {
                 playerList.initTable(playerListController.getBlankTexture());
@@ -70,7 +70,7 @@ public class PlayerListManager implements Listener {
     }
 
     public void refreshAllTabs() {
-        for (PlayerContext playerContext : TGM.getPlayerManager().getPlayers()) {
+        for (PlayerContext playerContext : TGM.get().getPlayerManager().getPlayers()) {
             refreshPlayerTab(playerContext);
         }
     }

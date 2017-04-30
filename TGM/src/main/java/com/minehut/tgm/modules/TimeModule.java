@@ -23,7 +23,7 @@ public class TimeModule extends MatchModule {
     }
 
     public double getTimeElapsed() {
-        MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.MID) {
             return (double) ((System.currentTimeMillis() - startedTimeStamp) / 1000);
         } else if (matchStatus == MatchStatus.POST) {

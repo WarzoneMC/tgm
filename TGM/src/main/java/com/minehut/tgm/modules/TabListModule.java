@@ -35,7 +35,7 @@ public class TabListModule extends MatchModule implements Listener {
     public void enable() {
         refreshAllTabs();
 
-        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.getTgm(), new Runnable() {
+        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
             @Override
             public void run() {
                 refreshAllTabs();
@@ -44,7 +44,7 @@ public class TabListModule extends MatchModule implements Listener {
     }
 
     private void refreshTab(Player player) {
-        MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
 
         ChatColor timeColor = ChatColor.GREEN;
         if (matchStatus == MatchStatus.PRE) {
@@ -53,7 +53,7 @@ public class TabListModule extends MatchModule implements Listener {
             timeColor = ChatColor.RED;
         }
 
-        String footer = ChatColor.GRAY + "Time: " + timeColor + Strings.formatTime(TGM.getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed());
+        String footer = ChatColor.GRAY + "Time: " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed());
         TitleAPI.sendTabTitle(player, header, footer);
     }
     private void refreshAllTabs() {

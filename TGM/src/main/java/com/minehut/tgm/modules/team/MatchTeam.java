@@ -1,4 +1,4 @@
-package com.minehut.tgm.team;
+package com.minehut.tgm.modules.team;
 
 import com.minehut.tgm.map.SpawnPoint;
 import com.minehut.tgm.user.PlayerContext;

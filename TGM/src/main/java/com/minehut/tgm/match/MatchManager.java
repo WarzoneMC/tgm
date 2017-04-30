@@ -2,7 +2,8 @@ package com.minehut.tgm.match;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.map.*;
-import com.minehut.tgm.team.MatchTeam;
+import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -38,7 +39,7 @@ public class MatchManager {
 
     public void endMatch(MatchTeam winningTeam) {
         List<MatchTeam> losers = new ArrayList<>();
-        for (MatchTeam matchTeam : TGM.getTgm().getTeamManager().getTeams()) {
+        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (!matchTeam.isSpectator() && matchTeam != winningTeam) {
                 losers.add(matchTeam);
             }

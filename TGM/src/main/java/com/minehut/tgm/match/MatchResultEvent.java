@@ -1,6 +1,6 @@
 package com.minehut.tgm.match;
 
-import com.minehut.tgm.team.MatchTeam;
+import com.minehut.tgm.modules.team.MatchTeam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.event.Event;

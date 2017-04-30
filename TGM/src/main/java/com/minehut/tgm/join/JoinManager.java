@@ -36,7 +36,7 @@ public class JoinManager implements Listener {
         TGM.registerEvents(this);
 
         //empty queued joins when the connection didn't follow through for an unknown reason.
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.getTgm(), new Runnable() {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
             @Override
             public void run() {
                 List<QueuedJoin> toRemove = new ArrayList<>();
@@ -62,7 +62,7 @@ public class JoinManager implements Listener {
 
     @EventHandler
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        UserProfile userProfile = TGM.getTgm().getTeamClient().login(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress());
+        UserProfile userProfile = TGM.get().getTeamClient().login(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress());
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }
 
@@ -76,7 +76,7 @@ public class JoinManager implements Listener {
         }
 
         PlayerContext playerContext = new PlayerContext(event.getPlayer(), queuedJoin.getUserProfile());
-        TGM.getPlayerManager().addPlayer(playerContext);
+        TGM.get().getPlayerManager().addPlayer(playerContext);
 
         for (LoginService loginService : loginServices) {
             loginService.login(playerContext);
@@ -96,14 +96,14 @@ public class JoinManager implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        PlayerContext playerContext = TGM.getPlayerManager().getPlayerContext(event.getPlayer());
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCycle(MatchPostLoadEvent event) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerContext playerContext = TGM.getPlayerManager().getPlayerContext(player);
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
             Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
         }
     }
@@ -119,7 +119,7 @@ public class JoinManager implements Listener {
     }
 
     public void handleQuit(Player player) {
-        TGM.getPlayerManager().removePlayer(TGM.getPlayerManager().getPlayerContext(player));
+        TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
     }
 
     @AllArgsConstructor

@@ -28,7 +28,7 @@ public class MapLoaderImpl implements MapLoader {
                     File mapJsonFile = new File(child, "map.json");
                     try {
                         JsonReader reader = new JsonReader(new FileReader(mapJsonFile));
-                        MapInfo mapInfo = TGM.getTgm().getGson().fromJson(reader, MapInfo.class);
+                        MapInfo mapInfo = TGM.get().getGson().fromJson(reader, MapInfo.class);
                         maps.add(new MapContainer(child, mapInfo));
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();

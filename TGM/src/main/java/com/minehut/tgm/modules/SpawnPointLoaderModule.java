@@ -10,7 +10,8 @@ import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.match.ModuleData;
 import com.minehut.tgm.match.ModuleLoadTime;
-import com.minehut.tgm.team.MatchTeam;
+import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.util.Parser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,7 +35,7 @@ public class SpawnPointLoaderModule extends MatchModule {
             List<MatchTeam> teams = new ArrayList<>();
             for (Object o : spawnJson.getAsJsonArray("teams")) {
                 String teamId = ((JsonPrimitive) o).getAsString();
-                MatchTeam team = TGM.getTgm().getTeamManager().getTeamById(teamId);
+                MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeamById(teamId);
                 if (team != null) {
                     teams.add(team);
                 }

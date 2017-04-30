@@ -3,7 +3,8 @@ package com.minehut.tgm.modules;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.match.MatchResultEvent;
-import com.minehut.tgm.team.MatchTeam;
+import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -15,7 +16,7 @@ public class MatchResultModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onMatchResult(MatchResultEvent event) {
-        MatchTeam spectators = TGM.getTgm().getTeamManager().getSpectators();
+        MatchTeam spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (spectators.containsPlayer(player)) {

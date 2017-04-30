@@ -11,9 +11,10 @@ import com.minehut.tgm.join.JoinManager;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
+import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.player.PlayerManager;
 import com.minehut.tgm.playerList.PlayerListManager;
-import com.minehut.tgm.team.TeamManager;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -31,9 +32,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TGM extends JavaPlugin {
-    @Getter public static TGM tgm;
+    public static TGM tgm;
     @Getter private Gson gson;
     @Getter private TeamClient teamClient;
 
@@ -43,8 +46,11 @@ public class TGM extends JavaPlugin {
     @Getter private MatchManager matchManager;
     @Getter private PlayerManager playerManager;
     @Getter private JoinManager joinManager;
-    @Getter private TeamManager teamManager;
     @Getter private PlayerListManager playerListManager;
+
+    public static TGM get() {
+        return tgm;
+    }
 
     @Override
     public void onEnable() {
@@ -86,7 +92,6 @@ public class TGM extends JavaPlugin {
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
-        teamManager = new TeamManager();
         playerListManager = new PlayerListManager();
 
         try {
@@ -116,11 +121,16 @@ public class TGM extends JavaPlugin {
     }
 
     public static void registerEvents(Listener listener) {
-        Bukkit.getPluginManager().registerEvents(listener, TGM.getTgm());
+        Bukkit.getPluginManager().registerEvents(listener, TGM.get());
     }
 
-    public static MatchManager getMatchManager() {
-        return getTgm().matchManager;
+    @SuppressWarnings("unchecked")
+    public <T extends MatchModule> T getModule(Class<T> clazz) {
+        return matchManager.getMatch().getModule(clazz);
     }
-    public static PlayerManager getPlayerManager() { return getTgm().playerManager; }
+
+    @SuppressWarnings("unchecked")
+    public <T extends MatchModule> List<T> getModules(Class<T> clazz) {
+        return matchManager.getMatch().getModules(clazz);
+    }
 }

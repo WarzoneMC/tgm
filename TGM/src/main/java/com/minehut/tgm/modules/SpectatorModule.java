@@ -2,8 +2,9 @@ package com.minehut.tgm.modules;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.*;
-import com.minehut.tgm.team.MatchTeam;
-import com.minehut.tgm.team.TeamChangeEvent;
+import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamChangeEvent;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import com.minehut.tgm.util.ColorConverter;
 import com.minehut.tgm.util.Players;
@@ -39,7 +40,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     @Getter private final int teamSelectionRunnable;
 
     public SpectatorModule() {
-        this.teamSelectionMenu = new PublicMenu(TGM.getTgm(), ChatColor.UNDERLINE + "Team Selection", 9);
+        this.teamSelectionMenu = new PublicMenu(TGM.get(), ChatColor.UNDERLINE + "Team Selection", 9);
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Team Selection");
@@ -55,7 +56,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         });
 
         int slot = 2;
-        for (MatchTeam matchTeam : TGM.getTgm().getTeamManager().getTeams()) {
+        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (matchTeam.isSpectator()) {
                 teamSelectionMenu.setItem(8, null, new MenuAction() {
                     @Override
@@ -84,14 +85,14 @@ public class SpectatorModule extends MatchModule implements Listener {
         /**
          * Update the item values every second to keep player counts accurate.
          */
-        teamSelectionRunnable = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.getTgm(), new Runnable() {
+        teamSelectionRunnable = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
             @Override
             public void run() {
                 int totalMatchSize = 0;
                 int totalMatchMaxSize = 0;
 
                 int i = 2;
-                for (MatchTeam matchTeam : TGM.getTgm().getTeamManager().getTeams()) {
+                for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
                     if (matchTeam.isSpectator()) {
                         ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
@@ -134,7 +135,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        this.spectators = TGM.getTgm().getTeamManager().getSpectators();
+        this.spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
     }
 
     private void applySpectatorKit(PlayerContext playerContext) {
@@ -160,7 +161,7 @@ public class SpectatorModule extends MatchModule implements Listener {
      *
      */
     public boolean isSpectating(Player player) {
-        MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.MID) {
             return spectators.containsPlayer(player);
         } else {

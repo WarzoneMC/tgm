@@ -1,11 +1,10 @@
 package com.minehut.tgm.modules.visibility;
 
-import com.minehut.tgm.TGM;
 import com.minehut.tgm.join.MatchJoinEvent;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.modules.SpectatorModule;
-import com.minehut.tgm.team.TeamChangeEvent;
+import com.minehut.tgm.modules.team.TeamChangeEvent;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

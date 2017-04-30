@@ -2,7 +2,8 @@ package com.minehut.tgm.command;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchStatus;
-import com.minehut.tgm.team.MatchTeam;
+import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
@@ -19,7 +20,7 @@ public class CycleCommands {
     @CommandPermissions({"tgm.cycle"})
     public static void cycle(CommandContext cmd, CommandSender sender) {
         try {
-            TGM.getMatchManager().cycleNextMatch();
+            TGM.get().getMatchManager().cycleNextMatch();
         } catch (IOException e) {
             e.printStackTrace();
             sender.sendMessage(e.getMessage());
@@ -29,9 +30,9 @@ public class CycleCommands {
     @Command(aliases = {"start"}, desc = "End the match.")
     @CommandPermissions({"tgm.start"})
     public static void start(CommandContext cmd, CommandSender sender) {
-        MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.PRE) {
-            TGM.getMatchManager().startMatch();
+            TGM.get().getMatchManager().startMatch();
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -40,17 +41,17 @@ public class CycleCommands {
     @Command(aliases = {"end"}, desc = "Start the match.")
     @CommandPermissions({"tgm.end"})
     public static void end(CommandContext cmd, CommandSender sender) {
-        MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.MID) {
             if (cmd.argsLength() > 0) {
-                MatchTeam matchTeam = TGM.getTgm().getTeamManager().getTeamFromInput(cmd.getJoinedStrings(0));
+                MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getJoinedStrings(0));
                 if (matchTeam == null) {
                     sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                     return;
                 }
-                TGM.getMatchManager().endMatch(matchTeam);
+                TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
-                TGM.getMatchManager().endMatch(TGM.getTgm().getTeamManager().getTeams().get(1));
+                TGM.get().getMatchManager().endMatch(TGM.get().getModule(TeamManagerModule.class).getTeams().get(1));
             }
         } else {
             sender.sendMessage(ChatColor.RED + "No match in progress.");
@@ -60,10 +61,10 @@ public class CycleCommands {
     @Command(aliases = {"join"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() == 0) {
-            MatchTeam matchTeam = TGM.getTgm().getTeamManager().getSmallestTeam();
+            MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getSmallestTeam();
             attemptJoinTeam((Player) sender, matchTeam, true);
         } else {
-            MatchTeam matchTeam = TGM.getTgm().getTeamManager().getTeamFromInput(cmd.getJoinedStrings(0));
+            MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getJoinedStrings(0));
             if (matchTeam == null) {
                 sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                 return;
@@ -86,8 +87,8 @@ public class CycleCommands {
             }
         }
 
-        PlayerContext playerContext = TGM.getPlayerManager().getPlayerContext(player);
-        TGM.getTgm().getTeamManager().joinTeam(playerContext, matchTeam);
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
     }
 
 }
