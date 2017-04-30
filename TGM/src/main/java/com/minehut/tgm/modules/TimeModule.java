@@ -14,10 +14,10 @@ public class TimeModule extends MatchModule {
         startedTimeStamp = System.currentTimeMillis();
     }
 
-    public int getTimeElapsed() {
+    public double getTimeElapsed() {
         MatchStatus matchStatus = TGM.getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.MID) {
-            return (int) ((System.currentTimeMillis() - startedTimeStamp) / 1000);
+            return (double) ((System.currentTimeMillis() - startedTimeStamp) / 1000);
         } else {
             return 0;
         }
