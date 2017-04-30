@@ -115,8 +115,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                     i++;
                 }
 
-                ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + "Auto Join",
-                        Arrays.asList(ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
+                ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
+                        Arrays.asList("", ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
                 ItemMeta autoJoinHelmetMeta = autoJoinHelmet.getItemMeta();
                 autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
