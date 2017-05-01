@@ -10,11 +10,15 @@ import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,7 +30,7 @@ import java.util.List;
  */
 @ModuleData(load = ModuleLoadTime.EARLIEST)
 public class ScoreboardManagerModule extends MatchModule implements Listener {
-    private List<SimpleScoreboard> scoreboards = new ArrayList<>();
+    private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
 
     @EventHandler
     public void onJoin(MatchJoinEvent event) {
@@ -46,8 +50,20 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         }
 
         simpleScoreboard.send(event.getPlayerContext().getPlayer());
-        scoreboards.add(simpleScoreboard);
+        scoreboards.put(event.getPlayerContext().getPlayer(), simpleScoreboard);
     }
 
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        this.scoreboards.remove(event.getPlayer());
+    }
 
+    @EventHandler
+    public void onKick(PlayerKickEvent event) {
+        this.scoreboards.remove(event.getPlayer());
+    }
+
+    public SimpleScoreboard getScoreboard(Player player) {
+        return scoreboards.get(player);
+    }
 }
