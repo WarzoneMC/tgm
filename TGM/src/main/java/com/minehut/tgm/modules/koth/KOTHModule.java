@@ -78,7 +78,6 @@ public class KOTHModule extends MatchModule implements Listener {
     public boolean incrementPoints(MatchTeam matchTeam, int amount) {
         points.put(matchTeam, points.getOrDefault(matchTeam, 0) + amount);
 
-        Bukkit.broadcastMessage(matchTeam.getAlias() + " points: " + points.get(matchTeam));
         updateScoreboardTeamLine(matchTeam);
 
         if (points.get(matchTeam) >= pointsToWin) {
@@ -147,7 +146,6 @@ public class KOTHModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        Bukkit.broadcastMessage("getTeamScoreLine points: " + points.getOrDefault(matchTeam, 0));
         return points.getOrDefault(matchTeam, 0) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsToWin + " " + matchTeam.getColor() + matchTeam.getAlias();
     }
 

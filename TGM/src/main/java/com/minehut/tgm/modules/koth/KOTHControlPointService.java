@@ -22,14 +22,12 @@ public class KOTHControlPointService implements ControlPointService {
 
     @Override
     public void holding(MatchTeam matchTeam) {
-        Bukkit.broadcastMessage(matchTeam.getAlias() + " is holding " + definition.getName());
         kothModule.incrementPoints(matchTeam, definition.getPointsPerTick());
     }
 
     @Override
     public void capturing(MatchTeam matchTeam, int progress, int maxProgress, boolean upward) {
         kothModule.updateScoreboardControlPointLine(definition);
-        Bukkit.broadcastMessage(matchTeam.getAlias() + " is capturing " + definition.getName() + " (" + progress + "/" + maxProgress + ")");
     }
 
     @Override
