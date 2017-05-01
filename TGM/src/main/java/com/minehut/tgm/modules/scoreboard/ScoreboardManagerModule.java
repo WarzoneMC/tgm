@@ -8,6 +8,7 @@ import com.minehut.tgm.match.ModuleLoadTime;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -30,12 +31,11 @@ import java.util.List;
  */
 @ModuleData(load = ModuleLoadTime.EARLIEST)
 public class ScoreboardManagerModule extends MatchModule implements Listener {
-    private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
+    @Getter private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
 
     @EventHandler
     public void onJoin(MatchJoinEvent event) {
         SimpleScoreboard simpleScoreboard = new SimpleScoreboard(ChatColor.AQUA + "Objectives");
-        Bukkit.getPluginManager().callEvent(new ScoreboardInitEvent(event.getPlayerContext().getPlayer(), simpleScoreboard));
 
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             Team team = simpleScoreboard.getScoreboard().registerNewTeam(matchTeam.getId());
@@ -49,8 +49,12 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
             }
         }
 
+        Bukkit.getPluginManager().callEvent(new ScoreboardInitEvent(event.getPlayerContext().getPlayer(), simpleScoreboard));
+
         simpleScoreboard.send(event.getPlayerContext().getPlayer());
         scoreboards.put(event.getPlayerContext().getPlayer(), simpleScoreboard);
+
+        simpleScoreboard.update();
     }
 
     @EventHandler

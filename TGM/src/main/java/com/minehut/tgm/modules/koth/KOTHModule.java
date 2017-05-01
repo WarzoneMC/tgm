@@ -6,18 +6,21 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.modules.controlpoint.ControlPoint;
+import com.minehut.tgm.modules.controlpoint.ControlPointDefinition;
 import com.minehut.tgm.modules.controlpoint.ControlPointService;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.region.RegionManagerModule;
+import com.minehut.tgm.modules.scoreboard.ScoreboardInitEvent;
+import com.minehut.tgm.modules.scoreboard.ScoreboardManagerModule;
+import com.minehut.tgm.modules.scoreboard.SimpleScoreboard;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
-import com.minehut.tgm.util.Parser;
-import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -32,10 +35,18 @@ public class KOTHModule extends MatchModule implements Listener {
     @Getter
     private final HashMap<MatchTeam, Integer> points = new HashMap<>();
 
+    @Getter
+    private final HashMap<ControlPointDefinition, Integer> controlPointScoreboardLines = new HashMap<>();
+
+    @Getter
+    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+
     @Override
     public void load(Match match) {
         JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("koth").getAsJsonObject();
         pointsToWin = kothJson.get("points").getAsInt();
+
+        int scoreboardLine = 1;
 
         for (JsonElement capturePointElement : kothJson.getAsJsonArray("hills")) {
             JsonObject capturePointJson = capturePointElement.getAsJsonObject();
@@ -44,66 +55,114 @@ public class KOTHModule extends MatchModule implements Listener {
             if (capturePointJson.has("time")) {
                 timeToCap = capturePointJson.get("time").getAsInt();
             }
-
             int swap = 1;
             if (capturePointJson.has("points")) {
                 swap = capturePointJson.get("points").getAsInt();
             }
             final int pointsPerHold = swap;
-
             final String name = capturePointJson.get("name").getAsString();
 
-            controlPoints.add(new ControlPoint(region, timeToCap, new ControlPointService() {
-                @Override
-                public void holding(MatchTeam matchTeam) {
-                    incrementPoints(matchTeam);
-                }
+            ControlPointDefinition definition = new ControlPointDefinition(name, timeToCap, pointsPerHold);
+            ControlPoint controlPoint = new ControlPoint(definition, region, new KOTHControlPointService(this, match, definition));
 
-                @Override
-                public void capturing(MatchTeam matchTeam, int progress, int maxProgress, boolean upward) {
-                    Bukkit.broadcastMessage(matchTeam.getAlias() + " is capturing " + name + " (" + progress + "/" + maxProgress + ")");
-                }
+            controlPoints.add(controlPoint);
+        }
 
-                @Override
-                public void captured(MatchTeam matchTeam) {
-                    Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE
-                            + " took control of " + ChatColor.AQUA + ChatColor.BOLD.toString() + name);
+        for (ControlPoint controlPoint : controlPoints) {
+            controlPoint.enable();
+        }
+    }
 
-                    if (incrementPoints(matchTeam)) {
-                        return; //don't play capture sound if the game ends. There already is an endgame sound.
-                    }
 
-                    for (MatchTeam team : match.getModule(TeamManagerModule.class).getTeams()) {
-                        for (PlayerContext playerContext : team.getMembers()) {
-                            if (team == matchTeam || team.isSpectator()) {
-                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
-                            } else {
-                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
-                            }
-                        }
-                    }
-                }
+    //returns true if winner was called
+    public boolean incrementPoints(MatchTeam matchTeam, int amount) {
+        points.put(matchTeam, points.getOrDefault(matchTeam, 0) + amount);
 
-                @Override
-                public void lost(MatchTeam matchTeam) {
-                    Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE
-                            + " lost control of " + ChatColor.AQUA + ChatColor.BOLD.toString() + name);
-                }
+        Bukkit.broadcastMessage(matchTeam.getAlias() + " points: " + points.get(matchTeam));
+        updateScoreboardTeamLine(matchTeam);
 
-                //returns true if winner was called
-                private boolean incrementPoints(MatchTeam matchTeam) {
-                    points.put(matchTeam, points.getOrDefault(matchTeam, 0) + pointsPerHold);
+        if (points.get(matchTeam) >= pointsToWin) {
+            TGM.get().getMatchManager().endMatch(matchTeam);
+            return true;
+        }
+        return false;
+    }
 
-                    if (points.get(matchTeam) >= pointsToWin) {
-                        TGM.get().getMatchManager().endMatch(matchTeam);
-                        return true;
-                    }
-                    return false;
-                }
-            }, null));
+    public void updateScoreboardTeamLine(MatchTeam matchTeam) {
+        for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+            int line = teamScoreboardLines.get(matchTeam);
+            simpleScoreboard.remove(line);
+            simpleScoreboard.add(getTeamScoreLine(matchTeam), line);
+            simpleScoreboard.update();
+        }
+    }
 
-            for (ControlPoint controlPoint : controlPoints) {
-                controlPoint.enable();
+    public void updateScoreboardControlPointLine(ControlPointDefinition definition) {
+        for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+            int line = controlPointScoreboardLines.get(definition);
+            simpleScoreboard.remove(line);
+            simpleScoreboard.add(getControlPointScoreboardLine(getControlPointByDefinition(definition)), line);
+            simpleScoreboard.update();
+        }
+    }
+
+    public ControlPoint getControlPointByDefinition(ControlPointDefinition definition) {
+        for (ControlPoint controlPoint : controlPoints) {
+            if(controlPoint.getDefinition() == definition) return controlPoint;
+        }
+        return null;
+    }
+
+    @EventHandler
+    public void onScoreboardInit(ScoreboardInitEvent event) {
+        List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
+
+
+        SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
+
+        int i;
+        for(i = 0; i < controlPoints.size(); i++) {
+            ControlPoint controlPoint = controlPoints.get(i);
+
+            controlPointScoreboardLines.put(controlPoint.getDefinition(), i);
+            simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), i);
+
+            Bukkit.broadcastMessage(getControlPointScoreboardLine(controlPoint));
+        }
+
+        i++;
+        simpleScoreboard.add(" ", i);
+
+        i++;
+        for (MatchTeam matchTeam : teams) {
+            if(matchTeam.isSpectator()) continue;
+
+            simpleScoreboard.add(getTeamScoreLine(matchTeam), i);
+            teamScoreboardLines.put(matchTeam, i);
+
+            Bukkit.broadcastMessage(getTeamScoreLine(matchTeam));
+
+            i++;
+        }
+    }
+
+    private String getTeamScoreLine(MatchTeam matchTeam) {
+        Bukkit.broadcastMessage("getTeamScoreLine points: " + points.getOrDefault(matchTeam, 0));
+        return points.getOrDefault(matchTeam, 0) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsToWin + " " + matchTeam.getColor() + matchTeam.getAlias();
+    }
+
+    private String getControlPointScoreboardLine(ControlPoint controlPoint) {
+        if (controlPoint.isInProgress()) {
+            if (controlPoint.getController() == null) {
+                return controlPoint.getPercent() + "% " + ChatColor.WHITE + controlPoint.getDefinition().getName();
+            } else {
+                return controlPoint.getPercent() + "% " + controlPoint.getController().getColor() + controlPoint.getDefinition().getName();
+            }
+        } else {
+            if (controlPoint.getController() == null) {
+                return ControlPoint.SYMBOL_CP_INCOMPLETE + " " + controlPoint.getDefinition().getName();
+            } else {
+                return ControlPoint.SYMBOL_CP_COMPLETE + " " + controlPoint.getController().getColor() + controlPoint.getDefinition().getName();
             }
         }
     }

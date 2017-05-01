@@ -44,6 +44,8 @@ public class ControlPoint implements Listener {
 
     public static final long TICK_RATE = 10;
 
+    @Getter private final ControlPointDefinition definition;
+
     @Getter private final Region region;
     @Getter private final RegionSave regionSave;
     @Getter private final ControlPointService controlPointService;
@@ -55,17 +57,21 @@ public class ControlPoint implements Listener {
     private MatchTeam controller = null;
 
     @Getter private int progress = 0;
-    @Getter private final int progressToCap;
     @Getter private MatchTeam progressingTowardsTeam = null;
 
     @Getter private int runnableId = -1;
 
     public ControlPoint(Region region, int progressToCap, ControlPointService controlPointService, ControlPointService blockDisplayController) {
+    public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
+        this.definition = controlPointDefinition;
         this.region = region;
-        this.progressToCap = progressToCap;
         this.controlPointService = controlPointService;
 
         regionSave = new RegionSave(region);
+    }
+
+    public boolean isInProgress() {
+        return progress > 0 && progress < definition.getMaxProgress();
     }
 
     private void handlePlayerMove(Player player, Location to) {
@@ -126,6 +132,10 @@ public class ControlPoint implements Listener {
 
                 if (most.size() == 1) {
                     handleCap(most.get(0));
+                } else {
+                    if (controller != null) {
+                        controlPointService.holding(controller);
+                    }
                 }
             }
         }, TICK_RATE, TICK_RATE);
@@ -137,16 +147,16 @@ public class ControlPoint implements Listener {
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
             progress++;
-            controlPointService.capturing(matchTeam, progress, progressToCap, true);
+            controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
         } else {
             if (matchTeam == progressingTowardsTeam) {
-                if(progress < progressToCap) {
+                if(progress < definition.getMaxProgress()) {
                     progress++; //don't go over the max cap number.
-                    controlPointService.capturing(matchTeam, progress, progressToCap, true);
+                    controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
                 }
             } else {
                 progress--;
-                controlPointService.capturing(matchTeam, progress, progressToCap, false);
+                controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), false);
             }
 
             if (progress == 0) {
@@ -156,7 +166,7 @@ public class ControlPoint implements Listener {
                     controlPointService.lost(controller);
                     controller = null;
                 }
-            } else if (progress >= progressToCap && matchTeam == progressingTowardsTeam) {
+            } else if (progress >= definition.getMaxProgress() && matchTeam == progressingTowardsTeam) {
                 if (controller == null) {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
@@ -169,8 +179,6 @@ public class ControlPoint implements Listener {
         renderBlocks(matchTeam);
     }
 
-    private int getPercent() {
-        return Math.min(100, Math.max(0, (progress * 100) / progressToCap));
     }
 
     private void renderBlocks(MatchTeam matchTeam) {
