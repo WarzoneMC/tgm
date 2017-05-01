@@ -66,7 +66,6 @@ public class ControlPoint implements Listener {
         this.controlPointService = controlPointService;
 
         regionSave = new RegionSave(region);
-        renderBlocks();
     }
 
     private void handlePlayerMove(Player player, Location to) {
@@ -167,21 +166,25 @@ public class ControlPoint implements Listener {
             }
         }
 
-        renderBlocks();
+        renderBlocks(matchTeam);
     }
 
-    private void renderBlocks() {
+    private int getPercent() {
+        return Math.min(100, Math.max(0, (progress * 100) / progressToCap));
+    }
+
+    private void renderBlocks(MatchTeam matchTeam) {
         byte color1 = progressingTowardsTeam != null ? ColorConverter.convertChatColorToDyeColor(progressingTowardsTeam.getColor()).getWoolData() : -1;
-        byte color2 = controller != null ? ColorConverter.convertChatColorToDyeColor(controller.getColor()).getWoolData() : -1;
+        byte color2 = controller != null && matchTeam == controller ? ColorConverter.convertChatColorToDyeColor(controller.getColor()).getWoolData() : -1;
         Location center = region.getCenter();
         double x = center.getX();
-        double y = center.getY();
-        double percent = Math.toRadians((double) progress / (double) progressToCap * 3.6);
+        double z = center.getZ();
+        double percent = Math.toRadians(getPercent() * 3.6);
         for(Block block : region.getBlocks()) {
             if(!Blocks.isVisualMaterial(block.getType())) continue;
             double dx = block.getX() - x;
-            double dy = block.getY() - y;
-            double angle = Math.atan2(dy, dx);
+            double dz = block.getZ() - z;
+            double angle = Math.atan2(dz, dx);
             if(angle < 0) angle += 2 * Math.PI;
             byte color = angle < percent ? color1 : color2;
             if (color == -1) {
