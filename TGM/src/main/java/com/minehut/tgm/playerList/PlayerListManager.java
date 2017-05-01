@@ -3,6 +3,7 @@ package com.minehut.tgm.playerList;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.join.MatchJoinEvent;
 import com.minehut.tgm.modules.team.TeamChangeEvent;
+import com.minehut.tgm.modules.team.TeamUpdateEvent;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -34,6 +35,11 @@ public class PlayerListManager implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        refreshAllTabs();
+    }
+
+    @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
         refreshAllTabs();
     }
 

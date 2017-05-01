@@ -8,11 +8,13 @@ import com.minehut.tgm.modules.countdown.CycleCountdown;
 import com.minehut.tgm.modules.countdown.StartCountdown;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
+import com.minehut.tgm.modules.team.TeamUpdateEvent;
 import com.minehut.tgm.user.PlayerContext;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -127,6 +129,31 @@ public class CycleCommands {
             attemptJoinTeam((Player) sender, matchTeam, false);
         }
     }
+
+    @Command(aliases = {"team"}, desc = "Manage teams.")
+    @CommandPermissions({"tgm.team"})
+    public static void team(CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() > 0) {
+            if (cmd.getString(0).equalsIgnoreCase("alias")) {
+                if (cmd.argsLength() == 3) {
+                    MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getString(1));
+                    if (matchTeam == null) {
+                        sender.sendMessage(ChatColor.RED + "Unknown team \"" + cmd.getString(1) + "\"");
+                        return;
+                    }
+                    matchTeam.setAlias(cmd.getString(2));
+                    Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(matchTeam));
+                } else {
+                    sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
+                }
+            } else {
+                sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
+            }
+        } else {
+            sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
+        }
+    }
+
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin) {
         if (matchTeam.getMembers().size() >= matchTeam.getMax()) {
