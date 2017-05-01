@@ -61,7 +61,6 @@ public class ControlPoint implements Listener {
 
     @Getter private int runnableId = -1;
 
-    public ControlPoint(Region region, int progressToCap, ControlPointService controlPointService, ControlPointService blockDisplayController) {
     public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
         this.definition = controlPointDefinition;
         this.region = region;
@@ -173,12 +172,18 @@ public class ControlPoint implements Listener {
                 } else {
                     controlPointService.holding(matchTeam);
                 }
+            } else { //hill isn't at 100%, but the owning team should still get points.
+                if (controller != null) {
+                    controlPointService.holding(controller);
+                }
             }
         }
 
         renderBlocks(matchTeam);
     }
 
+    public int getPercent() {
+        return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
     private void renderBlocks(MatchTeam matchTeam) {
