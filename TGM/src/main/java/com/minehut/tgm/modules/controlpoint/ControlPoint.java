@@ -4,15 +4,21 @@ import com.google.common.collect.Sets;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.modules.SpectatorModule;
 import com.minehut.tgm.modules.region.Region;
+import com.minehut.tgm.modules.region.RegionSave;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamChangeEvent;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
+import com.minehut.tgm.util.Blocks;
+import com.minehut.tgm.util.ColorConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -20,11 +26,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.util.BlockVector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Not a module! Other modules should initialize these and keep track of them.
@@ -41,8 +45,8 @@ public class ControlPoint implements Listener {
     public static final long TICK_RATE = 10;
 
     @Getter private final Region region;
+    @Getter private final RegionSave regionSave;
     @Getter private final ControlPointService controlPointService;
-    @Getter private final ControlPointService blockDisplayController;
 
     @Getter
     private final Set<Player> playersOnPoint = Sets.newHashSet();
@@ -61,11 +65,8 @@ public class ControlPoint implements Listener {
         this.progressToCap = progressToCap;
         this.controlPointService = controlPointService;
 
-        if (blockDisplayController != null) {
-            this.blockDisplayController = blockDisplayController;
-        } else {
-            this.blockDisplayController = new BlockDisplayControllerImpl();
-        }
+        regionSave = new RegionSave(region);
+        renderBlocks();
     }
 
     private void handlePlayerMove(Player player, Location to) {
@@ -137,54 +138,63 @@ public class ControlPoint implements Listener {
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
             progress++;
-            callServiceCapturing(matchTeam, progress, progressToCap, true);
+            controlPointService.capturing(matchTeam, progress, progressToCap, true);
         } else {
             if (matchTeam == progressingTowardsTeam) {
                 if(progress < progressToCap) {
                     progress++; //don't go over the max cap number.
-                    callServiceCapturing(matchTeam, progress, progressToCap, true);
+                    controlPointService.capturing(matchTeam, progress, progressToCap, true);
                 }
             } else {
                 progress--;
-                callServiceCapturing(matchTeam, progress, progressToCap, false);
+                controlPointService.capturing(matchTeam, progress, progressToCap, false);
             }
 
             if (progress == 0) {
                 progressingTowardsTeam = matchTeam; //change directions
 
                 if (controller != null) {
-                    callServiceLost(controller);
+                    controlPointService.lost(controller);
                     controller = null;
                 }
             } else if (progress >= progressToCap && matchTeam == progressingTowardsTeam) {
                 if (controller == null) {
                     controller = matchTeam;
-                    callServiceCaptured(matchTeam);
+                    controlPointService.captured(matchTeam);
                 } else {
-                    callServiceHolding(matchTeam);
+                    controlPointService.holding(matchTeam);
                 }
             }
         }
+
+        renderBlocks();
     }
 
-    private void callServiceCaptured(MatchTeam matchTeam) {
-        controlPointService.captured(matchTeam);
-        blockDisplayController.captured(matchTeam);
-    }
-
-    private void callServiceLost(MatchTeam matchTeam) {
-        controlPointService.lost(matchTeam);
-        blockDisplayController.lost(matchTeam);
-    }
-
-    private void callServiceHolding(MatchTeam matchTeam) {
-        controlPointService.holding(matchTeam);
-        blockDisplayController.holding(matchTeam);
-    }
-
-    private void callServiceCapturing(MatchTeam matchTeam, int progress, int maxProgress, boolean upward) {
-        controlPointService.capturing(matchTeam, progress, maxProgress, upward);
-        blockDisplayController.capturing(matchTeam, progress, maxProgress, upward);
+    private void renderBlocks() {
+        byte color1 = progressingTowardsTeam != null ? ColorConverter.convertChatColorToDyeColor(progressingTowardsTeam.getColor()).getWoolData() : -1;
+        byte color2 = controller != null ? ColorConverter.convertChatColorToDyeColor(controller.getColor()).getWoolData() : -1;
+        Location center = region.getCenter();
+        double x = center.getX();
+        double y = center.getY();
+        double percent = Math.toRadians((double) progress / (double) progressToCap * 3.6);
+        for(Block block : region.getBlocks()) {
+            if(!Blocks.isVisualMaterial(block.getType())) continue;
+            double dx = block.getX() - x;
+            double dy = block.getY() - y;
+            double angle = Math.atan2(dy, dx);
+            if(angle < 0) angle += 2 * Math.PI;
+            byte color = angle < percent ? color1 : color2;
+            if (color == -1) {
+                Pair<Material,Byte> oldBlock = regionSave.getBlockAt(new BlockVector(block.getLocation().toVector()));
+                if (oldBlock.getLeft().equals(block.getType())) color = oldBlock.getRight();
+            }
+            if (color != -1) {
+                block.setData(color);
+//                Bukkit.broadcastMessage("set to " + color);
+            } else {
+//                Bukkit.broadcastMessage("color = -1");
+            }
+        }
     }
 
     public void unload() {
