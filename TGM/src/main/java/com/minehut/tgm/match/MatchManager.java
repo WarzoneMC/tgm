@@ -5,6 +5,7 @@ import com.minehut.tgm.map.*;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -25,6 +26,8 @@ public class MatchManager {
     @Getter private MapLibrary mapLibrary;
     @Getter private MapRotation mapRotation;
     @Getter private Match match = null;
+
+    @Getter @Setter private MapContainer forcedNextMap = null;
 
     public MatchManager(FileConfiguration fileConfiguration) {
         mapLibrary = new MapLibrary(fileConfiguration, new MapLoaderImpl());
@@ -51,7 +54,11 @@ public class MatchManager {
 
     public void cycleNextMatch() throws IOException {
         //find a new map to cycle to.
-        MapContainer mapContainer = mapRotation.cycle();
+        MapContainer mapContainer = forcedNextMap;
+        if (mapContainer == null) {
+            mapContainer = mapRotation.cycle();
+        }
+        forcedNextMap = null;
 
         //create the new world under a random uuid in the matches folder.
         UUID matchUuid = UUID.randomUUID();
@@ -98,6 +105,13 @@ public class MatchManager {
             Bukkit.unloadWorld(oldMatch.getWorld(), false);
             FileUtils.deleteDirectory(worldFolder);
         }
+    }
 
+    public MapContainer getNextMap() {
+        if (forcedNextMap != null) {
+            return forcedNextMap;
+        } else {
+            return mapRotation.getNext();
+        }
     }
 }

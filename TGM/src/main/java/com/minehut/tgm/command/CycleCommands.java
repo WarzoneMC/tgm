@@ -1,12 +1,17 @@
 package com.minehut.tgm.command;
 
 import com.minehut.tgm.TGM;
+import com.minehut.tgm.map.MapContainer;
 import com.minehut.tgm.match.MatchStatus;
+import com.minehut.tgm.modules.countdown.Countdown;
+import com.minehut.tgm.modules.countdown.CycleCountdown;
+import com.minehut.tgm.modules.countdown.StartCountdown;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -19,11 +24,19 @@ public class CycleCommands {
     @Command(aliases = {"cycle"}, desc = "Cycle to a new map.")
     @CommandPermissions({"tgm.cycle"})
     public static void cycle(CommandContext cmd, CommandSender sender) {
-        try {
-            TGM.get().getMatchManager().cycleNextMatch();
-        } catch (IOException e) {
-            e.printStackTrace();
-            sender.sendMessage(e.getMessage());
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
+        if (matchStatus != MatchStatus.MID) {
+            int time = CycleCountdown.START_TIME;
+            if (cmd.argsLength() > 0) {
+                try {
+                    time = cmd.getInteger(0);
+                } catch (CommandNumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
+                }
+            }
+            TGM.get().getModule(CycleCountdown.class).start(time);
+        } else {
+            sender.sendMessage(ChatColor.RED + "A match is currently in progress.");
         }
     }
 
@@ -32,7 +45,15 @@ public class CycleCommands {
     public static void start(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.PRE) {
-            TGM.get().getMatchManager().startMatch();
+            int time = StartCountdown.START_TIME;
+            if (cmd.argsLength() > 0) {
+                try {
+                    time = cmd.getInteger(0);
+                } catch (CommandNumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
+                }
+            }
+            TGM.get().getModule(StartCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -56,6 +77,39 @@ public class CycleCommands {
         } else {
             sender.sendMessage(ChatColor.RED + "No match in progress.");
         }
+    }
+
+    @Command(aliases = {"cancel"}, desc = "Cancel all countdowns.")
+    @CommandPermissions({"tgm.cancel"})
+    public static void cancel(CommandContext cmd, CommandSender sender) {
+        for (Countdown countdown : TGM.get().getModules(Countdown.class)) {
+            countdown.cancel();
+        }
+        sender.sendMessage(ChatColor.GREEN + "Countdowns cancelled.");
+    }
+
+    @Command(aliases = {"setnext", "sn"}, desc = "Set the next map.")
+    @CommandPermissions({"tgm.setnext"})
+    public static void setNext(CommandContext cmd, CommandSender sender) {
+        MapContainer found = null;
+        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
+            if (mapContainer.getMapInfo().getName().equalsIgnoreCase(cmd.getJoinedStrings(0))) {
+                found = mapContainer;
+            }
+        }
+        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
+            if (mapContainer.getMapInfo().getName().startsWith(cmd.getJoinedStrings(0))) {
+                found = mapContainer;
+            }
+        }
+
+        if (found == null) {
+            sender.sendMessage(ChatColor.RED + "Map not found \"" + cmd.getJoinedStrings(0) + "\"");
+            return;
+        }
+
+        TGM.get().getMatchManager().setForcedNextMap(found);
+        sender.sendMessage(ChatColor.GREEN + "Set the next map to " + ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
     }
 
     @Command(aliases = {"join"}, desc = "Join a team.")

@@ -41,4 +41,13 @@ public class MapRotationFile implements MapRotation {
         }
         return rotation.get(current);
     }
+
+    @Override
+    public MapContainer getNext() {
+        if (rotation.size() >= current + 1) {
+            return rotation.get(0);
+        } else {
+            return rotation.get(current + 1);
+        }
+    }
 }
