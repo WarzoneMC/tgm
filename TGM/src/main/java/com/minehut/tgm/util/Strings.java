@@ -22,4 +22,8 @@ public class Strings {
         return (negative ? "-" : "") + (hours == 0 ? "" : hoursString + ":") + minutesString + ":" + secondsString;
     }
 
+    public static String getTechnicalName(String s) {
+        return s.toUpperCase().replace(" ", "_");
+    }
+
 }

@@ -32,6 +32,8 @@ public class Players {
         player.setInvulnerable(false);
         player.setCanPickupItems(true);
         player.setCollidable(true);
+        player.setFlying(false);
+        player.setAllowFlight(false);
 
         player.resetTitle();
 

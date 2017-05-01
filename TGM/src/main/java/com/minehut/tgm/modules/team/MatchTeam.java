@@ -1,6 +1,7 @@
 package com.minehut.tgm.modules.team;
 
 import com.minehut.tgm.map.SpawnPoint;
+import com.minehut.tgm.modules.kit.Kit;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,13 +17,16 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class MatchTeam {
-    @Getter private String id;
+    @Getter private final String id;
     @Getter @Setter private String alias;
     @Getter private ChatColor color;
-    @Getter private boolean spectator;
+    @Getter private final boolean spectator;
     @Getter private int max;
     @Getter private int min;
-    @Getter final private List<PlayerContext> members = new ArrayList<>();
+    @Getter private final List<PlayerContext> members = new ArrayList<>();
+
+    @Getter
+    private final List<Kit> kits = new ArrayList<>();
 
     //filled onload
     @Getter
@@ -43,6 +47,10 @@ public class MatchTeam {
             }
         }
         return false;
+    }
+
+    public void addKit(Kit kit) {
+        this.kits.add(kit);
     }
 
     public void addSpawnPoint(SpawnPoint spawnPoint) {

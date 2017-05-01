@@ -4,6 +4,7 @@ import com.minehut.tgm.modules.*;
 import com.minehut.tgm.modules.MatchResultModule;
 import com.minehut.tgm.modules.countdown.CycleCountdown;
 import com.minehut.tgm.modules.countdown.StartCountdown;
+import com.minehut.tgm.modules.kit.KitLoaderModule;
 import com.minehut.tgm.modules.region.RegionManagerModule;
 import com.minehut.tgm.modules.scoreboard.ScoreboardManagerModule;
 import com.minehut.tgm.modules.tasked.TaskedModuleManager;
@@ -49,6 +50,7 @@ public abstract class MatchManifest {
         modules.add(new TaskedModuleManager());
         modules.add(new StartCountdown());
         modules.add(new CycleCountdown());
+        modules.add(new KitLoaderModule());
 
         return modules;
     }

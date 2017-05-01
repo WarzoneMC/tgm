@@ -140,7 +140,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         }, 0L, 20L);
     }
 
-    private void applySpectatorKit(PlayerContext playerContext) {
+    public void applySpectatorKit(PlayerContext playerContext) {
         Players.reset(playerContext.getPlayer(), false);
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().setAllowFlight(true);
@@ -194,13 +194,6 @@ public class SpectatorModule extends MatchModule implements Listener {
         if (isSpectating((Player) event.getEntity())) {
             event.setCancelled(true);
             event.setFoodLevel(20);
-        }
-    }
-
-    @EventHandler
-    public void onTeamChange(TeamChangeEvent event) {
-        if (event.getTeam() == spectators) {
-            applySpectatorKit(event.getPlayerContext());
         }
     }
 
