@@ -98,7 +98,7 @@ public class CycleCommands {
             }
         }
         for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-            if (mapContainer.getMapInfo().getName().startsWith(cmd.getJoinedStrings(0))) {
+            if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
                 found = mapContainer;
             }
         }
