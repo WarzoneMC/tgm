@@ -35,5 +35,28 @@
 				}
 			}
 		]
-	}
+	},
+	"kits": [
+		{
+			"name": "Default",
+			"items": [
+				{"material": "stone sword", "slot": 0},
+				{"material": "bow", "slot": 1},
+				{"material": "stone pickaxe", "slot": 2, "enchantments": ["efficiency:1"]},
+				{"material": "stone axe", "slot": 3, "enchantments": ["efficiency:1"]},
+
+				{"material": "wood", "slot": 5, "amount": 12},
+
+				{"material": "arrow", "slot": 7, "amount": 24},
+				{"material": "golden carrot", "slot": 8, "amount": 64},
+
+				{"type": "helmet", "material": "leather helmet"},
+				{"type": "chestplate", "material": "chainmail chestplate", "enchantments": ["blast_protection:1"]},
+				{"type": "leggings", "material": "leather leggings"},
+				{"type": "boots", "material": "leather boots"}
+			]
+		}
+	]
 }
+
+
