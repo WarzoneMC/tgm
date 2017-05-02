@@ -75,7 +75,7 @@
                         <includes>
                             <include>com.minehut:TeamAPI</include>
                             <include>com.sk89q:command-framework-bukkit</include>
-                            <include>jode-time:joda-time</include>
+                            <include>joda-time:joda-time</include>
                         </includes>
                     </artifactSet>
                 </configuration>
