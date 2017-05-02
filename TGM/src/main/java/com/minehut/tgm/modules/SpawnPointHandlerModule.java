@@ -54,10 +54,14 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
         if (matchTeam.isSpectator()) {
             spectatorModule.applySpectatorKit(playerContext);
-            playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
+            if (teleport) {
+                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
+            }
         } else {
             matchTeam.getKits().get(0).apply(playerContext.getPlayer(), matchTeam);
-            playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
+            if (teleport) {
+                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
+            }
         }
     }
 
