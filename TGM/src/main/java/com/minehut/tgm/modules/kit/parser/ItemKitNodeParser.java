@@ -1,6 +1,8 @@
 package com.minehut.tgm.modules.kit.parser;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.minehut.tgm.modules.kit.KitNode;
 import com.minehut.tgm.modules.kit.types.ItemKitNode;
 import com.minehut.tgm.util.Strings;
@@ -38,8 +40,8 @@ public class ItemKitNodeParser implements KitNodeParser {
         }
 
         if (jsonObject.has("enchantments")) {
-            for (Object o : jsonObject.getAsJsonArray("enchantments")) {
-                String[] split = ((String) o).split(":");
+            for (JsonElement element : jsonObject.getAsJsonArray("enchantments")) {
+                String[] split = element.getAsString().split(":");
                 int level = Integer.valueOf(split[1]);
                 Enchantment enchantment = Enchantment.getByName(split[0]);
                 if (enchantment != null) {
