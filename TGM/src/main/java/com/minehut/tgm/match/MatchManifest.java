@@ -52,6 +52,7 @@ public abstract class MatchManifest {
         modules.add(new CycleCountdown());
         modules.add(new KitLoaderModule());
         modules.add(new DeathModule());
+        modules.add(new DeathMessageModule());
 
         return modules;
     }
