@@ -9,6 +9,7 @@ import com.minehut.tgm.match.ModuleLoadTime;
 import com.minehut.tgm.util.Parser;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 import java.util.HashMap;
 
@@ -18,6 +19,10 @@ public class RegionManagerModule extends MatchModule {
 
     @Override
     public void load(Match match) {
+        regions.put("global", new CuboidRegion(match.getWorld(),
+                new Location(match.getWorld(), Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE),
+                new Location(match.getWorld(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)));
+
         if (match.getMapContainer().getMapInfo().getJsonObject().has("regions")) {
             for (JsonElement regionElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("regions")) {
                 getRegion(match, regionElement);

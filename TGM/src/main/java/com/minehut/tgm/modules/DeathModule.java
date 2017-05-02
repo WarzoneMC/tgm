@@ -6,7 +6,6 @@ import com.minehut.tgm.match.MatchStatus;
 import com.minehut.tgm.modules.team.TeamChangeEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 
 public class DeathModule extends MatchModule implements Listener {
 
