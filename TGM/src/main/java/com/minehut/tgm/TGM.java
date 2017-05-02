@@ -7,6 +7,8 @@ import com.minehut.teamapi.client.http.HttpClient;
 import com.minehut.teamapi.client.http.HttpClientConfig;
 import com.minehut.teamapi.client.offline.OfflineClient;
 import com.minehut.tgm.command.CycleCommands;
+import com.minehut.tgm.damage.grave.GravePlugin;
+import com.minehut.tgm.damage.tracker.plugin.TrackerPlugin;
 import com.minehut.tgm.join.JoinManager;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
@@ -47,6 +49,8 @@ public class TGM extends JavaPlugin {
     @Getter private PlayerManager playerManager;
     @Getter private JoinManager joinManager;
     @Getter private PlayerListManager playerListManager;
+    @Getter private TrackerPlugin tracker;
+    @Getter private GravePlugin grave;
 
     public static TGM get() {
         return tgm;
@@ -85,14 +89,16 @@ public class TGM extends JavaPlugin {
                 return sender instanceof ConsoleCommandSender || sender.hasPermission(perm);
             }
         };
-        this.commandManager = new CommandsManagerRegistration(this, this.commands);
-
-        commandManager.register(CycleCommands.class);
 
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
         playerListManager = new PlayerListManager();
+        tracker = new TrackerPlugin(this);
+        grave = new GravePlugin(this);
+
+        this.commandManager = new CommandsManagerRegistration(this, this.commands);
+        commandManager.register(CycleCommands.class);
 
         try {
             matchManager.cycleNextMatch();
