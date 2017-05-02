@@ -141,4 +141,14 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
         return smallest;
     }
+
+    public int getAmountParticipating() {
+        int amount = 0;
+        for (MatchTeam matchTeam : teams) {
+            if (!matchTeam.isSpectator()) {
+                amount += matchTeam.getMembers().size();
+            }
+        }
+        return amount;
+    }
 }
