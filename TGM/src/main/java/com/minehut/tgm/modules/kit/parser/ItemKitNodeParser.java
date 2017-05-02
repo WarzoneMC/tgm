@@ -6,6 +6,7 @@ import com.minehut.tgm.modules.kit.types.ItemKitNode;
 import com.minehut.tgm.util.Strings;
 import com.minehut.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -34,6 +35,17 @@ public class ItemKitNodeParser implements KitNodeParser {
 
         if (jsonObject.has("amount")) {
             itemStack.setAmount(jsonObject.get("amount").getAsInt());
+        }
+
+        if (jsonObject.has("enchantments")) {
+            for (Object o : jsonObject.getAsJsonArray("enchantments")) {
+                String[] split = ((String) o).split(":");
+                int level = Integer.valueOf(split[1]);
+                Enchantment enchantment = Enchantment.getByName(split[0]);
+                if (enchantment != null) {
+                    itemStack.addEnchantment(enchantment, level);
+                }
+            }
         }
 
         return itemStack;
