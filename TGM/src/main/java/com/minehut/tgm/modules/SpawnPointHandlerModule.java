@@ -14,6 +14,7 @@ import com.minehut.tgm.util.Players;
 import lombok.Getter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerRespawnEvent;
 
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     @Getter private TeamManagerModule teamManagerModule;
@@ -28,11 +29,11 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
-            spawnPlayer(event.getPlayerContext(), event.getTeam());
+            spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
         }
         //player is joining the server
         else if (event.getOldTeam() == null) {
-            spawnPlayer(event.getPlayerContext(), event.getTeam());
+            spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
         }
         //player is swapping teams pre/post match.
         else {
@@ -40,7 +41,15 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         }
     }
 
-    private void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam) {
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
+        MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
+        event.setRespawnLocation(getTeamSpawn(matchTeam).getLocation());
+        spawnPlayer(playerContext, matchTeam, false);
+    }
+
+    private void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {
         Players.reset(playerContext.getPlayer(), true);
 
         if (matchTeam.isSpectator()) {
@@ -57,7 +66,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (!matchTeam.isSpectator()) {
                 for (PlayerContext player : matchTeam.getMembers()) {
-                    spawnPlayer(player, matchTeam);
+                    spawnPlayer(player, matchTeam, true);
                 }
             }
         }
