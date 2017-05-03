@@ -48,7 +48,6 @@ public class SpawnPointLoaderModule extends MatchModule {
             }
             SpawnPoint spawnPoint = new SpawnPoint(location);
             for (MatchTeam matchTeam : teams) {
-                Bukkit.getLogger().info("Added spawnpoint for " + matchTeam.getAlias());
                 matchTeam.addSpawnPoint(spawnPoint);
             }
         }
