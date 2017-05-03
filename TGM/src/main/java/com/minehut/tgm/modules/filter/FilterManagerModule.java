@@ -9,12 +9,14 @@ import com.minehut.tgm.modules.filter.evaluate.AllowFilterEvaluator;
 import com.minehut.tgm.modules.filter.evaluate.DenyFilterEvaluator;
 import com.minehut.tgm.modules.filter.evaluate.FilterEvaluator;
 import com.minehut.tgm.modules.filter.type.BuildFilterType;
+import com.minehut.tgm.modules.filter.type.EnterFilterType;
 import com.minehut.tgm.modules.filter.type.FilterType;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.region.RegionManagerModule;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.util.Parser;
+import com.sk89q.minecraft.util.commands.ChatColor;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -53,15 +55,36 @@ public class FilterManagerModule extends MatchModule {
 
         String type = jsonObject.get("type").getAsString().toLowerCase();
 
-        switch (type) {
-            case "build":
-                List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, jsonObject.get("region"));
-                FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-                String message = jsonObject.get("message").getAsString();
+        if (type.equals("build")) {
+            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
+            List<Region> regions = new ArrayList<>();
 
-                filterTypes.add(new BuildFilterType(matchTeams, region, filterEvaluator, message));
-                break;
+            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+                if (region != null) {
+                    regions.add(region);
+                }
+            }
+
+            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
+            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+
+            filterTypes.add(new BuildFilterType(matchTeams, regions, filterEvaluator, message));
+        } else if (type.equals("enter")) {
+            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
+            List<Region> regions = new ArrayList<>();
+
+            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+                if (region != null) {
+                    regions.add(region);
+                }
+            }
+
+            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
+            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+
+            filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
         }
 
         return filterTypes;

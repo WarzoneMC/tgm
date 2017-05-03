@@ -53,7 +53,7 @@ public class RegionManagerModule extends MatchModule {
                 case "cylinder":
                     Bukkit.broadcastMessage("cylinder");
                     region = new CylinderRegion(
-                            Parser.convertLocation(match.getWorld(), regionJson.getAsJsonObject("base")),
+                            Parser.convertLocation(match.getWorld(), regionJson.get("base")),
                             regionJson.get("radius").getAsDouble(),
                             regionJson.get("height").getAsDouble()
                     );
@@ -63,8 +63,8 @@ public class RegionManagerModule extends MatchModule {
                     Bukkit.broadcastMessage("cuboid region");
                     region = new CuboidRegion(
                             match.getWorld(),
-                            Parser.convertLocation(match.getWorld(), regionJson.getAsJsonObject("min")),
-                            Parser.convertLocation(match.getWorld(), regionJson.getAsJsonObject("max"))
+                            Parser.convertLocation(match.getWorld(), regionJson.get("min")),
+                            Parser.convertLocation(match.getWorld(), regionJson.get("max"))
                     );
                     break;
             }

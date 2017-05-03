@@ -168,12 +168,12 @@ public class PlayerList {
 
                 players.add(data);
 
-                Bukkit.broadcastMessage("added player to remove: " + ((GameProfile) gameProfile).getName() + " (" + ((GameProfile) gameProfile).getId().toString() + ")");
+//                Bukkit.broadcastMessage("added player to remove: " + ((GameProfile) gameProfile).getName() + " (" + ((GameProfile) gameProfile).getId().toString() + ")");
             }
             sendNEWPackets(Bukkit.getPlayer(this.uuid), packet, players,
                     PACKET_PLAYER_INFO_ACTION_REMOVE_PLAYER);
 
-            Bukkit.broadcastMessage("send remove player packet!");
+//            Bukkit.broadcastMessage("send remove player packet!");
         } else {
             Object olp = ReflectionUtil.invokeMethod(Bukkit.getServer(),
                     "getOnlinePlayers", null);

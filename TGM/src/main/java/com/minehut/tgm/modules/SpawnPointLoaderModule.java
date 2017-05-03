@@ -32,14 +32,20 @@ public class SpawnPointLoaderModule extends MatchModule {
             JsonObject spawnJson = spawnElement.getAsJsonObject();
 
             List<MatchTeam> teams = new ArrayList<>();
-            for (Object o : spawnJson.getAsJsonArray("teams")) {
-                String teamId = ((JsonPrimitive) o).getAsString();
+            for (JsonElement o : spawnJson.getAsJsonArray("teams")) {
+                String teamId = o.getAsString();
                 MatchTeam team = match.getModule(TeamManagerModule.class).getTeamById(teamId);
                 if (team != null) {
                     teams.add(team);
                 }
             }
-            Location location = Parser.convertLocation(match.getWorld(), spawnJson);
+
+            Location location;
+            if (spawnJson.has("coords")) {
+                location = Parser.convertLocation(match.getWorld(), spawnJson.get("coords"));
+            } else {
+                location = Parser.convertLocation(match.getWorld(), spawnJson);
+            }
             SpawnPoint spawnPoint = new SpawnPoint(location);
             for (MatchTeam matchTeam : teams) {
                 Bukkit.getLogger().info("Added spawnpoint for " + matchTeam.getAlias());
