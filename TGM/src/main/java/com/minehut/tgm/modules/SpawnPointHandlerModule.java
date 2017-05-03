@@ -12,6 +12,7 @@ import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import com.minehut.tgm.util.Players;
 import lombok.Getter;
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -61,6 +62,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             matchTeam.getKits().get(0).apply(playerContext.getPlayer(), matchTeam);
             if (teleport) {
                 playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
+                playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
             }
         }
     }
