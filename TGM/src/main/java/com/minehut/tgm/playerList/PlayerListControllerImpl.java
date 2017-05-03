@@ -46,7 +46,7 @@ public class PlayerListControllerImpl implements PlayerListController {
                     int slot = (TAB_WIDTH - leftInRow + 1) * (TAB_HEIGHT - row);
                     playerList.updateSlot(slot, matchTeam.getColor() + player.getName(), player.getUniqueId(), null);
 
-                    Bukkit.broadcastMessage(player.getName() + " : " + slot);
+//                    Bukkit.broadcastMessage(player.getName() + " : " + slot);
 
                     leftInRow--;
                 }
