@@ -1,6 +1,7 @@
 package com.minehut.tgm.modules;
 
 import com.minehut.tgm.TGM;
+import com.minehut.tgm.damage.tracker.event.PlayerDamageEvent;
 import com.minehut.tgm.match.*;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamChangeEvent;
@@ -19,9 +20,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -168,6 +173,45 @@ public class SpectatorModule extends MatchModule implements Listener {
             return spectators.containsPlayer(player);
         } else {
             return true;
+        }
+    }
+
+    @EventHandler
+    public void onDamage(PlayerDamageEvent event) {
+        if (spectators.containsPlayer(event.getEntity())) {
+            event.setCancelled(true);
+        } else if (event.getInfo().getResolvedDamager() instanceof Player) {
+            if (spectators.containsPlayer((Player) event.getInfo().getResolvedDamager())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlace(BlockPlaceEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPickup(PlayerPickupItemEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPickupArrow(PlayerPickupArrowEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
         }
     }
 
