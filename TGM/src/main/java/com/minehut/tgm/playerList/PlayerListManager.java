@@ -57,15 +57,15 @@ public class PlayerListManager implements Listener {
             public void run() {
                 playerList.initTable(playerListController.getBlankTexture());
 
-                for (Player other : Bukkit.getOnlinePlayers()) {
-                    PlayerList otherPlayerList = getPlayerList(other);
-
-                    //remove the joining player from everyone else's playerList list.
-                    otherPlayerList.removePlayer(event.getPlayer());
-
-                    //remove everyone from the joining players playerList.
-                    playerList.removePlayer(other);
-                }
+//                for (Player other : Bukkit.getOnlinePlayers()) {
+//                    PlayerList otherPlayerList = getPlayerList(other);
+//
+//                    //remove the joining player from everyone else's playerList list.
+//                    otherPlayerList.removsePlayer(event.getPlayer());
+//
+//                    //remove everyone from the joining players playerList.
+//                    playerList.removePlayer(other);
+//                }
                 refreshAllTabs();
             }
         }, 0L);
