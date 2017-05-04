@@ -16,7 +16,7 @@ import java.util.List;
 public class ApiManager {
     public ApiManager() {
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
+        Bukkit.getScheduler().scheduleAsyncRepeatingTask(TGM.get(), new Runnable() {
             @Override
             public void run() {
                 List<ObjectId> players = new ArrayList<>();
