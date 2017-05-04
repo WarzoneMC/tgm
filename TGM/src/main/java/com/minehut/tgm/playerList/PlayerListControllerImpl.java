@@ -44,7 +44,7 @@ public class PlayerListControllerImpl implements PlayerListController {
 
 //                    int slot = TOP_ITEM_INDEX - (row * TAB_WIDTH) - leftInRow;
                     int slot = (TAB_WIDTH - leftInRow + 1) * (TAB_HEIGHT - row);
-                    playerList.updateSlot(slot, matchTeam.getColor() + player.getName(), player.getUniqueId(), null);
+                    playerList.addExistingPlayer(slot, matchTeam.getColor() + player.getName(), player);
 
 //                    Bukkit.broadcastMessage(player.getName() + " : " + slot);
 
@@ -62,7 +62,7 @@ public class PlayerListControllerImpl implements PlayerListController {
 
                 for(int i = 0; i < matchTeam.getMembers().size(); i++) {
                     Player player = matchTeam.getMembers().get(i).getPlayer();
-                    playerList.updateSlot(teamTitleSlot + i + 1, matchTeam.getColor() + player.getName(), player.getUniqueId(), null);
+                    playerList.addExistingPlayer(teamTitleSlot + i + 1, matchTeam.getColor() + player.getName(), player);
                 }
 
                 currentTeamIndex++;

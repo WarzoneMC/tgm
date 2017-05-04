@@ -93,7 +93,7 @@ public class TGM extends JavaPlugin {
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
-        playerListManager = new PlayerListManager();
+//        playerListManager = new PlayerListManager();
         tracker = new TrackerPlugin(this);
         grave = new GravePlugin(this);
 
