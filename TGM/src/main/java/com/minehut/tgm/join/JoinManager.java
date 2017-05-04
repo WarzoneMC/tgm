@@ -1,6 +1,7 @@
 package com.minehut.tgm.join;
 
 import com.minehut.teamapi.models.UserProfile;
+import com.minehut.teamapi.models.serverBound.PlayerLogin;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchLoadEvent;
 import com.minehut.tgm.match.MatchPostLoadEvent;
@@ -62,7 +63,8 @@ public class JoinManager implements Listener {
 
     @EventHandler
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        UserProfile userProfile = TGM.get().getTeamClient().login(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress());
+        UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
+        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString());
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }
 

@@ -1,9 +1,11 @@
 package com.minehut.teamapi.models;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,14 +13,18 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class UserProfile {
+    @SerializedName("_id")
+    @Getter private String id;
+
     @Getter private String name;
     @Getter private String nameLower;
     @Getter private String uuid;
+    @Getter private long initialJoinDate;
+    @Getter private long lastOnlineDate;
+
     @Getter private List<String> ips;
-    @Getter private List<ObjectId> tournaments;
-    @Getter private ObjectId team;
-    @Getter private TeamRole teamRole;
-    @Getter private int kills;
-    @Getter private int deaths;
-    @Getter private List<ObjectId> matches;
+    @Getter private List<String> ranks;
+    @Getter private int kills = 0;
+    @Getter private int deaths = 0;
+    @Getter private List<String> matches;
 }
