@@ -9,9 +9,10 @@ import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-public class ChatModule extends MatchModule {
+public class ChatModule extends MatchModule implements Listener {
     @Getter private TeamManagerModule teamManagerModule;
 
     @Override
