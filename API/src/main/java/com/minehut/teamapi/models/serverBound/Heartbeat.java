@@ -9,7 +9,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Heartbeat {
     @Getter private final String name;
-    @Getter private List<ObjectId> players;
+    @Getter private final String id;
+    @Getter private List<String> players; //object ids
     @Getter private int playerCount;
     @Getter private int spectatorCount;
     @Getter private int maxPlayers;

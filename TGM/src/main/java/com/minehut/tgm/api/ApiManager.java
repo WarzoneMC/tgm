@@ -19,10 +19,10 @@ public class ApiManager {
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(TGM.get(), new Runnable() {
             @Override
             public void run() {
-                List<ObjectId> players = new ArrayList<>();
+                List<String> players = new ArrayList<>();
                 for (PlayerContext playerContext : TGM.get().getPlayerManager().getPlayers()) {
                     try {
-                        players.add(new ObjectId(playerContext.getUserProfile().getId()));
+                        players.add(playerContext.getUserProfile().getId());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -41,6 +41,7 @@ public class ApiManager {
                 }
                 Heartbeat heartbeat = new Heartbeat(
                         TGM.get().getConfig().getString("server.name"),
+                        TGM.get().getConfig().getString("server.id"),
                         players,
                         playerCount,
                         spectatorCount,

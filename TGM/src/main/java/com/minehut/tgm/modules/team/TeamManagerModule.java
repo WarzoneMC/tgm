@@ -1,5 +1,6 @@
 package com.minehut.tgm.modules.team;
 
+import com.minehut.tgm.TGM;
 import com.minehut.tgm.join.MatchJoinEvent;
 import com.minehut.tgm.map.ParsedTeam;
 import com.minehut.tgm.match.*;
@@ -11,6 +12,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
@@ -52,6 +55,21 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
         matchTeam.addPlayer(playerContext);
         Bukkit.getPluginManager().callEvent(new TeamChangeEvent(playerContext, matchTeam, oldTeam));
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        handleQuit(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onKick(PlayerKickEvent event) {
+        handleQuit(event.getPlayer());
+    }
+
+    private void handleQuit(Player player) {
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+        getTeam(player).removePlayer(playerContext);
     }
 
     public MatchTeam getTeamById(String id) {
