@@ -1,9 +1,8 @@
 package com.minehut.tgm.join;
 
 import com.minehut.teamapi.models.UserProfile;
-import com.minehut.teamapi.models.serverBound.PlayerLogin;
+import com.minehut.teamapi.models.PlayerLogin;
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.match.MatchLoadEvent;
 import com.minehut.tgm.match.MatchPostLoadEvent;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.UUID;
 
 /**

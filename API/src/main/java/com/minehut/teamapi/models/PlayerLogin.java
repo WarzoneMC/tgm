@@ -1,4 +1,4 @@
-package com.minehut.teamapi.models.serverBound;
+package com.minehut.teamapi.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

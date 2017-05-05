@@ -1,24 +1,20 @@
 package com.minehut.tgm.api;
 
-import com.minehut.teamapi.client.TeamClient;
 import com.minehut.teamapi.models.Kill;
 import com.minehut.teamapi.models.Map;
-import com.minehut.teamapi.models.serverBound.Heartbeat;
+import com.minehut.teamapi.models.Heartbeat;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
-import com.minehut.tgm.damage.grave.event.PlayerDeathEvent;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.ParsedTeam;
 import com.minehut.tgm.match.MatchLoadEvent;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
-import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.List;

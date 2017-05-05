@@ -3,16 +3,14 @@ package com.minehut.teamapi.client.offline;
 import com.minehut.teamapi.client.TeamClient;
 import com.minehut.teamapi.models.Kill;
 import com.minehut.teamapi.models.Map;
-import com.minehut.teamapi.models.TeamRole;
 import com.minehut.teamapi.models.UserProfile;
-import com.minehut.teamapi.models.serverBound.Heartbeat;
-import com.minehut.teamapi.models.serverBound.PlayerLogin;
+import com.minehut.teamapi.models.Heartbeat;
+import com.minehut.teamapi.models.PlayerLogin;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by luke on 4/27/17.

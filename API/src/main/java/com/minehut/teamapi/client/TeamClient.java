@@ -2,9 +2,9 @@ package com.minehut.teamapi.client;
 
 import com.minehut.teamapi.models.Kill;
 import com.minehut.teamapi.models.Map;
-import com.minehut.teamapi.models.serverBound.Heartbeat;
+import com.minehut.teamapi.models.Heartbeat;
 import com.minehut.teamapi.models.UserProfile;
-import com.minehut.teamapi.models.serverBound.PlayerLogin;
+import com.minehut.teamapi.models.PlayerLogin;
 import org.bson.types.ObjectId;
 
 /**
