@@ -119,17 +119,21 @@ public class ControlPoint implements Listener {
                 }
 
                 MatchTeam most = null;
+                int mostCount = 0;
                 for (MatchTeam matchTeam : holding.keySet()) {
                     if (most == null) {
                         most = matchTeam;
                     } else {
-                        if (holding.get(matchTeam) >= holding.get(most)) {
+                        if (holding.get(matchTeam) == holding.get(most)) {
+                            mostCount++;
+                        } else if (holding.get(matchTeam) > holding.get(most)) {
                             most = matchTeam;
+                            mostCount = 0;
                         }
                     }
                 }
 
-                if (most != null) {
+                if (most != null && mostCount == 0) {
                     handleCap(most);
                 } else {
                     if (controller != null) {
