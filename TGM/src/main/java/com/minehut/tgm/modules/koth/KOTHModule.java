@@ -125,8 +125,6 @@ public class KOTHModule extends MatchModule implements Listener {
 
             controlPointScoreboardLines.put(controlPoint.getDefinition(), i);
             simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), i);
-
-            Bukkit.broadcastMessage(getControlPointScoreboardLine(controlPoint));
         }
 
         i++;
@@ -138,8 +136,6 @@ public class KOTHModule extends MatchModule implements Listener {
 
             simpleScoreboard.add(getTeamScoreLine(matchTeam), i);
             teamScoreboardLines.put(matchTeam, i);
-
-            Bukkit.broadcastMessage(getTeamScoreLine(matchTeam));
 
             i++;
         }
