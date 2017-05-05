@@ -3,6 +3,7 @@ package com.minehut.tgm.command;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.map.MapContainer;
 import com.minehut.tgm.match.MatchStatus;
+import com.minehut.tgm.modules.ChatModule;
 import com.minehut.tgm.modules.countdown.Countdown;
 import com.minehut.tgm.modules.countdown.CycleCountdown;
 import com.minehut.tgm.modules.countdown.StartCountdown;
@@ -151,6 +152,14 @@ public class CycleCommands {
             }
         } else {
             sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
+        }
+    }
+
+    @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "/t (message)", min = 1)
+    public static void t(CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() > 0) {
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
+            TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, cmd.getJoinedStrings(0));
         }
     }
 
