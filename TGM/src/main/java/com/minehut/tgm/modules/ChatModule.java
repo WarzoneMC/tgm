@@ -34,7 +34,7 @@ public class ChatModule extends MatchModule implements Listener {
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
         event.setFormat("<" + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + "> " + event.getMessage());
 
-        chatLog.add(new Chat(playerContext.getUserProfile().getId(), event.getPlayer().getName(), event.getMessage(), matchTeam.getId(), (int) timeModule.getTimeElapsed(), false));
+        chatLog.add(new Chat(playerContext.getUserProfile().getId(), event.getPlayer().getName(), event.getMessage(), matchTeam.getId(), timeModule.getTimeElapsed(), false));
     }
 
     public void sendTeamChat(PlayerContext playerContext, String message) {
@@ -43,7 +43,7 @@ public class ChatModule extends MatchModule implements Listener {
             member.getPlayer().sendMessage(matchTeam.getColor() + "[" + matchTeam.getAlias() + "] "
                     + playerContext.getPlayer().getName() + ChatColor.WHITE + ": " + message);
         }
-        chatLog.add(new Chat(playerContext.getUserProfile().getId(), playerContext.getPlayer().getName(), message, matchTeam.getId(), (int) timeModule.getTimeElapsed(), true));
+        chatLog.add(new Chat(playerContext.getUserProfile().getId(), playerContext.getPlayer().getName(), message, matchTeam.getId(), timeModule.getTimeElapsed(), true));
     }
 
     @Override

@@ -9,6 +9,6 @@ public class Chat {
     @Getter private String username;
     @Getter private String message;
     @Getter private String team;
-    @Getter private int matchTime;
+    @Getter private double matchTime;
     @Getter private boolean teamChat;
 }
