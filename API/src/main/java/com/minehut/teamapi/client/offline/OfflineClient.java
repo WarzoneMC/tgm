@@ -1,11 +1,8 @@
 package com.minehut.teamapi.client.offline;
 
 import com.minehut.teamapi.client.TeamClient;
-import com.minehut.teamapi.models.Kill;
-import com.minehut.teamapi.models.Map;
-import com.minehut.teamapi.models.UserProfile;
-import com.minehut.teamapi.models.Heartbeat;
-import com.minehut.teamapi.models.PlayerLogin;
+import com.minehut.teamapi.models.*;
+import com.minehut.teamapi.models.Death;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
@@ -35,7 +32,7 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public void addKill(Kill kill) {
+    public void addKill(Death death) {
 
     }
 }

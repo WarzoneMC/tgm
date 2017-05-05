@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public class Kill {
+public class Death {
     @Getter private String player; //id
-    @Getter private String target; //id
+    @Getter private String killer; //id
 
     @Getter private String playerItem;
-    @Getter private String targetItem;
+    @Getter private String killerItem;
 
     @Getter private String map; //name
 }

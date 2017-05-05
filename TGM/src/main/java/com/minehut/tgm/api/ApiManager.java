@@ -1,10 +1,11 @@
 package com.minehut.tgm.api;
 
-import com.minehut.teamapi.models.Kill;
+import com.minehut.teamapi.models.Death;
 import com.minehut.teamapi.models.Map;
 import com.minehut.teamapi.models.Heartbeat;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
+import com.minehut.tgm.damage.grave.event.PlayerDeathEvent;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.ParsedTeam;
 import com.minehut.tgm.match.MatchLoadEvent;
@@ -79,27 +80,29 @@ public class ApiManager implements Listener {
     }
 
     @EventHandler
-    public void onKill(PlayerDeathByPlayerEvent event) {
-        PlayerContext player = TGM.get().getPlayerManager().getPlayerContext(event.getCause()); //dead
-        PlayerContext target = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer()); //killer
+    public void onKill(PlayerDeathEvent event) {
+        PlayerContext player = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer()); //dead
 
         String playerItem = "";
         if (event.getPlayer().getItemInHand() != null) {
             playerItem = event.getPlayer().getItemInHand().getType().toString();
         }
 
-        String targetItem = "";
-        if (event.getCause().getItemInHand() != null) {
-            targetItem = event.getCause().getItemInHand().getType().toString();
+        String killerItem = "";
+        String killerId = null;
+        if (event instanceof PlayerDeathByPlayerEvent) {
+            killerId = TGM.get().getPlayerManager().getPlayerContext(((PlayerDeathByPlayerEvent) event).getCause()).getUserProfile().getId();
+            if (((PlayerDeathByPlayerEvent) event).getCause().getItemInHand() != null) {
+                killerItem = ((PlayerDeathByPlayerEvent) event).getCause().getItemInHand().getType().toString();
+            }
         }
 
-        Kill kill = new Kill(player.getUserProfile().getId(),
-                target.getUserProfile().getId(), playerItem,
-                targetItem, currentMap.toString());
+        Death death = new Death(player.getUserProfile().getId(), killerId, playerItem,
+                killerItem, currentMap.toString());
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
             @Override
             public void run() {
-                TGM.get().getTeamClient().addKill(kill);
+                TGM.get().getTeamClient().addKill(death);
             }
         });
     }

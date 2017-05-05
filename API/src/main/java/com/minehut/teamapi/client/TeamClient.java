@@ -1,6 +1,6 @@
 package com.minehut.teamapi.client;
 
-import com.minehut.teamapi.models.Kill;
+import com.minehut.teamapi.models.Death;
 import com.minehut.teamapi.models.Map;
 import com.minehut.teamapi.models.Heartbeat;
 import com.minehut.teamapi.models.UserProfile;
@@ -28,6 +28,6 @@ public interface TeamClient {
      */
     ObjectId loadmap(Map map);
 
-    void addKill(Kill kill);
+    void addKill(Death death);
 
 }

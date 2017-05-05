@@ -7,11 +7,8 @@ import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.minehut.teamapi.client.TeamClient;
-import com.minehut.teamapi.models.Kill;
-import com.minehut.teamapi.models.Map;
-import com.minehut.teamapi.models.Heartbeat;
-import com.minehut.teamapi.models.UserProfile;
-import com.minehut.teamapi.models.PlayerLogin;
+import com.minehut.teamapi.models.*;
+import com.minehut.teamapi.models.Death;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 
@@ -94,13 +91,13 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void addKill(Kill kill) {
+    public void addKill(Death death) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/kill")
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/death")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
-                    .body(kill)
+                    .body(death)
                     .asJson();
         } catch (UnirestException e) {
             e.printStackTrace();
