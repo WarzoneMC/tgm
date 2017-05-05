@@ -90,7 +90,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         teamSelectionMenu.setItem(0, null, new MenuAction() {
             @Override
             public void run(Player player) {
-                player.performCommand("join spectators");
+                player.performCommand("join");
             }
         });
 
