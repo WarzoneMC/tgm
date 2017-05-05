@@ -11,5 +11,5 @@ public class Death {
     @Getter private String playerItem;
     @Getter private String killerItem;
 
-    @Getter private String map; //name
+    @Getter private String map; //id
 }

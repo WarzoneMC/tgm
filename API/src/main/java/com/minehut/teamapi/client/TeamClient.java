@@ -1,10 +1,6 @@
 package com.minehut.teamapi.client;
 
-import com.minehut.teamapi.models.Death;
-import com.minehut.teamapi.models.Map;
-import com.minehut.teamapi.models.Heartbeat;
-import com.minehut.teamapi.models.UserProfile;
-import com.minehut.teamapi.models.PlayerLogin;
+import com.minehut.teamapi.models.*;
 import org.bson.types.ObjectId;
 
 /**
@@ -30,4 +26,5 @@ public interface TeamClient {
 
     void addKill(Death death);
 
+    void matchFinish(Match match);
 }

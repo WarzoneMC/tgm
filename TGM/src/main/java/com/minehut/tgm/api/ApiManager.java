@@ -3,12 +3,15 @@ package com.minehut.tgm.api;
 import com.minehut.teamapi.models.Death;
 import com.minehut.teamapi.models.Map;
 import com.minehut.teamapi.models.Heartbeat;
+import com.minehut.teamapi.models.Match;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
 import com.minehut.tgm.damage.grave.event.PlayerDeathEvent;
 import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.ParsedTeam;
 import com.minehut.tgm.match.MatchLoadEvent;
+import com.minehut.tgm.match.MatchResultEvent;
+import com.minehut.tgm.modules.ChatModule;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
@@ -62,6 +65,30 @@ public class ApiManager implements Listener {
                 TGM.get().getTeamClient().heartbeat(heartbeat);
             }
         }, 20L, 20L);
+    }
+
+    @EventHandler
+    public void onMatchResult(MatchResultEvent event) {
+        List<String> winners = new ArrayList<>();
+        for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
+            winners.add(playerContext.getUserProfile().getId());
+        }
+
+        List<String> losers = new ArrayList<>();
+        for (MatchTeam matchTeam : event.getLosingTeams()) {
+            for (PlayerContext playerContext : matchTeam.getMembers()) {
+                losers.add(playerContext.getUserProfile().getId());
+            }
+        }
+        Match match = new Match(
+                currentMap.toString(),
+                event.getMatch().getStartedTime(),
+                event.getMatch().getFinishedTime(),
+                TGM.get().getModule(ChatModule.class).getChatLog(),
+                winners,
+                losers,
+                event.getWinningTeam().getId());
+        TGM.get().getTeamClient().matchFinish(match);
     }
 
     @EventHandler

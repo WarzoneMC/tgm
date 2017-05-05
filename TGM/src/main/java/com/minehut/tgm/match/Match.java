@@ -25,6 +25,9 @@ public class Match {
     @Getter private final MapContainer mapContainer;
     @Getter @Setter private MatchStatus matchStatus = MatchStatus.PRE;
 
+    @Getter private long startedTime;
+    @Getter private long finishedTime;
+
     public Match(UUID uuid, MatchManifest matchManifest, World world, MapContainer mapContainer) {
         this.uuid = uuid;
         this.matchManifest = matchManifest;
@@ -74,6 +77,7 @@ public class Match {
      */
     public void enable() {
         setMatchStatus(MatchStatus.MID);
+        startedTime = System.currentTimeMillis();
 
         for (MatchModule module : modules) {
             module.enable();
@@ -86,6 +90,7 @@ public class Match {
      */
     public void disable() {
         setMatchStatus(MatchStatus.POST);
+        finishedTime = System.currentTimeMillis();
 
         for (MatchModule module : modules) {
             module.disable();

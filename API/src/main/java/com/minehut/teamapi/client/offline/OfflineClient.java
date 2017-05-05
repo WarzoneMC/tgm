@@ -35,4 +35,9 @@ public class OfflineClient implements TeamClient {
     public void addKill(Death death) {
 
     }
+
+    @Override
+    public void matchFinish(Match match) {
+
+    }
 }
