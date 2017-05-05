@@ -51,7 +51,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
                 if (event.getOldTeam() != null) {
                     Team old = simpleScoreboard.getScoreboard().getTeam(event.getOldTeam().getId());
-                    old.removeEntry(playerContext.getPlayer().getName());
+                    old.removeEntry(event.getPlayerContext().getPlayer().getName());
                 }
             }
         }
