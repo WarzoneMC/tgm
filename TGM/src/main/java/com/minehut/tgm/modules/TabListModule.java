@@ -4,6 +4,7 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.match.MatchStatus;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.util.Strings;
 import com.minehut.tgm.util.TitleAPI;
 import lombok.Getter;
@@ -23,7 +24,7 @@ public class TabListModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         //todo: show all authors.
-        header = ChatColor.WHITE + ChatColor.BOLD.toString() + match.getMapContainer().getMapInfo().getName() + ChatColor.YELLOW + " by " + match.getMapContainer().getMapInfo().getAuthors().get(0);
+        header = ChatColor.GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + "TEAM.GG" + ChatColor.GRAY + " - ";
     }
 
     @EventHandler
@@ -53,7 +54,9 @@ public class TabListModule extends MatchModule implements Listener {
             timeColor = ChatColor.RED;
         }
 
-        String footer = ChatColor.GRAY + "Time: " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed());
+        String footer =
+                ChatColor.GRAY + "Time: " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed())
+                + "     " + ChatColor.GRAY + "Spectators: " + ChatColor.AQUA + TGM.get().getModule(TeamManagerModule.class).getSpectators().getMembers().size();
         TitleAPI.sendTabTitle(player, header, footer);
     }
     private void refreshAllTabs() {
