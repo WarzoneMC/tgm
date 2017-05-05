@@ -116,7 +116,7 @@ public class ControlPoint implements Listener {
                             holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                         }
                     }
-                })
+                }
 
                 MatchTeam most = null;
                 for (MatchTeam matchTeam : holding.keySet()) {
