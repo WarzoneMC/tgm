@@ -100,6 +100,11 @@ public class ApiManager implements Listener {
         Kill kill = new Kill(player.getUserProfile().getId(),
                 target.getUserProfile().getId(), playerItem,
                 targetItem, currentMap.toString());
-        TGM.get().getTeamClient().addKill(kill);
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
+            @Override
+            public void run() {
+                TGM.get().getTeamClient().addKill(kill);
+            }
+        });
     }
 }
