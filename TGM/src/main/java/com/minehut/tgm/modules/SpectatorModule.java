@@ -126,7 +126,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                         leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                         leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                         leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
-                                + "/" + matchTeam.getMax() + " playing.", "", ChatColor.LIGHT_PURPLE +  "Only premium users can choose their team.", ChatColor.LIGHT_PURPLE + "Everyone can use " + ChatColor.WHITE + "Auto Join " + ChatColor.LIGHT_PURPLE + "to play."));
+                                + "/" + matchTeam.getMax() + " playing."));
                         itemStack.setItemMeta(leatherArmorMeta);
                         teamSelectionMenu.setItem(i, itemStack);
 
