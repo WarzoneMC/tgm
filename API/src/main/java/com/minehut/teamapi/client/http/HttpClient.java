@@ -7,6 +7,8 @@ import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.minehut.teamapi.client.TeamClient;
+import com.minehut.teamapi.models.Kill;
+import com.minehut.teamapi.models.Map;
 import com.minehut.teamapi.models.serverBound.Heartbeat;
 import com.minehut.teamapi.models.UserProfile;
 import com.minehut.teamapi.models.serverBound.PlayerLogin;
@@ -74,6 +76,36 @@ public class HttpClient implements TeamClient {
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public ObjectId loadmap(Map map) {
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/map/load")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(map)
+                    .asJson();
+            return new ObjectId((String) jsonResponse.getBody().getObject().get("map"));
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void addKill(Kill kill) {
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/kill")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(kill)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
         }
     }
 }
