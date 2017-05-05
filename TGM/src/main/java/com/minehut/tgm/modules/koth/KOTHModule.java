@@ -148,7 +148,7 @@ public class KOTHModule extends MatchModule implements Listener {
     private String getControlPointScoreboardLine(ControlPoint controlPoint) {
         if (controlPoint.isInProgress()) {
             if (controlPoint.getController() == null) {
-                return controlPoint.getPercent() + "% " + ChatColor.WHITE + controlPoint.getDefinition().getName();
+                return controlPoint.getProgressingTowardsTeam().getColor().toString() + controlPoint.getPercent() + "% " + ChatColor.WHITE + controlPoint.getDefinition().getName();
             } else {
                 return controlPoint.getPercent() + "% " + controlPoint.getController().getColor() + controlPoint.getDefinition().getName();
             }
