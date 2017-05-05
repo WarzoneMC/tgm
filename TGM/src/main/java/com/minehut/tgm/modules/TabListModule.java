@@ -56,7 +56,7 @@ public class TabListModule extends MatchModule implements Listener {
 
         String footer =
                 ChatColor.GRAY + "Time: " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed())
-                + "     " + ChatColor.GRAY + "Spectators: " + ChatColor.AQUA + TGM.get().getModule(TeamManagerModule.class).getSpectators().getMembers().size();
+                + ChatColor.DARK_GRAY + " - " + ChatColor.GRAY + "Spectators: " + ChatColor.AQUA + TGM.get().getModule(TeamManagerModule.class).getSpectators().getMembers().size();
         TitleAPI.sendTabTitle(player, header, footer);
     }
     private void refreshAllTabs() {

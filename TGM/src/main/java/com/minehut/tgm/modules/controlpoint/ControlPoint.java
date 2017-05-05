@@ -116,21 +116,21 @@ public class ControlPoint implements Listener {
                             holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                         }
                     }
-                }
+                })
 
-                List<MatchTeam> most = new ArrayList<>();
+                MatchTeam most = null;
                 for (MatchTeam matchTeam : holding.keySet()) {
-                    if (most.isEmpty()) {
-                        most.add(matchTeam);
+                    if (most == null) {
+                        most = matchTeam;
                     } else {
                         if (holding.get(matchTeam) >= holding.get(most)) {
-                            most.add(matchTeam);
+                            most = matchTeam;
                         }
                     }
                 }
 
-                if (most.size() == 1) {
-                    handleCap(most.get(0));
+                if (most != null) {
+                    handleCap(most);
                 } else {
                     if (controller != null) {
                         controlPointService.holding(controller);
