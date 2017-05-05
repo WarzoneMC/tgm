@@ -155,7 +155,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "/t (message)", min = 1)
+    @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
