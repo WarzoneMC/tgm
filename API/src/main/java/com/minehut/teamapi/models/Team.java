@@ -3,6 +3,8 @@ package com.minehut.teamapi.models;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @AllArgsConstructor
 public class Team {
     @Getter private String id;

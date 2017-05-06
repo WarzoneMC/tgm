@@ -14,4 +14,5 @@ public class Match {
     @Getter private List<String> winners; //id
     @Getter private List<String> losers; //id
     @Getter private String winningTeam; //map defined team name
+    @Getter private List<TeamMapping> teamMappings;
 }

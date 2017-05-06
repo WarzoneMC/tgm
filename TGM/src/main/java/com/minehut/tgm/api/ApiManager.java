@@ -1,9 +1,6 @@
 package com.minehut.tgm.api;
 
-import com.minehut.teamapi.models.Death;
-import com.minehut.teamapi.models.Map;
-import com.minehut.teamapi.models.Heartbeat;
-import com.minehut.teamapi.models.Match;
+import com.minehut.teamapi.models.*;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
 import com.minehut.tgm.damage.grave.event.PlayerDeathEvent;
@@ -80,6 +77,17 @@ public class ApiManager implements Listener {
                 losers.add(playerContext.getUserProfile().getId());
             }
         }
+
+        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+        List<TeamMapping> teamMappings = new ArrayList<>();
+        for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
+            if(matchTeam.isSpectator()) continue;
+
+            for (PlayerContext playerContext : matchTeam.getMembers()) {
+                teamMappings.add(new TeamMapping(matchTeam.getId(), playerContext.getUserProfile().getId()));
+            }
+        }
+
         Match match = new Match(
                 currentMap.toString(),
                 event.getMatch().getStartedTime(),
@@ -87,7 +95,8 @@ public class ApiManager implements Listener {
                 TGM.get().getModule(ChatModule.class).getChatLog(),
                 winners,
                 losers,
-                event.getWinningTeam().getId());
+                event.getWinningTeam().getId(),
+                teamMappings);
         TGM.get().getTeamClient().matchFinish(match);
     }
 

@@ -7,6 +7,7 @@ import lombok.Getter;
 public class Chat {
     @Getter private String user;
     @Getter private String username;
+    @Getter private String uuid;
     @Getter private String message;
     @Getter private String team;
     @Getter private double matchTime;
