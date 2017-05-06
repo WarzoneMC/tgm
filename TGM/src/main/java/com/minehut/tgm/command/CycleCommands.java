@@ -155,6 +155,14 @@ public class CycleCommands {
         }
     }
 
+    @Command(aliases = {"loadmaps"}, desc = "Load maps.")
+    @CommandPermissions({"tgm.loadmaps"})
+    public static void loadmaps(CommandContext cmd, CommandSender sender) {
+        TGM.get().getMatchManager().getMapLibrary().refreshMaps();
+        TGM.get().getMatchManager().getMapRotation().refresh();
+        sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
+    }
+
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {

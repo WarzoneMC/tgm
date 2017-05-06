@@ -6,4 +6,5 @@ package com.minehut.tgm.map;
 public interface MapRotation {
     MapContainer cycle();
     MapContainer getNext();
+    void refresh();
 }
