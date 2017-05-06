@@ -31,4 +31,9 @@ public abstract class BossBarCountdown extends Countdown implements Listener {
     public void onBossBarCountdownKick(PlayerKickEvent event) {
         bossBar.removePlayer(event.getPlayer());
     }
+
+    @Override
+    public void unload() {
+        bossBar.removeAll();
+    }
 }
