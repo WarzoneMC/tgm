@@ -39,7 +39,7 @@ public class MatchResultModule extends MatchModule implements Listener {
         if (event.getWinningTeam() != null) {
             Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "   " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias() + " Wins!" + ChatColor.DARK_PURPLE + "   ");
         } else {
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "# #   " + ChatColor.YELLOW + "Tie" + ChatColor.YELLOW + "   # #");
+            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "   " + ChatColor.YELLOW + "Tie" + ChatColor.YELLOW + "   ");
         }
         Bukkit.broadcastMessage(ChatColor.GOLD + "------------");
     }
