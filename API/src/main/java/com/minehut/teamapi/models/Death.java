@@ -12,4 +12,5 @@ public class Death {
     @Getter private String killerItem;
 
     @Getter private String map; //id
+    @Getter private String match; //id
 }

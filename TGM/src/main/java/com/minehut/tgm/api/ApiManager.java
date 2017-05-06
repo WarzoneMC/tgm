@@ -12,7 +12,6 @@ import com.minehut.tgm.modules.ChatModule;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
-import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApiManager implements Listener {
-    private ObjectId currentMap;
+    private MatchInProgress matchInProgress;
 
     public ApiManager() {
         TGM.registerEvents(this);
@@ -89,7 +88,7 @@ public class ApiManager implements Listener {
         }
 
         Match match = new Match(
-                currentMap.toString(),
+                matchInProgress.getId(),
                 event.getMatch().getStartedTime(),
                 event.getMatch().getFinishedTime(),
                 TGM.get().getModule(ChatModule.class).getChatLog(),
@@ -97,7 +96,7 @@ public class ApiManager implements Listener {
                 losers,
                 event.getWinningTeam().getId(),
                 teamMappings);
-        TGM.get().getTeamClient().matchFinish(match);
+        TGM.get().getTeamClient().finishMatch(match);
     }
 
     @EventHandler
@@ -110,7 +109,10 @@ public class ApiManager implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
             @Override
             public void run() {
-                currentMap = TGM.get().getTeamClient().loadmap(new Map(mapInfo.getName(), mapInfo.getVersion(), mapInfo.getAuthors(), mapInfo.getGametype().toString(), teams));
+                MapLoadResponse mapLoadResponse = TGM.get().getTeamClient().loadmap(new Map(mapInfo.getName(), mapInfo.getVersion(), mapInfo.getAuthors(), mapInfo.getGametype().toString(), teams));
+                Bukkit.getLogger().info("Received load map response. Id: " + mapLoadResponse.getMap() + " [" + mapLoadResponse.isInserted() + "]");
+                matchInProgress = TGM.get().getTeamClient().loadMatch(new MatchLoadRequest(mapLoadResponse.getMap()));
+                Bukkit.getLogger().info("Match successfully loaded [" + matchInProgress.getMap() + "]");
             }
         });
     }
@@ -134,7 +136,7 @@ public class ApiManager implements Listener {
         }
 
         Death death = new Death(player.getUserProfile().getId(), killerId, playerItem,
-                killerItem, currentMap.toString());
+                killerItem, matchInProgress.getMap(), matchInProgress.getId());
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
             @Override
             public void run() {

@@ -1,7 +1,6 @@
 package com.minehut.teamapi.client;
 
 import com.minehut.teamapi.models.*;
-import org.bson.types.ObjectId;
 
 /**
  * Created by luke on 4/27/17.
@@ -21,10 +20,13 @@ public interface TeamClient {
 
     /**
      * Called whenever a map is loaded.
+     * Returns the map id.
      */
-    ObjectId loadmap(Map map);
+    MapLoadResponse loadmap(Map map);
 
     void addKill(Death death);
 
-    void matchFinish(Match match);
+    MatchInProgress loadMatch(MatchLoadRequest matchLoadRequest);
+
+    void finishMatch(Match match);
 }

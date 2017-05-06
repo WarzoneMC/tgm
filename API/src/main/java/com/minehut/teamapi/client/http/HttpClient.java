@@ -10,7 +10,6 @@ import com.minehut.teamapi.client.TeamClient;
 import com.minehut.teamapi.models.*;
 import com.minehut.teamapi.models.Death;
 import lombok.Getter;
-import org.bson.types.ObjectId;
 
 /**
  * Created by luke on 4/27/17.
@@ -75,15 +74,15 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public ObjectId loadmap(Map map) {
+    public MapLoadResponse loadmap(Map map) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/map/load")
+            HttpResponse<MapLoadResponse> mapLoadResponse = Unirest.post(config.getBaseUrl() + "/mc/map/load")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .body(map)
-                    .asJson();
-            return new ObjectId((String) jsonResponse.getBody().getObject().get("map"));
+                    .asObject(MapLoadResponse.class);
+            return mapLoadResponse.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
@@ -93,7 +92,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void addKill(Death death) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/death")
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/death/new")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
@@ -105,9 +104,25 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void matchFinish(Match match) {
+    public MatchInProgress loadMatch(MatchLoadRequest matchLoadRequest) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/new")
+            HttpResponse<MatchInProgress> userProfileResponse = Unirest.post(config.getBaseUrl() + "/mc/match/load")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(matchLoadRequest)
+                    .asObject(MatchInProgress.class);
+            return userProfileResponse.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public void finishMatch(Match match) {
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/finish")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")

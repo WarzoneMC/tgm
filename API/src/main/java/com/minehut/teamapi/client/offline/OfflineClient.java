@@ -27,8 +27,8 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public ObjectId loadmap(Map map) {
-        return null;
+    public MapLoadResponse loadmap(Map map) {
+        return new MapLoadResponse(false, new ObjectId().toString());
     }
 
     @Override
@@ -37,7 +37,12 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public void matchFinish(Match match) {
+    public MatchInProgress loadMatch(MatchLoadRequest matchLoadRequest) {
+        return new MatchInProgress(new ObjectId().toString(), matchLoadRequest.getMap());
+    }
+
+    @Override
+    public void finishMatch(Match match) {
 
     }
 }
