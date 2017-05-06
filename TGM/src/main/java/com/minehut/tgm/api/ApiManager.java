@@ -101,6 +101,7 @@ public class ApiManager implements Listener {
         TGM.get().getTeamClient().finishMatch(matchFinishPacket);
     }
 
+    @EventHandler
     public void onMatchLoad(MatchLoadEvent event) {
         MapInfo mapInfo = event.getMatch().getMapContainer().getMapInfo();
         List<com.minehut.teamapi.models.Team> teams = new ArrayList<>();
