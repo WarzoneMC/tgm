@@ -6,7 +6,8 @@ import lombok.Getter;
 import java.util.List;
 
 @AllArgsConstructor
-public class Match {
+public class MatchFinishPacket {
+    @Getter private String id; //id
     @Getter private String map; //id
     @Getter private long startedDate;
     @Getter private long finishedDate;

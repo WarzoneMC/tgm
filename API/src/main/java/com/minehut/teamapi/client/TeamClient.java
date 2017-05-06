@@ -28,5 +28,5 @@ public interface TeamClient {
 
     MatchInProgress loadMatch(MatchLoadRequest matchLoadRequest);
 
-    void finishMatch(Match match);
+    void finishMatch(MatchFinishPacket matchFinishPacket);
 }

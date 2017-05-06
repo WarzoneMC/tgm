@@ -120,13 +120,13 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void finishMatch(Match match) {
+    public void finishMatch(MatchFinishPacket matchFinishPacket) {
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/finish")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
-                    .body(match)
+                    .body(matchFinishPacket)
                     .asJson();
         } catch (UnirestException e) {
             e.printStackTrace();

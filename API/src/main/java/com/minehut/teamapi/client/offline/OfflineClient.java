@@ -42,7 +42,7 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public void finishMatch(Match match) {
+    public void finishMatch(MatchFinishPacket matchFinishPacket) {
 
     }
 }

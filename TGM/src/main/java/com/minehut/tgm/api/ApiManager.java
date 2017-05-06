@@ -87,8 +87,9 @@ public class ApiManager implements Listener {
             }
         }
 
-        Match match = new Match(
+        MatchFinishPacket matchFinishPacket = new MatchFinishPacket(
                 matchInProgress.getId(),
+                matchInProgress.getMap(),
                 event.getMatch().getStartedTime(),
                 event.getMatch().getFinishedTime(),
                 TGM.get().getModule(ChatModule.class).getChatLog(),
@@ -96,7 +97,7 @@ public class ApiManager implements Listener {
                 losers,
                 event.getWinningTeam().getId(),
                 teamMappings);
-        TGM.get().getTeamClient().finishMatch(match);
+        TGM.get().getTeamClient().finishMatch(matchFinishPacket);
     }
 
     @EventHandler
