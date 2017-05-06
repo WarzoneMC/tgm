@@ -14,6 +14,7 @@ import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -100,7 +101,6 @@ public class ApiManager implements Listener {
         TGM.get().getTeamClient().finishMatch(matchFinishPacket);
     }
 
-    @EventHandler
     public void onMatchLoad(MatchLoadEvent event) {
         MapInfo mapInfo = event.getMatch().getMapContainer().getMapInfo();
         List<com.minehut.teamapi.models.Team> teams = new ArrayList<>();

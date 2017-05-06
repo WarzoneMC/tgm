@@ -47,9 +47,9 @@ public class MatchManager {
                 losers.add(matchTeam);
             }
         }
-        Bukkit.getPluginManager().callEvent(new MatchResultEvent(match, winningTeam, losers));
-
         match.disable();
+
+        Bukkit.getPluginManager().callEvent(new MatchResultEvent(match, winningTeam, losers));
     }
 
     public void cycleNextMatch() throws IOException {
