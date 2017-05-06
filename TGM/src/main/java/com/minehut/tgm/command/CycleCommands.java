@@ -43,7 +43,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"start"}, desc = "End the match.")
+    @Command(aliases = {"start"}, desc = "Start the match.")
     @CommandPermissions({"tgm.start"})
     public static void start(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
@@ -62,7 +62,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"end"}, desc = "Start the match.")
+    @Command(aliases = {"end"}, desc = "End the match.")
     @CommandPermissions({"tgm.end"})
     public static void end(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
