@@ -51,7 +51,6 @@ public class RegionManagerModule extends MatchModule {
 
             switch (type) {
                 case "cylinder":
-                    Bukkit.broadcastMessage("cylinder");
                     region = new CylinderRegion(
                             Parser.convertLocation(match.getWorld(), regionJson.get("base")),
                             regionJson.get("radius").getAsDouble(),
@@ -60,7 +59,6 @@ public class RegionManagerModule extends MatchModule {
                     break;
                 case "cuboid":
                 default:
-                    Bukkit.broadcastMessage("cuboid region");
                     region = new CuboidRegion(
                             match.getWorld(),
                             Parser.convertLocation(match.getWorld(), regionJson.get("min")),
