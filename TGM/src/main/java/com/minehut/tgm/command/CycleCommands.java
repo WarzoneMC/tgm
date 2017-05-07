@@ -181,9 +181,13 @@ public class CycleCommands {
             }
             if (cmd.getString(1).equalsIgnoreCase("off")) {
                 TGM.get().getConfig().set("api.stats.enabled", false);
+                TGM.get().saveDefaultConfig();
+
                 sender.sendMessage(ChatColor.GREEN + "Disabled stat uploading.");
             } else if (cmd.getString(1).equalsIgnoreCase("on")) {
                 TGM.get().getConfig().set("api.stats.enabled", true);
+                TGM.get().saveDefaultConfig();
+
                 sender.sendMessage(ChatColor.GREEN + "Enabled stat uploading.");
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
