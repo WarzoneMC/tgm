@@ -49,7 +49,6 @@ public class TGM extends JavaPlugin {
     @Getter private MatchManager matchManager;
     @Getter private PlayerManager playerManager;
     @Getter private JoinManager joinManager;
-    @Getter private PlayerListManager playerListManager;
     @Getter private TrackerPlugin tracker;
     @Getter private GravePlugin grave;
     @Getter private ApiManager apiManager;
