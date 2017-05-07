@@ -31,7 +31,6 @@ import java.util.List;
 
 public class KOTHModule extends MatchModule implements Listener {
     @Getter private final List<ControlPoint> controlPoints = new ArrayList<>();
-    @Getter private int pointsToWin;
     @Getter private PointsModule pointsModule;
 
     @Getter
@@ -133,7 +132,7 @@ public class KOTHModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        return pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsToWin + " " + matchTeam.getColor() + matchTeam.getAlias();
+        return pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsModule.getTarget(matchTeam) + " " + matchTeam.getColor() + matchTeam.getAlias();
     }
 
     private String getControlPointScoreboardLine(ControlPoint controlPoint) {

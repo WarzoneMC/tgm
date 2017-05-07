@@ -57,6 +57,10 @@ public class PointsModule extends MatchModule {
         return this.points.getOrDefault(matchTeam, 0);
     }
 
+    public int getTarget(MatchTeam matchTeam) {
+        return this.targets.getOrDefault(matchTeam, 0);
+    }
+
     public void addService(PointService pointService) {
         services.add(pointService);
     }
