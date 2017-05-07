@@ -61,6 +61,11 @@ public class WoolObjective implements Listener {
         if (event.getBlockPlaced().getType() == Material.WOOL) {
             if ((event.getBlockPlaced().getState().getData().getData() == color)) {
                 if (!completed) {
+
+                    if (!owner.containsPlayer(event.getPlayer())) {
+                        return;
+                    }
+
                     event.setCancelled(false); //override filter
                     setCompleted(true);
 
@@ -85,6 +90,10 @@ public class WoolObjective implements Listener {
 
     private void handleWoolPickup(Player player) {
         if(completed) return;
+
+        if (!owner.containsPlayer(player)) {
+            return;
+        }
 
         if (touches.containsKey(player.getUniqueId())) {
             return;

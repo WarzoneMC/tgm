@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
@@ -20,10 +21,10 @@ import java.util.List;
 
 public class WoolChestModule extends MatchModule implements Listener {
     @Getter
-    private final List<Inventory> scannedChests = new ArrayList<>();
+    private final List<InventoryHolder> scannedChests = new ArrayList<>();
 
     @Getter
-    private final HashMap<Inventory, DyeColor> woolChests = new HashMap<>();
+    private final HashMap<InventoryHolder, DyeColor> woolChests = new HashMap<>();
 
     private int runnableId = -1;
 
@@ -32,8 +33,8 @@ public class WoolChestModule extends MatchModule implements Listener {
         runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
             @Override
             public void run() {
-                for (Inventory inventory : woolChests.keySet()) {
-                    fillInventoryWithWool(inventory, woolChests.get(inventory));
+                for (InventoryHolder inventory : woolChests.keySet()) {
+                    fillInventoryWithWool(inventory.getInventory(), woolChests.get(inventory));
                 }
             }
         }, 10 * 20L, 10 * 20L);
@@ -51,25 +52,26 @@ public class WoolChestModule extends MatchModule implements Listener {
     }
 
     private void fillInventoryWithWool(Inventory inventory, DyeColor dyeColor) {
-        ItemStack itemStack = new ItemStack(Material.WOOL);
-        itemStack.setData(new Wool(dyeColor));
+        Wool wool = new Wool(dyeColor);
 
         for(int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i, itemStack);
+            inventory.setItem(i, new ItemStack(wool.getItemType(), 1, (short) 0, wool.getData()));
         }
     }
 
     private void registerInventory(Inventory inventory) {
-        if (scannedChests.contains(inventory)) {
+        if (scannedChests.contains(inventory.getHolder())) {
             return;
         }
-        scannedChests.add(inventory);
+        scannedChests.add(inventory.getHolder());
 
         for (ItemStack itemStack : inventory) {
-            if (itemStack.getType() == Material.WOOL) {
-                DyeColor dyeColor = ((Wool) itemStack.getData()).getColor();
-                woolChests.put(inventory, dyeColor);
-                fillInventoryWithWool(inventory, dyeColor);
+            if (itemStack != null && itemStack.getType() != null) {
+                if (itemStack.getType() == Material.WOOL) {
+                    DyeColor dyeColor = ((Wool) itemStack.getData()).getColor();
+                    woolChests.put(inventory.getHolder(), dyeColor);
+                    fillInventoryWithWool(inventory, dyeColor);
+                }
             }
         }
     }
