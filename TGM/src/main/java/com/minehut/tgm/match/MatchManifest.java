@@ -59,6 +59,7 @@ public abstract class MatchManifest {
         modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
         modules.add(new PointsModule());
+        modules.add(new LegacyDamageModule());
 
         return modules;
     }
