@@ -137,8 +137,10 @@ public class DTMModule extends MatchModule implements Listener {
             teamScoreboardLines.put(matchTeam, i);
             i++;
 
-            event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount), i);
-            i++; spaceCount++;
+            if (teams.indexOf(matchTeam) < teams.size() - 1) {
+                event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount), i);
+                i++; spaceCount++;
+            }
         }
     }
 
