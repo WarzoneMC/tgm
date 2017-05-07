@@ -35,6 +35,11 @@ public class TabListModule extends MatchModule implements Listener {
         }, 20L, 20L);
     }
 
+    @Override
+    public void unload() {
+        Bukkit.getScheduler().cancelTask(runnableId);
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         refreshTab(event.getPlayer());
