@@ -95,4 +95,9 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
     public SimpleScoreboard getScoreboard(Player player) {
         return scoreboards.get(player);
     }
+
+    @Override
+    public void unload() {
+        this.scoreboards.clear();
+    }
 }
