@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
@@ -50,6 +51,13 @@ public class ItemRemoveModule extends MatchModule implements Listener {
     public void onDrop(PlayerDropItemEvent event) {
         if (removed.contains(event.getItemDrop().getItemStack().getType())) {
             event.getItemDrop().remove();
+        }
+    }
+
+    @EventHandler
+    public void onItemSpawn(ItemSpawnEvent event) {
+        if (removed.contains(event.getEntity().getItemStack().getType())) {
+            event.setCancelled(true);
         }
     }
 }
