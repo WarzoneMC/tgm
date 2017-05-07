@@ -40,9 +40,11 @@ public class WoolObjective implements Listener {
     @Getter private final Region podium; //where players place wool to complete objective.
 
     @Getter
-    private HashMap<UUID, Double> touches = new HashMap<>(); //saves match time
+    private final HashMap<UUID, Double> touches = new HashMap<>(); //saves match time
 
     @Getter @Setter private boolean completed = false;
+
+    @Getter private final List<WoolObjectiveService> services = new ArrayList<>();
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
@@ -57,6 +59,10 @@ public class WoolObjective implements Listener {
 
                     Bukkit.broadcastMessage(matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE +
                             " placed " + ChatColor.AQUA + ChatColor.BOLD.toString());
+
+                    for (WoolObjectiveService woolObjectiveService : services) {
+                        woolObjectiveService.place(event.getPlayer(), matchTeam);
+                    }
                 }
             }
         }
@@ -83,6 +89,10 @@ public class WoolObjective implements Listener {
 
         Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() +
                 ChatColor.WHITE + " picked up " + ChatColor.AQUA + ChatColor.BOLD.toString() + name);
+
+        for (WoolObjectiveService woolObjectiveService : services) {
+            woolObjectiveService.pickup(player, matchTeam);
+        }
     }
 
     @EventHandler
@@ -113,5 +123,9 @@ public class WoolObjective implements Listener {
         } else {
             return WoolStatus.TOUCHED;
         }
+    }
+
+    public void addService(WoolObjectiveService woolObjectiveService) {
+        this.services.add(woolObjectiveService);
     }
 }
