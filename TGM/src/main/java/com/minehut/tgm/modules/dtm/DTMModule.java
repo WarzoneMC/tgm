@@ -123,12 +123,12 @@ public class DTMModule extends MatchModule implements Listener {
                     }
 
                     event.getSimpleScoreboard().add(getScoreboardString(monument), i);
-                    teamScoreboardLines.put(matchTeam, i);
 
                     i++;
                 }
             }
             event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
+            teamScoreboardLines.put(matchTeam, i);
             i++;
         }
     }
