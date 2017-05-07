@@ -38,5 +38,9 @@ public class PlayerManager {
                 player.sendMessage(message);
             }
         }
+        //if no players are online, Bukkit.broadcastMessage() doesn't log.
+        if (Bukkit.getOnlinePlayers().size() == 0) {
+            Bukkit.getLogger().severe(message);
+        }
     }
 }

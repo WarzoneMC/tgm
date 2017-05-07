@@ -61,11 +61,14 @@ public class Match {
                 try {
                     matchModule.load(this);
                 } catch (Exception e) {
+                    e.printStackTrace();
                     TGM.get().getPlayerManager().broadcastToAdmins(ChatColor.RED + "[JSON] Failed to parse module: " + matchModule.getClass().getSimpleName());
 
                     try {
                         matchModule.unload();
-                    } catch (Exception e2) {}
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
                 }
 
                 //automatically register modules that implement listener.

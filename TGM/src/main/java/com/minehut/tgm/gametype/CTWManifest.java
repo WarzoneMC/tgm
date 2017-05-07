@@ -2,6 +2,7 @@ package com.minehut.tgm.gametype;
 
 import com.minehut.tgm.match.MatchManifest;
 import com.minehut.tgm.match.MatchModule;
+import com.minehut.tgm.modules.ctw.CTWModule;
 import com.minehut.tgm.modules.koth.KOTHModule;
 import com.minehut.tgm.modules.wool.WoolChestModule;
 
@@ -17,6 +18,7 @@ public class CTWManifest extends MatchManifest {
     public List<MatchModule> allocateGameModules() {
         List<MatchModule> matchModules = new ArrayList<>();
         matchModules.add(new WoolChestModule());
+        matchModules.add(new CTWModule());
         return matchModules;
     }
 }

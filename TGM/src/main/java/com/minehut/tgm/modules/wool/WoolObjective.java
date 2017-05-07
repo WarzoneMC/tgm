@@ -5,11 +5,13 @@ import com.minehut.tgm.modules.TimeModule;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
+import com.minehut.tgm.util.ColorConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,12 +34,12 @@ import java.util.UUID;
  * Should be used as the actual objective.
  */
 
-@AllArgsConstructor
 public class WoolObjective implements Listener {
     @Getter private final String name;
     @Getter private final byte color;
     @Getter private final MatchTeam owner;
     @Getter private final Region podium; //where players place wool to complete objective.
+    @Getter private final ChatColor chatColor;
 
     @Getter
     private final HashMap<UUID, Double> touches = new HashMap<>(); //saves match time
@@ -45,6 +47,14 @@ public class WoolObjective implements Listener {
     @Getter @Setter private boolean completed = false;
 
     @Getter private final List<WoolObjectiveService> services = new ArrayList<>();
+
+    public WoolObjective(String name, DyeColor color, MatchTeam owner, Region podium) {
+        this.name = name;
+        this.color = color.getWoolData();
+        this.owner = owner;
+        this.podium = podium;
+        this.chatColor = ColorConverter.convertDyeColorToChatColor(color);
+    }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
@@ -57,11 +67,8 @@ public class WoolObjective implements Listener {
                     TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
                     MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
 
-                    Bukkit.broadcastMessage(matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE +
-                            " placed " + ChatColor.AQUA + ChatColor.BOLD.toString());
-
                     for (WoolObjectiveService woolObjectiveService : services) {
-                        woolObjectiveService.place(event.getPlayer(), matchTeam);
+                        woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
                     }
                 }
             }
@@ -82,16 +89,14 @@ public class WoolObjective implements Listener {
         if (touches.containsKey(player.getUniqueId())) {
             return;
         }
+        boolean firstTouch = touches.isEmpty();
         touches.put(player.getUniqueId(), TGM.get().getModule(TimeModule.class).getTimeElapsed());
 
         TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         MatchTeam matchTeam = teamManagerModule.getTeam(player);
 
-        Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() +
-                ChatColor.WHITE + " picked up " + ChatColor.AQUA + ChatColor.BOLD.toString() + name);
-
         for (WoolObjectiveService woolObjectiveService : services) {
-            woolObjectiveService.pickup(player, matchTeam);
+            woolObjectiveService.pickup(player, matchTeam, firstTouch);
         }
     }
 
