@@ -19,6 +19,7 @@ import com.minehut.tgm.util.ColorConverter;
 import com.minehut.tgm.util.FireworkUtil;
 import com.minehut.tgm.util.Parser;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -110,6 +111,7 @@ public class DTMModule extends MatchModule implements Listener {
     public void onScoreboardInit(ScoreboardInitEvent event) {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
+        int spaceCount = 1;
         int i = 0;
         for (MatchTeam matchTeam : teams) {
             if(matchTeam.isSpectator()) continue;
@@ -132,6 +134,9 @@ public class DTMModule extends MatchModule implements Listener {
             event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
             teamScoreboardLines.put(matchTeam, i);
             i++;
+
+            event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount), i);
+            i++; spaceCount++;
         }
     }
 
