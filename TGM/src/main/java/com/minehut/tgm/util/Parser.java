@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -71,5 +72,24 @@ public class Parser {
         }
 
         return teams;
+    }
+
+    /**
+     * returns null if all materials are allowed
+     */
+    public static List<Material> getMaterialsFromElement(JsonElement element) {
+        List<Material> materials = new ArrayList<>();
+
+        if (element.isJsonPrimitive()) {
+            if (element.getAsString().equalsIgnoreCase("all")) {
+                return null;
+            }
+        } else {
+            for (JsonElement jsonElement : element.getAsJsonArray()) {
+                materials.add(Material.valueOf(Strings.getTechnicalName(jsonElement.getAsString())));
+            }
+        }
+
+        return materials;
     }
 }

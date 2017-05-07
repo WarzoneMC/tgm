@@ -8,6 +8,8 @@ import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.modules.controlpoint.ControlPoint;
 import com.minehut.tgm.modules.controlpoint.ControlPointDefinition;
 import com.minehut.tgm.modules.controlpoint.ControlPointService;
+import com.minehut.tgm.modules.points.PointService;
+import com.minehut.tgm.modules.points.PointsModule;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.region.RegionManagerModule;
 import com.minehut.tgm.modules.scoreboard.ScoreboardInitEvent;
@@ -29,11 +31,7 @@ import java.util.List;
 
 public class KOTHModule extends MatchModule implements Listener {
     @Getter private final List<ControlPoint> controlPoints = new ArrayList<>();
-
-    @Getter private int pointsToWin;
-
-    @Getter
-    private final HashMap<MatchTeam, Integer> points = new HashMap<>();
+    @Getter private PointsModule pointsModule;
 
     @Getter
     private final HashMap<ControlPointDefinition, Integer> controlPointScoreboardLines = new HashMap<>();
@@ -44,9 +42,6 @@ public class KOTHModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("koth").getAsJsonObject();
-        pointsToWin = kothJson.get("points").getAsInt();
-
-        int scoreboardLine = 1;
 
         for (JsonElement capturePointElement : kothJson.getAsJsonArray("hills")) {
             JsonObject capturePointJson = capturePointElement.getAsJsonObject();
@@ -71,20 +66,15 @@ public class KOTHModule extends MatchModule implements Listener {
         for (ControlPoint controlPoint : controlPoints) {
             controlPoint.enable();
         }
+
+        pointsModule = match.getModule(PointsModule.class);
+        pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
     }
 
 
-    //returns true if winner was called
-    public boolean incrementPoints(MatchTeam matchTeam, int amount) {
-        points.put(matchTeam, points.getOrDefault(matchTeam, 0) + amount);
-
+    public void incrementPoints(MatchTeam matchTeam, int amount) {
+        pointsModule.incrementPoints(matchTeam, amount);
         updateScoreboardTeamLine(matchTeam);
-
-        if (points.get(matchTeam) >= pointsToWin) {
-            TGM.get().getMatchManager().endMatch(matchTeam);
-            return true;
-        }
-        return false;
     }
 
     public void updateScoreboardTeamLine(MatchTeam matchTeam) {
@@ -142,7 +132,7 @@ public class KOTHModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        return points.getOrDefault(matchTeam, 0) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsToWin + " " + matchTeam.getColor() + matchTeam.getAlias();
+        return pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsModule.getTarget(matchTeam) + " " + matchTeam.getColor() + matchTeam.getAlias();
     }
 
     private String getControlPointScoreboardLine(ControlPoint controlPoint) {
