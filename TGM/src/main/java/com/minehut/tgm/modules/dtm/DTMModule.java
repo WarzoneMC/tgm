@@ -119,7 +119,9 @@ public class DTMModule extends MatchModule implements Listener {
                     if (monumentScoreboardLines.containsKey(monument)) {
                         monumentScoreboardLines.get(monument).add(i);
                     } else {
-                        monumentScoreboardLines.put(monument, Arrays.asList(i));
+                        List<Integer> list = new ArrayList<>();
+                        list.add(i);
+                        monumentScoreboardLines.put(monument, list);
                     }
 
                     event.getSimpleScoreboard().add(getScoreboardString(monument), i);
