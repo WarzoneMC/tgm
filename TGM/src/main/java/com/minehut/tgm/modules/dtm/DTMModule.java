@@ -14,6 +14,7 @@ import com.minehut.tgm.modules.scoreboard.ScoreboardManagerModule;
 import com.minehut.tgm.modules.scoreboard.SimpleScoreboard;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
+import com.minehut.tgm.modules.team.TeamUpdateEvent;
 import com.minehut.tgm.util.ColorConverter;
 import com.minehut.tgm.util.FireworkUtil;
 import com.minehut.tgm.util.Parser;
@@ -35,6 +36,9 @@ public class DTMModule extends MatchModule implements Listener {
 
     @Getter
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
+
+    @Getter
+    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -118,13 +122,29 @@ public class DTMModule extends MatchModule implements Listener {
                         monumentScoreboardLines.put(monument, Arrays.asList(i));
                     }
 
-                    event.getSimpleScoreboard().add(getScoreboardLine(monument), i);
+                    event.getSimpleScoreboard().add(getScoreboardString(monument), i);
+                    teamScoreboardLines.put(matchTeam, i);
 
                     i++;
                 }
             }
-            event.getSimpleScoreboard().add(matchTeam.getColor() + matchTeam.getAlias(), i);
+            event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
             i++;
+        }
+    }
+
+    @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
+        for (MatchTeam matchTeam : teamScoreboardLines.keySet()) {
+            if (event.getMatchTeam() == matchTeam) {
+                int i = teamScoreboardLines.get(matchTeam);
+
+                for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+                    simpleScoreboard.remove(i);
+                    simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
+                    simpleScoreboard.update();
+                }
+            }
         }
     }
 
@@ -134,13 +154,17 @@ public class DTMModule extends MatchModule implements Listener {
         for (int i : monumentScoreboardLines.get(monument)) {
             for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
                 simpleScoreboard.remove(i);
-                simpleScoreboard.add(getScoreboardLine(monument), i);
+                simpleScoreboard.add(getScoreboardString(monument), i);
                 simpleScoreboard.update();
             }
         }
     }
 
-    private String getScoreboardLine(Monument monument) {
+    private String getTeamScoreboardString(MatchTeam matchTeam) {
+        return matchTeam.getColor() + matchTeam.getAlias();
+    }
+
+    private String getScoreboardString(Monument monument) {
         if (monument.isAlive()) {
             int percentage = monument.getHealthPercentage();
 
