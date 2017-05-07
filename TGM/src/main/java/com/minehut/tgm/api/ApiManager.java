@@ -14,7 +14,6 @@ import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -66,6 +65,10 @@ public class ApiManager implements Listener {
 
     @EventHandler
     public void onMatchResult(MatchResultEvent event) {
+        if (isStatsDisabled()) {
+            return;
+        }
+
         List<String> winners = new ArrayList<>();
         for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
             winners.add(playerContext.getUserProfile().getId());
@@ -103,6 +106,10 @@ public class ApiManager implements Listener {
 
     @EventHandler
     public void onMatchLoad(MatchLoadEvent event) {
+        if (isStatsDisabled()) {
+            return;
+        }
+
         MapInfo mapInfo = event.getMatch().getMapContainer().getMapInfo();
         List<com.minehut.teamapi.models.Team> teams = new ArrayList<>();
         for (ParsedTeam parsedTeam : mapInfo.getTeams()) {
@@ -121,6 +128,10 @@ public class ApiManager implements Listener {
 
     @EventHandler
     public void onKill(PlayerDeathEvent event) {
+        if (isStatsDisabled()) {
+            return;
+        }
+
         PlayerContext player = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer()); //dead
 
         String playerItem = "";
@@ -145,5 +156,9 @@ public class ApiManager implements Listener {
                 TGM.get().getTeamClient().addKill(death);
             }
         });
+    }
+
+    public boolean isStatsDisabled() {
+        return !TGM.get().getConfig().getBoolean("api.stats.enabled");
     }
 }

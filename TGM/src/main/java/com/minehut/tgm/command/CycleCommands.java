@@ -171,6 +171,22 @@ public class CycleCommands {
         }
     }
 
+    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
+    @CommandPermissions({"tgm.config"})
+    public static void config(CommandContext cmd, CommandSender sender) {
+        if (cmd.getString(0).equalsIgnoreCase("stats")) {
+            if (cmd.getString(0).equalsIgnoreCase("off")) {
+                TGM.get().getConfig().set("api.stats.enabled", false);
+                sender.sendMessage(ChatColor.GREEN + "Disabled stat uploading.");
+            } else if (cmd.getString(0).equalsIgnoreCase("on")) {
+                TGM.get().getConfig().set("api.stats.enabled", true);
+                sender.sendMessage(ChatColor.GREEN + "Enabled stat uploading.");
+            } else {
+                sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
+            }
+        }
+    }
+
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin) {
         if (matchTeam.getMembers().size() >= matchTeam.getMax()) {
