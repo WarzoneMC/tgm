@@ -81,7 +81,12 @@ public class DTMModule extends MatchModule implements Listener {
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + monument.getName());
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
-                    TGM.get().getMatchManager().endMatch(matchTeam);
+                    for (MatchTeam owner : monument.getOwners()) {
+                        if (getAliveMonuments(owner).isEmpty()) {
+                            TGM.get().getMatchManager().endMatch(matchTeam);
+                            break;
+                        }
+                    }
                 }
             });
         }
