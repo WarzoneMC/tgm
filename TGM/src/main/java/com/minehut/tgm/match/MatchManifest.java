@@ -6,6 +6,7 @@ import com.minehut.tgm.modules.countdown.CycleCountdown;
 import com.minehut.tgm.modules.countdown.StartCountdown;
 import com.minehut.tgm.modules.filter.FilterManagerModule;
 import com.minehut.tgm.modules.kit.KitLoaderModule;
+import com.minehut.tgm.modules.points.PointsModule;
 import com.minehut.tgm.modules.region.RegionManagerModule;
 import com.minehut.tgm.modules.scoreboard.ScoreboardManagerModule;
 import com.minehut.tgm.modules.tasked.TaskedModuleManager;
@@ -57,6 +58,7 @@ public abstract class MatchManifest {
         modules.add(new FilterManagerModule());
         modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
+        modules.add(new PointsModule());
 
         return modules;
     }
