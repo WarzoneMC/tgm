@@ -16,12 +16,14 @@ import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -184,6 +186,19 @@ public class SpectatorModule extends MatchModule implements Listener {
         } else if (event.getInfo().getResolvedDamager() instanceof Player) {
             if (isSpectating((Player) event.getInfo().getResolvedDamager())) {
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onVoidDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player && isSpectating((Player) event.getEntity())) {
+            if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                Location location = event.getEntity().getLocation().clone();
+                location.setY(1);
+
+                event.getEntity().teleport(location);
+                ((Player) event.getEntity()).setFlying(false);
             }
         }
     }
