@@ -9,7 +9,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum GameType {
     TDM("TDM", TDMManifest.class),
-    KOTH("King of the Hill", KOTHManifest.class);
+    KOTH("King of the Hill", KOTHManifest.class),
+    DTM("Destroy the Monument", DTMManifest.class);
 
     @Getter private String name;
     @Getter private Class manifest;
