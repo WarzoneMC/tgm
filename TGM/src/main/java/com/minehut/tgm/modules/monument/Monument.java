@@ -43,6 +43,7 @@ public class Monument implements Listener {
             if (materials == null || materials.contains(event.getBlock().getType())) {
                 if (canDamage(event.getPlayer())) {
                     event.setCancelled(false); //override filters
+                    event.getBlock().getDrops().clear();
 
                     health--;
 
