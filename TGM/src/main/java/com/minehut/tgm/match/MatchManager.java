@@ -33,7 +33,7 @@ public class MatchManager {
         mapLibrary = new MapLibrary(fileConfiguration, new MapLoaderImpl());
         mapLibrary.refreshMaps();
 
-        mapRotation = new MapRotationFile(fileConfiguration, mapLibrary);
+        mapRotation = new MapRotationFile(mapLibrary);
     }
 
     public void startMatch() {
