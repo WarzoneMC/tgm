@@ -4,6 +4,7 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.match.MatchStatus;
 import com.minehut.tgm.modules.team.TeamChangeEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -28,6 +29,11 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        event.getEntity().spigot().respawn();
+        Bukkit.getScheduler().runTaskLater(TGM.get(), new Runnable() {
+            @Override
+            public void run() {
+                event.getEntity().spigot().respawn();
+            }
+        }, 0L);
     }
 }
