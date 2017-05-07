@@ -51,12 +51,12 @@ public class Monument implements Listener {
                     }
                     else if (health == 0) {
                         for (MonumentService monumentService : services) {
-                            monumentService.destroy(event.getPlayer());
+                            monumentService.destroy(event.getPlayer(), event.getBlock());
                         }
                     }
                     else {
                         for (MonumentService monumentService : services) {
-                            monumentService.damage(event.getPlayer());
+                            monumentService.damage(event.getPlayer(), event.getBlock());
                         }
                     }
 

@@ -14,10 +14,12 @@ import com.minehut.tgm.modules.scoreboard.ScoreboardManagerModule;
 import com.minehut.tgm.modules.scoreboard.SimpleScoreboard;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
+import com.minehut.tgm.util.ColorConverter;
+import com.minehut.tgm.util.FireworkUtil;
 import com.minehut.tgm.util.Parser;
 import lombok.Getter;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -50,29 +52,30 @@ public class DTMModule extends MatchModule implements Listener {
             monuments.add(new Monument(name, teams, region, materials, health, health));
         }
 
+        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+
         //monument services
         for (Monument monument : monuments) {
             monument.addService(new MonumentService() {
                 @Override
-                public void damage(Player player) {
+                public void damage(Player player, Block block) {
                     updateOnScoreboard(monument);
+
+                    MatchTeam matchTeam = teamManagerModule.getTeam(player);
+                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + monument.getName());
+                    playFireworkEffect(matchTeam.getColor(), block.getLocation());
                 }
 
                 @Override
-                public void destroy(Player player) {
+                public void destroy(Player player, Block block) {
                     updateOnScoreboard(monument);
 
-                    TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    if (getAliveMonuments(matchTeam).size() == 0) {
 
-                        //find enemy team and set them as winners
-                        for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
-                            if (!otherTeam.isSpectator() && otherTeam != matchTeam) {
-                                TGM.get().getMatchManager().endMatch(otherTeam);
-                            }
-                        }
-                    }
+                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + monument.getName());
+                    playFireworkEffect(matchTeam.getColor(), block.getLocation());
+
+                    TGM.get().getMatchManager().endMatch(matchTeam);
                 }
             });
         }
@@ -80,6 +83,22 @@ public class DTMModule extends MatchModule implements Listener {
         //load monuments
         for (Monument monument : monuments) {
             monument.load();
+        }
+    }
+
+    private void playFireworkEffect(ChatColor color, Location location) {
+        FireworkUtil.spawnFirework(location, FireworkEffect.builder()
+                .with(FireworkEffect.Type.BURST)
+                .withFlicker()
+                .withColor(ColorConverter.getColor(color))
+                .build(), 0).detonate();
+
+        // Play the sound for the player if they are too far to render the firework.
+        for(Player listener : Bukkit.getOnlinePlayers()) {
+            if(listener.getLocation().distance(location) > 64) {
+                listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_BLAST, 0.75f, 1f);
+                listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_TWINKLE, 0.75f, 1f);
+            }
         }
     }
 
@@ -126,14 +145,14 @@ public class DTMModule extends MatchModule implements Listener {
             int percentage = monument.getHealthPercentage();
 
             if (percentage > 70) {
-                return ChatColor.YELLOW.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
+                return "  " + ChatColor.GREEN.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
             } else if (percentage > 40) {
-                return ChatColor.YELLOW.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
+                return "  " + ChatColor.YELLOW.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
             } else {
-                return ChatColor.RED.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
+                return "  " + ChatColor.RED.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
             }
         } else {
-            return ChatColor.RED.toString() + ChatColor.STRIKETHROUGH + monument.getName();
+            return "  " + ChatColor.STRIKETHROUGH + monument.getName();
         }
     }
 
