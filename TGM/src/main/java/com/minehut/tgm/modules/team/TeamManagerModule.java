@@ -69,7 +69,10 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     private void handleQuit(Player player) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        getTeam(player).removePlayer(playerContext);
+        MatchTeam matchTeam = getTeam(player);
+        if (matchTeam != null) {
+            matchTeam.removePlayer(playerContext);
+        }
     }
 
     public MatchTeam getTeamById(String id) {
