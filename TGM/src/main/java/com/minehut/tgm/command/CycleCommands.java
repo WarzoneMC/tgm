@@ -175,10 +175,14 @@ public class CycleCommands {
     @CommandPermissions({"tgm.config"})
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
-            if (cmd.getString(0).equalsIgnoreCase("off")) {
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.RED + "/config stats [on/off]");
+                return;
+            }
+            if (cmd.getString(1).equalsIgnoreCase("off")) {
                 TGM.get().getConfig().set("api.stats.enabled", false);
                 sender.sendMessage(ChatColor.GREEN + "Disabled stat uploading.");
-            } else if (cmd.getString(0).equalsIgnoreCase("on")) {
+            } else if (cmd.getString(1).equalsIgnoreCase("on")) {
                 TGM.get().getConfig().set("api.stats.enabled", true);
                 sender.sendMessage(ChatColor.GREEN + "Enabled stat uploading.");
             } else {
