@@ -189,6 +189,13 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
