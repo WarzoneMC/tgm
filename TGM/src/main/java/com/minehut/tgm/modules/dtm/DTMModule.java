@@ -22,6 +22,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -92,11 +93,12 @@ public class DTMModule extends MatchModule implements Listener {
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
-        FireworkUtil.spawnFirework(location, FireworkEffect.builder()
+        Firework firework = FireworkUtil.spawnFirework(location, FireworkEffect.builder()
                 .with(FireworkEffect.Type.BURST)
                 .withFlicker()
                 .withColor(ColorConverter.getColor(color))
-                .build(), 0).detonate();
+                .build(), 0);
+
 
         // Play the sound for the player if they are too far to render the firework.
         for(Player listener : Bukkit.getOnlinePlayers()) {
