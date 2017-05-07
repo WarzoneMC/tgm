@@ -27,18 +27,22 @@ public class MapRotationFile implements MapRotation {
         refresh();
     }
 
-    public MapContainer cycle() {
-        if (rotation.size() >= current + 1) {
-            current = 0;
+    public MapContainer cycle(boolean initial) {
+        if (initial) {
+            return rotation.get(0);
         } else {
-            current++;
+            if (rotation.size() <= current + 1) {
+                current = 0;
+            } else {
+                current++;
+            }
+            return rotation.get(current);
         }
-        return rotation.get(current);
     }
 
     @Override
     public MapContainer getNext() {
-        if (rotation.size() >= current + 1) {
+        if (rotation.size() <= current + 1) {
             return rotation.get(0);
         } else {
             return rotation.get(current + 1);

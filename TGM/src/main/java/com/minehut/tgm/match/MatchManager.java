@@ -26,6 +26,7 @@ public class MatchManager {
     @Getter private MapLibrary mapLibrary;
     @Getter private MapRotation mapRotation;
     @Getter private Match match = null;
+    @Getter private int matchNumber = 1;
 
     @Getter @Setter private MapContainer forcedNextMap = null;
 
@@ -56,7 +57,7 @@ public class MatchManager {
         //find a new map to cycle to.
         MapContainer mapContainer = forcedNextMap;
         if (mapContainer == null) {
-            mapContainer = mapRotation.cycle();
+            mapContainer = mapRotation.cycle(matchNumber == 1);
         }
         forcedNextMap = null;
 
