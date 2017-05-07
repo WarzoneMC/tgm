@@ -2,6 +2,7 @@ package com.minehut.tgm.player;
 
 import com.minehut.tgm.user.PlayerContext;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -29,5 +30,13 @@ public class PlayerManager {
             }
         }
         return null;
+    }
+
+    public void broadcastToAdmins(String message) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.isOp()) {
+                player.sendMessage(message);
+            }
+        }
     }
 }

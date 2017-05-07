@@ -5,6 +5,7 @@ import com.minehut.tgm.map.MapContainer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
@@ -57,7 +58,15 @@ public class Match {
         int listenerCount = 0;
         for (ModuleLoadTime moduleLoadTime : ModuleLoadTime.values()) {
             for (MatchModule matchModule : getModules(moduleLoadTime)) {
-                matchModule.load(this);
+                try {
+                    matchModule.load(this);
+                } catch (Exception e) {
+                    TGM.get().getPlayerManager().broadcastToAdmins(ChatColor.RED + "[JSON] Failed to parse module: " + matchModule.getClass().getSimpleName());
+
+                    try {
+                        matchModule.unload();
+                    } catch (Exception e2) {}
+                }
 
                 //automatically register modules that implement listener.
                 if (matchModule instanceof Listener) {

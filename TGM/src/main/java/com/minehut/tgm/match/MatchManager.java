@@ -26,7 +26,7 @@ public class MatchManager {
     @Getter private MapLibrary mapLibrary;
     @Getter private MapRotation mapRotation;
     @Getter private Match match = null;
-    @Getter private int matchNumber = 1;
+    @Getter private int matchNumber = 0;
 
     @Getter @Setter private MapContainer forcedNextMap = null;
 
@@ -54,6 +54,8 @@ public class MatchManager {
     }
 
     public void cycleNextMatch() throws IOException {
+        matchNumber++;
+
         //find a new map to cycle to.
         MapContainer mapContainer = forcedNextMap;
         if (mapContainer == null) {
