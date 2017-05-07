@@ -2,6 +2,8 @@ api:
   enabled: false
   url: api.team.gg
   auth: secret
+  stats:
+    enabled: true
 rotation: rotation
 map:
   sources:
