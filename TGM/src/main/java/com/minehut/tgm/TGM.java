@@ -16,8 +16,6 @@ import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.player.PlayerManager;
-import com.minehut.tgm.playerList.PlayerListManager;
-import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -35,7 +33,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TGM extends JavaPlugin {
