@@ -4,6 +4,7 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.join.MatchJoinEvent;
 import com.minehut.tgm.map.ParsedTeam;
 import com.minehut.tgm.match.*;
+import com.minehut.tgm.modules.scoreboard.SimpleScoreboard;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.Getter;
 import lombok.Setter;

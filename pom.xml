@@ -14,13 +14,6 @@
         <module>tgm</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>spigotmc-public</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
-
     <build>
         <sourceDirectory>${project.basedir}/src/main/java/</sourceDirectory>
 
