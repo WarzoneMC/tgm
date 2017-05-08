@@ -83,9 +83,9 @@ public class CTWModule extends MatchModule implements Listener {
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                             for (PlayerContext playerContext : otherTeam.getMembers()) {
                                 if (otherTeam.isSpectator() || otherTeam == matchTeam) {
-                                    playerContext.getPlayer().playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                                    playerContext.getPlayer().playSound(player.getLocation(), Sound.PORTAL_TRAVEL, 0.7f, 2f);
                                 } else {
-                                    playerContext.getPlayer().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                                    playerContext.getPlayer().playSound(player.getLocation(), Sound.BLAZE_DEATH, 0.8f, 0.8f);
                                 }
                             }
                         }
@@ -102,9 +102,9 @@ public class CTWModule extends MatchModule implements Listener {
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
                             if (otherTeam.isSpectator() || otherTeam == matchTeam) {
-                                playerContext.getPlayer().playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                                playerContext.getPlayer().playSound(player.getLocation(), Sound.PORTAL_TRAVEL, 0.7f, 2f);
                             } else {
-                                playerContext.getPlayer().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                                playerContext.getPlayer().playSound(player.getLocation(), Sound.BLAZE_DEATH, 0.8f, 0.8f);
                             }
                         }
                     }
@@ -137,7 +137,7 @@ public class CTWModule extends MatchModule implements Listener {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
         int spaceCount = 1;
-        int i = 0;
+        int i = 1;
         for (MatchTeam matchTeam : teams) {
             if(matchTeam.isSpectator()) continue;
 

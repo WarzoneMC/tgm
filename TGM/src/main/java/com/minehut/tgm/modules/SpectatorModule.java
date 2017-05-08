@@ -23,13 +23,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -113,8 +115,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
                         leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
 //                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+//                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+//                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                         leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match.", "", ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString() + " spectating."));
                         itemStack.setItemMeta(leatherArmorMeta);
                         teamSelectionMenu.setItem(8, itemStack);
@@ -126,8 +128,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
                         leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
                         leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+//                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+//                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                         leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
                                 + "/" + matchTeam.getMax() + " playing."));
                         itemStack.setItemMeta(leatherArmorMeta);
@@ -140,8 +142,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                 ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
                         Arrays.asList("", ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
                 ItemMeta autoJoinHelmetMeta = autoJoinHelmet.getItemMeta();
-                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+//                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+//                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 autoJoinHelmet.setItemMeta(autoJoinHelmetMeta);
                 teamSelectionMenu.setItem(0, autoJoinHelmet);
             }
@@ -150,16 +152,18 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     public void applySpectatorKit(PlayerContext playerContext) {
         Players.reset(playerContext.getPlayer(), false);
-        playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
+        playerContext.getPlayer().setGameMode(GameMode.CREATIVE);
         playerContext.getPlayer().setAllowFlight(true);
         playerContext.getPlayer().setFlying(true);
 
-        playerContext.getPlayer().setInvulnerable(true);
+//        playerContext.getPlayer().setInvulnerable(true);
         playerContext.getPlayer().setCanPickupItems(false);
-        playerContext.getPlayer().setCollidable(false);
+//        playerContext.getPlayer().setCollidable(false);
 
         playerContext.getPlayer().getInventory().setItem(0, compassItem);
         playerContext.getPlayer().getInventory().setItem(2, teamSelectionItem);
+
+        playerContext.getPlayer().getInventory().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
     }
 
     /**
@@ -239,7 +243,23 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onPickupArrow(PlayerPickupArrowEvent event) {
+    public void onAttack(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player && isSpectating((Player) event.getDamager())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBowShoot(EntityShootBowEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if (isSpectating((Player) event.getEntity())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHangingPlace(HangingPlaceEvent event) {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
         }
@@ -248,6 +268,20 @@ public class SpectatorModule extends MatchModule implements Listener {
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event){
         if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onVehicleEnter(VehicleEnterEvent event) {
+        if (event.getEntered() instanceof Player && isSpectating((Player) event.getEntered())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onVehicleDamage(VehicleDamageEvent event) {
+        if (event.getAttacker() instanceof Player && isSpectating((Player) event.getAttacker())) {
             event.setCancelled(true);
         }
     }

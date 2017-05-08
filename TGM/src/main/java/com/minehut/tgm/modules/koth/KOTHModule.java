@@ -110,8 +110,8 @@ public class KOTHModule extends MatchModule implements Listener {
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
         int i;
-        for(i = 0; i < controlPoints.size(); i++) {
-            ControlPoint controlPoint = controlPoints.get(i);
+        for(i = 1; i < controlPoints.size() + 1; i++) {
+            ControlPoint controlPoint = controlPoints.get(i - 1);
 
             controlPointScoreboardLines.put(controlPoint.getDefinition(), i);
             simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), i);

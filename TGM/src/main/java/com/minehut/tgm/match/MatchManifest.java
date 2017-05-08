@@ -43,7 +43,7 @@ public abstract class MatchManifest {
         modules.add(new SpawnPointLoaderModule());
         modules.add(new VisibilityModule());
         modules.add(new TimeModule());
-        modules.add(new TabListModule());
+//        modules.add(new TabListModule());
         modules.add(new MatchProgressNotifications());
         modules.add(new MatchResultModule());
         modules.add(new TeamManagerModule());
@@ -59,7 +59,6 @@ public abstract class MatchManifest {
         modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
         modules.add(new PointsModule());
-        modules.add(new LegacyDamageModule());
         modules.add(new FireworkDamageModule());
         modules.add(new GameRuleModule());
         modules.add(new ItemRemoveModule());

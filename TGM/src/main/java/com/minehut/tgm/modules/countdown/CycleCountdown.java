@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 
-public class CycleCountdown extends BossBarCountdown {
+public class CycleCountdown extends Countdown {
     public static int START_TIME = 20;
 
     @Override
@@ -26,35 +26,45 @@ public class CycleCountdown extends BossBarCountdown {
         start(START_TIME);
     }
 
-    @Override
-    public BossBar initBossBar() {
-        BossBar bossBar = Bukkit.createBossBar("", BarColor.BLUE, BarStyle.SOLID);
-        bossBar.setVisible(false);
-        return bossBar;
-    }
 
     @Override
     protected void onStart() {
-        getBossBar().setVisible(true);
+
     }
 
     @Override
     protected void onTick() {
         if(isCancelled()) return;
 
-        getBossBar().setProgress((getTimeMax() - getTimeLeft()) / getTimeMax());
-
         if (getTimeLeft() % 20 == 0) {
-            getBossBar().setTitle(ChatColor.DARK_AQUA + "Cycling to " + ChatColor.AQUA + TGM.get().getMatchManager().getNextMap().getMapInfo().getName()
-                    + ChatColor.DARK_AQUA + " in " + ChatColor.DARK_RED + getTimeLeftSeconds()
-                    + ChatColor.DARK_AQUA + " second" + (getTimeLeftSeconds() > 1 ? "s" : ""));
+            int timeLeftSeconds = getTimeLeftSeconds();
+            if(timeLeftSeconds == 0) return;
 
+            boolean message = false;
+            boolean sound = false;
+            if (timeLeftSeconds <= 5 && timeLeftSeconds > 0) {
+                message = true;
+            } else if (timeLeftSeconds % 10 == 0) {
+                message = true;
+                sound = true;
+            }
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (message) {
+                    player.sendMessage(ChatColor.DARK_AQUA + "Cycling to " + ChatColor.AQUA + TGM.get().getMatchManager().getNextMap().getMapInfo().getName()
+                            + ChatColor.DARK_AQUA + " in " + ChatColor.DARK_RED + getTimeLeftSeconds()
+                            + ChatColor.DARK_AQUA + " second" + (getTimeLeftSeconds() > 1 ? "s" : ""));
+                }
+
+                if (sound) {
+                    player.playSound(player.getLocation(), Sound.NOTE_PLING, 1, 1);
+                }
+            }
         }
     }
 
     @Override
     protected void onFinish() {
-        getBossBar().setVisible(false);
         try {
             TGM.get().getMatchManager().cycleNextMatch();
         } catch (IOException e) {
@@ -64,6 +74,6 @@ public class CycleCountdown extends BossBarCountdown {
 
     @Override
     protected void onCancel() {
-        getBossBar().setVisible(false);
+
     }
 }

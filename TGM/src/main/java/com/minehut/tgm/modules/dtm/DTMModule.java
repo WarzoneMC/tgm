@@ -108,8 +108,8 @@ public class DTMModule extends MatchModule implements Listener {
         // Play the sound for the player if they are too far to render the firework.
         for(Player listener : Bukkit.getOnlinePlayers()) {
             if(listener.getLocation().distance(location) > 64) {
-                listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_BLAST, 0.75f, 1f);
-                listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_TWINKLE, 0.75f, 1f);
+                listener.playSound(listener.getLocation(), Sound.FIREWORK_BLAST, 0.75f, 1f);
+                listener.playSound(listener.getLocation(), Sound.FIREWORK_TWINKLE, 0.75f, 1f);
             }
         }
     }
@@ -119,7 +119,7 @@ public class DTMModule extends MatchModule implements Listener {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
         int spaceCount = 1;
-        int i = 0;
+        int i = 1;
         for (MatchTeam matchTeam : teams) {
             if(matchTeam.isSpectator()) continue;
 

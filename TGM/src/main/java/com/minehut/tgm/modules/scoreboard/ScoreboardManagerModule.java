@@ -65,7 +65,6 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
             team.setPrefix(matchTeam.getColor().toString());
             team.setCanSeeFriendlyInvisibles(true);
             team.setAllowFriendlyFire(false);
-            team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 
             for (PlayerContext player : matchTeam.getMembers()) {
                 team.addEntry(player.getPlayer().getName());
@@ -98,6 +97,14 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            for (SimpleScoreboard simpleScoreboard : scoreboards.values()) {
+                for (Team team : simpleScoreboard.getScoreboard().getTeams()) {
+                    team.removeEntry(player.getName());
+                }
+            }
+        }
+
         this.scoreboards.clear();
     }
 }

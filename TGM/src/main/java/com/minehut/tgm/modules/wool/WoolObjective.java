@@ -66,6 +66,10 @@ public class WoolObjective implements Listener {
                         return;
                     }
 
+                    if (!podium.contains(event.getBlockPlaced().getLocation())) {
+                        return;
+                    }
+
                     event.setCancelled(false); //override filter
                     setCompleted(true);
 
