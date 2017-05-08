@@ -244,6 +244,13 @@ public class SpectatorModule extends MatchModule implements Listener {
             event.setCancelled(true);
         }
     }
+    
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event){
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onHotbarClick(PlayerInteractEvent event) {
