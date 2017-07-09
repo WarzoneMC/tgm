@@ -19,6 +19,14 @@
             <id>spigotmc-public</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>cubist-snapshots</id>
+            <url>https://repo.extension.ws/content/repositories/snapshots</url>
+        </repository>
+        <repository>
+            <id>cubist-releases</id>
+            <url>https://repo.extension.ws/content/repositories/releases</url>
+        </repository>
     </repositories>
 
     <build>
