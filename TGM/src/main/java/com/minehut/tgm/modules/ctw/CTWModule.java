@@ -185,9 +185,7 @@ public class CTWModule extends MatchModule implements Listener {
         for (MatchTeam matchTeam : teamScoreboardLines.keySet()) {
             if (event.getMatchTeam() == matchTeam) {
                 int i = teamScoreboardLines.get(matchTeam);
-
                 for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
-                    simpleScoreboard.remove(i);
                     simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                     simpleScoreboard.update();
                 }
@@ -200,7 +198,6 @@ public class CTWModule extends MatchModule implements Listener {
 
         for (int i : woolScoreboardLines.get(woolObjective)) {
             for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
-                simpleScoreboard.remove(i);
                 simpleScoreboard.add(getScoreboardString(woolObjective), i);
                 simpleScoreboard.update();
             }
