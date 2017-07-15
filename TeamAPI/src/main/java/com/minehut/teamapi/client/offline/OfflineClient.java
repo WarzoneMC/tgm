@@ -21,7 +21,7 @@ public class OfflineClient implements TeamClient {
 
     @Override
     public UserProfile login(PlayerLogin playerLogin) {
-        return new UserProfile(new ObjectId().toString(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
+        return new UserProfile(new ObjectId(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
                 playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Arrays.asList(playerLogin.getIp()), new ArrayList<>(),
                 0, 0, new ArrayList<>());
     }

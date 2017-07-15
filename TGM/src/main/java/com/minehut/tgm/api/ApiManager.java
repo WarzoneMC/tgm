@@ -31,7 +31,7 @@ public class ApiManager implements Listener {
                 List<String> players = new ArrayList<>();
                 for (PlayerContext playerContext : TGM.get().getPlayerManager().getPlayers()) {
                     try {
-                        players.add(playerContext.getUserProfile().getId());
+                        players.add(playerContext.getUserProfile().getId().toString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -71,13 +71,13 @@ public class ApiManager implements Listener {
 
         List<String> winners = new ArrayList<>();
         for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
-            winners.add(playerContext.getUserProfile().getId());
+            winners.add(playerContext.getUserProfile().getId().toString());
         }
 
         List<String> losers = new ArrayList<>();
         for (MatchTeam matchTeam : event.getLosingTeams()) {
             for (PlayerContext playerContext : matchTeam.getMembers()) {
-                losers.add(playerContext.getUserProfile().getId());
+                losers.add(playerContext.getUserProfile().getId().toString());
             }
         }
 
@@ -87,7 +87,7 @@ public class ApiManager implements Listener {
             if(matchTeam.isSpectator()) continue;
 
             for (PlayerContext playerContext : matchTeam.getMembers()) {
-                teamMappings.add(new TeamMapping(matchTeam.getId(), playerContext.getUserProfile().getId()));
+                teamMappings.add(new TeamMapping(matchTeam.getId(), playerContext.getUserProfile().getId().toString()));
             }
         }
 
@@ -142,14 +142,14 @@ public class ApiManager implements Listener {
         String killerItem = "";
         String killerId = null;
         if (event instanceof PlayerDeathByPlayerEvent) {
-            killerId = TGM.get().getPlayerManager().getPlayerContext(((PlayerDeathByPlayerEvent) event).getCause()).getUserProfile().getId();
+            killerId = TGM.get().getPlayerManager().getPlayerContext(((PlayerDeathByPlayerEvent) event).getCause()).getUserProfile().getId().toString();
             if (((PlayerDeathByPlayerEvent) event).getCause().getItemInHand() != null) {
                 killerItem = ((PlayerDeathByPlayerEvent) event).getCause().getItemInHand().getType().toString();
             }
         }
 
-        Death death = new Death(player.getUserProfile().getId(), killerId, playerItem,
-                killerItem, matchInProgress.getMap(), matchInProgress.getId());
+        Death death = new Death(player.getUserProfile().getId().toString(), killerId, playerItem,
+                killerItem, matchInProgress.getMap(), matchInProgress.getId().toString());
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
             @Override
             public void run() {
