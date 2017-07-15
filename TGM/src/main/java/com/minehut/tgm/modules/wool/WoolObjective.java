@@ -62,6 +62,11 @@ public class WoolObjective implements Listener {
             if ((event.getBlockPlaced().getState().getData().getData() == color)) {
                 if (!completed) {
 
+                    if (!podium.contains(event.getBlockPlaced().getLocation())) {
+                        event.setCancelled(true);
+                        return;
+                    }
+
                     if (!owner.containsPlayer(event.getPlayer())) {
                         return;
                     }
