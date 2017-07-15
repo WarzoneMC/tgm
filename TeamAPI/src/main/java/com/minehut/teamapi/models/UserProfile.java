@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserProfile {
     @SerializedName("_id")
-    @Getter private String id;
+    @Getter private ObjectId id;
 
     @Getter private String name;
     @Getter private String nameLower;

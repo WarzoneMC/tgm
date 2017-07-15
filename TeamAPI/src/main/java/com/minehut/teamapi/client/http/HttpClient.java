@@ -1,6 +1,6 @@
 package com.minehut.teamapi.client.http;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
@@ -10,6 +10,7 @@ import com.minehut.teamapi.client.TeamClient;
 import com.minehut.teamapi.models.*;
 import com.minehut.teamapi.models.Death;
 import lombok.Getter;
+import org.bson.types.ObjectId;
 
 /**
  * Created by luke on 4/27/17.
@@ -20,7 +21,14 @@ public class HttpClient implements TeamClient {
 
     public HttpClient(HttpClientConfig config) {
         this.config = config;
-        this.gson = new Gson();
+
+        GsonBuilder builder = new GsonBuilder();
+
+        // ObjectId
+        builder.registerTypeAdapter(ObjectId.class, (JsonDeserializer<ObjectId>) (json, typeOfT, context) -> new ObjectId(json.getAsJsonPrimitive().getAsString()));
+        builder.registerTypeAdapter(ObjectId.class, (JsonSerializer<ObjectId>) (src, typeOfT, context) -> new JsonPrimitive(src.toString()));
+
+        this.gson = builder.create();
 
         //serialize objects using gson
         Unirest.setObjectMapper(new ObjectMapper() {
