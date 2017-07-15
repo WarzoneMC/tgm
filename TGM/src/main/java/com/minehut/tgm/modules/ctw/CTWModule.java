@@ -200,7 +200,6 @@ public class CTWModule extends MatchModule implements Listener {
 
         for (int i : woolScoreboardLines.get(woolObjective)) {
             for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
-                simpleScoreboard.remove(i);
                 simpleScoreboard.add(getScoreboardString(woolObjective), i);
                 simpleScoreboard.update();
             }
