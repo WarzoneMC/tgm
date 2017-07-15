@@ -202,12 +202,12 @@ public class CycleCommands {
             return;
         }
 
-//        if (!autoJoin) {
-//            if (!player.hasPermission("tgm.pickteam")) {
-//                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can choose their team. Use " + ChatColor.WHITE + "Auto Join " + ChatColor.LIGHT_PURPLE + "instead.");
-//                return;
-//            }
-//        }
+        if (!autoJoin) {
+            if (!player.hasPermission("tgm.pickteam")) {
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can choose their team. Use " + ChatColor.WHITE + "Auto Join " + ChatColor.LIGHT_PURPLE + "instead.");
+                return;
+            }
+        }
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
         TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
