@@ -12,6 +12,7 @@ import com.minehut.tgm.modules.ChatModule;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
+import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,9 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApiManager implements Listener {
+    private ObjectId serverId;
     private MatchInProgress matchInProgress;
 
     public ApiManager() {
+        this.serverId = new ObjectId();
         TGM.registerEvents(this);
 
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(TGM.get(), new Runnable() {
@@ -56,7 +59,8 @@ public class ApiManager implements Listener {
                         spectatorCount,
                         maxPlayers,
                         TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getName(),
-                        TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().getName()
+                        TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().getName(),
+                        serverId
                 );
                 TGM.get().getTeamClient().heartbeat(heartbeat);
             }

@@ -1,5 +1,6 @@
 package com.minehut.teamapi.models;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bson.types.ObjectId;
@@ -16,4 +17,7 @@ public class Heartbeat {
     @Getter private int maxPlayers;
     @Getter private String map;
     @Getter private String gametype;
+
+    @SerializedName("_id")
+    @Getter private ObjectId serverId;
 }
