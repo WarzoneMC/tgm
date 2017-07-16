@@ -28,7 +28,7 @@ public class ApiManager implements Listener {
         this.serverId = new ObjectId();
         TGM.registerEvents(this);
 
-        Bukkit.getScheduler().scheduleAsyncRepeatingTask(TGM.get(), new Runnable() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(TGM.get(), new Runnable() {
             @Override
             public void run() {
                 List<String> players = new ArrayList<>();
@@ -153,7 +153,7 @@ public class ApiManager implements Listener {
         }
 
         Death death = new Death(player.getUserProfile().getId().toString(), killerId, playerItem,
-                killerItem, matchInProgress.getMap(), matchInProgress.getId().toString());
+                killerItem, matchInProgress.getMap(), matchInProgress.getId());
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
             @Override
             public void run() {
