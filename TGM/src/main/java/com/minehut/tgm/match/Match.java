@@ -41,14 +41,10 @@ public class Match {
      * No players are in the world at this point.
      */
     public void load() {
-        for (MatchModule module : matchManifest.allocateCoreModules()) {
-            modules.add(module);
-        }
-        for (MatchModule module : matchManifest.allocateGameModules()) {
-            modules.add(module);
-        }
+        modules.addAll(matchManifest.allocateCoreModules());
+        modules.addAll(matchManifest.allocateGameModules());
 
-        /**
+        /*
          * Core managers initialize off of MatchLoadEvent
          * so we call it first.
          */
