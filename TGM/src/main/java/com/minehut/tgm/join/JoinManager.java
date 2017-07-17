@@ -44,9 +44,7 @@ public class JoinManager implements Listener {
                         toRemove.add(queuedJoin);
                     }
                 }
-                for (QueuedJoin queuedJoin : toRemove) {
-                    queuedJoins.remove(queuedJoin);
-                }
+                queuedJoins.removeAll(toRemove);
             }
         }, 20 * 10L, 20 * 10L);
     }
@@ -98,6 +96,7 @@ public class JoinManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
+        event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " joined.");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -110,11 +109,7 @@ public class JoinManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        handleQuit(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onLeave(PlayerQuitEvent event) {
+        event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " left.");
         handleQuit(event.getPlayer());
     }
 
