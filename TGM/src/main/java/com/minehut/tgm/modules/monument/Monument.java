@@ -59,10 +59,10 @@ public class Monument implements Listener {
                                 monumentService.damage(event.getPlayer(), event.getBlock());
                             }
                         }
-                    } else {
-                        event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
-                        event.setCancelled(true);
                     }
+                } else {
+                    event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
+                    event.setCancelled(true);
                 }
             }
         }
