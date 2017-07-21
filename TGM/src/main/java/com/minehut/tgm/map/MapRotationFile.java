@@ -65,4 +65,9 @@ public class MapRotationFile implements MapRotation {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public List<MapContainer> getMaps() {
+        return rotation;
+    }
 }

@@ -15,14 +15,36 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CycleCommands {
+
+    @Command(aliases = {"rot", "rotation", "rotations", "maps"}, desc = "View the maps that are in the rotation.")
+    @CommandPermissions({"tgm.rotation"})
+    public static void rotation(CommandContext cmd, CommandSender sender) {
+        List<String> maps = new ArrayList<>();
+        int i = 1;
+        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapRotation().getMaps()) {
+            if (mapContainer.equals(TGM.get().getMatchManager().getMatch().getMapContainer())) {
+                maps.add(ChatColor.GREEN + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
+            } else {
+                maps.add(ChatColor.GRAY + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
+            }
+            i++;
+        }
+
+        sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Current Rotation: \n" + StringUtils.join(maps, "\n"));
+    }
+
 
     @Command(aliases = {"cycle"}, desc = "Cycle to a new map.")
     @CommandPermissions({"tgm.cycle"})
