@@ -34,11 +34,7 @@ public class CycleCommands {
         List<String> maps = new ArrayList<>();
         int i = 1;
         for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-            if (mapContainer.equals(TGM.get().getMatchManager().getMatch().getMapContainer())) {
-                maps.add(ChatColor.GREEN + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
-            } else {
-                maps.add(ChatColor.GRAY + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
-            }
+            maps.add(ChatColor.GRAY + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
             i++;
         }
 
@@ -59,7 +55,7 @@ public class CycleCommands {
             i++;
         }
 
-        sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Current Rotation: \n" + StringUtils.join(maps, "\n"));
+        sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Rotation: \n" + StringUtils.join(maps, "\n"));
     }
 
 
