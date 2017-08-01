@@ -19,8 +19,7 @@ import java.util.List;
 public class ChatModule extends MatchModule implements Listener {
     @Getter private TeamManagerModule teamManagerModule;
     @Getter private TimeModule timeModule;
-    @Getter
-    private final List<Chat> chatLog = new ArrayList<>();
+    @Getter private final List<Chat> chatLog = new ArrayList<>();
 
     @Override
     public void load(Match match) {
@@ -32,7 +31,7 @@ public class ChatModule extends MatchModule implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-        event.setFormat("<" + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + "> " + event.getMessage());
+        event.setFormat(matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
 
         chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), event.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), event.getMessage(), matchTeam.getId(), timeModule.getTimeElapsed(), false));
     }

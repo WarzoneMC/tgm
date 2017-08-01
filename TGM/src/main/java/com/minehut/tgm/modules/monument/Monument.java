@@ -1,7 +1,7 @@
 package com.minehut.tgm.modules.monument;
 
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.match.MatchModule;
+import com.minehut.tgm.match.MatchStatus;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.team.MatchTeam;
 import lombok.AllArgsConstructor;
@@ -42,25 +42,24 @@ public class Monument implements Listener {
         if (region.contains(event.getBlock().getLocation())) {
             if (materials == null || materials.contains(event.getBlock().getType())) {
                 if (canDamage(event.getPlayer())) {
-                    event.setCancelled(false); //override filters
-                    event.getBlock().getDrops().clear();
+                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                        event.setCancelled(false); //override filters
+                        event.getBlock().getDrops().clear();
 
-                    health--;
+                        health--;
 
-                    if (health < 0) {
-                        event.getPlayer().sendMessage(ChatColor.RED + "This monument is already destroyed.");
-                    }
-                    else if (health == 0) {
-                        for (MonumentService monumentService : services) {
-                            monumentService.destroy(event.getPlayer(), event.getBlock());
+                        if (health < 0) {
+                            event.getPlayer().sendMessage(ChatColor.RED + "This monument is already destroyed.");
+                        } else if (health == 0) {
+                            for (MonumentService monumentService : services) {
+                                monumentService.destroy(event.getPlayer(), event.getBlock());
+                            }
+                        } else {
+                            for (MonumentService monumentService : services) {
+                                monumentService.damage(event.getPlayer(), event.getBlock());
+                            }
                         }
                     }
-                    else {
-                        for (MonumentService monumentService : services) {
-                            monumentService.damage(event.getPlayer(), event.getBlock());
-                        }
-                    }
-
                 } else {
                     event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
                     event.setCancelled(true);
