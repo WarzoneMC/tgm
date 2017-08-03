@@ -35,12 +35,20 @@ public class MatchResultModule extends MatchModule implements Listener {
             }
         }
 
-        Bukkit.broadcastMessage(ChatColor.GOLD + "-------------");
+        player.sendMessage(ChatColor.AQUA + "---------------------------------");
+        player.sendMessage(ChatColor.AQUA + "");
         if (event.getWinningTeam() != null) {
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "  " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias() + " Wins!" + ChatColor.DARK_PURPLE + "  ");
+            player.sendMessage(ChatColor.DARK_PURPLE + "               Winning Team: " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias());
         } else {
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "  " + ChatColor.YELLOW + "Tie" + ChatColor.YELLOW + "  ");
+            player.sendMessage(ChatColor.DARK_PURPLE + "                             " + ChatColor.YELLOW + "Tie!" + ChatColor.YELLOW + "");
         }
-        Bukkit.broadcastMessage(ChatColor.GOLD + "-------------");
+        if (event.getWinningTeam().containsPlayer(player)) {
+            player.sendMessage(ChatColor.GRAY + "                   Congratulations!");
+        } else {
+            player.sendMessage(ChatColor.GRAY+ "               Better luck next time!");
+        } else if (TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator) {
+            player.sendMessage(ChatColor.Gray+ "                   Play next game?");
+        player.sendMessage(ChatColor.AQUA + "");
+        player.sendMessage(ChatColor.AQUA + "---------------------------------");
     }
 }
