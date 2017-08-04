@@ -1,6 +1,7 @@
 package com.minehut.tgm.modules.infection;
 
 import com.google.gson.JsonObject;
+import com.minehut.teamapi.models.Team;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
 import com.minehut.tgm.damage.grave.event.PlayerDeathEvent;
@@ -11,6 +12,8 @@ import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.match.MatchStatus;
 import com.minehut.tgm.modules.countdown.BossBarCountdown;
 import com.minehut.tgm.modules.countdown.Countdown;
+import com.minehut.tgm.modules.scoreboard.ScoreboardManagerModule;
+import com.minehut.tgm.modules.scoreboard.SimpleScoreboard;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamChangeEvent;
 import com.minehut.tgm.modules.team.TeamManagerModule;
@@ -31,9 +34,11 @@ import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.NameTagVisibility;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
 
 /**
  * Created by Draem on 7/31/2017.
@@ -61,10 +66,11 @@ public class InfectionModule extends MatchModule implements Listener {
         int zombies = (int)(players * (5 / 100.0F)) == 0 ? 1 : (int)(players * (5 / 100.0F));
 
         for (int i = 0; i < zombies; i++) {
-            PlayerContext player = teamManager.getTeamById("humans").getMembers().get(teamManager.getTeamById("humans").getMembers().size() - 1);
+            PlayerContext player = teamManager.getTeamById("humans").getMembers().get(new Random().nextInt(teamManager.getTeamById("humans").getMembers().size()));
             broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
 
             infect(player.getPlayer());
+            freeze(player.getPlayer());
         }
 
         for (MatchTeam team : teamManager.getTeams()) {
@@ -161,9 +167,8 @@ public class InfectionModule extends MatchModule implements Listener {
                             teamManager.getTeam(killer).getColor(),
                             killer.getName()
                             ));
-
-                    refresh(TGM.get().getPlayerManager().getPlayerContext(event.getEntity()), teamManager.getTeam(event.getEntity()));
                 }
+                refresh(TGM.get().getPlayerManager().getPlayerContext(event.getEntity()), teamManager.getTeam(event.getEntity()));
             }
             event.setDamage(0);
         }
@@ -197,6 +202,10 @@ public class InfectionModule extends MatchModule implements Listener {
             TGM.get().getMatchManager().endMatch(teamManager.getTeamById("infected"));
         }
         event.getPlayerContext().getPlayer().setGameMode(GameMode.ADVENTURE);
+
+        if (event.getTeam().getId().equalsIgnoreCase("infected")) {
+            event.getPlayerContext().getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
+        }
     }
 
     @EventHandler
@@ -215,14 +224,14 @@ public class InfectionModule extends MatchModule implements Listener {
 
         teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"));
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
-        player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
+        player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
     }
 
     public void freeze(Player player) {
         player.addPotionEffects(Arrays.asList(
-                new PotionEffect(PotionEffectType.SLOW, 10, 255, true, false),
-                new PotionEffect(PotionEffectType.JUMP, 10, 128, true, false),
-                new PotionEffect(PotionEffectType.BLINDNESS, 10, 255, true, false)
+                new PotionEffect(PotionEffectType.SLOW, 10 * 20, 255, true, false),
+                new PotionEffect(PotionEffectType.JUMP, 10 * 20, 128, true, false),
+                new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 255, true, false)
         ));
 
         new BukkitRunnable() {
@@ -238,7 +247,7 @@ public class InfectionModule extends MatchModule implements Listener {
         player.removePotionEffect(PotionEffectType.SLOW);
         player.removePotionEffect(PotionEffectType.BLINDNESS);
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 5000, 1, true, false));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false));
     }
 
 }
