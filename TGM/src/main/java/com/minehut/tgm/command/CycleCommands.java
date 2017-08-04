@@ -1,6 +1,7 @@
 package com.minehut.tgm.command;
 
 import com.minehut.tgm.TGM;
+import com.minehut.tgm.gametype.GameType;
 import com.minehut.tgm.map.MapContainer;
 import com.minehut.tgm.match.MatchStatus;
 import com.minehut.tgm.modules.ChatModule;
@@ -153,8 +154,23 @@ public class CycleCommands {
     @Command(aliases = {"join"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() == 0) {
-            MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getSmallestTeam();
-            attemptJoinTeam((Player) sender, matchTeam, true);
+            if (TGM.get().getModule(TeamManagerModule.class).getTeam((Player) sender).isSpectator()) {
+                if (TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Infected)) {
+                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                        MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeamById("infected");
+                        attemptJoinTeam((Player) sender, team, true);
+                        return;
+                    }
+
+                    MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeamById("humans");
+                    attemptJoinTeam((Player) sender, team, true);
+                    return;
+                }
+                MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getSmallestTeam();
+                attemptJoinTeam((Player) sender, matchTeam, true);
+            } else {
+                sender.sendMessage(ChatColor.RED + "You have already chosen a team.");
+            }
         } else {
             MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getJoinedStrings(0));
             if (matchTeam == null) {

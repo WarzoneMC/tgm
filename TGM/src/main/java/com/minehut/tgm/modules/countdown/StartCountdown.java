@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
 
 public class StartCountdown extends BossBarCountdown {
     public static final int START_TIME = 20;
-    public static final int REQUIRED_PLAYERS = 1;
+    public static final int REQUIRED_PLAYERS = 2;
 
     @Getter private TeamManagerModule teamManagerModule;
 
