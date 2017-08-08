@@ -33,14 +33,23 @@ public class MatchResultModule extends MatchModule implements Listener {
                     player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1f, 1f);
                 }
             }
-        }
 
-        Bukkit.broadcastMessage(ChatColor.GOLD + "-------------");
-        if (event.getWinningTeam() != null) {
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "  " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias() + " Wins!" + ChatColor.DARK_PURPLE + "  ");
-        } else {
-            Bukkit.broadcastMessage(ChatColor.DARK_PURPLE + "  " + ChatColor.YELLOW + "Tie" + ChatColor.YELLOW + "  ");
+            player.sendMessage(ChatColor.AQUA + "---------------------------------");
+            player.sendMessage(ChatColor.AQUA + "");
+            if (event.getWinningTeam() != null) {
+                player.sendMessage(ChatColor.DARK_PURPLE + "               Winning Team: " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias());
+            } else {
+                player.sendMessage(ChatColor.DARK_PURPLE + "                             " + ChatColor.YELLOW + "Tie!" + ChatColor.YELLOW + "");
+            }
+            if (event.getWinningTeam().containsPlayer(player)) {
+                player.sendMessage(ChatColor.GRAY + "                  Congratulations!");
+            }  else if (TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator()) {
+                player.sendMessage(ChatColor.GRAY + "                   Play next game?");
+            } else {
+                player.sendMessage(ChatColor.GRAY+ "               Better luck next time!");
+            }
+                player.sendMessage(ChatColor.AQUA + "");
+                player.sendMessage(ChatColor.AQUA + "---------------------------------");
         }
-        Bukkit.broadcastMessage(ChatColor.GOLD + "-------------");
     }
 }

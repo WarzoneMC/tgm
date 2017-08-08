@@ -2,6 +2,7 @@ package com.minehut.tgm.modules.kit;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.modules.kit.parser.ArmorKitNodeParser;
@@ -44,7 +45,7 @@ public class KitLoaderModule extends MatchModule {
                 TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
                 if (kitJson.has("teams")) {
                     for (Object o : kitJson.getAsJsonArray("teams")) {
-                        MatchTeam matchTeam = teamManagerModule.getTeamById((String) o);
+                        MatchTeam matchTeam = teamManagerModule.getTeamById(((JsonPrimitive) o).getAsString());
                         if (matchTeam != null) {
                             teams.add(matchTeam);
                         }

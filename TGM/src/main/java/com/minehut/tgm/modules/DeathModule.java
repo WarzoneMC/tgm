@@ -2,8 +2,6 @@ package com.minehut.tgm.modules;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.MatchModule;
-import com.minehut.tgm.match.MatchStatus;
-import com.minehut.tgm.modules.team.TeamChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,14 +16,16 @@ public class DeathModule extends MatchModule implements Listener {
      * This is to prevent players from "combat logging"
      * by team swapping to avoid getting a death.
      */
-    @EventHandler
-    public void onTeamChange(TeamChangeEvent event) {
-        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
-            if (event.getOldTeam() != null && !event.getOldTeam().isSpectator()) {
-                event.getPlayerContext().getPlayer().setHealth(0);
-            }
-        }
-    }
+
+    // not need because i prevent people changing teams during the game
+//    @EventHandler
+//    public void onTeamChange(TeamChangeEvent event) {
+//        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
+//            if (event.getOldTeam() != null && !event.getOldTeam().isSpectator()) {
+//                event.getPlayerContext().getPlayer().setHealth(0);
+//            }
+//        }
+//    }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
