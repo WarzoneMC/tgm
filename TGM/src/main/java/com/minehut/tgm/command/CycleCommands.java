@@ -3,6 +3,7 @@ package com.minehut.tgm.command;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.gametype.GameType;
 import com.minehut.tgm.map.MapContainer;
+import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.match.MatchStatus;
 import com.minehut.tgm.modules.ChatModule;
 import com.minehut.tgm.modules.countdown.Countdown;
@@ -153,26 +154,29 @@ public class CycleCommands {
 
     @Command(aliases = {"join"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
+        TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
         if (cmd.argsLength() == 0) {
-            if (TGM.get().getModule(TeamManagerModule.class).getTeam((Player) sender).isSpectator()) {
-                if (TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Infected)) {
-                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) {
-                        MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeamById("infected");
+            MatchManager matchManager = TGM.get().getMatchManager();
+
+            if (teamManager.getTeam((Player) sender).isSpectator() || matchManager.getMatch().getMatchStatus().equals(MatchStatus.PRE)) {
+                if (matchManager.getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Infected)) {
+                    if (matchManager.getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                        MatchTeam team = teamManager.getTeamById("infected");
                         attemptJoinTeam((Player) sender, team, true);
                         return;
                     }
 
-                    MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeamById("humans");
+                    MatchTeam team = teamManager.getTeamById("humans");
                     attemptJoinTeam((Player) sender, team, true);
                     return;
                 }
-                MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getSmallestTeam();
+                MatchTeam matchTeam = teamManager.getSmallestTeam();
                 attemptJoinTeam((Player) sender, matchTeam, true);
             } else {
                 sender.sendMessage(ChatColor.RED + "You have already chosen a team.");
             }
         } else {
-            MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getJoinedStrings(0));
+            MatchTeam matchTeam = teamManager.getTeamFromInput(cmd.getJoinedStrings(0));
             if (matchTeam == null) {
                 sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                 return;

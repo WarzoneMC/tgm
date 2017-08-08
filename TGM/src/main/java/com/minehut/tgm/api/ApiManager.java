@@ -12,6 +12,7 @@ import com.minehut.tgm.modules.ChatModule;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
+import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class ApiManager implements Listener {
     private ObjectId serverId;
-    private MatchInProgress matchInProgress;
+    @Getter private MatchInProgress matchInProgress;
 
     public ApiManager() {
         this.serverId = new ObjectId();

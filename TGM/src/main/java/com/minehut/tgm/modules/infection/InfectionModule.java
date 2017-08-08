@@ -1,8 +1,10 @@
 package com.minehut.tgm.modules.infection;
 
 import com.google.gson.JsonObject;
+import com.minehut.teamapi.models.Death;
 import com.minehut.teamapi.models.Team;
 import com.minehut.tgm.TGM;
+import com.minehut.tgm.api.ApiManager;
 import com.minehut.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
 import com.minehut.tgm.damage.grave.event.PlayerDeathEvent;
 import com.minehut.tgm.damage.grave.listener.PlayerListener;
@@ -30,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -79,16 +82,7 @@ public class InfectionModule extends MatchModule implements Listener {
             });
         }
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (match.getMatchStatus().equals(MatchStatus.MID) && teamManager.getTeamById("humans").getMembers().size() != 0) {
-                    TGM.get().getMatchManager().endMatch(teamManager.getTeamById("humans"));
-                }
-            }
-        }.runTaskLater(TGM.get(), length * 60 * 20);
-
-
+        match.getModule(InfectedTimeLimit.class).startCountdown(length);
     }
 
 //    @EventHandler
@@ -171,6 +165,37 @@ public class InfectionModule extends MatchModule implements Listener {
                 refresh(TGM.get().getPlayerManager().getPlayerContext(event.getEntity()), teamManager.getTeam(event.getEntity()));
             }
             event.setDamage(0);
+
+            if (TGM.get().getApiManager().isStatsDisabled()) {
+                return;
+            }
+
+            PlayerContext player = TGM.get().getPlayerManager().getPlayerContext(event.getEntity()); //dead
+
+            String playerItem = "";
+            if (event.getEntity().getItemInHand() != null) {
+                playerItem = event.getEntity().getItemInHand().getType().toString();
+            }
+
+            String killerItem = "";
+            String killerId = null;
+            if (event.getInfo().getResolvedDamager() instanceof Player) {
+                killerId = TGM.get().getPlayerManager().getPlayerContext(((Player) event.getInfo().getResolvedDamager())).getUserProfile().getId().toString();
+                if (event.getInfo().getResolvedDamager() != null) {
+                    killerItem = ((Player) event.getInfo().getResolvedDamager()).getItemInHand().getType().toString();
+                }
+            }
+
+            ApiManager api = TGM.get().getApiManager();
+
+            Death death = new Death(player.getUserProfile().getId().toString(), killerId, playerItem,
+                    killerItem, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
+                @Override
+                public void run() {
+                    TGM.get().getTeamClient().addKill(death);
+                }
+            });
         }
     }
 
@@ -183,6 +208,13 @@ public class InfectionModule extends MatchModule implements Listener {
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
 
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
+            event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
+        }
     }
 
     public void broadcastMessage(String msg) {

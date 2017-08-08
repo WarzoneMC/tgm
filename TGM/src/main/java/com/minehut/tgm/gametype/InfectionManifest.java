@@ -6,6 +6,7 @@ import com.minehut.tgm.modules.*;
 import com.minehut.tgm.modules.countdown.CycleCountdown;
 import com.minehut.tgm.modules.countdown.StartCountdown;
 import com.minehut.tgm.modules.filter.FilterManagerModule;
+import com.minehut.tgm.modules.infection.InfectedTimeLimit;
 import com.minehut.tgm.modules.infection.InfectionModule;
 import com.minehut.tgm.modules.kit.KitLoaderModule;
 import com.minehut.tgm.modules.points.PointsModule;
@@ -28,6 +29,7 @@ public class InfectionManifest extends MatchManifest {
         List<MatchModule> matchModules = new ArrayList<>();
 
         matchModules.add(new InfectionModule());
+        matchModules.add(new InfectedTimeLimit());
         return matchModules;
     }
 
