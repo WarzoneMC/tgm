@@ -15,6 +15,7 @@ import com.minehut.tgm.map.MapInfo;
 import com.minehut.tgm.map.MapInfoDeserializer;
 import com.minehut.tgm.match.MatchManager;
 import com.minehut.tgm.match.MatchModule;
+import com.minehut.tgm.modules.GameRuleModule;
 import com.minehut.tgm.player.PlayerManager;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -98,6 +99,8 @@ public class TGM extends JavaPlugin {
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
         commandManager.register(CycleCommands.class);
+
+        GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
         try {
             matchManager.cycleNextMatch();

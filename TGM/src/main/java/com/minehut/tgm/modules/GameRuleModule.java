@@ -2,17 +2,22 @@ package com.minehut.tgm.modules;
 
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
+import org.bukkit.World;
 
 public class GameRuleModule extends MatchModule {
 
     @Override
     public void load(Match match) {
-        match.getWorld().setGameRuleValue("doMobSpawning", "false");
-        match.getWorld().setGameRuleValue("doDaylightCycle", "false");
-        match.getWorld().setGameRuleValue("commandBlockOutput", "false");
-        match.getWorld().setGameRuleValue("logAdminCommands", "false");
-        match.getWorld().setGameRuleValue("doWeatherCycle", "false");
-        match.getWorld().setGameRuleValue("disableElytraMovementCheck", "true");
-        match.getWorld().setGameRuleValue("announceAdvancements", "false");
+        setGameRules(match.getWorld());
+    }
+
+    public static void setGameRules(World world) {
+        world.setGameRuleValue("doMobSpawning", "false");
+        world.setGameRuleValue("doDaylightCycle", "false");
+        world.setGameRuleValue("commandBlockOutput", "false");
+        world.setGameRuleValue("logAdminCommands", "false");
+        world.setGameRuleValue("doWeatherCycle", "false");
+        world.setGameRuleValue("disableElytraMovementCheck", "true");
+        world.setGameRuleValue("announceAdvancements", "false");
     }
 }
