@@ -5,8 +5,6 @@ import com.google.gson.JsonObject;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
-import com.minehut.tgm.modules.monument.Monument;
-import com.minehut.tgm.modules.monument.MonumentService;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.region.RegionManagerModule;
 import com.minehut.tgm.modules.scoreboard.ScoreboardInitEvent;
@@ -27,7 +25,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -83,9 +80,9 @@ public class CTWModule extends MatchModule implements Listener {
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                             for (PlayerContext playerContext : otherTeam.getMembers()) {
                                 if (otherTeam.isSpectator() || otherTeam == matchTeam) {
-                                    playerContext.getPlayer().playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
                                 } else {
-                                    playerContext.getPlayer().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
                                 }
                             }
                         }
@@ -102,9 +99,9 @@ public class CTWModule extends MatchModule implements Listener {
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
                             if (otherTeam.isSpectator() || otherTeam == matchTeam) {
-                                playerContext.getPlayer().playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
                             } else {
-                                playerContext.getPlayer().playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
                             }
                         }
                     }
@@ -125,9 +122,10 @@ public class CTWModule extends MatchModule implements Listener {
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
-        Firework firework = FireworkUtil.spawnFirework(location, FireworkEffect.builder()
+        FireworkUtil.spawnFirework(location, FireworkEffect.builder()
                 .with(FireworkEffect.Type.BURST)
                 .withFlicker()
+                .trail(false)
                 .withColor(ColorConverter.getColor(color))
                 .build(), 0);
     }
