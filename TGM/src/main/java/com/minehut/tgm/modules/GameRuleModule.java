@@ -12,6 +12,7 @@ public class GameRuleModule extends MatchModule {
     }
 
     public static void setGameRules(World world) {
+        world.setGameRuleValue("keepInventory", "true");
         world.setGameRuleValue("doMobSpawning", "false");
         world.setGameRuleValue("doDaylightCycle", "false");
         world.setGameRuleValue("commandBlockOutput", "false");
