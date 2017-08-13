@@ -8,10 +8,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,8 +46,18 @@ public class MatchManager {
     public void endMatch(MatchTeam winningTeam) {
         List<MatchTeam> losers = new ArrayList<>();
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-            if (!matchTeam.isSpectator() && matchTeam != winningTeam) {
-                losers.add(matchTeam);
+            if (!matchTeam.isSpectator()) {
+                matchTeam.getMembers().forEach(playerContext -> {
+                    playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
+                    playerContext.getPlayer().setAllowFlight(true);
+                    playerContext.getPlayer().setVelocity(new Vector(playerContext.getPlayer().getVelocity().getX(),
+                            playerContext.getPlayer().getVelocity().getZ() + 1.0, playerContext.getPlayer().getVelocity().getZ()));
+                    playerContext.getPlayer().setFlying(true);
+                });
+
+                if (matchTeam != winningTeam) {
+                    losers.add(matchTeam);
+                }
             }
         }
         match.disable();

@@ -6,10 +6,8 @@ import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.util.ColorConverter;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -18,10 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.material.Wool;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,7 +89,7 @@ public class WoolObjective implements Listener {
     }
 
     private void handleWoolPickup(Player player) {
-        if(completed) return;
+        if (completed) return;
 
         if (!owner.containsPlayer(player)) {
             return;
@@ -114,19 +110,21 @@ public class WoolObjective implements Listener {
     }
 
     @EventHandler
-    public void onPickup(PlayerPickupItemEvent event) {
-        if (event.getItem().getItemStack().getType() == Material.WOOL) {
-            if (event.getItem().getItemStack().getData().getData() == color) {
-                handleWoolPickup(event.getPlayer());
+    public void onPickup(EntityPickupItemEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if (event.getItem() != null && event.getItem().getItemStack().getType() == Material.WOOL) {
+                if (event.getItem().getItemStack().getData().getData() == color) {
+                    handleWoolPickup(((Player) event.getEntity()).getPlayer());
+                }
             }
         }
     }
 
     @EventHandler
-    public void onTransfer(InventoryMoveItemEvent event) {
-        if (event.getItem().getType() == Material.WOOL) {
-            if (event.getItem().getData().getData() == color) {
-                handleWoolPickup((Player) event.getInitiator());
+    public void onCollect(InventoryClickEvent event) {
+        if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.WOOL) {
+            if (event.getCurrentItem().getData().getData() == color) {
+                handleWoolPickup((Player) event.getWhoClicked());
             }
         }
     }

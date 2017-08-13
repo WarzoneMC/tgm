@@ -4,7 +4,6 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.damage.tracker.event.PlayerDamageEvent;
 import com.minehut.tgm.match.*;
 import com.minehut.tgm.modules.team.MatchTeam;
-import com.minehut.tgm.modules.team.TeamChangeEvent;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.user.PlayerContext;
 import com.minehut.tgm.util.ColorConverter;
@@ -16,7 +15,6 @@ import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,6 +29,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 
@@ -191,11 +190,11 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onVoidDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player && isSpectating((Player) event.getEntity())) {
             if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                Location location = event.getEntity().getLocation().clone();
-                location.setY(1);
+                event.setCancelled(true); //
+                event.getEntity().setVelocity(new Vector(event.getEntity().getVelocity().getX(),
+                        event.getEntity().getVelocity().getZ() + 10.0, event.getEntity().getVelocity().getZ()));
 
-                event.getEntity().teleport(location);
-                ((Player) event.getEntity()).setFlying(false);
+                ((Player) event.getEntity()).setFlying(true);
             }
         }
     }
