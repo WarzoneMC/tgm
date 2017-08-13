@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 public class CycleCommands {
 
     @Command(aliases = {"maps"}, desc = "View the maps that are on team.gg, although not necessarily in the rotation.")
-    @CommandPermissions({"tgm.maps"})
     public static void maps(CommandContext cmd, CommandSender sender) {
         List<String> maps = new ArrayList<>();
         int i = 1;
@@ -44,7 +43,6 @@ public class CycleCommands {
     }
 
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.")
-    @CommandPermissions({"tgm.rotation"})
     public static void rotation(CommandContext cmd, CommandSender sender) {
         List<String> maps = new ArrayList<>();
         int i = 1;
