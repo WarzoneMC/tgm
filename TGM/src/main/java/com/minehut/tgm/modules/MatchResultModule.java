@@ -35,7 +35,6 @@ public class MatchResultModule extends MatchModule implements Listener {
             }
 
             player.sendMessage("" + ChatColor.AQUA + ChatColor.STRIKETHROUGH + "-----------------------------------");
-            player.sendMessage(ChatColor.AQUA + "");
             if (event.getWinningTeam() != null) {
                 player.sendMessage(ChatColor.DARK_PURPLE + "               Winning Team: " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias());
             } else {
@@ -48,7 +47,6 @@ public class MatchResultModule extends MatchModule implements Listener {
             } else {
                 player.sendMessage(ChatColor.GRAY+ "               Better luck next time!");
             }
-                player.sendMessage(ChatColor.AQUA + "");
                 player.sendMessage("" + ChatColor.AQUA + ChatColor.STRIKETHROUGH + "-----------------------------------");
         }
     }
