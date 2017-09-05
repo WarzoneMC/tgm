@@ -41,12 +41,10 @@ public class TDMModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        //TGM.registerEvents(this);
         this.match = match;
         teamManager = TGM.get().getModule(TeamManagerModule.class);
         pointsModule = TGM.get().getModule(PointsModule.class);
         pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
-        //teamManager = match.getModule(TeamManagerModule.class);
     }
 
     @EventHandler
@@ -55,18 +53,15 @@ public class TDMModule extends MatchModule implements Listener {
 
 
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
-        //simpleScoreboard.setTitle(ChatColor.AQUA + "Kills");
 
         int i = 0;
         for (MatchTeam matchTeam : teams) {
             if(matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam), i);
             teamScoreboardLines.put(matchTeam, i);
-            i++;
-            simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i);
-            i++;
+            simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i++);
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                simpleScoreboard.add(matchTeam.getColor() + " ", i);
+                simpleScoreboard.add(matchTeam.getColor() + " ", i++);
                 i++;
             }
         }
@@ -98,7 +93,6 @@ public class TDMModule extends MatchModule implements Listener {
         }
         Player killer = (Player) event.getEntity().getKiller();
         MatchTeam team = teamManager.getTeam(killer);
-        TGM.get().getLogger().log(Level.INFO, "Player Killed: " + event.getEntity().getName() + " | Point for: " + team.getAlias());
         incrementPoints(team, 1);
 
     }
