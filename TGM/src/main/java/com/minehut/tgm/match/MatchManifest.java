@@ -63,6 +63,7 @@ public abstract class MatchManifest {
         modules.add(new FireworkDamageModule());
         modules.add(new GameRuleModule());
         modules.add(new ItemRemoveModule());
+        modules.add(new RegenModule());
 
         return modules;
     }
