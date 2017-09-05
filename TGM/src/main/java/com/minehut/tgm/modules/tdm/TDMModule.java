@@ -48,7 +48,6 @@ public class TDMModule extends MatchModule implements Listener {
     public void onScoreboardInit(ScoreboardInitEvent event) {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
-
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
         int i = 0;
