@@ -54,11 +54,10 @@ public class TDMModule extends MatchModule implements Listener {
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i);
+            teamScoreboardLines.put(matchTeam, i++);
             simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i++);
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
                 simpleScoreboard.add(matchTeam.getColor() + " ", i++);
-                i++;
             }
         }
     }
