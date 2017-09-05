@@ -29,15 +29,12 @@ import java.util.logging.Level;
  * Created by Jorge on 9/4/2017.
  */
 public class TDMModule extends MatchModule implements Listener {
-
+    
+    @Getter private Match match;
     @Getter private PointsModule pointsModule;
-
     @Getter private TeamManagerModule teamManager;
 
-    @Getter
-    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
-
-    @Getter private Match match;
+    @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -56,7 +53,7 @@ public class TDMModule extends MatchModule implements Listener {
 
         int i = 0;
         for (MatchTeam matchTeam : teams) {
-            if(matchTeam.isSpectator()) continue;
+            if (matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam), i);
             teamScoreboardLines.put(matchTeam, i);
             simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i++);
@@ -87,14 +84,13 @@ public class TDMModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDamage(PlayerDeathEvent event) {
-
         if (event.getEntity().getKiller() == null || !(event.getEntity().getKiller() instanceof Player)) {
             return;
         }
+
         Player killer = (Player) event.getEntity().getKiller();
         MatchTeam team = teamManager.getTeam(killer);
         incrementPoints(team, 1);
-
     }
 
 }
