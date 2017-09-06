@@ -25,7 +25,7 @@ public class TimeModule extends MatchModule {
     public void load(Match match){
         if (match.getMapContainer().getMapInfo().getJsonObject().has("time")) {
             JsonObject timeJson = match.getMapContainer().getMapInfo().getJsonObject().get("time").getAsJsonObject();
-            timeLimit = timeJson.get("limit").getAsInt();
+            timeLimit = (timeJson.has("limit") ? timeJson.get("limit").getAsInt() : 0);
         }
 
         if (timeLimit > 0) {
