@@ -181,7 +181,7 @@ public class InfectionModule extends MatchModule implements Listener {
     private void refresh(PlayerContext playerContext, MatchTeam matchTeam) {
         Players.reset(playerContext.getPlayer(), true);
 
-        matchTeam.getKits().get(0).apply(playerContext.getPlayer(), matchTeam);
+        matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
         playerContext.getPlayer().updateInventory();
         playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation());
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
