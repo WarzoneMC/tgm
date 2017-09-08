@@ -59,6 +59,7 @@ public class JoinManager implements Listener {
 
     @EventHandler
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
+        if (event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.KICK_BANNED)) return;
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
         Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString());
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
@@ -67,7 +68,7 @@ public class JoinManager implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         QueuedJoin queuedJoin = getQueuedUserProfile(event.getPlayer());
-        if(queuedJoin == null) {
+        if (queuedJoin == null) {
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             event.setKickMessage(ChatColor.RED + "Unable to load user profile. Please try again.");
             return;
