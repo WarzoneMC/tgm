@@ -27,7 +27,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,6 +57,8 @@ public class DTMModule extends MatchModule implements Listener {
 
         //monument services
         for (Monument monument : monuments) {
+            String unformattedName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&' , (monument.getName())));
+
             monument.addService(new MonumentService() {
                 @Override
                 public void damage(Player player, Block block) {
@@ -65,7 +66,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + monument.getName());
+                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
                 }
 
@@ -75,8 +76,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-
-                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + monument.getName());
+                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
                     for (MatchTeam owner : monument.getOwners()) {
@@ -102,10 +102,9 @@ public class DTMModule extends MatchModule implements Listener {
                 .withColor(ColorConverter.getColor(color))
                 .build(), 0);
 
-
         // Play the sound for the player if they are too far to render the firework.
-        for(Player listener : Bukkit.getOnlinePlayers()) {
-            if(listener.getLocation().distance(location) > 64) {
+        for (Player listener : Bukkit.getOnlinePlayers()) {
+            if (listener.getLocation().distance(location) > 64) {
                 listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_BLAST, 0.75f, 1f);
                 listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_TWINKLE, 0.75f, 1f);
             }
@@ -131,18 +130,14 @@ public class DTMModule extends MatchModule implements Listener {
                         monumentScoreboardLines.put(monument, list);
                     }
 
-                    event.getSimpleScoreboard().add(getScoreboardString(monument), i);
-
-                    i++;
+                    event.getSimpleScoreboard().add(getScoreboardString(monument), i++);
                 }
             }
             event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i);
-            i++;
+            teamScoreboardLines.put(matchTeam, i++);
 
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount), i);
-                i++; spaceCount++;
+                event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
             }
         }
     }
