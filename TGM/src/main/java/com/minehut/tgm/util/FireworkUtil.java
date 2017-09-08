@@ -1,6 +1,7 @@
 package com.minehut.tgm.util;
 
 import com.google.common.base.Preconditions;
+import com.minehut.tgm.TGM;
 import org.bukkit.Bukkit;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
@@ -18,11 +19,12 @@ public class FireworkUtil {
         Preconditions.checkArgument(power >= 0, "power must be positive");
 
         FireworkMeta meta = (FireworkMeta) Bukkit.getItemFactory().getItemMeta(Material.FIREWORK);
-        meta.setPower(power);
+        meta.setPower(power > 0 ? (power - 1) : power);
         meta.addEffect(effect);
 
-        Firework firework = (Firework) location.getWorld().spawnEntity(location, EntityType.FIREWORK);
+        Firework firework = (Firework) location.getWorld().spawnEntity(location.add(0.5, 0.0, 0.5), EntityType.FIREWORK);
         firework.setFireworkMeta(meta);
+        if (power == 0) Bukkit.getScheduler().runTaskLater(TGM.get(), firework::detonate, 1L);
 
         return firework;
     }
