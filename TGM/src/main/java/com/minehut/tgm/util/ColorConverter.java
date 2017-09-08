@@ -6,6 +6,10 @@ import org.bukkit.DyeColor;
 
 public class ColorConverter {
 
+    public static String filterString(String text) {
+        return ChatColor.translateAlternateColorCodes('&' , text);
+    }
+
     public static Color getColor(ChatColor color) {
         if (color == ChatColor.RED) {
             return Color.RED;
@@ -20,6 +24,45 @@ public class ColorConverter {
         } else {
             return Color.WHITE;
         }
+    }
+
+    public static Color getColorAll(ChatColor color) {
+        switch (color) {
+            case BLACK:
+                return Color.fromRGB(0, 0, 0);
+            case DARK_BLUE:
+                return Color.fromRGB(0, 0, 170);
+            case DARK_GREEN:
+                return Color.fromRGB(0, 170, 0);
+            case DARK_AQUA:
+                return Color.fromRGB(0, 170, 170);
+            case DARK_RED:
+                return Color.fromRGB(170, 0, 0);
+            case DARK_PURPLE:
+                return Color.fromRGB(170, 0, 170);
+            case GOLD:
+                return Color.fromRGB(255, 170, 0);
+            case GRAY:
+                return Color.fromRGB(170, 170, 170);
+            case DARK_GRAY:
+                return Color.fromRGB(85, 85, 85);
+            case BLUE:
+                return Color.fromRGB(85, 85, 255);
+            case GREEN:
+                return Color.fromRGB(85, 255, 85);
+            case AQUA:
+                return Color.fromRGB(85, 255, 255);
+            case RED:
+                return Color.fromRGB(255, 85, 85);
+            case LIGHT_PURPLE:
+                return Color.fromRGB(255, 85, 255);
+            case YELLOW:
+                return Color.fromRGB(255, 255, 85);
+            case WHITE:
+                return Color.fromRGB(255, 255, 255);
+        }
+
+        return Color.WHITE;
     }
 
     public static ChatColor getChatColor(Color color) {

@@ -1,7 +1,6 @@
 package com.minehut.tgm.modules;
 
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.join.MatchJoinEvent;
 import com.minehut.tgm.map.SpawnPoint;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
@@ -66,7 +65,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
             }
         } else {
-            matchTeam.getKits().get(0).apply(playerContext.getPlayer(), matchTeam);
+            matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
             playerContext.getPlayer().updateInventory();
 
             if (teleport) {

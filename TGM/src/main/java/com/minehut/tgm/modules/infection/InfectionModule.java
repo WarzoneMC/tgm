@@ -2,20 +2,12 @@ package com.minehut.tgm.modules.infection;
 
 import com.google.gson.JsonObject;
 import com.minehut.teamapi.models.Death;
-import com.minehut.teamapi.models.Team;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.api.ApiManager;
-import com.minehut.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
-import com.minehut.tgm.damage.grave.event.PlayerDeathEvent;
-import com.minehut.tgm.damage.grave.listener.PlayerListener;
 import com.minehut.tgm.damage.tracker.event.PlayerDamageEvent;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.match.MatchStatus;
-import com.minehut.tgm.modules.countdown.BossBarCountdown;
-import com.minehut.tgm.modules.countdown.Countdown;
-import com.minehut.tgm.modules.scoreboard.ScoreboardManagerModule;
-import com.minehut.tgm.modules.scoreboard.SimpleScoreboard;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamChangeEvent;
 import com.minehut.tgm.modules.team.TeamManagerModule;
@@ -25,19 +17,13 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.NameTagVisibility;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -77,9 +63,7 @@ public class InfectionModule extends MatchModule implements Listener {
         }
 
         for (MatchTeam team : teamManager.getTeams()) {
-            team.getMembers().forEach(playerContext -> {
-                playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
-            });
+            team.getMembers().forEach(playerContext -> playerContext.getPlayer().setGameMode(GameMode.ADVENTURE));
         }
 
         match.getModule(InfectedTimeLimit.class).startCountdown(length);
@@ -173,8 +157,8 @@ public class InfectionModule extends MatchModule implements Listener {
             PlayerContext player = TGM.get().getPlayerManager().getPlayerContext(event.getEntity()); //dead
 
             String playerItem = "";
-            if (event.getEntity().getItemInHand() != null) {
-                playerItem = event.getEntity().getItemInHand().getType().toString();
+            if (event.getEntity().getInventory().getItemInMainHand() != null) {
+                playerItem = event.getEntity().getInventory().getItemInMainHand().getType().toString();
             }
 
             String killerItem = "";
@@ -182,7 +166,7 @@ public class InfectionModule extends MatchModule implements Listener {
             if (event.getInfo().getResolvedDamager() instanceof Player) {
                 killerId = TGM.get().getPlayerManager().getPlayerContext(((Player) event.getInfo().getResolvedDamager())).getUserProfile().getId().toString();
                 if (event.getInfo().getResolvedDamager() != null) {
-                    killerItem = ((Player) event.getInfo().getResolvedDamager()).getItemInHand().getType().toString();
+                    killerItem = ((Player) event.getInfo().getResolvedDamager()).getInventory().getItemInMainHand().getType().toString();
                 }
             }
 
@@ -190,19 +174,14 @@ public class InfectionModule extends MatchModule implements Listener {
 
             Death death = new Death(player.getUserProfile().getId().toString(), killerId, playerItem,
                     killerItem, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
-            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), new Runnable() {
-                @Override
-                public void run() {
-                    TGM.get().getTeamClient().addKill(death);
-                }
-            });
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
         }
     }
 
     private void refresh(PlayerContext playerContext, MatchTeam matchTeam) {
         Players.reset(playerContext.getPlayer(), true);
 
-        matchTeam.getKits().get(0).apply(playerContext.getPlayer(), matchTeam);
+        matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
         playerContext.getPlayer().updateInventory();
         playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation());
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -218,9 +197,7 @@ public class InfectionModule extends MatchModule implements Listener {
     }
 
     public void broadcastMessage(String msg) {
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
-        });
+        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg)));
     }
 
     @EventHandler
@@ -250,12 +227,12 @@ public class InfectionModule extends MatchModule implements Listener {
         }
     }
 
-
+    //TODO Remove effects and replace with new kit module
     public void infect(Player player) {
         player.getWorld().strikeLightningEffect(player.getLocation());
 
         teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"));
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
+        if (teamManager.getTeamById("humans").getMembers().size() > 0) player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
         player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
     }
 
@@ -266,12 +243,7 @@ public class InfectionModule extends MatchModule implements Listener {
                 new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 255, true, false)
         ));
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                unfreeze(player);
-            }
-        }.runTaskLater(TGM.get(), 10 * 20);
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> unfreeze(player), 10 * 20);
     }
 
     public void unfreeze(Player player) {
