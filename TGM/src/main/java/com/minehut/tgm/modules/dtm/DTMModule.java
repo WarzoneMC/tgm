@@ -22,7 +22,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,14 +31,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+@Getter
 public class DTMModule extends MatchModule implements Listener {
-    @Getter
+
     private final List<Monument> monuments = new ArrayList<>();
-
-    @Getter
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
-
-    @Getter
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
@@ -66,6 +62,7 @@ public class DTMModule extends MatchModule implements Listener {
                 @Override
                 public void damage(Player player, Block block) {
                     updateOnScoreboard(monument);
+                    block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + monument.getName());
@@ -75,6 +72,7 @@ public class DTMModule extends MatchModule implements Listener {
                 @Override
                 public void destroy(Player player, Block block) {
                     updateOnScoreboard(monument);
+                    block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
 
@@ -98,7 +96,7 @@ public class DTMModule extends MatchModule implements Listener {
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
-        Firework firework = FireworkUtil.spawnFirework(location, FireworkEffect.builder()
+        FireworkUtil.spawnFirework(location, FireworkEffect.builder()
                 .with(FireworkEffect.Type.BURST)
                 .withFlicker()
                 .withColor(ColorConverter.getColor(color))
