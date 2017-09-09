@@ -7,11 +7,12 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class Kit {
-    @Getter private final String name;
-    @Getter private final String description;
-    @Getter private final List<KitNode> nodes;
+
+    private final String name;
+    private final String description;
+    private final List<KitNode> nodes;
 
     public void apply(Player player, MatchTeam matchTeam) {
         for (KitNode kitNode : nodes) {

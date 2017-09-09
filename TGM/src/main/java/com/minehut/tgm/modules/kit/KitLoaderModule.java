@@ -5,24 +5,29 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
-import com.minehut.tgm.modules.kit.parser.ArmorKitNodeParser;
+import com.minehut.tgm.modules.kit.parser.EffectKitNodeParser;
 import com.minehut.tgm.modules.kit.parser.ItemKitNodeParser;
-import com.minehut.tgm.modules.kit.parser.KitNodeParser;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class KitLoaderModule extends MatchModule {
-    @Getter
-    private final List<KitNodeParser> parsers = new ArrayList<>();
+
+    //@Getter private final List<KitNodeParser> parsers = new ArrayList<>();
+    //@Getter private final List<KitNodeParser> effectParsers = new ArrayList<>();
+
+    private ItemKitNodeParser itemParser;
+    private EffectKitNodeParser effectParser;
 
     public KitLoaderModule() {
-        parsers.add(new ItemKitNodeParser());
-        parsers.add(new ArmorKitNodeParser());
+        itemParser = new ItemKitNodeParser();
+        effectParser = new EffectKitNodeParser();
+
+        //parsers.add(new ItemKitNodeParser());
+        //parsers.add(new EffectKitNodeParser());
     }
 
     @Override
@@ -59,16 +64,20 @@ public class KitLoaderModule extends MatchModule {
                     }
                 }
 
+                //TODO Change this with new kit module
                 List<KitNode> nodes = new ArrayList<>();
                 for (JsonElement nodeElement : kitJson.getAsJsonArray("items")) {
-                    JsonObject nodeJson = nodeElement.getAsJsonObject();
+                    try {
+                        nodes.addAll(itemParser.parse(nodeElement.getAsJsonObject()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
-                    for (KitNodeParser parser : parsers) {
+                if (kitJson.has("effects")) {
+                    for (JsonElement nodeElement : kitJson.getAsJsonArray("effects")) {
                         try {
-                            List<KitNode> result = parser.parse(nodeJson);
-                            if (result != null) {
-                                nodes.addAll(result);
-                            }
+                            nodes.addAll(effectParser.parse(nodeElement.getAsJsonObject()));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
