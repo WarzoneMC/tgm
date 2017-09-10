@@ -200,11 +200,28 @@ public class CycleCommands {
                 } else {
                     sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
                 }
+            } else if (cmd.getString(0).equalsIgnoreCase("force")) {
+                if (cmd.argsLength() == 3) {
+                    MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getString(2));
+                    if (matchTeam == null) {
+                        sender.sendMessage(ChatColor.RED + "Unknown team \"" + cmd.getString(2) + "\"");
+                        return;
+                    }
+                    Player player = Bukkit.getPlayer(cmd.getString(1));
+                    if (player == null) {
+                        sender.sendMessage(ChatColor.RED + "Unknown player \"" + cmd.getString(1) + "\"");
+                        return;
+                    }
+                    attemptJoinTeam(player, matchTeam, true);
+                    sender.sendMessage(ChatColor.GREEN + "Forced " + player.getName() + " into " + matchTeam.getColor() + matchTeam.getAlias());
+                } else {
+                    sender.sendMessage(ChatColor.RED + "/team force (player) (team)");
+                }
             } else {
-                sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
+                sender.sendMessage(ChatColor.RED + "/team alias|force");
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
+            sender.sendMessage(ChatColor.RED + "/team alias|force");
         }
     }
 
