@@ -217,11 +217,34 @@ public class CycleCommands {
                 } else {
                     sender.sendMessage(ChatColor.RED + "/team force (player) (team)");
                 }
+            } else if (cmd.getString(0).equalsIgnoreCase("size")) {
+                if (cmd.argsLength() == 4) {
+                    MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getString(1));
+                    if (matchTeam == null) {
+                        sender.sendMessage(ChatColor.RED + "Unknown team \"" + cmd.getString(1) + "\"");
+                        return;
+                    }
+                    int min = 0;
+                    int max = 0;
+                    try {
+                        min = cmd.getInteger(2);
+                        max = cmd.getInteger(3);
+                    } catch (CommandNumberFormatException e){
+                        sender.sendMessage(ChatColor.RED + "Error: " + e.getMessage());
+                        return;
+                    }
+                    matchTeam.setMin(min);
+                    matchTeam.setMax(max);
+                    Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(matchTeam));
+                    sender.sendMessage(ChatColor.GREEN + "Set " + matchTeam.getColor() + matchTeam.getAlias() + ChatColor.GREEN + " size limits to " + min + "-" + max);
+                } else {
+                    sender.sendMessage(ChatColor.RED + "/team size (team) (min) (max)");
+                }
             } else {
-                sender.sendMessage(ChatColor.RED + "/team alias|force");
+                sender.sendMessage(ChatColor.RED + "/team alias|force|size");
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "/team alias|force");
+            sender.sendMessage(ChatColor.RED + "/team alias|force|size");
         }
     }
 
