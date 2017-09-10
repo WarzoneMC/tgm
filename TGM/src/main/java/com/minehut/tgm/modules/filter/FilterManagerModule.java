@@ -8,6 +8,7 @@ import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.modules.filter.evaluate.AllowFilterEvaluator;
 import com.minehut.tgm.modules.filter.evaluate.DenyFilterEvaluator;
 import com.minehut.tgm.modules.filter.evaluate.FilterEvaluator;
+import com.minehut.tgm.modules.filter.type.BlockExplodeFilterType;
 import com.minehut.tgm.modules.filter.type.BuildFilterType;
 import com.minehut.tgm.modules.filter.type.EnterFilterType;
 import com.minehut.tgm.modules.filter.type.FilterType;
@@ -85,6 +86,17 @@ public class FilterManagerModule extends MatchModule {
             String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
 
             filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
+        } else if (type.equals("blockexplode")) {
+            List<Region> regions = new ArrayList<>();
+            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+                if (region != null) {
+                    regions.add(region);
+                }
+            }
+
+            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
+            filterTypes.add(new BlockExplodeFilterType(regions, filterEvaluator));
         }
 
         return filterTypes;
