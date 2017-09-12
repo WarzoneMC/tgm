@@ -212,7 +212,7 @@ public class CycleCommands {
                         sender.sendMessage(ChatColor.RED + "Unknown player \"" + cmd.getString(1) + "\"");
                         return;
                     }
-                    attemptJoinTeam(player, matchTeam, true);
+                    attemptJoinTeam(player, matchTeam, true, true);
                     sender.sendMessage(ChatColor.GREEN + "Forced " + player.getName() + " into " + matchTeam.getColor() + matchTeam.getAlias());
                 } else {
                     sender.sendMessage(ChatColor.RED + "/team force (player) (team)");
@@ -290,7 +290,11 @@ public class CycleCommands {
 
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin) {
-        if (matchTeam.getMembers().size() >= matchTeam.getMax()) {
+        attemptJoinTeam(player, matchTeam, autoJoin, false);
+    }
+
+    public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin, boolean ignoreFull) {
+        if (matchTeam.getMembers().size() >= matchTeam.getMax() && !ignoreFull) {
             player.sendMessage(ChatColor.RED + "Team is full! Wait for a spot to open up.");
             return;
         }
