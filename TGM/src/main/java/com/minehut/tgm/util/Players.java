@@ -5,24 +5,20 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
 
 import java.util.UUID;
 
 public class Players {
 
     public static void reset(Player player, boolean heal) {
-        if (heal) player.setHealth(player.getMaxHealth());
+        if (heal) player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
         player.setFoodLevel(20);
         player.setSaturation(20);
         player.getInventory().clear();
         player.getInventory().setArmorContents(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR)});
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            try {
-                player.removePotionEffect(effect.getType());
-            } catch (NullPointerException ignored) {
-            }
-        }
+
+        player.getActivePotionEffects().stream().findAny().ifPresent(potionEffect -> player.removePotionEffect(potionEffect.getType()));
+
         player.setTotalExperience(0);
         player.setExp(0);
         player.setLevel(0);
@@ -43,6 +39,8 @@ public class Players {
                 player.getAttribute(attribute).removeModifier(modifier);
             }
         }
-        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 4.000D, AttributeModifier.Operation.ADD_SCALAR));
+        player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 24.000D, AttributeModifier.Operation.ADD_SCALAR));
+
+        player.updateInventory();
     }
 }
