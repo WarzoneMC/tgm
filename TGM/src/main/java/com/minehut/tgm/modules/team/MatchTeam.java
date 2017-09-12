@@ -21,8 +21,8 @@ public class MatchTeam {
     @Getter @Setter private String alias;
     @Getter private ChatColor color;
     @Getter private final boolean spectator;
-    @Getter private int max;
-    @Getter private int min;
+    @Getter @Setter private int max;
+    @Getter @Setter private int min;
     @Getter private final List<PlayerContext> members = new ArrayList<>();
 
     @Getter
