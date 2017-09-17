@@ -39,7 +39,12 @@ public class TDMModule extends MatchModule implements Listener {
 
         if (match.getMapContainer().getMapInfo().getJsonObject().has("tdm")) {
             JsonObject tdmJson = match.getMapContainer().getMapInfo().getJsonObject().get("tdm").getAsJsonObject();
-            tdmObjective = (tdmJson.has("objective") ? TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase()) : TDMObjective.KILLS);
+            if (tdmJson.has("objective")){
+                TDMObjective objective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
+                if (objective != null) tdmObjective = objective;
+                else tdmObjective = TDMObjective.KILLS;
+            }
+            else tdmObjective = TDMObjective.KILLS;
         }
 
         pointsModule = TGM.get().getModule(PointsModule.class);
