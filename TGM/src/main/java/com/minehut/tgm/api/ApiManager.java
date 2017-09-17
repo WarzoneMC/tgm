@@ -76,12 +76,14 @@ public class ApiManager implements Listener {
         List<String> winners = new ArrayList<>();
         for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
             winners.add(playerContext.getUserProfile().getId().toString());
+            playerContext.getUserProfile().addWin();
         }
 
         List<String> losers = new ArrayList<>();
         for (MatchTeam matchTeam : event.getLosingTeams()) {
             for (PlayerContext playerContext : matchTeam.getMembers()) {
                 losers.add(playerContext.getUserProfile().getId().toString());
+                playerContext.getUserProfile().addLoss();
             }
         }
 
@@ -134,14 +136,16 @@ public class ApiManager implements Listener {
 
         PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(module.getPlayer());
 
+        killed.getUserProfile().addDeath();
+
         String playerItem = event.getPlayer().getInventory().getItemInMainHand() == null ? "" : event.getPlayer().getInventory().getItemInMainHand().getType().toString();
         String killerItem = module.getItem() == null ? "" : module.getItem().getType().toString();
         String killerId = null;
 
         if (event instanceof PlayerDeathByPlayerEvent) {
             PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(module.getKiller());
-
             if (context == null) return;
+            context.getUserProfile().addKill();
             killerId = context.getUserProfile().getId().toString();
         }
 
