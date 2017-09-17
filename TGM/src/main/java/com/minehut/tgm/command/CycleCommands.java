@@ -288,6 +288,38 @@ public class CycleCommands {
         }
     }
 
+    @Command(aliases = {"stats", "stat"}, desc = "View your stats.")
+    public static void say(final CommandContext cmd, CommandSender sender) {
+        Player player = (Player) sender;
+
+        if (cmd.argsLength() == 0) {
+            viewStats(player, player.getName());
+        } else {
+            Player target = Bukkit.getPlayer(cmd.getString(0));
+            viewStats(player, cmd.getString(0));
+        }
+    }
+
+    public static void viewStats(Player player, String target) {
+        Player targetPlayer = Bukkit.getServer().getPlayer(target);
+        if (targetPlayer == null) {
+            player.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
+            return;
+        }
+
+        PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
+        player.sendMessage(ChatColor.BLUE + "-------------------------------");
+        player.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
+        player.sendMessage("   Level: " + ChatColor.GREEN + targetUser.getLevelString().replace("[", "").replace("]", ""));
+        player.sendMessage("   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
+        player.sendMessage("   Deaths: " + ChatColor.GREEN + targetUser.getUserProfile().getDeaths());
+        player.sendMessage("   K/D: " + ChatColor.GREEN + targetUser.getUserProfile().getKDR());
+        player.sendMessage("   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
+        player.sendMessage("   Losses: " + ChatColor.GREEN + targetUser.getUserProfile().getLosses());
+        player.sendMessage("   W/L: " + ChatColor.GREEN + targetUser.getUserProfile().getWLR());
+        player.sendMessage(ChatColor.BLUE + "-------------------------------");
+    }
+
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin) {
         attemptJoinTeam(player, matchTeam, autoJoin, false);
