@@ -48,20 +48,23 @@ public class ChatModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChatHighPriority(AsyncPlayerChatEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
-        if (!event.isCancelled()) Bukkit.getOnlinePlayers().stream().forEach(player -> {
-            TextComponent message = new TextComponent(event.getFormat().replaceAll("%%", "%"));
-            BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString().replace("[", "").replace("]", "")),
-                    new TextComponent("\n"),
-                    new TextComponent("\n" + ChatColor.AQUA + "Kills: " + ChatColor.RESET + playerContext.getUserProfile().getKills()),
-                    new TextComponent("\n" + ChatColor.AQUA + "Deaths: " + ChatColor.RESET + playerContext.getUserProfile().getDeaths()),
-                    new TextComponent("\n" + ChatColor.AQUA + "K/D: " + ChatColor.RESET + playerContext.getUserProfile().getKDR()),
-                    new TextComponent("\n"),
-                    new TextComponent("\n" + ChatColor.AQUA + "Wins: " + ChatColor.RESET + playerContext.getUserProfile().getWins()),
-                    new TextComponent("\n" + ChatColor.AQUA + "Losses: " + ChatColor.RESET + playerContext.getUserProfile().getLosses()),
-                    new TextComponent("\n" + ChatColor.AQUA + "W/L: " + ChatColor.RESET + playerContext.getUserProfile().getWLR())};
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, stats));
-            player.spigot().sendMessage(message);
-        });
+        if (!event.isCancelled())  {
+            Bukkit.getOnlinePlayers().stream().forEach(player -> {
+                TextComponent message = new TextComponent(event.getFormat().replaceAll("%%", "%"));
+                BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString().replace("[", "").replace("]", "")),
+                        new TextComponent("\n"),
+                        new TextComponent("\n" + ChatColor.AQUA + "Kills: " + ChatColor.RESET + playerContext.getUserProfile().getKills()),
+                        new TextComponent("\n" + ChatColor.AQUA + "Deaths: " + ChatColor.RESET + playerContext.getUserProfile().getDeaths()),
+                        new TextComponent("\n" + ChatColor.AQUA + "K/D: " + ChatColor.RESET + playerContext.getUserProfile().getKDR()),
+                        new TextComponent("\n"),
+                        new TextComponent("\n" + ChatColor.AQUA + "Wins: " + ChatColor.RESET + playerContext.getUserProfile().getWins()),
+                        new TextComponent("\n" + ChatColor.AQUA + "Losses: " + ChatColor.RESET + playerContext.getUserProfile().getLosses()),
+                        new TextComponent("\n" + ChatColor.AQUA + "W/L: " + ChatColor.RESET + playerContext.getUserProfile().getWLR())};
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, stats));
+                player.spigot().sendMessage(message);
+            });
+            Bukkit.getConsoleSender().sendMessage(event.getFormat().replace("%%", "%"));
+        }
         event.setCancelled(true);
     }
 
