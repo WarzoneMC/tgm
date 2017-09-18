@@ -34,31 +34,31 @@ public class UserProfile {
     @Getter private int deaths = 0;
     @Getter private List<String> matches;
 
-    public void addWin(){
+    public void addWin() {
         wins++;
     }
 
-    public void addKill(){
+    public void addKill() {
         kills++;
     }
 
-    public void addDeath(){
+    public void addDeath() {
         deaths++;
     }
 
-    public void addLoss(){
+    public void addLoss() {
         losses++;
     }
 
-    public int getXP(){
+    public int getXP() {
         return (getWins() * 10) + getKills();
     }
 
-    public int getLevel(){
+    public int getLevel() {
         return (int) (0.6 * Math.sqrt(getXP())) + 1;
     }
 
-    public String getKDR(){
+    public String getKDR() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits(2);
         nf.setMinimumFractionDigits(2);
@@ -66,7 +66,7 @@ public class UserProfile {
         return nf.format((double) getKills()/getDeaths());
     }
 
-    public String getWLR(){
+    public String getWLR() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits(2);
         nf.setMinimumFractionDigits(2);

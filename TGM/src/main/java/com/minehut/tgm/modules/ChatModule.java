@@ -46,7 +46,7 @@ public class ChatModule extends MatchModule implements Listener {
     * AsyncPlayerChatEvent#setFormat() method.
     */
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onChatHighPriority(AsyncPlayerChatEvent event){
+    public void onChatHighPriority(AsyncPlayerChatEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         if (!event.isCancelled()) Bukkit.getOnlinePlayers().stream().forEach(player -> {
             TextComponent message = new TextComponent(event.getFormat().replaceAll("%%", "%"));
