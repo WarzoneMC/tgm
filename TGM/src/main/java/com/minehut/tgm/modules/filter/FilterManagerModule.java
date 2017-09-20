@@ -86,7 +86,7 @@ public class FilterManagerModule extends MatchModule {
             String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
 
             filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("blockexplode")) {
+        } else if (type.equals("block-explode")) {
             List<Region> regions = new ArrayList<>();
             for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
                 Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
