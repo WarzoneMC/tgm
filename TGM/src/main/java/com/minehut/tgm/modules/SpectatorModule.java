@@ -249,7 +249,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
     
     @EventHandler
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent event){
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
         }
@@ -275,9 +275,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onHangingDestroy(HangingBreakByEntityEvent event){ // Item Frames and Paintings
-        if (event.getRemover() != null && event.getRemover() instanceof Player){
-            Player remover = (Player) event.getRemover();
-            if (isSpectating(remover)) {
+        if (event.getRemover() != null && event.getRemover() instanceof Player) {
+            if (isSpectating((Player) event.getRemover())) {
                 event.setCancelled(true);
             }
         }
@@ -285,19 +284,17 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onVehicleDamage(VehicleDamageEvent event){
-        if (event.getAttacker() != null && event.getAttacker() instanceof Player){
-            Player attacker = (Player) event.getAttacker();
-            if (isSpectating(attacker)) {
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
+            if (isSpectating((Player) event.getAttacker())) {
                 event.setCancelled(true);
             }
         }
     }
 
     @EventHandler
-    public void onVehicleDestroy(VehicleDestroyEvent event){
+    public void onVehicleDestroy(VehicleDestroyEvent event) {
         if (event.getAttacker() != null && event.getAttacker() instanceof Player){
-            Player attacker = (Player) event.getAttacker();
-            if (isSpectating(attacker)) {
+            if (isSpectating((Player) event.getAttacker())) {
                 event.setCancelled(true);
             }
         }
