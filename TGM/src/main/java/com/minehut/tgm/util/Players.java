@@ -16,9 +16,15 @@ public class Players {
         player.setSaturation(20);
         player.getInventory().clear();
         player.getInventory().setArmorContents(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR)});
+        
+        player.getActivePotionEffects().forEach(potionEffect -> {
+            try {
+                player.removePotionEffect(potionEffect.getType());
+            } catch (NullPointerException ignored) {}
+        });
 
-        player.getActivePotionEffects().stream().findAny().ifPresent(potionEffect -> player.removePotionEffect(potionEffect.getType()));
-
+        player.setFireTicks(0);
+        player.setFallDistance(0);
         player.setTotalExperience(0);
         player.setExp(0);
         player.setLevel(0);
