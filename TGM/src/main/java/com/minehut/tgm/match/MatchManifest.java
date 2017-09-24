@@ -60,6 +60,7 @@ public abstract class MatchManifest {
         modules.add(new DisabledCommandsModule());
         modules.add(new PointsModule());
         modules.add(new LegacyDamageModule());
+        modules.add(new EntityDamageModule());
         modules.add(new FireworkDamageModule());
         modules.add(new GameRuleModule());
         modules.add(new ItemRemoveModule());
