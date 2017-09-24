@@ -24,6 +24,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -267,6 +268,16 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onDrop(PlayerDropItemEvent event) {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onHangingDestroy(HangingBreakByEntityEvent event){ // Item Frames and Paintings
+        if (event.getRemover() != null && event.getRemover() instanceof Player){
+            Player remover = (Player) event.getRemover();
+            if (isSpectating(remover)) {
+                event.setCancelled(true);
+            }
         }
     }
 
