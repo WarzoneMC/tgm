@@ -198,7 +198,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 event.setCancelled(true); //
                 event.getEntity().setVelocity(new Vector(event.getEntity().getVelocity().getX(),
                         event.getEntity().getVelocity().getZ() + 10.0, event.getEntity().getVelocity().getZ()));
-
+                ((Player) event.getEntity()).setAllowFlight(true); // Prevent IllegalArgumentException: Cannot make player fly if getAllowFlight() is false.
                 ((Player) event.getEntity()).setFlying(true);
             }
         }
