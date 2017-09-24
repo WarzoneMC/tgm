@@ -62,6 +62,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         if (matchTeam.isSpectator()) {
             spectatorModule.applySpectatorKit(playerContext);
             if (teleport) {
+                playerContext.getPlayer().setFallDistance(0);
                 playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
             }
         } else {
@@ -69,6 +70,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             playerContext.getPlayer().updateInventory();
 
             if (teleport) {
+                playerContext.getPlayer().setFallDistance(0);
                 playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
                 playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
             }
