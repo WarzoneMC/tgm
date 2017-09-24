@@ -294,6 +294,10 @@ public class CycleCommands {
     }
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin, boolean ignoreFull) {
+        if (!ignoreFull && autoJoin && !player.hasPermission("tgm.pickteam") && !TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator()) {
+            player.sendMessage(ChatColor.RED + "You are already in a team.");
+            return;
+        }
         if (matchTeam.getMembers().size() >= matchTeam.getMax() && !ignoreFull) {
             player.sendMessage(ChatColor.RED + "Team is full! Wait for a spot to open up.");
             return;
