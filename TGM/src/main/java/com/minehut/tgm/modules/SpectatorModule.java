@@ -30,6 +30,8 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -276,6 +278,26 @@ public class SpectatorModule extends MatchModule implements Listener {
         if (event.getRemover() != null && event.getRemover() instanceof Player){
             Player remover = (Player) event.getRemover();
             if (isSpectating(remover)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onVehicleDamage(VehicleDamageEvent event){
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player){
+            Player attacker = (Player) event.getAttacker();
+            if (isSpectating(attacker)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onVehicleDestroy(VehicleDestroyEvent event){
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player){
+            Player attacker = (Player) event.getAttacker();
+            if (isSpectating(attacker)) {
                 event.setCancelled(true);
             }
         }
