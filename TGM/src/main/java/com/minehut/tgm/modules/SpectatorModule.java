@@ -274,7 +274,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onHangingDestroy(HangingBreakByEntityEvent event){ // Item Frames and Paintings
+    public void onHangingDestroy(HangingBreakByEntityEvent event) { // Item Frames and Paintings
         if (event.getRemover() != null && event.getRemover() instanceof Player) {
             if (isSpectating((Player) event.getRemover())) {
                 event.setCancelled(true);
@@ -283,7 +283,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onVehicleDamage(VehicleDamageEvent event){
+    public void onVehicleDamage(VehicleDamageEvent event) {
         if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
             if (isSpectating((Player) event.getAttacker())) {
                 event.setCancelled(true);
@@ -293,7 +293,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {
-        if (event.getAttacker() != null && event.getAttacker() instanceof Player){
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
             if (isSpectating((Player) event.getAttacker())) {
                 event.setCancelled(true);
             }

@@ -80,8 +80,7 @@ public class WoolObjective implements Listener {
                     woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
                 }
             }
-        }
-        else {
+        } else {
             if (podium.contains(event.getBlockPlaced().getLocation())) {
                 event.setCancelled(true);
             }
@@ -164,7 +163,7 @@ public class WoolObjective implements Listener {
     }
 
     @EventHandler
-    public void onTeamChange(TeamChangeEvent event){
+    public void onTeamChange(TeamChangeEvent event) {
         handleWoolDrop(event.getPlayerContext().getPlayer());
         if (touches.containsKey(event.getPlayerContext().getPlayer().getUniqueId())) {
             touches.remove(event.getPlayerContext().getPlayer().getUniqueId());
@@ -175,7 +174,7 @@ public class WoolObjective implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onQuit(PlayerQuitEvent event){
+    public void onQuit(PlayerQuitEvent event) {
         handleWoolDrop(event.getPlayer());
     }
 
