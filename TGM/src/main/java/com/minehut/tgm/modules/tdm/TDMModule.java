@@ -1,5 +1,6 @@
 package com.minehut.tgm.modules.tdm;
 
+import com.google.gson.JsonObject;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
@@ -27,6 +28,7 @@ public class TDMModule extends MatchModule implements Listener {
     @Getter private Match match;
     @Getter private PointsModule pointsModule;
     @Getter private TeamManagerModule teamManager;
+    @Getter private TDMObjective tdmObjective;
 
     @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
@@ -34,6 +36,17 @@ public class TDMModule extends MatchModule implements Listener {
     public void load(Match match) {
         this.match = match;
         teamManager = TGM.get().getModule(TeamManagerModule.class);
+
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("tdm")) {
+            JsonObject tdmJson = match.getMapContainer().getMapInfo().getJsonObject().get("tdm").getAsJsonObject();
+            if (tdmJson.has("objective")) {
+                TDMObjective objective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
+                if (objective != null) tdmObjective = objective;
+                else tdmObjective = TDMObjective.KILLS;
+            }
+            else tdmObjective = TDMObjective.KILLS;
+        }
+
         pointsModule = TGM.get().getModule(PointsModule.class);
         pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
     }
@@ -75,7 +88,17 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onDamage(PlayerDeathEvent event) {
+    public void onDeath(PlayerDeathEvent event) {
+        if (tdmObjective.equals(TDMObjective.DEATHS)) {
+            MatchTeam team = teamManager.getTeam(event.getEntity());
+            for (MatchTeam matchTeam : teamManager.getTeams()) {
+                if (!matchTeam.equals(team) && !matchTeam.isSpectator()) {
+                    incrementPoints(matchTeam, 1);
+                }
+            }
+            return;
+        }
+
         if (event.getEntity().getKiller() == null || !(event.getEntity().getKiller() instanceof Player)) {
             return;
         }
