@@ -28,6 +28,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,6 +113,15 @@ public class CTWModule extends MatchModule implements Listener {
                         TGM.get().getMatchManager().endMatch(matchTeam);
                     }
                 }
+
+                 @Override
+                 public void drop(Player player, MatchTeam matchTeam, boolean broadcast) {
+                    updateOnScoreboard(woolObjective);
+
+                     if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                             " dropped " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                 }
+
             });
         }
 

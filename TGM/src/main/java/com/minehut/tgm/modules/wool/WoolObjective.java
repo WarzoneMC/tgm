@@ -4,20 +4,25 @@ import com.minehut.tgm.TGM;
 import com.minehut.tgm.modules.TimeModule;
 import com.minehut.tgm.modules.region.Region;
 import com.minehut.tgm.modules.team.MatchTeam;
+import com.minehut.tgm.modules.team.TeamChangeEvent;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.util.ColorConverter;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,28 +59,30 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
-        if (event.getBlockPlaced().getType() == Material.WOOL) {
-            if ((event.getBlockPlaced().getState().getData().getData() == color)) {
-                if (!completed) {
+        if (event.getBlockPlaced().getType() == Material.WOOL && event.getBlockPlaced().getState().getData().getData() == color) {
+            if (!completed) {
 
-                    if (!podium.contains(event.getBlockPlaced().getLocation())) {
-                        return;
-                    }
-
-                    if (!owner.containsPlayer(event.getPlayer())) {
-                        return;
-                    }
-
-                    event.setCancelled(false); //override filter
-                    setCompleted(true);
-
-                    TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-                    MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-
-                    for (WoolObjectiveService woolObjectiveService : services) {
-                        woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
-                    }
+                if (!podium.contains(event.getBlockPlaced().getLocation())) {
+                    return;
                 }
+
+                if (!owner.containsPlayer(event.getPlayer())) {
+                    return;
+                }
+
+                event.setCancelled(false); //override filter
+                setCompleted(true);
+
+                TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+                MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
+
+                for (WoolObjectiveService woolObjectiveService : services) {
+                    woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
+                }
+            }
+        } else {
+            if (podium.contains(event.getBlockPlaced().getLocation())) {
+                event.setCancelled(true);
             }
         }
     }
@@ -127,6 +134,48 @@ public class WoolObjective implements Listener {
                 handleWoolPickup((Player) event.getWhoClicked());
             }
         }
+    }
+
+    private void handleWoolDrop(Player player) {
+        if (completed) return;
+
+        if (!owner.containsPlayer(player)) {
+            return;
+        }
+
+        if (!touches.containsKey(player.getUniqueId())) {
+            return;
+        }
+        touches.remove(player.getUniqueId());
+        boolean broadcast = touches.isEmpty();
+
+        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+        MatchTeam matchTeam = teamManagerModule.getTeam(player);
+
+        for (WoolObjectiveService woolObjectiveService : services) {
+            woolObjectiveService.drop(player, matchTeam, broadcast);
+        }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event) {
+        handleWoolDrop(event.getEntity());
+    }
+
+    @EventHandler
+    public void onTeamChange(TeamChangeEvent event) {
+        handleWoolDrop(event.getPlayerContext().getPlayer());
+        if (touches.containsKey(event.getPlayerContext().getPlayer().getUniqueId())) {
+            touches.remove(event.getPlayerContext().getPlayer().getUniqueId());
+        }
+        for (WoolObjectiveService woolObjectiveService : services) {
+            woolObjectiveService.drop(event.getPlayerContext().getPlayer(), event.getOldTeam(), false);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onQuit(PlayerQuitEvent event) {
+        handleWoolDrop(event.getPlayer());
     }
 
     public WoolStatus getStatus() {

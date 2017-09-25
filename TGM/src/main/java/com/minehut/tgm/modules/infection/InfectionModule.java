@@ -52,14 +52,15 @@ public class InfectionModule extends MatchModule implements Listener {
     @Override
     public void enable() {
         int players = teamManager.getTeamById("humans").getMembers().size();
-        int zombies = (int)(players * (5 / 100.0F)) == 0 ? 1 : (int)(players * (5 / 100.0F));
+        int zombies = ((int) (players * (5 / 100.0F)) == 0 ? 1 : (int) (players * (5 / 100.0F))) - teamManager.getTeamById("infected").getMembers().size();
+        if (zombies > 0) {
+            for (int i = 0; i < zombies; i++) {
+                PlayerContext player = teamManager.getTeamById("humans").getMembers().get(new Random().nextInt(teamManager.getTeamById("humans").getMembers().size()));
+                broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
 
-        for (int i = 0; i < zombies; i++) {
-            PlayerContext player = teamManager.getTeamById("humans").getMembers().get(new Random().nextInt(teamManager.getTeamById("humans").getMembers().size()));
-            broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
-
-            infect(player.getPlayer());
-            freeze(player.getPlayer());
+                infect(player.getPlayer());
+                freeze(player.getPlayer());
+            }
         }
 
         for (MatchTeam team : teamManager.getTeams()) {

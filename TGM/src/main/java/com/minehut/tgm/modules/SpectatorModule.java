@@ -24,15 +24,20 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
@@ -150,6 +155,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     public void applySpectatorKit(PlayerContext playerContext) {
         Players.reset(playerContext.getPlayer(), false);
+        playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().setAllowFlight(true);
         playerContext.getPlayer().setFlying(true);
@@ -197,7 +203,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 event.setCancelled(true); //
                 event.getEntity().setVelocity(new Vector(event.getEntity().getVelocity().getX(),
                         event.getEntity().getVelocity().getZ() + 10.0, event.getEntity().getVelocity().getZ()));
-
+                ((Player) event.getEntity()).setAllowFlight(true); // Prevent IllegalArgumentException: Cannot make player fly if getAllowFlight() is false.
                 ((Player) event.getEntity()).setFlying(true);
             }
         }
@@ -246,7 +252,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
     
     @EventHandler
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent event){
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
         }
@@ -267,6 +273,33 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onDrop(PlayerDropItemEvent event) {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onHangingDestroy(HangingBreakByEntityEvent event) { // Item Frames and Paintings
+        if (event.getRemover() != null && event.getRemover() instanceof Player) {
+            if (isSpectating((Player) event.getRemover())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onVehicleDamage(VehicleDamageEvent event) {
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
+            if (isSpectating((Player) event.getAttacker())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onVehicleDestroy(VehicleDestroyEvent event) {
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
+            if (isSpectating((Player) event.getAttacker())) {
+                event.setCancelled(true);
+            }
         }
     }
 
