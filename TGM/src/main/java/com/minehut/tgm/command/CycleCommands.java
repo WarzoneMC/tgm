@@ -153,12 +153,11 @@ public class CycleCommands {
     @Command(aliases = {"join"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
+        MatchManager matchManager = TGM.get().getMatchManager();
         if (cmd.argsLength() == 0) {
-            MatchManager matchManager = TGM.get().getMatchManager();
-
             if (teamManager.getTeam((Player) sender).isSpectator() || matchManager.getMatch().getMatchStatus().equals(MatchStatus.PRE)) {
                 if (matchManager.getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Infected)) {
-                    if (matchManager.getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                    if (matchManager.getMatch().getMatchStatus().equals(MatchStatus.MID) || matchManager.getMatch().getMatchStatus().equals(MatchStatus.POST)) {
                         MatchTeam team = teamManager.getTeamById("infected");
                         attemptJoinTeam((Player) sender, team, true);
                         return;
@@ -175,9 +174,30 @@ public class CycleCommands {
             }
         } else {
             MatchTeam matchTeam = teamManager.getTeamFromInput(cmd.getJoinedStrings(0));
+
             if (matchTeam == null) {
                 sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                 return;
+            }
+
+            if (matchManager.getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Infected)) {
+                if (matchManager.getMatch().getMatchStatus().equals(MatchStatus.POST)) {
+                    if (!matchTeam.isSpectator()) {
+                        sender.sendMessage(ChatColor.RED + "The game has already ended.");
+                        return;
+                    } else {
+                        attemptJoinTeam((Player) sender, matchTeam, false);
+                        return;
+                    }
+                } else if (matchManager.getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                    if (!matchTeam.isSpectator()) {
+                        sender.sendMessage(ChatColor.RED + "You can't pick a team after the game starts in this gamemode.");
+                        return;
+                    } else {
+                        attemptJoinTeam((Player) sender, matchTeam, false);
+                        return;
+                    }
+                }
             }
 
             attemptJoinTeam((Player) sender, matchTeam, false);
@@ -229,7 +249,7 @@ public class CycleCommands {
                     try {
                         min = cmd.getInteger(2);
                         max = cmd.getInteger(3);
-                    } catch (CommandNumberFormatException e){
+                    } catch (CommandNumberFormatException e) {
                         sender.sendMessage(ChatColor.RED + "Error: " + e.getMessage());
                         return;
                     }
