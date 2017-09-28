@@ -27,12 +27,7 @@ public class TabListModule extends MatchModule implements Listener {
 
         refreshAllTabs();
 
-        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
-            @Override
-            public void run() {
-                refreshAllTabs();
-            }
-        }, 20L, 20L);
+        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), this::refreshAllTabs, 20L, 20L);
     }
 
     @Override
@@ -57,11 +52,11 @@ public class TabListModule extends MatchModule implements Listener {
 
         String header = ChatColor.WHITE + ChatColor.BOLD.toString() + TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().toString() +
                         ChatColor.DARK_GRAY + " - " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed()) +
-                        ChatColor.DARK_GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + "TEAM.GG";
+                        ChatColor.DARK_GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + "WARZONE";
 
         String footer = "";
         for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
-            if(matchTeam.isSpectator()) continue;
+            if (matchTeam.isSpectator()) continue;
             footer += matchTeam.getColor() + matchTeam.getAlias() + ": " + ChatColor.WHITE + matchTeam.getMembers().size() + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + matchTeam.getMax();
             footer += ChatColor.DARK_GRAY + " - ";
         }

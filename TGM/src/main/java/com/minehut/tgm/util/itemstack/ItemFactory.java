@@ -1,6 +1,5 @@
 package com.minehut.tgm.util.itemstack;
 
-import org.apache.commons.codec.binary.Base64;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
@@ -11,10 +10,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by luke on 10/17/15.
@@ -26,8 +23,7 @@ public class ItemFactory {
     }
 
     public static ItemStack createItem(Material material, int amount) {
-        ItemStack item = new ItemStack(material, amount);
-        return item;
+        return new ItemStack(material, amount);
     }
 
     public static ItemStack createItem(Material material, String name) {

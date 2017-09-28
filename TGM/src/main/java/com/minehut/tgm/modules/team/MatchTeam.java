@@ -15,22 +15,21 @@ import java.util.List;
 /**
  * Created by luke on 4/28/17.
  */
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class MatchTeam {
-    @Getter private final String id;
-    @Getter @Setter private String alias;
-    @Getter private ChatColor color;
-    @Getter private final boolean spectator;
-    @Getter @Setter private int max;
-    @Getter @Setter private int min;
-    @Getter private final List<PlayerContext> members = new ArrayList<>();
 
-    @Getter
+    private final String id;
+    @Setter private String alias;
+    private ChatColor color;
+    private final boolean spectator;
+    @Setter private int max;
+    @Setter private int min;
+    private final List<PlayerContext> members = new ArrayList<>();
+
     private final List<Kit> kits = new ArrayList<>();
 
     //filled onload
-    @Getter
-    final private List<SpawnPoint> spawnPoints = new ArrayList<>();
+    private final List<SpawnPoint> spawnPoints = new ArrayList<>();
 
     public void addPlayer(PlayerContext playerContext) {
         members.add(playerContext);

@@ -16,11 +16,16 @@ import com.minehut.tgm.user.PlayerContext;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ApiManager implements Listener {
 
@@ -110,6 +115,20 @@ public class ApiManager implements Listener {
         TGM.get().getTeamClient().finishMatch(matchFinishPacket);
     }
 
+    public void xpEffect(UUID uuid, int before, int ammount, int after) {
+        BossBar bar = Bukkit.createBossBar(ChatColor.GREEN.toString() + before + "/" + after + ChatColor.DARK_GREEN + " +" + ammount, BarColor.GREEN, BarStyle.SEGMENTED_12);
+        bar.setProgress(0.5);
+        bar.addPlayer(Bukkit.getPlayer(uuid));
+        bar.setVisible(true);
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+            bar.setTitle(ChatColor.GREEN.toString() + (before + ammount) + "xp");
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                bar.setVisible(false);
+                bar.removeAll();
+            }, 60L);
+        }, 60L);
+    }
+
     @EventHandler
     public void onMatchLoad(MatchLoadEvent event) {
         if (isStatsDisabled()) return;
@@ -145,7 +164,11 @@ public class ApiManager implements Listener {
         if (event instanceof PlayerDeathByPlayerEvent) {
             PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(module.getKiller());
             if (context == null) return;
+            //int a = context.getUserProfile().getXP();
             context.getUserProfile().addKill();
+            //int b = context.getUserProfile().getXP();
+            //xpEffect(context.getPlayer().getUniqueId(), a, b - a, 6 * context.getUserProfile().getLevel());
+
             killerId = context.getUserProfile().getId().toString();
         }
 

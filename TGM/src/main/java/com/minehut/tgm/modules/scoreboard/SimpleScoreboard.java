@@ -54,8 +54,7 @@ public class SimpleScoreboard {
 
         scores.remove(toRemove);
 
-        if(b)
-            removed.add(score);
+        if (b) removed.add(score);
 
         return true;
     }
@@ -67,7 +66,6 @@ public class SimpleScoreboard {
             return false;
 
         scores.remove(toRemove);
-
         removed.add(score);
 
         return true;
@@ -126,7 +124,7 @@ public class SimpleScoreboard {
 
         team.setPrefix(prefix);
 
-        if(!team.hasEntry(result.getName()))
+        if (!team.hasEntry(result.getName()))
             team.addEntry(result.getName());
 
         if (text.length() > 16) {
@@ -186,11 +184,11 @@ public class SimpleScoreboard {
             Team t = scoreboard.getTeam(ChatColor.values()[text.getValue()].toString());
             Map.Entry<Team, OfflinePlayer> team;
 
-            if(!updated.contains(text.getKey())) {
+            if (!updated.contains(text.getKey())) {
                 continue;
             }
 
-            if(t != null) {
+            if (t != null) {
                 String color = ChatColor.values()[text.getValue()].toString();
 
                 if (!cache.containsKey(color)) {
@@ -218,7 +216,7 @@ public class SimpleScoreboard {
     public void setTitle(String title) {
         this.title = ChatColor.translateAlternateColorCodes('&', title);
 
-        if(obj != null)
+        if (obj != null)
             obj.setDisplayName(title);
     }
 

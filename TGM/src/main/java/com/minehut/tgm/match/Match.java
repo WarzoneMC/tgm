@@ -2,7 +2,6 @@ package com.minehut.tgm.match;
 
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.map.MapContainer;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
@@ -129,7 +128,7 @@ public class Match {
 
     @SuppressWarnings("unchecked")
     public <T extends MatchModule> List<T> getModules(Class<T> clazz) {
-        List<T> results = new ArrayList<T>();
+        List<T> results = new ArrayList<>();
         for (MatchModule module : modules) {
             if (clazz.isInstance(module)) results.add((T) module);
         }

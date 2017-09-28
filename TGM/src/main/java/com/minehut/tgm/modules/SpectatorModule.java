@@ -9,7 +9,6 @@ import com.minehut.tgm.user.PlayerContext;
 import com.minehut.tgm.util.ColorConverter;
 import com.minehut.tgm.util.Players;
 import com.minehut.tgm.util.itemstack.ItemFactory;
-import com.minehut.tgm.util.menu.MenuAction;
 import com.minehut.tgm.util.menu.PublicMenu;
 import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
@@ -41,16 +40,18 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.Arrays;
+import java.util.Collections;
 
-@ModuleData(load = ModuleLoadTime.EARLIER)
+@ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class SpectatorModule extends MatchModule implements Listener {
-    @Getter private MatchTeam spectators;
-    @Getter private PublicMenu teamSelectionMenu;
 
-    @Getter private final ItemStack compassItem;
-    @Getter private final ItemStack teamSelectionItem;
+    private MatchTeam spectators;
+    private PublicMenu teamSelectionMenu;
 
-    @Getter private int teamSelectionRunnable;
+    private final ItemStack compassItem;
+    private final ItemStack teamSelectionItem;
+
+    private int teamSelectionRunnable;
 
     public SpectatorModule() {
         this.teamSelectionMenu = new PublicMenu(TGM.get(), ChatColor.UNDERLINE + "Team Selection", 9);
@@ -59,8 +60,6 @@ public class SpectatorModule extends MatchModule implements Listener {
         teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Team Selection");
     }
 
-
-
     @Override
     public void load(Match match) {
         this.spectators = match.getModule(TeamManagerModule.class).getSpectators();
@@ -68,88 +67,64 @@ public class SpectatorModule extends MatchModule implements Listener {
         /**
          * Only assign the menu actions once. No need to update these every second.
          */
-        teamSelectionMenu.setItem(0, null, new MenuAction() {
-            @Override
-            public void run(Player player) {
-                player.performCommand("join");
-            }
-        });
+        teamSelectionMenu.setItem(0, null, player -> player.performCommand("join"));
 
         int slot = 2;
         for (MatchTeam matchTeam : match.getModule(TeamManagerModule.class).getTeams()) {
             if (matchTeam.isSpectator()) {
-                teamSelectionMenu.setItem(8, null, new MenuAction() {
-                    @Override
-                    public void run(Player player) {
-                        player.performCommand("join spectators");
-                    }
-                });
+                teamSelectionMenu.setItem(8, null, player -> player.performCommand("join spectators"));
             } else {
-                teamSelectionMenu.setItem(slot, null, new MenuAction() {
-                    @Override
-                    public void run(Player player) {
-                        player.performCommand("join " + matchTeam.getId());
-                    }
-                });
-                slot++;
+                teamSelectionMenu.setItem(slot++, null, player -> player.performCommand("join " + matchTeam.getId()));
             }
         }
 
-        teamSelectionMenu.setItem(0, null, new MenuAction() {
-            @Override
-            public void run(Player player) {
-                player.performCommand("join");
-            }
-        });
+        teamSelectionMenu.setItem(0, null, player -> player.performCommand("join"));
 
         /**
          * Update the item values every second to keep player counts accurate.
          */
-        teamSelectionRunnable = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
-            @Override
-            public void run() {
-                int totalMatchSize = 0;
-                int totalMatchMaxSize = 0;
+        teamSelectionRunnable = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
+            int totalMatchSize = 0;
+            int totalMatchMaxSize = 0;
 
-                int i = 2;
-                for (MatchTeam matchTeam : match.getModule(TeamManagerModule.class).getTeams()) {
-                    if (matchTeam.isSpectator()) {
-                        ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
-                        LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
-                        leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
+            int i = 2;
+            for (MatchTeam matchTeam : match.getModule(TeamManagerModule.class).getTeams()) {
+                if (matchTeam.isSpectator()) {
+                    ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
+                    LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+                    leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
 //                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                        leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match.", "", ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString() + " spectating."));
-                        itemStack.setItemMeta(leatherArmorMeta);
-                        teamSelectionMenu.setItem(8, itemStack);
-                    } else {
-                        totalMatchSize += matchTeam.getMembers().size();
-                        totalMatchMaxSize += matchTeam.getMax();
+                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match.", "", ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString() + " spectating."));
+                    itemStack.setItemMeta(leatherArmorMeta);
+                    teamSelectionMenu.setItem(8, itemStack);
+                } else {
+                    totalMatchSize += matchTeam.getMembers().size();
+                    totalMatchMaxSize += matchTeam.getMax();
 
-                        ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
-                        LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
-                        leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
-                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                        leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
-                                + "/" + matchTeam.getMax() + " playing."));
-                        itemStack.setItemMeta(leatherArmorMeta);
-                        teamSelectionMenu.setItem(i, itemStack);
+                    ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
+                    LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+                    leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
+                    leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
+                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    leatherArmorMeta.setLore(Collections.singletonList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
+                            + "/" + matchTeam.getMax() + " playing."));
+                    itemStack.setItemMeta(leatherArmorMeta);
+                    teamSelectionMenu.setItem(i, itemStack);
 
-                        i++;
-                    }
+                    i++;
                 }
-
-                ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
-                        Arrays.asList("", ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
-                ItemMeta autoJoinHelmetMeta = autoJoinHelmet.getItemMeta();
-                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                autoJoinHelmet.setItemMeta(autoJoinHelmetMeta);
-                teamSelectionMenu.setItem(0, autoJoinHelmet);
             }
+
+            ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
+                    Arrays.asList("", ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
+            ItemMeta autoJoinHelmetMeta = autoJoinHelmet.getItemMeta();
+            autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            autoJoinHelmet.setItemMeta(autoJoinHelmetMeta);
+            teamSelectionMenu.setItem(0, autoJoinHelmet);
         }, 0L, 20L);
     }
 
@@ -178,11 +153,7 @@ public class SpectatorModule extends MatchModule implements Listener {
      */
     public boolean isSpectating(Player player) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        if (matchStatus == MatchStatus.MID) {
-            return spectators.containsPlayer(player);
-        } else {
-            return true;
-        }
+        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player);
     }
 
     @EventHandler
@@ -206,13 +177,6 @@ public class SpectatorModule extends MatchModule implements Listener {
                 ((Player) event.getEntity()).setAllowFlight(true); // Prevent IllegalArgumentException: Cannot make player fly if getAllowFlight() is false.
                 ((Player) event.getEntity()).setFlying(true);
             }
-        }
-    }
-
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if (isSpectating(event.getPlayer())) {
-            event.setCancelled(true);
         }
     }
 
@@ -259,12 +223,13 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onHotbarClick(PlayerInteractEvent event) {
-        if (event.getItem() != null) {
-            if (event.getItem().isSimilar(teamSelectionItem)) {
+    public void onInteract(PlayerInteractEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+
+            if (event.getItem() != null && event.getItem().isSimilar(teamSelectionItem)) {
                 teamSelectionMenu.open(event.getPlayer());
-                event.setCancelled(true);
-                event.getPlayer().updateInventory(); //client side glitch shows hat on head until this is called.
+                Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getPlayer().updateInventory(), 1L); //client side glitch shows hat on head until this is called.
             }
         }
     }

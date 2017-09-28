@@ -25,38 +25,42 @@ public class AnvilListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(!this.tracker.isEnabled(event.getBlock().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getBlock().getWorld())) return;
 
-        if(event.getBlock().getType() == Material.ANVIL) {
+        if (event.getBlock().getType() == Material.ANVIL) {
             this.tracker.setPlacer(event.getBlock(), Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()));
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if(!this.tracker.isEnabled(event.getBlock().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getBlock().getWorld())) return;
 
-        this.tracker.clearPlacer(event.getBlock());
+        if (event.getBlock().getType() == Material.ANVIL) {
+            this.tracker.clearPlacer(event.getBlock());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockExplode(EntityExplodeEvent event) {
-        if(!this.tracker.isEnabled(event.getLocation().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getLocation().getWorld())) return;
 
         // Remove all blocks that are destroyed from explosion
         for (Block block : event.blockList()) {
-            this.tracker.clearPlacer(block);
+            if (block.getType() == Material.ANVIL) {
+                this.tracker.clearPlacer(block);
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAnvilFall(BlockFallEvent event) {
-        if(!this.tracker.isEnabled(event.getEntity().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getEntity().getWorld())) return;
 
-        if(event.getBlock().getType() == Material.ANVIL) {
+        if (event.getBlock().getType() == Material.ANVIL) {
             OfflinePlayer placer = tracker.getPlacer(event.getBlock());
 
-            if(placer != null) {
+            if (placer != null) {
                 tracker.setOwner(event.getEntity(), tracker.getPlacer(event.getBlock()));
             }
         }
@@ -64,9 +68,9 @@ public class AnvilListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onAnvilLand(EntityChangeBlockEvent event) {
-        if(!this.tracker.isEnabled(event.getEntity().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getEntity().getWorld())) return;
 
-        if(event.getEntityType() == EntityType.FALLING_BLOCK && event.getTo() == Material.ANVIL) {
+        if (event.getEntityType() == EntityType.FALLING_BLOCK && event.getTo() == Material.ANVIL) {
             OfflinePlayer owner = tracker.getOwner((FallingBlock) event.getEntity());
             if(owner != null) {
                 tracker.setPlacer(event.getBlock(), tracker.getOwner((FallingBlock) event.getEntity()));
