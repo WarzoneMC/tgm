@@ -15,7 +15,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         if ((event.getDamager() instanceof Player)) {
-            Player player = (Player)event.getDamager();
+            Player player = (Player) event.getDamager();
             if (player.getInventory().getItemInMainHand().getType() == Material.DIAMOND_AXE) {
                 event.setDamage(event.getDamage() - 6.0D + 3.0D);
             } else if (player.getInventory().getItemInMainHand().getType() == Material.IRON_AXE) {

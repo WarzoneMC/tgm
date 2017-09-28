@@ -23,10 +23,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CycleCommands {
 
@@ -129,25 +127,29 @@ public class CycleCommands {
     @Command(aliases = {"setnext", "sn"}, desc = "Set the next map.")
     @CommandPermissions({"tgm.setnext"})
     public static void setNext(CommandContext cmd, CommandSender sender) {
-        MapContainer found = null;
-        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-            if (mapContainer.getMapInfo().getName().equalsIgnoreCase(cmd.getJoinedStrings(0))) {
-                found = mapContainer;
+        if (cmd.argsLength() > 0) {
+            MapContainer found = null;
+            for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
+                if (mapContainer.getMapInfo().getName().equalsIgnoreCase(cmd.getJoinedStrings(0))) {
+                    found = mapContainer;
+                }
             }
-        }
-        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-            if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
-                found = mapContainer;
+            for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
+                if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
+                    found = mapContainer;
+                }
             }
-        }
 
-        if (found == null) {
-            sender.sendMessage(ChatColor.RED + "Map not found \"" + cmd.getJoinedStrings(0) + "\"");
-            return;
-        }
+            if (found == null) {
+                sender.sendMessage(ChatColor.RED + "Map not found \"" + cmd.getJoinedStrings(0) + "\"");
+                return;
+            }
 
-        TGM.get().getMatchManager().setForcedNextMap(found);
-        sender.sendMessage(ChatColor.GREEN + "Set the next map to " + ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
+            TGM.get().getMatchManager().setForcedNextMap(found);
+            sender.sendMessage(ChatColor.GREEN + "Set the next map to " + ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
+        } else {
+            sender.sendMessage(ChatColor.RED + "/sn <map_name>");
+        }
     }
 
     @Command(aliases = {"join"}, desc = "Join a team.")
@@ -309,7 +311,7 @@ public class CycleCommands {
     }
 
     @Command(aliases = {"stats", "stat"}, desc = "View your stats.")
-    public static void say(final CommandContext cmd, CommandSender sender) {
+    public static void stats(final CommandContext cmd, CommandSender sender) {
         Player player = (Player) sender;
 
         if (cmd.argsLength() == 0) {

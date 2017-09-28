@@ -1,7 +1,6 @@
 package com.minehut.tgm.modules.scoreboard;
 
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.join.MatchJoinEvent;
 import com.minehut.tgm.match.MatchModule;
 import com.minehut.tgm.match.ModuleData;
 import com.minehut.tgm.match.ModuleLoadTime;
@@ -54,13 +53,24 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         }
     }
 
+    /*
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onScoreboard(ScoreboardInitEvent event) {
+        StringBuilder builder = new StringBuilder();
+        event.getSimpleScoreboard().getScoreboard().getTeams().forEach(team -> builder.append(team.getName()).append(", "));
+
+
+        Bukkit.broadcastMessage(ColorConverter.filterString("&aScoreboard:\n&r" + event.getPlayer().getName() + " - &7[&a" + builder.toString().substring(0, builder.length() - 2) + "&r&7]"));
+    }
+    */
+
     private SimpleScoreboard initScoreboard(PlayerContext playerContext) {
         SimpleScoreboard simpleScoreboard = new SimpleScoreboard(ChatColor.AQUA + "Objectives");
 
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             Team team = simpleScoreboard.getScoreboard().registerNewTeam(matchTeam.getId());
             team.setPrefix(matchTeam.getColor().toString());
-            team.setCanSeeFriendlyInvisibles(true);
+            team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
             team.setAllowFriendlyFire(false);
             team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 

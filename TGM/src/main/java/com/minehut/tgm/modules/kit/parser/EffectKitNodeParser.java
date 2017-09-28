@@ -18,7 +18,7 @@ public class EffectKitNodeParser implements KitNodeParser {
     }
 
     private PotionEffect parsePotionEffect(JsonObject jsonObject) {
-        PotionEffectType type = PotionEffectType.getByName(Strings.getTechnicalName(jsonObject.get("effect").getAsString()));
+        PotionEffectType type = PotionEffectType.getByName(Strings.getTechnicalName(jsonObject.get("type").getAsString()));
 
         int duration = 30;
         int amplifier = 0;

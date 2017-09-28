@@ -4,7 +4,7 @@ api:
   auth: secret
   stats:
     enabled: true
-rotation: rotation
+rotation: maps/rotation.txt
 map:
   sources:
   - maps

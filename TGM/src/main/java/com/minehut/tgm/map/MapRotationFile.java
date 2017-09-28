@@ -3,10 +3,8 @@ package com.minehut.tgm.map;
 import com.google.common.io.Files;
 import com.minehut.tgm.TGM;
 import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;

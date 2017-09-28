@@ -13,6 +13,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>rip.reflex.api</groupId>
+            <artifactId>ReflexAPI</artifactId>
+            <version>10.1-2U</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.minehut</groupId>
             <artifactId>TeamAPI</artifactId>
             <version>${project.version}</version>
@@ -21,15 +27,21 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.12-R0.1-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.12-R0.1-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.8.1</version>
         </dependency>
 
         <dependency>

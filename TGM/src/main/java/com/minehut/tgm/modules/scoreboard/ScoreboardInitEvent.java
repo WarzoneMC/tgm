@@ -1,6 +1,5 @@
 package com.minehut.tgm.modules.scoreboard;
 
-import com.minehut.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.entity.Player;

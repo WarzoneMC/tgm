@@ -102,8 +102,6 @@ public class TGM extends JavaPlugin {
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
-        DisablePlayerData.disable();
-
         try {
             matchManager.cycleNextMatch();
         } catch (IOException e) {

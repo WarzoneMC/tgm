@@ -40,7 +40,7 @@ public class BuildFilterType implements FilterType, Listener {
     }
 
     @EventHandler
-    public void onBlockPlace(BlockBreakEvent event) {
+    public void onBlockBreak(BlockBreakEvent event) {
         for (Region region : regions) {
             if (region.contains(event.getBlock().getLocation())) {
                 for (MatchTeam matchTeam : teams) {

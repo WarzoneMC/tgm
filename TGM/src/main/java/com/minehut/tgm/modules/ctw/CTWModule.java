@@ -28,7 +28,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,19 +158,14 @@ public class CTWModule extends MatchModule implements Listener {
                         woolScoreboardLines.put(woolObjective, list);
                     }
 
-                    event.getSimpleScoreboard().add(getScoreboardString(woolObjective), i);
-                    Bukkit.getLogger().info("scoreboard string[" + i + "]: " + getScoreboardString(woolObjective));
-
-                    i++;
+                    event.getSimpleScoreboard().add(getScoreboardString(woolObjective), i++);
                 }
             }
             event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i);
-            i++;
+            teamScoreboardLines.put(matchTeam, i++);
 
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount), i);
-                i++; spaceCount++;
+                event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
             }
         }
     }

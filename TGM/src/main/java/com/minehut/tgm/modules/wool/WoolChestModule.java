@@ -5,10 +5,13 @@ import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -45,16 +48,25 @@ public class WoolChestModule extends MatchModule implements Listener {
         Bukkit.getScheduler().cancelTask(runnableId);
     }
 
-
     @EventHandler
     public void onOpen(InventoryOpenEvent event) {
         registerInventory(event.getInventory());
     }
 
+    @EventHandler
+    public void onBreak(BlockBreakEvent event) {
+        if (event.getBlock().getType() == Material.CHEST) {
+            if (scannedChests.contains(((Chest) event.getBlock().getState()).getBlockInventory().getHolder())) {
+                event.setCancelled(true);
+                event.getPlayer().sendMessage(ChatColor.RED + "You cannot break the wool chest!");
+            }
+        }
+    }
+
     private void fillInventoryWithWool(Inventory inventory, DyeColor dyeColor) {
         Wool wool = new Wool(dyeColor);
 
-        for(int i = 0; i < inventory.getSize(); i++) {
+        for (int i = 0; i < inventory.getSize(); i++) {
             inventory.setItem(i, new ItemStack(wool.getItemType(), 1, (short) 0, wool.getData()));
         }
     }

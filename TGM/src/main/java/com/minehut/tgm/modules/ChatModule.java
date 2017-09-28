@@ -37,7 +37,7 @@ public class ChatModule extends MatchModule implements Listener {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
         event.setFormat(playerContext.getLevelString() + " " + (event.getPlayer().isOp() ? ChatColor.translateAlternateColorCodes('&', "&d&lOP ") : "") + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
-        chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), event.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), event.getMessage(), matchTeam.getId(), timeModule.getTimeElapsed(), false));
+        if (!matchTeam.isSpectator()) chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), event.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), event.getMessage(), matchTeam.getId(), timeModule.getTimeElapsed(), false));
     }
 
     /*
@@ -49,7 +49,7 @@ public class ChatModule extends MatchModule implements Listener {
     public void onChatHighPriority(AsyncPlayerChatEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         if (!event.isCancelled())  {
-            Bukkit.getOnlinePlayers().stream().forEach(player -> {
+            Bukkit.getOnlinePlayers().forEach(player -> {
                 TextComponent message = new TextComponent(event.getFormat().replaceAll("%%", "%"));
                 BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString().replace("[", "").replace("]", "")),
                         new TextComponent("\n"),
@@ -74,7 +74,7 @@ public class ChatModule extends MatchModule implements Listener {
             member.getPlayer().sendMessage(matchTeam.getColor() + "[" + matchTeam.getAlias() + "] "
                     + playerContext.getPlayer().getName() + ChatColor.WHITE + ": " + message);
         }
-        chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), playerContext.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), message, matchTeam.getId(), timeModule.getTimeElapsed(), true));
+        if (!matchTeam.isSpectator()) chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), playerContext.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), message, matchTeam.getId(), timeModule.getTimeElapsed(), true));
     }
 
     @Override

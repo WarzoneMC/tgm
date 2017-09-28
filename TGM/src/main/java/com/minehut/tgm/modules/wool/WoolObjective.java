@@ -9,7 +9,6 @@ import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.util.ColorConverter;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -21,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -84,6 +84,14 @@ public class WoolObjective implements Listener {
             if (podium.contains(event.getBlockPlaced().getLocation())) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void onWoolCraft(CraftItemEvent event) {
+        if (event.getRecipe().getResult().getType() == Material.WOOL) {
+            event.setCancelled(true);
+            event.getWhoClicked().sendMessage(ChatColor.RED + "You are now allowed to craft wool.");
         }
     }
 
@@ -164,10 +172,11 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        handleWoolDrop(event.getPlayerContext().getPlayer());
-        if (touches.containsKey(event.getPlayerContext().getPlayer().getUniqueId())) {
-            touches.remove(event.getPlayerContext().getPlayer().getUniqueId());
-        }
+        //handleWoolDrop(event.getPlayerContext().getPlayer());
+        if (!touches.containsKey(event.getPlayerContext().getPlayer().getUniqueId())) return;
+
+        touches.remove(event.getPlayerContext().getPlayer().getUniqueId());
+
         for (WoolObjectiveService woolObjectiveService : services) {
             woolObjectiveService.drop(event.getPlayerContext().getPlayer(), event.getOldTeam(), false);
         }

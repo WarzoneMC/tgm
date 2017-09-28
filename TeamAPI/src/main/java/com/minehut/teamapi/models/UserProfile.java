@@ -3,13 +3,9 @@ package com.minehut.teamapi.models;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import org.bson.types.ObjectId;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Date;
 import java.util.List;
 
 /**

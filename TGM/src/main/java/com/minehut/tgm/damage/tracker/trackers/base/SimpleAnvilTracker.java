@@ -37,7 +37,7 @@ public class SimpleAnvilTracker extends AbstractTracker implements AnvilTracker 
     public OfflinePlayer setOwner(@Nonnull FallingBlock anvil, @Nullable OfflinePlayer offlinePlayer) {
         Preconditions.checkNotNull(anvil, "anvil");
 
-        if(offlinePlayer != null) {
+        if (offlinePlayer != null) {
             return this.ownedAnvils.put(anvil, offlinePlayer);
         } else {
             return this.ownedAnvils.remove(anvil);

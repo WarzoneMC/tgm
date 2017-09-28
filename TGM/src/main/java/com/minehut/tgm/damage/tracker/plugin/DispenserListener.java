@@ -21,37 +21,39 @@ public class DispenserListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if(!this.tracker.isEnabled(event.getBlock().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getBlock().getWorld())) return;
 
-        if(event.getBlock().getType() == Material.DISPENSER) {
+        if (event.getBlock().getType() == Material.DISPENSER) {
             this.tracker.setPlacer(event.getBlock(), event.getPlayer());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if(!this.tracker.isEnabled(event.getBlock().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getBlock().getWorld())) return;
 
-        this.tracker.clearPlacer(event.getBlock());
+        if (event.getBlock().getType() == Material.DISPENSER) {
+            this.tracker.clearPlacer(event.getBlock());
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockExplode(EntityExplodeEvent event) {
-        if(!this.tracker.isEnabled(event.getLocation().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getLocation().getWorld())) return;
 
         // Remove all blocks that are destroyed from explosion
         for (Block block : event.blockList()) {
-            this.tracker.clearPlacer(block);
+            if (block.getType() == Material.DISPENSER) this.tracker.clearPlacer(block);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onDispense(BlockDispenseEntityEvent event) {
-        if(!this.tracker.isEnabled(event.getEntity().getWorld())) return;
+        if (!this.tracker.isEnabled(event.getEntity().getWorld())) return;
 
         Block block = event.getBlock();
         OfflinePlayer placer = this.tracker.getPlacer(block);
-        if(placer != null) {
+        if (placer != null) {
             this.tracker.setOwner(event.getEntity(), placer.getPlayer());
         }
     }

@@ -18,23 +18,20 @@ import org.bukkit.event.block.BlockBreakEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class Monument implements Listener {
-    @Getter private String name;
 
-    @Getter
+    private String name;
+
     private final List<MatchTeam> owners;
 
-    @Getter
     private final Region region;
 
-    @Getter
     private final List<Material> materials;
 
-    @Getter private int health;
-    @Getter private int maxHealth;
+    private int health;
+    private int maxHealth;
 
-    @Getter
     private final List<MonumentService> services = new ArrayList<>();
 
     @EventHandler(priority = EventPriority.HIGH)
