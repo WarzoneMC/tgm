@@ -28,7 +28,7 @@ import java.util.List;
 
 public class CycleCommands {
 
-    @Command(aliases = {"maps"}, desc = "View the maps that are on team.gg, although not necessarily in the rotation.")
+    @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.")
     public static void maps(CommandContext cmd, CommandSender sender) {
         List<String> maps = new ArrayList<>();
         int i = 1;
@@ -152,7 +152,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"join"}, desc = "Join a team.")
+    @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
         MatchManager matchManager = TGM.get().getMatchManager();
