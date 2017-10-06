@@ -45,4 +45,9 @@ public class OfflineClient implements TeamClient {
     public void finishMatch(MatchFinishPacket matchFinishPacket) {
 
     }
+
+    @Override
+    public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
+
+    }
 }
