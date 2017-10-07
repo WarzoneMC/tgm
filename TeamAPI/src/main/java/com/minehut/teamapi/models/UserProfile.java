@@ -51,7 +51,11 @@ public class UserProfile {
     }
 
     public int getLevel() {
-        return (int) (0.6 * Math.sqrt(getXP())) + 1;
+        return (int) getLevelRaw();
+    }
+
+    public double getLevelRaw() {
+        return (0.6 * Math.sqrt(getXP())) + 1;
     }
 
     public String getKDR() {
