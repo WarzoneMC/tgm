@@ -2,6 +2,7 @@ package com.minehut.tgm.modules.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.minehut.teamapi.models.DestroyWoolRequest;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
@@ -33,7 +34,7 @@ import java.util.List;
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
-    private final List<Monument> monuments = new ArrayList<>();
+    @Getter private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
@@ -68,6 +69,10 @@ public class DTMModule extends MatchModule implements Listener {
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
+
+                    if (TGM.get().getApiManager().isStatsDisabled()) return;
+                    TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().addWoolDestroy();
+                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
                 }
 
                 @Override
@@ -85,6 +90,10 @@ public class DTMModule extends MatchModule implements Listener {
                             break;
                         }
                     }
+
+                    if (TGM.get().getApiManager().isStatsDisabled()) return;
+                    TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().addWoolDestroy();
+                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
                 }
             });
         }

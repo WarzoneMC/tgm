@@ -28,6 +28,7 @@ public class UserProfile {
     @Getter private int losses = 0;
     @Getter private int kills = 0;
     @Getter private int deaths = 0;
+    @Getter private int wool_destroys = 0;
     @Getter private List<String> matches;
 
     public void addWin() {
@@ -46,8 +47,12 @@ public class UserProfile {
         losses++;
     }
 
+    public void addWoolDestroy() {
+        wool_destroys++;
+    }
+
     public int getXP() {
-        return (getWins() * 10) + getKills();
+        return (getWins() * 10) + (getLosses() * 5) + (getWool_destroys() * 7) + getKills();
     }
 
     public int getLevel() {
