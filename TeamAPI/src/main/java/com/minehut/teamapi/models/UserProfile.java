@@ -13,6 +13,12 @@ import java.util.List;
  */
 @AllArgsConstructor
 public class UserProfile {
+
+    public static final int XP_PER_KILL = 1,
+                            XP_PER_WIN = 10,
+                            XP_PER_LOSS = 5,
+                            XP_PER_WOOL_BREAK = 7;
+
     @SerializedName("_id")
     @Getter private ObjectId id;
 
@@ -52,7 +58,7 @@ public class UserProfile {
     }
 
     public int getXP() {
-        return (getWins() * 10) + (getLosses() * 5) + (getWool_destroys() * 7) + getKills();
+        return (getWins() * XP_PER_WIN) + (getLosses() * XP_PER_LOSS) + (getWool_destroys() * XP_PER_WOOL_BREAK) + (getKills() * XP_PER_KILL);
     }
 
     public int getLevel() {

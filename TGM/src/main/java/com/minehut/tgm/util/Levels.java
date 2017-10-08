@@ -54,4 +54,8 @@ public class Levels {
     public static int getXPRequiredForLevel(int l) {
         return (int) Math.round(Math.pow((l - 1)/0.6, 2) + 0.49);
     }
+
+    public static int calculateLevel(int XP) {
+        return (int) (0.6 * Math.sqrt(XP)) + 1;
+    }
 }

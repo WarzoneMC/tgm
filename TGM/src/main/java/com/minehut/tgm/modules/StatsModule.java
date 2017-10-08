@@ -10,9 +10,13 @@ import com.minehut.tgm.modules.dtm.DTMModule;
 import com.minehut.tgm.modules.monument.Monument;
 import com.minehut.tgm.modules.monument.MonumentService;
 import com.minehut.tgm.modules.tdm.TDMModule;
+import com.minehut.tgm.player.event.PlayerLevelUpEvent;
+import com.minehut.tgm.player.event.PlayerXPEvent;
 import com.minehut.tgm.user.PlayerContext;
 import com.minehut.tgm.util.Levels;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +29,7 @@ import org.bukkit.scheduler.BukkitTask;
 /**
  * Created by Jorge on 10/6/2017.
  */
-public class StatsModule extends MatchModule {
+public class StatsModule extends MatchModule implements Listener{
 
     private Match match;
 
@@ -48,6 +52,20 @@ public class StatsModule extends MatchModule {
         Bukkit.getScheduler().cancelTask(xpBarTaskID);
     }
 
-    // TODO: Check when a player levels up to send a message and sound.
+    @EventHandler
+    public void onPlayerXP(PlayerXPEvent event) {
+        if (Levels.calculateLevel(event.getFromXP()) < Levels.calculateLevel(event.getToXP())){
+            Bukkit.getPluginManager().callEvent(new PlayerLevelUpEvent(event.getPlayerContext(), event.getPlayerContext().getUserProfile().getLevel() - 1, event.getPlayerContext().getUserProfile().getLevel()));
+        }
+    }
+
+    @EventHandler
+    public void onPlayerLevelUp(PlayerLevelUpEvent event) {
+        Player player = event.getPlayerContext().getPlayer();
+        player.sendMessage(ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "----------------------------------------");
+        player.sendMessage(ChatColor.GREEN +  "" +  ChatColor.BOLD + " Level up!" + ChatColor.GREEN + " You are now level " + ChatColor.RED + event.getToLevel());
+        player.sendMessage(ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "----------------------------------------");
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+    }
 
 }
