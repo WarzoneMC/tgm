@@ -28,7 +28,7 @@ public class TDMModule extends MatchModule implements Listener {
     @Getter private Match match;
     @Getter private PointsModule pointsModule;
     @Getter private TeamManagerModule teamManager;
-    @Getter private TDMObjective tdmObjective;
+    @Getter private TDMObjective tdmObjective = TDMObjective.KILLS;
 
     @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
@@ -42,9 +42,7 @@ public class TDMModule extends MatchModule implements Listener {
             if (tdmJson.has("objective")) {
                 TDMObjective objective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
                 if (objective != null) tdmObjective = objective;
-                else tdmObjective = TDMObjective.KILLS;
             }
-            else tdmObjective = TDMObjective.KILLS;
         }
 
         pointsModule = TGM.get().getModule(PointsModule.class);
