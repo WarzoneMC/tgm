@@ -1,20 +1,50 @@
 package com.minehut.tgm.modules;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.minehut.tgm.TGM;
-import com.minehut.tgm.match.MatchModule;
-import com.minehut.tgm.match.MatchStatus;
-import com.minehut.tgm.match.ModuleData;
-import com.minehut.tgm.match.ModuleLoadTime;
+import com.minehut.tgm.match.*;
+import com.minehut.tgm.modules.team.TeamManagerModule;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST)
 public class TimeModule extends MatchModule {
     @Getter private long startedTimeStamp = 0;
     @Getter private long endedTimeStamp = 0;
 
+    @Getter protected int runnableId;
+    @Getter private int timeLimit = 0;
+
     @Override
     public void enable() {
         startedTimeStamp = System.currentTimeMillis();
+    }
+
+    @Override
+    public void load(Match match){
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("time")) {
+            JsonObject timeJson = match.getMapContainer().getMapInfo().getJsonObject().get("time").getAsJsonObject();
+            timeLimit = (timeJson.has("limit") ? timeJson.get("limit").getAsInt() : 0);
+        }
+
+        if (timeLimit > 0) {
+            runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
+                @Override
+                public void run() {
+                    if (timeLimit > getTimeElapsed()) return;
+                    TGM.get().getMatchManager().endMatch(TGM.get().getModule(TeamManagerModule.class).getTeams().get(1));
+                    Bukkit.getScheduler().cancelTask(runnableId);
+                }
+            }, 20L, 20L);
+        }
+    }
+
+    @Override
+    public void unload(){
+        if (timeLimit > 0) {
+            Bukkit.getScheduler().cancelTask(runnableId);
+        }
     }
 
     @Override
