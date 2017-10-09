@@ -17,7 +17,7 @@ public class Levels {
     * @param player target player
     *
     */
-    public static double getLevelProgress(Player player){
+    public static double getLevelProgress(Player player) {
         UserProfile profile = TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile();
         return (((0.6 * Math.sqrt(profile.getXP())) + 1) - profile.getLevel()) * 100;
     }
@@ -29,7 +29,7 @@ public class Levels {
      * @param player target player
      *
      */
-    public static int getXPRequiredForNextLevel(Player player){
+    public static int getXPRequiredForNextLevel(Player player) {
         return getTotalXPRequiredForNextLevel(player) - TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().getXP();
     }
 
@@ -40,7 +40,7 @@ public class Levels {
      * @param player target player
      *
      */
-    public static int getTotalXPRequiredForNextLevel(Player player){
+    public static int getTotalXPRequiredForNextLevel(Player player) {
         return getXPRequiredForLevel(TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().getLevel() + 1);
     }
 
@@ -51,7 +51,7 @@ public class Levels {
      * @param level target level
      *
      */
-    public static int getXPRequiredForLevel(int l){
+    public static int getXPRequiredForLevel(int l) {
         return (int) Math.round(Math.pow((l - 1)/0.6, 2) + 0.49);
     }
 }
