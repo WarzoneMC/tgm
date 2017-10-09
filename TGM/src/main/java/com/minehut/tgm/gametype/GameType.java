@@ -13,7 +13,8 @@ public enum GameType {
     KOTH("King of the Hill", KOTHManifest.class),
     DTM("Destroy the Monument", DTMManifest.class),
     CTW("Capture the Wool", CTWManifest.class),
-    Infected("Infection", InfectionManifest.class);
+    Infected("Infection", InfectionManifest.class),
+    Blitz("Blitz", BlitzManifest.class);
 
     @Getter private String name;
     @Getter private Class manifest;

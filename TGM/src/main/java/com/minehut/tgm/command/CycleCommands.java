@@ -157,6 +157,12 @@ public class CycleCommands {
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
         MatchManager matchManager = TGM.get().getMatchManager();
         if (cmd.argsLength() == 0) {
+            if (matchManager.getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Blitz)) {
+                if (!matchManager.getMatch().getMatchStatus().equals(MatchStatus.PRE)) {
+                    sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
+                    return;
+                }
+            }
             if (teamManager.getTeam((Player) sender).isSpectator() || matchManager.getMatch().getMatchStatus().equals(MatchStatus.PRE)) {
                 if (matchManager.getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Infected)) {
                     if (matchManager.getMatch().getMatchStatus().equals(MatchStatus.MID) || matchManager.getMatch().getMatchStatus().equals(MatchStatus.POST)) {
@@ -193,12 +199,17 @@ public class CycleCommands {
                     }
                 } else if (matchManager.getMatch().getMatchStatus().equals(MatchStatus.MID)) {
                     if (!matchTeam.isSpectator()) {
-                        sender.sendMessage(ChatColor.RED + "You can't pick a team after the game starts in this gamemode.");
+                        sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
                         return;
                     } else {
                         attemptJoinTeam((Player) sender, matchTeam, false);
                         return;
                     }
+                }
+            } else if (matchManager.getMatch().getMapContainer().getMapInfo().getGametype().equals(GameType.Blitz)) {
+                if (!matchManager.getMatch().getMatchStatus().equals(MatchStatus.PRE)) {
+                    sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
+                    return;
                 }
             }
 
