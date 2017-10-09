@@ -29,4 +29,6 @@ public interface TeamClient {
     MatchInProgress loadMatch(MatchLoadRequest matchLoadRequest);
 
     void finishMatch(MatchFinishPacket matchFinishPacket);
+
+    void destroyWool(DestroyWoolRequest destroyWoolRequest);
 }

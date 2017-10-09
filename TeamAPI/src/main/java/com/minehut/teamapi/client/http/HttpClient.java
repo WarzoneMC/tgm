@@ -140,4 +140,18 @@ public class HttpClient implements TeamClient {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/destroy_wool")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(destroyWoolRequest)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
 }

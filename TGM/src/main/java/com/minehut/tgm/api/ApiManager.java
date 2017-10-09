@@ -12,6 +12,7 @@ import com.minehut.tgm.modules.ChatModule;
 import com.minehut.tgm.modules.DeathModule;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
+import com.minehut.tgm.player.event.PlayerXPEvent;
 import com.minehut.tgm.user.PlayerContext;
 import lombok.Getter;
 import org.bson.types.ObjectId;
@@ -82,6 +83,7 @@ public class ApiManager implements Listener {
         for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
             winners.add(playerContext.getUserProfile().getId().toString());
             playerContext.getUserProfile().addWin();
+            Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP()));
         }
 
         List<String> losers = new ArrayList<>();
@@ -89,6 +91,7 @@ public class ApiManager implements Listener {
             for (PlayerContext playerContext : matchTeam.getMembers()) {
                 losers.add(playerContext.getUserProfile().getId().toString());
                 playerContext.getUserProfile().addLoss();
+                Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP()));
             }
         }
 
@@ -166,6 +169,7 @@ public class ApiManager implements Listener {
             if (context == null) return;
             //int a = context.getUserProfile().getXP();
             context.getUserProfile().addKill();
+            Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, UserProfile.XP_PER_KILL, context.getUserProfile().getXP() - UserProfile.XP_PER_KILL, context.getUserProfile().getXP()));
             //int b = context.getUserProfile().getXP();
             //xpEffect(context.getPlayer().getUniqueId(), a, b - a, 6 * context.getUserProfile().getLevel());
 

@@ -2,6 +2,8 @@ package com.minehut.tgm.modules.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.minehut.teamapi.models.DestroyWoolRequest;
+import com.minehut.teamapi.models.UserProfile;
 import com.minehut.tgm.TGM;
 import com.minehut.tgm.match.Match;
 import com.minehut.tgm.match.MatchModule;
@@ -15,6 +17,8 @@ import com.minehut.tgm.modules.scoreboard.SimpleScoreboard;
 import com.minehut.tgm.modules.team.MatchTeam;
 import com.minehut.tgm.modules.team.TeamManagerModule;
 import com.minehut.tgm.modules.team.TeamUpdateEvent;
+import com.minehut.tgm.player.event.PlayerXPEvent;
+import com.minehut.tgm.user.PlayerContext;
 import com.minehut.tgm.util.ColorConverter;
 import com.minehut.tgm.util.FireworkUtil;
 import com.minehut.tgm.util.Parser;
@@ -33,7 +37,7 @@ import java.util.List;
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
-    private final List<Monument> monuments = new ArrayList<>();
+    @Getter private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
@@ -68,6 +72,14 @@ public class DTMModule extends MatchModule implements Listener {
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
+
+                    if (TGM.get().getApiManager().isStatsDisabled()) return;
+
+                    PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+                    playerContext.getUserProfile().addWoolDestroy();
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
+                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
+
                 }
 
                 @Override
@@ -85,6 +97,12 @@ public class DTMModule extends MatchModule implements Listener {
                             break;
                         }
                     }
+
+                    if (TGM.get().getApiManager().isStatsDisabled()) return;
+                    PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+                    playerContext.getUserProfile().addWoolDestroy();
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
+                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
                 }
             });
         }
