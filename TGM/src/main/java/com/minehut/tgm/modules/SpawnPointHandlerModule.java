@@ -56,7 +56,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         }, 0L);
     }
 
-    private void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {
+    public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {
         Players.reset(playerContext.getPlayer(), true);
 
         if (matchTeam.isSpectator()) {
