@@ -67,8 +67,7 @@ public class BlitzModule extends MatchModule implements Listener {
                 if (team == null || team.isSpectator()) continue;
                 teamLives.put(team, teamObject.get("lives").getAsInt());
             }
-        }
-        else {
+        } else {
             for (MatchTeam team : teamManagerModule.getTeams()) {
                 if (team.isSpectator()) continue;
                 teamLives.put(team, 1);
