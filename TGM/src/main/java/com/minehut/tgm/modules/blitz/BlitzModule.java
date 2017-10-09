@@ -33,6 +33,7 @@ import org.bukkit.util.*;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 10/7/2017.
@@ -240,14 +241,8 @@ public class BlitzModule extends MatchModule implements Listener {
         return false;
     }
 
-    public List<Player> getAlivePlayers(MatchTeam matchTeam) {
-        List<Player> alive = new ArrayList<>();
-        for (PlayerContext playerContext : matchTeam.getMembers()) {
-            if (!playerContext.getPlayer().getGameMode().equals(GameMode.SPECTATOR)) {
-                alive.add(playerContext.getPlayer());
-            }
-        }
-        return alive;
+    public List<PlayerContext> getAlivePlayers(MatchTeam matchTeam) {
+        return matchTeam.getMembers().stream().filter(playerContext -> !playerContext.getPlayer().getGameMode().equals(GameMode.SPECTATOR)).collect(Collectors.toList());
     }
 
 }
