@@ -1,4 +1,4 @@
-# TeamGG
+# Warzone
 Team oriented minecraft pvp suite
 
 ## Project Goals
