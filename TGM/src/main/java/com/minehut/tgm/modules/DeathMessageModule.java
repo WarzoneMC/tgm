@@ -24,7 +24,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
         deathModule = match.getModule(DeathModule.class);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onTGMDeath(PlayerDeathEvent event) {
         DeathModule module = deathModule.getPlayer(event.getPlayer());
 
