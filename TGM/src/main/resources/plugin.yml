@@ -1,3 +1,3 @@
 name: TGM
-main: com.minehut.tgm.TGM
+main: network.warzone.tgm.TGM
 version: ${project.version}

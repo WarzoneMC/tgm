@@ -1,0 +1,97 @@
+package network.warzone.tgm.modules.monument;
+
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.region.Region;
+import network.warzone.tgm.modules.team.MatchTeam;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@AllArgsConstructor @Getter
+public class Monument implements Listener {
+
+    private String name;
+
+    private final List<MatchTeam> owners;
+
+    private final Region region;
+
+    private final List<Material> materials;
+
+    private int health;
+    private int maxHealth;
+
+    private final List<MonumentService> services = new ArrayList<>();
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (region.contains(event.getBlock().getLocation())) {
+            if (materials == null || materials.contains(event.getBlock().getType())) {
+                if (canDamage(event.getPlayer())) {
+                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                        event.setCancelled(false); //override filters
+                        event.getBlock().getDrops().clear();
+
+                        health--;
+
+                        if (health < 0) {
+                            event.getPlayer().sendMessage(ChatColor.RED + "This monument is already destroyed.");
+                        } else if (health == 0) {
+                            for (MonumentService monumentService : services) {
+                                monumentService.destroy(event.getPlayer(), event.getBlock());
+                            }
+                        } else {
+                            for (MonumentService monumentService : services) {
+                                monumentService.damage(event.getPlayer(), event.getBlock());
+                            }
+                        }
+                    }
+                } else {
+                    event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    public boolean isAlive() {
+        return this.health > 0;
+    }
+
+    public int getHealthPercentage() {
+        return Math.min(100, Math.max(0, (health * 100) / maxHealth));
+    }
+
+    public void load() {
+        TGM.registerEvents(this);
+    }
+
+    public void unload() {
+        HandlerList.unregisterAll(this);
+    }
+
+
+    public boolean canDamage(Player player) {
+        for (MatchTeam matchTeam : owners) {
+            if (matchTeam.containsPlayer(player)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void addService(MonumentService monumentService) {
+        this.services.add(monumentService);
+    }
+}
