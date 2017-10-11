@@ -2,14 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>Warzone</artifactId>
-        <groupId>com.minehut</groupId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>TeamAPI</artifactId>
+    <parent>
+        <artifactId>Warzone</artifactId>
+        <groupId>network.warzone</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>WarzoneAPI</artifactId>
 
     <dependencies>
         <dependency>
@@ -36,8 +37,6 @@
             <artifactId>unirest-java</artifactId>
             <version>1.4.9</version>
         </dependency>
-
-
     </dependencies>
 
 
