@@ -1,16 +1,12 @@
 package com.minehut.tgm.map;
 
-import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.minehut.tgm.TGM;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

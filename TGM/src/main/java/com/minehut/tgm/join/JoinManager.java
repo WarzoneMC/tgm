@@ -25,27 +25,24 @@ import java.util.UUID;
 /**
  * Created by luke on 4/27/17.
  */
+@Getter
 public class JoinManager implements Listener {
-    @Getter
-    List<QueuedJoin> queuedJoins = new ArrayList<>();
-    @Getter
+
+    private List<QueuedJoin> queuedJoins = new ArrayList<>();
     private List<LoginService> loginServices = new ArrayList<>();
 
     public JoinManager() {
         TGM.registerEvents(this);
 
         //empty queued joins when the connection didn't follow through for an unknown reason.
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
-            @Override
-            public void run() {
-                List<QueuedJoin> toRemove = new ArrayList<>();
-                for (QueuedJoin queuedJoin : queuedJoins) {
-                    if (System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000) {
-                        toRemove.add(queuedJoin);
-                    }
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
+            List<QueuedJoin> toRemove = new ArrayList<>();
+            for (QueuedJoin queuedJoin : queuedJoins) {
+                if (System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000) {
+                    toRemove.add(queuedJoin);
                 }
-                queuedJoins.removeAll(toRemove);
             }
+            queuedJoins.removeAll(toRemove);
         }, 20 * 10L, 20 * 10L);
     }
 
@@ -118,11 +115,11 @@ public class JoinManager implements Listener {
         TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
     }
 
-    @AllArgsConstructor
+    @AllArgsConstructor @Getter
     private class QueuedJoin {
-        @Getter UUID uuid;
-        @Getter UserProfile userProfile;
-        @Getter long time;
+        private UUID uuid;
+        private UserProfile userProfile;
+        private long time;
     }
 
 }

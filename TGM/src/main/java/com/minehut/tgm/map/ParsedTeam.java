@@ -7,11 +7,11 @@ import org.bukkit.ChatColor;
 /**
  * Created by luke on 4/27/17.
  */
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class ParsedTeam {
-    @Getter private String id;
-    @Getter private String alias;
-    @Getter private ChatColor teamColor;
-    @Getter private int max;
-    @Getter private int min;
+    private String id;
+    private String alias;
+    private ChatColor teamColor;
+    private int max;
+    private int min;
 }

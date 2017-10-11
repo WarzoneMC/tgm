@@ -18,12 +18,11 @@ import java.util.HashMap;
  * This allows map information to be easily reloaded
  * during runtime.
  */
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class MapContainer {
-    @Getter private File sourceFolder;
-    @Getter @Setter private MapInfo mapInfo;
+    private File sourceFolder;
+    @Setter private MapInfo mapInfo;
 
-    @Getter
     private final HashMap<String, Location> locations = new HashMap<>();
 
     public void parseWorldDependentContent(World world) {
@@ -31,7 +30,7 @@ public class MapContainer {
     }
 
     private void parseLocations(World world) {
-        if(!mapInfo.getJsonObject().has("locations")) return;
+        if (!mapInfo.getJsonObject().has("locations")) return;
 
         JsonArray jsonArray = mapInfo.getJsonObject().getAsJsonArray("locations");
         for (JsonElement locationElement : jsonArray) {

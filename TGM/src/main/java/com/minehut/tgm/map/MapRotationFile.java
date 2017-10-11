@@ -13,11 +13,12 @@ import java.util.List;
 /**
  * Created by luke on 4/27/17.
  */
+@Getter
 public class MapRotationFile implements MapRotation {
-    @Getter private final MapLibrary mapLibrary;
-    @Getter private int current = 0;
-    @Getter private List<MapContainer> rotation = new ArrayList<>();
-    @Getter private File rotationFile;
+    private final MapLibrary mapLibrary;
+    private int current = 0;
+    private List<MapContainer> rotation = new ArrayList<>();
+    private File rotationFile;
 
     public MapRotationFile(MapLibrary mapLibrary) {
         this.mapLibrary = mapLibrary;

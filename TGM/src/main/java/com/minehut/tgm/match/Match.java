@@ -17,16 +17,17 @@ import java.util.UUID;
 /**
  * Created by luke on 4/27/17.
  */
+@Getter
 public class Match {
-    @Getter private final UUID uuid;
-    @Getter private final MatchManifest matchManifest;
-    @Getter private final List<MatchModule> modules = new ArrayList<>();
-    @Getter private final World world;
-    @Getter private final MapContainer mapContainer;
-    @Getter @Setter private MatchStatus matchStatus = MatchStatus.PRE;
+    private final UUID uuid;
+    private final MatchManifest matchManifest;
+    private final List<MatchModule> modules = new ArrayList<>();
+    private final World world;
+    private final MapContainer mapContainer;
+    @Setter private MatchStatus matchStatus = MatchStatus.PRE;
 
-    @Getter private long startedTime;
-    @Getter private long finishedTime;
+    private long startedTime;
+    private long finishedTime;
 
     public Match(UUID uuid, MatchManifest matchManifest, World world, MapContainer mapContainer) {
         this.uuid = uuid;

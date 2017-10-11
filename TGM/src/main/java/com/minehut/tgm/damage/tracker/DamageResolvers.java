@@ -10,7 +10,7 @@ public final class DamageResolvers {
 
     public static @Nonnull
     DamageResolverManager getManager() {
-        if(manager == null) {
+        if (manager == null) {
             manager = new SimpleResolverManager();
         }
         return manager;

@@ -10,7 +10,7 @@ public final class Trackers {
 
     public static @Nonnull
     TrackerManager getManager() {
-        if(manager == null) {
+        if (manager == null) {
             manager = new SimpleTrackerManager();
         }
         return manager;

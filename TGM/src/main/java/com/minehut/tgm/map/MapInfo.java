@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * Created by luke on 4/27/17.
  */
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class MapInfo {
-    @Getter private String name;
-    @Getter private String version;
-    @Getter private List<String> authors;
-    @Getter private GameType gametype;
-    @Getter private List<ParsedTeam> teams;
-    @Getter private JsonObject jsonObject;
+    private String name;
+    private String version;
+    private List<String> authors;
+    private GameType gametype;
+    private List<ParsedTeam> teams;
+    private JsonObject jsonObject;
 }

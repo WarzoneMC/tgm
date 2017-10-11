@@ -35,11 +35,11 @@ public class VisibilityModule extends MatchModule implements Listener {
     }
 
     public void refreshPlayer(Player player) {
-        if(player == null) return;
+        if (player == null) return;
 
         //update who can see the player.
         for (Player eyes : Bukkit.getOnlinePlayers()) {
-            if(player == eyes) continue;
+            if (player == eyes) continue;
 
             boolean canSee = visibilityController.canSee(eyes, player);
             if (canSee) {
@@ -51,7 +51,7 @@ public class VisibilityModule extends MatchModule implements Listener {
 
         //update who the player can see.
         for (Player target : Bukkit.getOnlinePlayers()) {
-            if(player == target) continue;
+            if (player == target) continue;
 
             boolean canSee = visibilityController.canSee(player, target);
             if (canSee) {

@@ -24,13 +24,14 @@ import java.util.UUID;
 /**
  * Created by luke on 4/27/17.
  */
+@Getter
 public class MatchManager {
-    @Getter private MapLibrary mapLibrary;
-    @Getter private MapRotation mapRotation;
-    @Getter private Match match = null;
-    @Getter private int matchNumber = 0;
+    private MapLibrary mapLibrary;
+    private MapRotation mapRotation;
+    private Match match = null;
+    private int matchNumber = 0;
 
-    @Getter @Setter private MapContainer forcedNextMap = null;
+    @Setter private MapContainer forcedNextMap = null;
 
     public MatchManager(FileConfiguration fileConfiguration) {
         mapLibrary = new MapLibrary(fileConfiguration, new MapLoaderImpl());

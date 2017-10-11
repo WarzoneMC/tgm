@@ -11,7 +11,7 @@ public final class Lifetimes {
 
     public static @Nonnull
     LifetimeManager getManager() {
-        if(manager == null) {
+        if (manager == null) {
             manager = new SimpleLifetimeManager();
         }
         return manager;

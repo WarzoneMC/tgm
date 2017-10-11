@@ -94,6 +94,7 @@ public class ItemKitNodeParser implements KitNodeParser {
             }
         }
 
+        // https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
         if (jsonObject.has("enchantments")) {
             for (JsonElement element : jsonObject.getAsJsonArray("enchantments")) {
                 String[] split = element.getAsString().split(":");
