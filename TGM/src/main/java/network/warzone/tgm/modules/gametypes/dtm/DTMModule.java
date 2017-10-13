@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.dtm;
+package network.warzone.tgm.modules.gametypes.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,13 +37,13 @@ import java.util.List;
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
-    @Getter private final List<Monument> monuments = new ArrayList<>();
+    private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
-        JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("dtm").getAsJsonObject();
+        JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
 
         for (JsonElement monumentElement : dtmJson.getAsJsonArray("monuments")) {
             JsonObject monumentJson = monumentElement.getAsJsonObject();
@@ -129,14 +129,6 @@ public class DTMModule extends MatchModule implements Listener {
                 .withFlicker()
                 .withColor(ColorConverter.getColor(color))
                 .build(), 0);
-
-        // Play the sound for the player if they are too far to render the firework.
-        //for (Player listener : Bukkit.getOnlinePlayers()) {
-        //    if (listener.getLocation().distance(location) > 64) {
-        //        listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_BLAST, 0.75f, 1f);
-        //        listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_TWINKLE, 0.75f, 1f);
-        //    }
-        //}
     }
 
     @EventHandler

@@ -1,8 +1,8 @@
-package network.warzone.tgm.gametype;
+package network.warzone.tgm.modules.gametypes;
 
 import network.warzone.tgm.match.MatchManifest;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.tdm.TDMModule;
+import network.warzone.tgm.modules.gametypes.tdm.TDMModule;
 
 import java.util.ArrayList;
 import java.util.List;

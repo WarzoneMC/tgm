@@ -1,7 +1,7 @@
 package network.warzone.tgm.command;
 
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.gametype.GameType;
+import network.warzone.tgm.modules.gametypes.GameType;
 import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchStatus;

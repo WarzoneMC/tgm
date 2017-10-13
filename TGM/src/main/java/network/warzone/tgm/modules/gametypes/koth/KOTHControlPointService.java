@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.koth;
+package network.warzone.tgm.modules.gametypes.koth;
 
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.controlpoint.ControlPointDefinition;
@@ -12,11 +12,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class KOTHControlPointService implements ControlPointService {
-    @Getter private KOTHModule kothModule;
-    @Getter private Match match;
-    @Getter private ControlPointDefinition definition;
+
+    private KOTHModule kothModule;
+    private Match match;
+    private ControlPointDefinition definition;
 
     @Override
     public void holding(MatchTeam matchTeam) {
