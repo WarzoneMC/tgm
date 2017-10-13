@@ -3,8 +3,8 @@ package network.warzone.tgm.gametype;
 import network.warzone.tgm.match.MatchManifest;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.DeathMessageModule;
-import network.warzone.tgm.modules.infection.InfectedTimeLimit;
-import network.warzone.tgm.modules.infection.InfectionModule;
+import network.warzone.tgm.modules.gametypes.infection.InfectedTimeLimit;
+import network.warzone.tgm.modules.gametypes.infection.InfectionModule;
 
 import java.util.ArrayList;
 import java.util.List;

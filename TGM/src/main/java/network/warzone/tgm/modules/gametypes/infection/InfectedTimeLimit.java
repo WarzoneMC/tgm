@@ -1,11 +1,11 @@
-package network.warzone.tgm.modules.infection;
+package network.warzone.tgm.modules.gametypes.infection;
 
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.Bukkit;
 
 /**
  * Created by Draem on 8/5/2017.
@@ -22,15 +22,11 @@ public class InfectedTimeLimit extends MatchModule {
     }
 
     public void startCountdown(int length) {
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (match.getMatchStatus().equals(MatchStatus.MID) && teamManager.getTeamById("humans").getMembers().size() != 0) {
-                    TGM.get().getMatchManager().endMatch(teamManager.getTeamById("humans"));
-                }
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+            if (match.getMatchStatus().equals(MatchStatus.MID) && teamManager.getTeamById("humans").getMembers().size() != 0) {
+                TGM.get().getMatchManager().endMatch(teamManager.getTeamById("humans"));
             }
-        }.runTaskLater(TGM.get(), length * 60 * 20);
+        }, length * 60 * 20);
     }
 
 }
