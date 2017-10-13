@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.gametypes.tdm;
+package network.warzone.tgm.modules.tdm;
 
 import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
@@ -37,8 +37,8 @@ public class TDMModule extends MatchModule implements Listener {
         this.match = match;
         teamManager = TGM.get().getModule(TeamManagerModule.class);
 
-        if (match.getMapContainer().getMapInfo().getJsonObject().has("gametype-settings")) {
-            JsonObject tdmJson = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("tdm")) {
+            JsonObject tdmJson = match.getMapContainer().getMapInfo().getJsonObject().get("tdm").getAsJsonObject();
             if (tdmJson.has("objective")) {
                 TDMObjective objective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
                 if (objective != null) tdmObjective = objective;

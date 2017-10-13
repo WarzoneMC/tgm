@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.gametypes.dtm;
+package network.warzone.tgm.modules.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,13 +37,13 @@ import java.util.List;
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
-    private final List<Monument> monuments = new ArrayList<>();
+    @Getter private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
-        JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
+        JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("dtm").getAsJsonObject();
 
         for (JsonElement monumentElement : dtmJson.getAsJsonArray("monuments")) {
             JsonObject monumentJson = monumentElement.getAsJsonObject();

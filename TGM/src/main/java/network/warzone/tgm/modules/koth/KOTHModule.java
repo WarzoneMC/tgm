@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.gametypes.koth;
+package network.warzone.tgm.modules.koth;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -36,7 +36,7 @@ public class KOTHModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
+        JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("koth").getAsJsonObject();
 
         for (JsonElement capturePointElement : kothJson.getAsJsonArray("hills")) {
             JsonObject capturePointJson = capturePointElement.getAsJsonObject();

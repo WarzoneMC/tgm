@@ -2,7 +2,7 @@ package network.warzone.tgm.gametype;
 
 import network.warzone.tgm.match.MatchManifest;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.gametypes.ctw.CTWModule;
+import network.warzone.tgm.modules.ctw.CTWModule;
 import network.warzone.tgm.modules.wool.WoolChestModule;
 
 import java.util.ArrayList;
