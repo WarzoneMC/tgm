@@ -1,7 +1,7 @@
-package network.warzone.tgm.modules.infection;
+package network.warzone.tgm.modules.gametypes.infection;
 
 import com.google.gson.JsonObject;
-import network.warzone.warzoneapi.models.Death;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.damage.tracker.event.PlayerDamageEvent;
@@ -13,7 +13,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
-import lombok.Getter;
+import network.warzone.warzoneapi.models.Death;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -32,18 +32,17 @@ import java.util.Random;
 /**
  * Created by Draem on 7/31/2017.
  */
+@Getter
 public class InfectionModule extends MatchModule implements Listener {
 
-    @Getter private TeamManagerModule teamManager;
-
-    @Getter private int length;
-
-    @Getter private Match match;
+    private TeamManagerModule teamManager;
+    private int length;
+    private Match match;
 
     @Override
     public void load(Match match) {
         TGM.registerEvents(this);
-        JsonObject json = match.getMapContainer().getMapInfo().getJsonObject().get("infection").getAsJsonObject();
+        JsonObject json = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
         length = json.get("length").getAsInt();
         teamManager = match.getModule(TeamManagerModule.class);
         this.match = match;
@@ -69,45 +68,6 @@ public class InfectionModule extends MatchModule implements Listener {
 
         match.getModule(InfectedTimeLimit.class).startCountdown(length);
     }
-
-//    @EventHandler
-//    public void onPlayerDeath(PlayerDeathEvent event) {
-//        // If the player isn't on the spectator team, they must be either human or infected.
-//        if (!teamManager.getTeam(event.getPlayer()).getId().equals("spectators")) {
-//
-//            // "infected" = zombie team; "humans" = human team;
-//            if (teamManager.getTeam(event.getPlayer()).getId().equals("humans")) {
-//                // Now to determine if the user got infected by a player, or died because of anything else (still infected).
-//                if (event instanceof PlayerDeathByPlayerEvent) {
-//                    broadcastMessage(String.format("%s%s &7has been infected by %s%s",
-//                            teamManager.getTeam(event.getPlayer()).getColor(),
-//                            event.getPlayer().getName(),
-//                            teamManager.getTeam(((PlayerDeathByPlayerEvent) event).getCause()).getColor(),
-//                            ((PlayerDeathByPlayerEvent) event).getCause().getName()));
-//
-//                } else {
-//                    broadcastMessage(String.format("%s%s &7has been taken by the environment",
-//                            teamManager.getTeam(event.getPlayer()).getColor(),
-//                            event.getPlayer().getName()));
-//                }
-//
-//                infect(event.getPlayer());
-//            } else if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
-//                if (event instanceof PlayerDeathByPlayerEvent) {
-//                    if (teamManager.getTeam(((PlayerDeathByPlayerEvent) event).getCause()).getId().equalsIgnoreCase("infected")) {
-//                        return;
-//                    }
-//                    broadcastMessage(String.format("%s%s &7has been slain by %s%s",
-//                            teamManager.getTeam(event.getPlayer()).getColor(),
-//                            event.getPlayer().getName(),
-//                            teamManager.getTeam(((PlayerDeathByPlayerEvent) event).getCause()).getColor(),
-//                            ((PlayerDeathByPlayerEvent) event).getCause().getName()
-//                            ));
-//                }
-//            }
-//
-//        }
-//    }
 
     @EventHandler
     public void onDamage(PlayerDamageEvent event) {
@@ -145,7 +105,7 @@ public class InfectionModule extends MatchModule implements Listener {
                             event.getEntity().getName(),
                             teamManager.getTeam(killer).getColor(),
                             killer.getName()
-                            ));
+                    ));
                 }
                 refresh(TGM.get().getPlayerManager().getPlayerContext(event.getEntity()), teamManager.getTeam(event.getEntity()));
             }

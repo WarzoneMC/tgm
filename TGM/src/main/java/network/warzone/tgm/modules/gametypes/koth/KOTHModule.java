@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.koth;
+package network.warzone.tgm.modules.gametypes.koth;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,19 +24,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Getter
 public class KOTHModule extends MatchModule implements Listener {
-    @Getter private final List<ControlPoint> controlPoints = new ArrayList<>();
-    @Getter private PointsModule pointsModule;
 
-    @Getter
+    private final List<ControlPoint> controlPoints = new ArrayList<>();
+    private PointsModule pointsModule;
+
     private final HashMap<ControlPointDefinition, Integer> controlPointScoreboardLines = new HashMap<>();
-
-    @Getter
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
-        JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("koth").getAsJsonObject();
+        JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
 
         for (JsonElement capturePointElement : kothJson.getAsJsonArray("hills")) {
             JsonObject capturePointJson = capturePointElement.getAsJsonObject();

@@ -1,4 +1,4 @@
-package network.warzone.tgm.gametype;
+package network.warzone.tgm.modules.gametypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

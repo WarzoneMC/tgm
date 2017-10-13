@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.tdm;
+package network.warzone.tgm.modules.gametypes.tdm;
 
 import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
@@ -23,25 +23,25 @@ import java.util.List;
 /**
  * Created by Jorge on 9/4/2017.
  */
+@Getter
 public class TDMModule extends MatchModule implements Listener {
-    
-    @Getter private Match match;
-    @Getter private PointsModule pointsModule;
-    @Getter private TeamManagerModule teamManager;
-    @Getter private TDMObjective tdmObjective = TDMObjective.KILLS;
 
-    @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private Match match;
+    private PointsModule pointsModule;
+    private TeamManagerModule teamManager;
+    private TDMObjective tdmObjective = TDMObjective.KILLS;
+
+    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
         this.match = match;
         teamManager = TGM.get().getModule(TeamManagerModule.class);
 
-        if (match.getMapContainer().getMapInfo().getJsonObject().has("tdm")) {
-            JsonObject tdmJson = match.getMapContainer().getMapInfo().getJsonObject().get("tdm").getAsJsonObject();
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("gametype-settings")) {
+            JsonObject tdmJson = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
             if (tdmJson.has("objective")) {
-                TDMObjective objective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
-                if (objective != null) tdmObjective = objective;
+                tdmObjective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
             }
         }
 

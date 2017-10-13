@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.ctw;
+package network.warzone.tgm.modules.gametypes.ctw;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -33,23 +33,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Getter
 public class CTWModule extends MatchModule implements Listener {
+
     public static final String SYMBOL_WOOL_INCOMPLETE = "\u2b1c";   // ⬜
     public static final String SYMBOL_WOOL_TOUCHED = "\u2592";      // ▒
     public static final String SYMBOL_WOOL_COMPLETE = "\u2b1b";     // ⬛
 
-    @Getter
     private final List<WoolObjective> wools = new ArrayList<>();
-
-    @Getter
     private final HashMap<WoolObjective, List<Integer>> woolScoreboardLines = new HashMap<>();
-
-    @Getter
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
-        JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("ctw").getAsJsonObject();
+        JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("gametype-settings").getAsJsonObject();
 
         for (JsonElement monumentElement : dtmJson.getAsJsonArray("wools")) {
             JsonObject monumentJson = monumentElement.getAsJsonObject();
@@ -113,13 +110,13 @@ public class CTWModule extends MatchModule implements Listener {
                     }
                 }
 
-                 @Override
-                 public void drop(Player player, MatchTeam matchTeam, boolean broadcast) {
+                @Override
+                public void drop(Player player, MatchTeam matchTeam, boolean broadcast) {
                     updateOnScoreboard(woolObjective);
 
-                     if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                             " dropped " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
-                 }
+                    if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                            " dropped " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                }
 
             });
         }

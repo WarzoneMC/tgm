@@ -1,7 +1,7 @@
 package network.warzone.tgm.map;
 
 import com.google.gson.JsonObject;
-import network.warzone.tgm.gametype.GameType;
+import network.warzone.tgm.modules.gametypes.GameType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

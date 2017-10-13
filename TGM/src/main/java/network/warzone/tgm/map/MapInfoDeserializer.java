@@ -1,7 +1,7 @@
 package network.warzone.tgm.map;
 
 import com.google.gson.*;
-import network.warzone.tgm.gametype.GameType;
+import network.warzone.tgm.modules.gametypes.GameType;
 import org.bukkit.ChatColor;
 
 import java.lang.reflect.Type;
