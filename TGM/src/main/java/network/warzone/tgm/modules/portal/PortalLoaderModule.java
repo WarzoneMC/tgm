@@ -31,7 +31,7 @@ public class PortalLoaderModule extends MatchModule {
 
                 List<MatchTeam> teams = new ArrayList<>();
                 if (json.has("teams")) {
-                    for (JsonElement teamElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("portals")) {
+                    for (JsonElement teamElement : json.getAsJsonArray("teams")) {
                         teams.add(TGM.get().getModule(TeamManagerModule.class).getTeamById(teamElement.getAsString()));
                     }
                 }
@@ -41,7 +41,9 @@ public class PortalLoaderModule extends MatchModule {
                     sound = json.get("sound").getAsBoolean();
                 }
 
-                match.getModules().add(new PortalModule(from, to, teams, sound));
+                PortalModule portalModule = new PortalModule(from, to, teams, sound);
+                match.getModules().add(portalModule);
+                TGM.registerEvents(portalModule);
             }
         }
     }

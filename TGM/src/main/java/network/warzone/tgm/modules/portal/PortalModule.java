@@ -23,7 +23,7 @@ public class PortalModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        if (from.contains(event.getTo()) && !from.contains(event.getFrom())) {
+        if (from.getBlocks().contains(event.getTo().getBlock()) && !from.getBlocks().contains(event.getFrom().getBlock())) {
             if (!teams.isEmpty()) {
 
                 //allow spectators to use portals

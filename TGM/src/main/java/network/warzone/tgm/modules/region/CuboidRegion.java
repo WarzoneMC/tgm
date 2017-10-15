@@ -50,9 +50,9 @@ public class CuboidRegion implements Region {
     @Override
     public List<Block> getBlocks() {
         List<Block> results = new ArrayList<>();
-        for (int x = (int) getMinX(); x < getMaxX(); x++) {
-            for (int z = (int) getMinZ(); z < getMaxZ(); z++) {
-                for (int y = (int) getMinY(); y < getMaxY(); y++) {
+        for (int x = (int) getMinX(); x <= getMaxX(); x++) {
+            for (int z = (int) getMinZ(); z <= getMaxZ(); z++) {
+                for (int y = (int) getMinY(); y <= getMaxY(); y++) {
                     results.add((new Location(TGM.get().getMatchManager().getMatch().getWorld(), x, y, z).getBlock()));
                 }
             }
