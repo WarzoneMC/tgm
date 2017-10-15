@@ -2,6 +2,9 @@ package network.warzone.tgm.modules.blitz;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -14,9 +17,6 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
-import lombok.Getter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -27,6 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -147,7 +148,7 @@ public class BlitzModule extends MatchModule implements Listener {
             player.getInventory().clear();
 
             if (player.getLocation().getY() < 0) {
-                player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation());
+                player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
 
             MatchTeam team = teamManagerModule.getTeam(player);
@@ -158,7 +159,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
         } else {
             showLives(player);
-            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation());
+            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
         }
 
         if (lastTeamAlive()) {

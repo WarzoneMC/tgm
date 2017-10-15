@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules;
 
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.SpawnPoint;
 import network.warzone.tgm.match.Match;
@@ -10,12 +11,12 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     @Getter private TeamManagerModule teamManagerModule;
@@ -62,14 +63,14 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         if (matchTeam.isSpectator()) {
             spectatorModule.applySpectatorKit(playerContext);
             if (teleport) {
-                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
+                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
         } else {
             matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
             playerContext.getPlayer().updateInventory();
 
             if (teleport) {
-                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
+                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                 playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
             }
         }

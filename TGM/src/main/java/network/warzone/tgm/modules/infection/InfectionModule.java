@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules.infection;
 
 import com.google.gson.JsonObject;
-import network.warzone.warzoneapi.models.Death;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.damage.tracker.event.PlayerDamageEvent;
@@ -13,7 +13,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
-import lombok.Getter;
+import network.warzone.warzoneapi.models.Death;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -184,7 +185,7 @@ public class InfectionModule extends MatchModule implements Listener {
 
         matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
         playerContext.getPlayer().updateInventory();
-        playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation());
+        playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
 

@@ -4,6 +4,7 @@ import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
+import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
@@ -64,6 +65,7 @@ public abstract class MatchManifest {
         modules.add(new GameRuleModule());
         modules.add(new ItemRemoveModule());
         modules.add(new RegenModule());
+        modules.add(new KillstreakModule());
         modules.add(new StatsModule());
 
         return modules;
