@@ -13,6 +13,8 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -30,6 +32,8 @@ public class MatchManager {
     private MapRotation mapRotation;
     private Match match = null;
     private int matchNumber = 0;
+
+    private BukkitTask unloadMatchTask;
 
     @Setter private MapContainer forcedNextMap = null;
 
@@ -67,60 +71,84 @@ public class MatchManager {
     }
 
     public void cycleNextMatch() throws IOException {
-        matchNumber++;
+        Bukkit.getScheduler().runTask(TGM.get(), () -> {
+            matchNumber++;
 
-        //find a new map to cycle to.
-        MapContainer mapContainer = forcedNextMap;
-        if (mapContainer == null) {
-            mapContainer = mapRotation.cycle(matchNumber == 1);
-        }
-        forcedNextMap = null;
+            //find a new map to cycle to.
+            MapContainer mapContainer = forcedNextMap;
+            if (mapContainer == null) {
+                mapContainer = mapRotation.cycle(matchNumber == 1);
+            }
+            forcedNextMap = null;
 
-        //create the new world under a random uuid in the matches folder.
-        UUID matchUuid = UUID.randomUUID();
-        FileUtils.copyDirectory(mapContainer.getSourceFolder(), new File("matches/" + matchUuid.toString()));
-        WorldCreator worldCreator = new WorldCreator("matches/" + matchUuid.toString());
-        worldCreator.generator(new NullChunkGenerator());
-        World world = worldCreator.createWorld();
+            //generate next match's uuid
+            UUID matchUuid = UUID.randomUUID();
 
-        /**
-         * Initialize a match manifest based on the map's gametype.
-         * The match manifest will handle which match modules should
-         * be loaded.
-         */
-        MatchManifest matchManifest = null;
-        try {
-            matchManifest = (MatchManifest) mapContainer.getMapInfo().getGametype().getManifest().getConstructors()[0].newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            try {
+                FileUtils.copyDirectory(mapContainer.getSourceFolder(), new File("matches/" + matchUuid.toString()));
 
-        //unload the existing match modules before we move any players.
-        if (match != null) {
-            match.unload();
-        }
 
-        //transport all players to the new world so we can unload the old one.
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.teleport(world.getSpawnLocation());
-        }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        //create and load the match.
-        Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
-        Match oldMatch = match;
-        match = createdMatch;
+            //create the new world under a random uuid in the matches folder.
+            WorldCreator worldCreator = new WorldCreator("matches/" + matchUuid.toString());
+            worldCreator.generator(new NullChunkGenerator());
+            //worldCreator.environment(World.Environment.NETHER);
+            World world = worldCreator.createWorld();
 
-        createdMatch.load();
+            /**
+             * Initialize a match manifest based on the map's gametype.
+             * The match manifest will handle which match modules should
+             * be loaded.
+             */
+            MatchManifest matchManifest = null;
+            try {
+                matchManifest = (MatchManifest) mapContainer.getMapInfo().getGametype().getManifest().getConstructors()[0].newInstance();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        //parse locations now that we have the world object.
-        mapContainer.parseWorldDependentContent(world);
+            //unload the existing match modules before we move any players.
+            if (match != null) {
+                match.unload();
+            }
 
-        //if a match is currently running, unload it.
-        if (oldMatch != null) {
-            File worldFolder = oldMatch.getWorld().getWorldFolder();
-            Bukkit.unloadWorld(oldMatch.getWorld(), false);
-            FileUtils.deleteDirectory(worldFolder);
-        }
+            // Transport all players to the new world so we can unload the old one.
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            }
+
+            //create and load the match.
+            Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
+            Match oldMatch = match;
+            match = createdMatch;
+
+            createdMatch.load();
+
+            //parse locations now that we have the world object.
+            mapContainer.parseWorldDependentContent(world);
+
+            //if a match is currently running, unload it.
+            unloadMatchTask = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+                if (oldMatch != null) {
+                    try {
+                        File worldFolder = oldMatch.getWorld().getWorldFolder();
+                        Bukkit.unloadWorld(oldMatch.getWorld(), false);
+                        FileUtils.deleteDirectory(worldFolder);
+
+                        unloadMatchTask.cancel();
+                        return;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                }
+
+                unloadMatchTask.cancel();
+            }, 30L, 10L);
+        });
     }
 
     public MapContainer getNextMap() {
