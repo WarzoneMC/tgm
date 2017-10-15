@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 public class VisibilityModule extends MatchModule implements Listener {
     @Getter private VisibilityController visibilityController;
@@ -40,6 +41,11 @@ public class VisibilityModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onMatchJoin(MatchJoinEvent event) {
         if (!TGM.get().getModule(ChatModule.class).getTeamManagerModule().getTeam(event.getPlayerContext().getPlayer()).isSpectator()) refreshPlayer(event.getPlayerContext().getPlayer());
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> refreshPlayer(event.getPlayer()), 20L);
     }
 
     public void refreshPlayer(Player player) {

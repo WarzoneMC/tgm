@@ -10,13 +10,10 @@ public class TaskedModuleManager extends MatchModule {
 
     @Override
     public void load(Match match) {
-        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
-            @Override
-            public void run() {
-                for (MatchModule matchModule : match.getModules()) {
-                    if (matchModule instanceof TaskedModule) {
-                        ((TaskedModule) matchModule).tick();
-                    }
+        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
+            for (MatchModule matchModule : match.getModules()) {
+                if (matchModule instanceof TaskedModule) {
+                    ((TaskedModule) matchModule).tick();
                 }
             }
         }, 0L, 0L);

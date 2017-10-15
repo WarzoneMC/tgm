@@ -1,10 +1,10 @@
 package network.warzone.tgm.match;
 
-import network.warzone.tgm.TGM;
-import network.warzone.tgm.map.MapContainer;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.map.MapContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
