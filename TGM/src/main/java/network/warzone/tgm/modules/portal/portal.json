@@ -1,0 +1,9 @@
+{
+  "portals": [
+    {
+      "from": "blue-portal",
+      "to": "10, 23, 34, 180",
+      "team": ""
+    }
+  ]
+}

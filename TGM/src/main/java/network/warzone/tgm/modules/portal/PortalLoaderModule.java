@@ -15,6 +15,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PortalLoaderModule extends MatchModule {
 
     @Override
@@ -26,9 +29,11 @@ public class PortalLoaderModule extends MatchModule {
                 Region from = TGM.get().getModule(RegionManagerModule.class).getRegion(match, json.get("from"));
                 Location to = Parser.convertLocation(match.getWorld(), json.get("to"));
 
-                MatchTeam team = null;
-                if (json.has("team")) {
-                    team = TGM.get().getModule(TeamManagerModule.class).getTeamById(json.get("team").getAsString());
+                List<MatchTeam> teams = new ArrayList<>();
+                if (json.has("teams")) {
+                    for (JsonElement teamElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("portals")) {
+                        teams.add(TGM.get().getModule(TeamManagerModule.class).getTeamById(teamElement.getAsString()));
+                    }
                 }
 
                 boolean sound = true;
@@ -36,7 +41,7 @@ public class PortalLoaderModule extends MatchModule {
                     sound = json.get("sound").getAsBoolean();
                 }
 
-                match.getModules().add(new PortalModule(from, to, team, sound));
+                match.getModules().add(new PortalModule(from, to, teams, sound));
             }
         }
     }
