@@ -64,5 +64,67 @@ public class BuildFilterType implements FilterType, Listener {
         }
     }
 
+    @EventHandler
+    public void onPlayerClickItemFram(PlayerInteractEntityEvent event) {
+        if (!event.isCancelled() && event.getRightClicked() != null && event.getRightClicked() instanceof ItemFrame) {
+            for (Region region : regions) {
+                if (region.contains(event.getRightClicked().getLocation())) {
+                    for (MatchTeam matchTeam : teams) {
+                        if (matchTeam.containsPlayer(event.getPlayer())) {
+                            FilterResult filterResult = evaluator.evaluate(event.getPlayer());
+                            if (filterResult == FilterResult.DENY) {
+                                event.setCancelled(true);
+                                event.getPlayer().sendMessage(message);
+                            } else if (filterResult == FilterResult.ALLOW) {
+                                event.setCancelled(false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHangingDamage(EntityDamageByEntityEvent event) {
+        if (!event.isCancelled() && event.getEntity() != null && event.getEntity() instanceof ItemFrame) {
+            if (event.getDamager() instanceof Player) {
+                Player player = ((Player) event.getDamager()).getPlayer();
+
+                for (Region region : regions) {
+                    if (region.contains(player.getLocation())) {
+                        for (MatchTeam matchTeam : teams) {
+                            if (matchTeam.containsPlayer(player)) {
+                                FilterResult filterResult = evaluator.evaluate(player);
+                                if (filterResult == FilterResult.DENY) {
+                                    event.setCancelled(true);
+                                    player.sendMessage(message);
+                                } else if (filterResult == FilterResult.ALLOW) {
+                                    event.setCancelled(false);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (Region region : regions) {
+                    if (region.contains(event.getEntity().getLocation())) {
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHangingDamage(HangingBreakEvent event) {
+        if (!event.isCancelled()) {
+            for (Region region : regions) {
+                if (region.contains(event.getEntity().getLocation())) {
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
 
 }
