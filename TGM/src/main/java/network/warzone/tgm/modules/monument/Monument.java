@@ -14,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,15 @@ public class Monument implements Listener {
                     event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
                     event.setCancelled(true);
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onBlockBurn(BlockBurnEvent event) {
+        if (region.contains(event.getBlock().getLocation())) {
+            if (materials == null || materials.contains(event.getBlock().getType())) {
+                event.setCancelled(true);
             }
         }
     }
