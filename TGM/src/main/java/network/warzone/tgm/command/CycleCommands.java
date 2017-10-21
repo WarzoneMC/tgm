@@ -303,7 +303,7 @@ public class CycleCommands {
     }
     
     @Command(aliases = "map", desc = "View the map info for the current map")
-    public static void next(CommandContext cmd, CommandSender sender) {
+    public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMapRotation().getCurrent().getMapInfo();
         sender.sendMessage(ChatColor.GRAY + "Currently playing on " + ChatColor.YELLOW + info.getName + ChatColor.GRAY + "by " + ChatColor.YELLOW + StringUtils.join(info.getAuthors(), ", ")());
     }
