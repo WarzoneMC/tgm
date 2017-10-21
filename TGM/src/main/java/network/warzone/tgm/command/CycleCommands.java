@@ -302,12 +302,10 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.YELLOW + "Next Map: " + ChatColor.GRAY + TGM.get().getMatchManager().getMapRotation().getNext().getMapInfo().getName());
     }
     
-    @Command(aliases = "mapinfo", desc = "View the map info for the current map")
+    @Command(aliases = "map", desc = "View the map info for the current map")
     public static void next(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMapRotation().getCurrent().getMapInfo();
-        sender.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "MAP INFO");
-        sender.sendMessage(ChatColor.YELLOW + "Name: " + ChatColor.GRAY + info.getName());
-        sender.sendMessage(ChatColor.YELLOW + "Creator(s): " + ChatColor.GRAY + StringUtils.join(info.getAuthors(), ", "));
+        sender.sendMessage(ChatColor.GRAY + "Currently playing on " + ChatColor.YELLOW + info.getName + ChatColor.GRAY + "by " + ChatColor.YELLOW + StringUtils.join(info.getAuthors(), ", ")());
     }
 
     @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
