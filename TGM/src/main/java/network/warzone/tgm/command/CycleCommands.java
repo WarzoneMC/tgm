@@ -299,7 +299,7 @@ public class CycleCommands {
 
     @Command(aliases = "next", desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
-        sender.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "Next Map: " + ChatColor.GRAY + TGM.get().getMatchManager().getMapRotation().getNext().getMapInfo().getName());
+        sender.sendMessage(ChatColor.YELLOW + "Next Map: " + ChatColor.GRAY + TGM.get().getMatchManager().getMapRotation().getNext().getMapInfo().getName());
     }
     
     @Command(aliases = "mapinfo", desc = "View the map info for the current map")
