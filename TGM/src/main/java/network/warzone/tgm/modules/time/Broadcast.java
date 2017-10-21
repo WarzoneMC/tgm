@@ -22,13 +22,6 @@ public class Broadcast {
     @Getter int interval;
     @Getter private List<Integer> excludedTimes;
 
-    /*public Broadcast(BroadcastTimeType timeType, String message, int interval) {
-        this.timeType = timeType;
-        this.message = message;
-        this.interval = interval;
-        excludedTimes = new ArrayList<>();
-    }*/
-
     public void run(int time) {
         if (timeType == null || time == 0) return;
         if (timeType.equals(BroadcastTimeType.ABSOLUTE)) {
