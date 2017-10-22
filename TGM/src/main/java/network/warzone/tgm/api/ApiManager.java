@@ -1,5 +1,6 @@
 package network.warzone.tgm.api;
 
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
 import network.warzone.tgm.damage.grave.event.PlayerDeathEvent;
@@ -13,7 +14,6 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
-import lombok.Getter;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
@@ -118,20 +118,6 @@ public class ApiManager implements Listener {
         TGM.get().getTeamClient().finishMatch(matchFinishPacket);
     }
 
-    public void xpEffect(UUID uuid, int before, int ammount, int after) {
-        BossBar bar = Bukkit.createBossBar(ChatColor.GREEN.toString() + before + "/" + after + ChatColor.DARK_GREEN + " +" + ammount, BarColor.GREEN, BarStyle.SEGMENTED_12);
-        bar.setProgress(0.5);
-        bar.addPlayer(Bukkit.getPlayer(uuid));
-        bar.setVisible(true);
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-            bar.setTitle(ChatColor.GREEN.toString() + (before + ammount) + "xp");
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-                bar.setVisible(false);
-                bar.removeAll();
-            }, 60L);
-        }, 60L);
-    }
-
     @EventHandler
     public void onMatchLoad(MatchLoadEvent event) {
         if (isStatsDisabled()) return;
@@ -167,11 +153,8 @@ public class ApiManager implements Listener {
         if (event instanceof PlayerDeathByPlayerEvent) {
             PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(module.getKiller());
             if (context == null) return;
-            //int a = context.getUserProfile().getXP();
             context.getUserProfile().addKill();
             Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, UserProfile.XP_PER_KILL, context.getUserProfile().getXP() - UserProfile.XP_PER_KILL, context.getUserProfile().getXP()));
-            //int b = context.getUserProfile().getXP();
-            //xpEffect(context.getPlayer().getUniqueId(), a, b - a, 6 * context.getUserProfile().getLevel());
 
             killerId = context.getUserProfile().getId().toString();
         }
