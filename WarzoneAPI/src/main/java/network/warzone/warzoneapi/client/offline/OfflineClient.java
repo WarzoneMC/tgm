@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by luke on 4/27/17.
@@ -47,6 +48,16 @@ public class OfflineClient implements TeamClient {
 
     @Override
     public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
+
+    }
+
+    @Override
+    public List<Rank> retrieveRanks() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void updateRank(RankUpdateRequest destroyWoolRequest) {
 
     }
 }

@@ -11,6 +11,9 @@ import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by luke on 4/27/17.
  */
@@ -148,6 +151,44 @@ public class HttpClient implements TeamClient {
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .body(destroyWoolRequest)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<Rank> retrieveRanks() {
+        try {
+            HttpResponse<JsonObject> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json").asObject(JsonObject.class);
+            List<Rank> ranks = new ArrayList<>();
+            for (JsonElement element : ranksResponse.getBody().getAsJsonArray("ranks")) {
+                JsonObject rankObject = (JsonObject) element;
+                ObjectId id = new ObjectId(rankObject.get("_id").getAsString());
+                String prefix = rankObject.get("prefix").getAsString();
+                boolean staff = rankObject.get("staff").getAsBoolean();
+                List<String> permissions = new ArrayList<>();
+                for (JsonElement permission : rankObject.get("permissions").getAsJsonArray()) permissions.add(permission.getAsString());
+                ranks.add(new Rank(id, prefix, permissions, staff));
+            }
+            return ranks;
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void updateRank(RankUpdateRequest rankUpdateRequest) {
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/" + rankUpdateRequest.getPlayer() + "/rank/" + rankUpdateRequest.getAction().name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(rankUpdateRequest)
                     .asJson();
         } catch (UnirestException e) {
             e.printStackTrace();
