@@ -59,7 +59,7 @@ public class CycleCommands {
             i++;
         }
 
-        sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Rotation: \n" + StringUtils.join(maps, "\n"));
+        sender.sendMessage(ChatColor.CYAN.toString() + ChatColor.BOLD + "Rotation: \n" + StringUtils.join(maps, "\n"));
     }
 
 
