@@ -295,7 +295,11 @@ public class CycleCommands {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
             TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, cmd.getJoinedStrings(0));
         }
-    }
+        
+        @Command(aliases = "next", desc = "View the next map in the rotation")
+public static void next(CommandContext cmd, CommandSender sender) {
+    sender.sendMessage(ChatColor.YELLOW + "Next Map: " + ChatColor.GRAY + TGM.get().getMatchManager().getMapRotation().getNext().getMapInfo().getName());
+}
 
     @Command(aliases = "next", desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
