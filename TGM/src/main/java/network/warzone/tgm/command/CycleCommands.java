@@ -354,7 +354,7 @@ public class CycleCommands {
         }
 
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
-        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH + "-------------------------------");
+        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
         player.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
         player.sendMessage("");
         player.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
@@ -366,7 +366,7 @@ public class CycleCommands {
         player.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
         player.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());
         player.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
-        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH + "-------------------------------");
+        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
     }
 
 
