@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules;
 
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.warzoneapi.models.Chat;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
