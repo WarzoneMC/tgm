@@ -46,10 +46,14 @@ public class CycleCommands {
     public static void rotation(CommandContext cmd, CommandSender sender) {
         List<String> maps = new ArrayList<>();
         int i = 1;
-        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapRotation().getMaps()) {
+          for (MapContainer mapContainer : TGM.get().getMatchManager().getMapRotation().getMaps()) {
             if (mapContainer.equals(TGM.get().getMatchManager().getMatch().getMapContainer())) {
                 maps.add(ChatColor.GREEN + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
-            } else {
+            }
+            else if (mapContainer.equals(TGM.get().getMatchManager().getNextMap())) {
+                maps.add(ChatColor.YELLOW + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
+            }
+            else {
                 maps.add(ChatColor.GRAY + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
             }
             i++;
