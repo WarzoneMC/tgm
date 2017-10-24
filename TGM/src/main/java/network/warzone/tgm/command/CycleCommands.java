@@ -3,6 +3,7 @@ package network.warzone.tgm.command;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
+import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.ChatModule;
@@ -25,6 +26,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CycleCommands {
 
@@ -304,8 +306,8 @@ public class CycleCommands {
     
     @Command(aliases = "map", desc = "View the map info for the current map")
     public static void map(CommandContext cmd, CommandSender sender) {
-        MapInfo info = TGM.get().getMatchManager().getMapRotation().getCurrent().getMapInfo();
-        sender.sendMessage(ChatColor.GRAY + "Currently playing " + ChatColor.YELLOW + info.getGametype + ChatColor.GRAY + " on map " + ChatColor.YELLOW + info.getName + ChatColor.GRAY + "by " + ChatColor.YELLOW + StringUtils.join(info.getAuthors(), ", ")());
+        MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
+        sender.sendMessage(ChatColor.GRAY + "Currently playing " + ChatColor.YELLOW + info.getGametype() + ChatColor.GRAY + " on map " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
     }
 
     @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
