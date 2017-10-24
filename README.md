@@ -1,5 +1,5 @@
 # Warzone
-Team oriented minecraft pvp suite
+Minecraft team oritented pvp suite brought to you by Minehut.
 
 ## Project Goals
 
