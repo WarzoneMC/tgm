@@ -1,5 +1,11 @@
 package network.warzone.tgm.command;
 
+import com.google.common.base.Joiner;
+import com.sk89q.minecraft.util.commands.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
@@ -14,10 +20,6 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.user.PlayerContext;
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,31 +33,71 @@ import java.util.stream.Collectors;
 public class CycleCommands {
 
     @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.")
-    public static void maps(CommandContext cmd, CommandSender sender) {
-        List<String> maps = new ArrayList<>();
-        int i = 1;
-        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-            maps.add(ChatColor.GRAY + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
-            i++;
+    public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
+        int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+        List<MapContainer> rot = TGM.get().getMatchManager().getMapLibrary().getMaps();
+        int pages = (int) Math.ceil((rot.size() + 7) / 8);
+        if (index > pages || index <= 0) {
+            throw new CommandException("Invalid page number specified! Maximum page number is " + pages + ".");
         }
+        sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
+        String[] maps = {"", "", "", "", "", "", "", "", ""};
 
-        sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Maps: \n" + StringUtils.join(maps, "\n"));
+        try {
+            for (int i = 0; i <= maps.length - 1; i++) {
+                int position = 9 * (index - 1) + i;
+                MapContainer map = rot.get(position);
+                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
+
+                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
+                } else {
+                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
+                }
+                TextComponent message = new TextComponent(maps[i]);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rot.get(position).getMapInfo().getName()));
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + rot.get(position).getMapInfo().getName()).append("\n\n")
+                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(rot.get(position).getMapInfo().getAuthors())).append("\n")
+                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
+                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + rot.get(position).getMapInfo().getVersion()).create()));
+
+                sender.spigot().sendMessage(message);
+            }
+        } catch (IndexOutOfBoundsException ignored) { }
     }
 
-    @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.")
-    public static void rotation(CommandContext cmd, CommandSender sender) {
-        List<String> maps = new ArrayList<>();
-        int i = 1;
-        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapRotation().getMaps()) {
-            if (mapContainer.equals(TGM.get().getMatchManager().getMatch().getMapContainer())) {
-                maps.add(ChatColor.GREEN + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
-            } else {
-                maps.add(ChatColor.GRAY + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
-            }
-            i++;
+    @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
+    public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
+        int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+        List<MapContainer> rot = TGM.get().getMatchManager().getMapRotation().getMaps();
+        int pages = (int) Math.ceil((rot.size() + 7) / 8);
+        if (index > pages || index <= 0) {
+            throw new CommandException("Invalid page number specified! Maximum page number is " + pages + ".");
         }
+        sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
+        String[] maps = {"", "", "", "", "", "", "", "", ""};
 
-        sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Rotation: \n" + StringUtils.join(maps, "\n"));
+        try {
+            for (int i = 0; i <= maps.length - 1; i++) {
+                int position = 9 * (index - 1) + i;
+                MapContainer map = rot.get(position);
+                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
+
+                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
+                } else {
+                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
+                }
+                TextComponent message = new TextComponent(maps[i]);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rot.get(position).getMapInfo().getName()));
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + rot.get(position).getMapInfo().getName()).append("\n\n")
+                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(rot.get(position).getMapInfo().getAuthors())).append("\n")
+                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
+                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + rot.get(position).getMapInfo().getVersion()).create()));
+
+                sender.spigot().sendMessage(message);
+            }
+        } catch (IndexOutOfBoundsException ignored) { }
     }
 
 
