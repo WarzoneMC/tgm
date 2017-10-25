@@ -18,7 +18,6 @@ import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
 import network.warzone.tgm.player.PlayerManager;
-import network.warzone.tgm.rank.RankManager;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.client.http.HttpClientConfig;
@@ -47,7 +46,6 @@ public class TGM extends JavaPlugin {
 
     @Getter private MatchManager matchManager;
     @Getter private PlayerManager playerManager;
-    @Getter private RankManager rankManager;
     @Getter private JoinManager joinManager;
     @Getter private TrackerPlugin tracker;
     @Getter private GravePlugin grave;
@@ -93,14 +91,11 @@ public class TGM extends JavaPlugin {
 
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
-        rankManager = new RankManager();
         joinManager = new JoinManager();
 //        playerListManager = new PlayerListManager();
         tracker = new TrackerPlugin(this);
         grave = new GravePlugin(this);
         apiManager = new ApiManager();
-
-        rankManager.retrieveRanks();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
         commandManager.register(CycleCommands.class);
