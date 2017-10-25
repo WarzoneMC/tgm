@@ -16,7 +16,7 @@ public class Broadcast extends JavaPlugin implements Listener {
 	}
 	public void broadcast() {
 		final String[] messages = {
-				ChatColor.AQUA + "\n\n\nJoin our community discord by using command " + ChatColor.BLUE + "/discord\n\n\n ",
+				ChatColor.AQUA + "\n\n\nJoin our discord commuity by using the link " + ChatColor.BLUE + "https://discord.gg/kVh2YJ8\n\n\n ",
 				ChatColor.AQUA + "\n\n\nPurchase ranks, tags, and more all at " + ChatColor.BLUE + "https://warzone.store/\n\n\n "
 		};
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
