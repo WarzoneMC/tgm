@@ -16,7 +16,8 @@ public class Players {
         player.setSaturation(20);
         player.getInventory().clear();
         player.getInventory().setArmorContents(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR)});
-        
+        player.setItemOnCursor(new ItemStack(Material.AIR));
+
         player.getActivePotionEffects().forEach(potionEffect -> {
             try {
                 player.removePotionEffect(potionEffect.getType());
