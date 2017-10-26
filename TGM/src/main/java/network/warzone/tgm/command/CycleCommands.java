@@ -49,13 +49,17 @@ public class CycleCommands {
         for (MapContainer mapContainer : TGM.get().getMatchManager().getMapRotation().getMaps()) {
             if (mapContainer.equals(TGM.get().getMatchManager().getMatch().getMapContainer())) {
                 maps.add(ChatColor.GREEN + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
-            } else {
+            }
+            else if (mapContainer.equals(TGM.get().getMatchManager().getNextMap())) {
+                maps.add(ChatColor.YELLOW + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
+            }
+            else {
                 maps.add(ChatColor.GRAY + String.valueOf(i) + ". " + mapContainer.getMapInfo().getName());
             }
             i++;
         }
 
-        sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD + "Rotation: \n" + StringUtils.join(maps, "\n"));
+        sender.sendMessage(ChatColor.CYAN.toString() + ChatColor.BOLD + "Rotation: \n" + StringUtils.join(maps, "\n"));
     }
 
 
