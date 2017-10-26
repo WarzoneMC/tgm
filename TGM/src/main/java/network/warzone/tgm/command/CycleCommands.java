@@ -30,15 +30,15 @@ import java.util.stream.Collectors;
 
 public class CycleCommands {
 
-    @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.")
+    @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.", usage = "[page]")
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
         int pages = (int) Math.ceil((mapLibrary.size() + 7) / 8);
 
-        if ((index > pages) || (index <= 0))
+        if ((index > pages) || (index <= 0)) {
             index = 1;
-
+        }
         sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
         String[] maps = {"", "", "", "", "", "", "", "", ""};
 
@@ -71,10 +71,9 @@ public class CycleCommands {
         List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
         int pages = (int) Math.ceil((rotation.size() + 7) / 8);
 
-        if (index > pages || index <= 0) {
+        if ((index > pages) || (index <= 0)) {
             index = 1;
         }
-
         sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
         String[] maps = {"", "", "", "", "", "", "", "", ""};
 
