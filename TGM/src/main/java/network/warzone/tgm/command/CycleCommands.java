@@ -304,6 +304,11 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.YELLOW + "Next Map: " + ChatColor.GRAY + TGM.get().getMatchManager().getMapRotation().getNext().getMapInfo().getName());
     }
     
+    @Command(aliases = {"website", "web", "site"}, desc = "View warzone official website")
+    public static void next(CommandContext cmd, CommandSender sender) {
+        sender.sendMessage(ChatColor.AQUA + "View stats, leaderboard, store and more all at https://warz.one/ ");
+    }
+    
     @Command(aliases = "map", desc = "View the map info for the current map")
     public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
