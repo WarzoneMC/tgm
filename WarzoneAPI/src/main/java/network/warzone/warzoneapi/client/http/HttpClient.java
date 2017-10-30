@@ -168,11 +168,14 @@ public class HttpClient implements TeamClient {
             for (JsonElement element : ranksResponse.getBody().getAsJsonArray("ranks")) {
                 JsonObject rankObject = (JsonObject) element;
                 ObjectId id = new ObjectId(rankObject.get("_id").getAsString());
-                String prefix = rankObject.get("prefix").getAsString();
-                boolean staff = rankObject.get("staff").getAsBoolean();
+                int priority = (rankObject.has("priority") ? rankObject.get("priority").getAsInt() : 0);
+                String prefix = (rankObject.has("prefix") ? rankObject.get("prefix").getAsString() : null);
+                boolean staff = (rankObject.has("staff") ? rankObject.get("staff").getAsBoolean() : false);
                 List<String> permissions = new ArrayList<>();
-                for (JsonElement permission : rankObject.get("permissions").getAsJsonArray()) permissions.add(permission.getAsString());
-                ranks.add(new Rank(id, prefix, permissions, staff));
+                if (rankObject.has("permissions")) {
+                    for (JsonElement permission : rankObject.get("permissions").getAsJsonArray()) permissions.add(permission.getAsString());
+                }
+                ranks.add(new Rank(id, priority, prefix, permissions, staff));
             }
             return ranks;
         } catch (UnirestException e) {
