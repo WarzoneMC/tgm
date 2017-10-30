@@ -17,10 +17,9 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.permissions.PermissionAttachment;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by luke on 4/27/17.
@@ -30,6 +29,8 @@ public class JoinManager implements Listener {
 
     private List<QueuedJoin> queuedJoins = new ArrayList<>();
     private List<LoginService> loginServices = new ArrayList<>();
+
+    private Map<UUID, PermissionAttachment> attachments = new HashMap<>();
 
     public JoinManager() {
         TGM.registerEvents(this);
@@ -58,7 +59,7 @@ public class JoinManager implements Listener {
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.KICK_BANNED)) return;
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
-        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString());
+        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + (userProfile.getRanks() != null ? userProfile.getRanks() : new ArrayList<>()).size() + " (loaded/total)");
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }
 
@@ -73,6 +74,9 @@ public class JoinManager implements Listener {
 
         PlayerContext playerContext = new PlayerContext(event.getPlayer(), queuedJoin.getUserProfile());
         TGM.get().getPlayerManager().addPlayer(playerContext);
+
+        createAttachment(event.getPlayer());
+        playerContext.getUserProfile().getRanksLoaded().stream().forEach(rank -> addPermissions(event.getPlayer(), rank.getPermissions()));
 
         for (LoginService loginService : loginServices) {
             loginService.login(playerContext);
@@ -113,6 +117,7 @@ public class JoinManager implements Listener {
 
     public void handleQuit(Player player) {
         TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
+        removeAttachment(player);
     }
 
     @AllArgsConstructor @Getter
@@ -120,6 +125,26 @@ public class JoinManager implements Listener {
         private UUID uuid;
         private UserProfile userProfile;
         private long time;
+    }
+
+    private void createAttachment(Player player) {
+        attachments.put(player.getUniqueId(), player.addAttachment(TGM.get()));
+    }
+
+    private void addPermissions(Player player, List<String> permissions) {
+        permissions.stream().forEach(permission -> addPermission(player, permission));
+    }
+
+    private void addPermission(Player player, String permission) {
+        if (attachments.containsKey(player.getUniqueId())) {
+            attachments.get(player.getUniqueId()).setPermission(permission, true);
+        }
+    }
+
+    private void removeAttachment(Player player) {
+        if (attachments.containsKey(player.getUniqueId())) {
+            attachments.remove(player.getUniqueId());
+        }
     }
 
 }
