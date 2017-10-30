@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.bson.types.ObjectId;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +31,7 @@ public class UserProfile {
 
     @Getter private List<String> ips;
     @Getter private List<String> ranks;
+    @Getter private List<Rank> ranksLoaded;
     @Getter private int wins = 0;
     @Getter private int losses = 0;
     @Getter private int kills = 0;
@@ -83,5 +85,10 @@ public class UserProfile {
         nf.setMinimumFractionDigits(2);
         if (getLosses() == 0) return nf.format((double) getWins());
         return nf.format((double) getWins()/getLosses());
+    }
+
+    public String getPrefix() {
+        if (!ranksLoaded.isEmpty()) return ranksLoaded.stream().findFirst().get().getPrefix();
+        else return null;
     }
 }
