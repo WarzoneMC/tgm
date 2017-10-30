@@ -30,8 +30,8 @@ public class UserProfile {
     @Getter private long lastOnlineDate;
 
     @Getter private List<String> ips;
-    @Getter private List<String> ranks;
-    @Getter private List<Rank> ranksLoaded;
+    private List<String> ranks;
+    private List<Rank> ranksLoaded;
     @Getter private int wins = 0;
     @Getter private int losses = 0;
     @Getter private int kills = 0;
@@ -69,6 +69,16 @@ public class UserProfile {
 
     public double getLevelRaw() {
         return (0.6 * Math.sqrt(getXP())) + 1;
+    }
+
+    public List<String> getRanks() {
+        if (ranks == null) ranks = new ArrayList<>();
+        return ranks;
+    }
+
+    public List<Rank> getRanksLoaded() {
+        if (ranksLoaded == null) ranksLoaded = new ArrayList<>();
+        return ranksLoaded;
     }
 
     public String getKDR() {
