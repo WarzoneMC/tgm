@@ -16,6 +16,7 @@ public class Rank {
 
     @SerializedName("_id")
     @Getter private ObjectId id;
+    @Getter private int priority;
     @Getter private String prefix;
     @Getter private List<String> permissions;
     @Getter private boolean staff;
