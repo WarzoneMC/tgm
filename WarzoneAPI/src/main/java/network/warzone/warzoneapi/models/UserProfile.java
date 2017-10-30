@@ -98,7 +98,13 @@ public class UserProfile {
     }
 
     public String getPrefix() {
-        if (!ranksLoaded.isEmpty()) return ranksLoaded.stream().findFirst().get().getPrefix();
+        if (!ranksLoaded.isEmpty()) {
+            Rank highest = ranksLoaded.get(0);
+            for (Rank rank : ranksLoaded) {
+                if (highest.getPriority() < rank.getPriority()) highest = rank;
+            }
+            return highest.getPrefix();
+        }
         else return null;
     }
 }
