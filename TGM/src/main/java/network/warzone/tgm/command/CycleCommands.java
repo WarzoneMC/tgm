@@ -101,7 +101,7 @@ public class CycleCommands {
     }
 
 
-    @Command(aliases = {"cycle"}, desc = "Cycle to a new map.")
+    @Command(aliases = {"cycle", "skip"}, desc = "Cycle to a new map.")
     @CommandPermissions({"tgm.cycle"})
     public static void cycle(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
