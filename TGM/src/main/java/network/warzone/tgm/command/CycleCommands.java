@@ -342,12 +342,12 @@ public class CycleCommands {
     }
     
     @Command(aliases = {"website", "web", "site"}, desc = "View the official warzone website")
-    public static void next(CommandContext cmd, CommandSender sender) {
+    public static void website(CommandContext cmd, CommandSender sender) {
         sender.sendMessage(ChatColor.AQUA + "Access our website at https://warz.one/ ");
     }
     
     @Command(aliases = {"buy", "store"}, desc = "View the official warzone store")
-    public static void next(CommandContext cmd, CommandSender sender) {
+    public static void buy(CommandContext cmd, CommandSender sender) {
         sender.sendMessage(ChatColor.AQUA + "Access our store at http://warzone.store/ ");
     }
 
