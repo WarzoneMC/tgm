@@ -132,7 +132,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void applySpectatorKit(PlayerContext playerContext) {
         Players.reset(playerContext.getPlayer(), false);
         playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
-        playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
+        playerContext.getPlayer().setGameMode(GameMode.CREATIVE);
         playerContext.getPlayer().setAllowFlight(true);
         playerContext.getPlayer().setFlying(true);
 
