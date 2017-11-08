@@ -53,7 +53,7 @@ public class MatchManager {
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (!matchTeam.isSpectator()) {
                 matchTeam.getMembers().forEach(playerContext -> {
-                    playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
+                    playerContext.getPlayer().setGameMode(GameMode.CREATIVE); // Spectators Can't Break Anything (Tested it before)
                     playerContext.getPlayer().setAllowFlight(true);
                     playerContext.getPlayer().setVelocity(new Vector(playerContext.getPlayer().getVelocity().getX(),
                             playerContext.getPlayer().getVelocity().getZ() + 1.0, playerContext.getPlayer().getVelocity().getZ()));
