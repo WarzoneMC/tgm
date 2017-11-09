@@ -56,6 +56,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                         message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was thrown into the void by " +
                                 killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
                                 itemToString(weapon);
+                        module.getKiller().sendMessage("§a§l+1 §bXP §d| §7Killed " + playerTeam.getColor() + module.getPlayerName());
                     } else {
                         message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " fell into the void";
                     }
@@ -63,11 +64,13 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 int distance = ((Double) module.getKillerLocation().distance(module.getPlayerLocation())).intValue();
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was shot by " +
                         killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " from " + distance + " blocks";
+                module.getKiller().sendMessage("§a§l+1 §bXP §d| §7Killed " + playerTeam.getColor() + module.getPlayerName());
             } else {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was killed by " +
                             killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
                             (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the the environment");
+                    module.getKiller().sendMessage("§a§l+1 §bXP §d| §7Killed " + playerTeam.getColor() + module.getPlayerName());
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
                 }
