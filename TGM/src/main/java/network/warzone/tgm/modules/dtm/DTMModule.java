@@ -72,6 +72,7 @@ public class DTMModule extends MatchModule implements Listener {
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
+                    player.sendMessage("§a§l+7 §bXP §d| §7Damaged an objective");
 
 
                     //TODO
@@ -100,6 +101,7 @@ public class DTMModule extends MatchModule implements Listener {
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
+                    player.sendMessage("§a§l+7 §bXP §d| §7Destroyed an objective");
 
                     for (MatchTeam owner : monument.getOwners()) {
                         if (getAliveMonuments(owner).isEmpty()) {
