@@ -67,16 +67,16 @@ public class KillstreakModule extends MatchModule implements Listener {
                         .setCommands(Arrays.asList(
                                 "execute %killername% ~ ~ ~ playsound entity.wither.spawn master @a ~ ~ ~ 1000 1.4", // 1.4 so it doesn't sound the same as the game end sound
                                 "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
-                        )),
+                        ))//,
 
-                new Killstreak()
-                        .setCount(100)
-                        .setMessage("%killercolor%%killername% &7is on a kill streak of &5&l%count%&r&7!")
-                        .setCommands(Arrays.asList(
-                                "execute @a ~ ~ ~ playsound ui.toast.challenge_complete master @p ~ ~100 ~ 1000",
-                                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Colors:[I;16766776],FadeColors:[I;16774912]}]}}}}",
-                                "ban %killername% &c&lDETECTED FOR KILL FARMING&r" // :facepalm:
-                        ))
+                //new Killstreak()
+                //        .setCount(100)
+                //        .setMessage("%killercolor%%killername% &7is on a kill streak of &5&l%count%&r&7!")
+                //        .setCommands(Arrays.asList(
+                //                "execute @a ~ ~ ~ playsound ui.toast.challenge_complete master @p ~ ~100 ~ 1000",
+                //                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Colors:[I;16766776],FadeColors:[I;16774912]}]}}}}",
+                //                "ban %killername% &c&lDETECTED FOR KILL FARMING&r" // :facepalm:
+                //        ))
             ));
         } else { // If json contains killstreaks, read it
             for (JsonElement streakElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("killstreaks")) {
@@ -86,9 +86,6 @@ public class KillstreakModule extends MatchModule implements Listener {
 
                 if (streakJson.has("count")) {
                     killstreak.setCount(streakJson.get("count").getAsInt());
-                } else if (streakJson.has("multiple")) { //TODO Add this
-                    //ks % 10
-                    killstreak.setCount(streakJson.get("multiple").getAsInt());
                 }
 
                 if (streakJson.has("message")) {
@@ -99,6 +96,10 @@ public class KillstreakModule extends MatchModule implements Listener {
                     killstreak.setCommands(new ArrayList<String>(){{
                         streakJson.getAsJsonArray("commands").forEach(jsonElement -> add(jsonElement.getAsString()));
                     }});
+                }
+
+                if (streakJson.has("repeat")) {
+                    killstreak.setRepeat(streakJson.get("repeat").getAsBoolean());
                 }
 
                 killstreaks.add(killstreak);
@@ -140,7 +141,7 @@ public class KillstreakModule extends MatchModule implements Listener {
         players.put(killedUuid, 0);
 
         killstreaks.forEach(killstreak -> {
-            if (players.get(killerUuid) == killstreak.getCount()) {
+            if (!killstreak.isRepeat() && players.get(killerUuid) == killstreak.getCount() || killstreak.isRepeat() && players.get(killerUuid) % killstreak.getCount() == 0) {
                 Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
                         .replace("%killername%", module.getKillerName())
                         .replace("%killercolor%", module.getKillerTeam().getColor().toString())
