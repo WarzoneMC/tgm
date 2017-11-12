@@ -4,6 +4,7 @@ import com.sk89q.minecraft.util.commands.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -44,6 +45,7 @@ public class PunishmentCommands {
         warned.sendMessage(ChatColor.RED + "Warned by: " + ChatColor.GOLD + sender.getName());
         warned.sendMessage(ChatColor.RED + "Reason: " + ChatColor.GOLD + reason);
         warned.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "------------------------------");
+        warned.playSound(warned.getLocation(), Sound.ENTITY_GHAST_SCREAM, 1, 0); // Added Sound when a player gets warned (Suggested by @Vice)
         // Maybe i should add playerTeam.getColor() + module.getPlayerName()
         Bukkit.broadcast(ChatColor.GRAY + "[" + ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + ": Warned " + warned.getDisplayName(), Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
     }
