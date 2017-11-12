@@ -67,16 +67,16 @@ public class KillstreakModule extends MatchModule implements Listener {
                         .setCommands(Arrays.asList(
                                 "execute %killername% ~ ~ ~ playsound entity.wither.spawn master @a ~ ~ ~ 1000 1.4", // 1.4 so it doesn't sound the same as the game end sound
                                 "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
-                        ))//,
+                        )),
 
-                //new Killstreak()
-                //        .setCount(100)
-                //        .setMessage("%killercolor%%killername% &7is on a kill streak of &5&l%count%&r&7!")
-                //        .setCommands(Arrays.asList(
-                //                "execute @a ~ ~ ~ playsound ui.toast.challenge_complete master @p ~ ~100 ~ 1000",
-                //                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Colors:[I;16766776],FadeColors:[I;16774912]}]}}}}",
-                //                "ban %killername% &c&lDETECTED FOR KILL FARMING&r" // :facepalm:
-                //        ))
+                new Killstreak()
+                        .setCount(100)
+                        .setMessage("%killercolor%%killername% &7is on a kill streak of &5&l%count%&r&7!")
+                        .setCommands(Arrays.asList(
+                                "execute @a ~ ~ ~ playsound ui.toast.challenge_complete master @p ~ ~100 ~ 1000",
+                                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Colors:[I;16766776],FadeColors:[I;16774912]}]}}}}"//,
+                                //"ban %killername% &c&lDETECTED FOR KILL FARMING&r" // :facepalm:
+                        ))
             ));
         } else { // If json contains killstreaks, read it
             for (JsonElement streakElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("killstreaks")) {
