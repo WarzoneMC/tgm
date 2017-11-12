@@ -31,7 +31,7 @@ public class PunishmentCommands {
 
 
 
-    @Command(aliases = {"warn", "w"}, desc = "Warn a player.", usage = "<player> [reason]", min = 1)
+    @Command(aliases = {"warn"}, desc = "Warn a player.", usage = "<player> [reason]", min = 1)
     @CommandPermissions("tgm.warn")
     public static void warn(CommandContext cmd, CommandSender sender) throws CommandException {
         Player warned = Bukkit.getPlayer(cmd.getString(0));
