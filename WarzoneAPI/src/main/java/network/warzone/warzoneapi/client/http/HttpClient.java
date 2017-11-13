@@ -153,4 +153,20 @@ public class HttpClient implements TeamClient {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
+        try {
+            HttpResponse<IssuePunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/issue_punishment")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(issuePunishmentRequest)
+                    .asObject(IssuePunishmentResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -49,4 +49,9 @@ public class OfflineClient implements TeamClient {
     public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
 
     }
+
+    @Override
+    public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
+        return null;
+    }
 }
