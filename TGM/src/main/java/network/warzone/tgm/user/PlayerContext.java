@@ -36,7 +36,7 @@ public class PlayerContext {
             return ChatColor.RED + "[" + level + "]";
         }
         else if (level < 80) {
-            return ChatColor.PINK + "[" + level + "]";
+            return ChatColor.LIGHT_PURPLE + "[" + level + "]";
         }
         else if (level < 100) {
             return ChatColor.DARK_PURPLE + "[" + level + "]";
