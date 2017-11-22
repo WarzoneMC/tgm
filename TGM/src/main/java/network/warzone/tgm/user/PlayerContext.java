@@ -40,8 +40,17 @@ public class PlayerContext {
         }
         else if (level < 100) {
             return ChatColor.DARK_PURPLE + "[" + level + "]";
-        } else {
+        } 
+        else if (level < 150) {
             return ChatColor.GOLD + "[" + level + "]";
+        }
+        else if (level < 200) {
+            return ChatColor.YELLOW + "[" + level + "]";
+        }
+        else if (level < 250) {
+            return ChatColor.DARK_AQUA + "[" + level + "]";
+        } else {
+            return ChatColor.AQUA + "[" + level + "]";
         }
     }
 }
