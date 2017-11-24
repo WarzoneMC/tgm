@@ -142,12 +142,13 @@ public class KillstreakModule extends MatchModule implements Listener {
 
         killstreaks.forEach(killstreak -> {
             if (!killstreak.isRepeat() && players.get(killerUuid) == killstreak.getCount() || killstreak.isRepeat() && players.get(killerUuid) % killstreak.getCount() == 0) {
-                Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
-                        .replace("%killername%", module.getKillerName())
-                        .replace("%killercolor%", module.getKillerTeam().getColor().toString())
-                        .replace("%killedname%", module.getPlayerName())
-                        .replace("%count%", String.valueOf(killstreak.getCount()))
-                );
+                if (killstreak.getMessage() != null && !killstreak.getMessage().isEmpty())
+                    Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
+                            .replace("%killername%", module.getKillerName())
+                            .replace("%killercolor%", module.getKillerTeam().getColor().toString())
+                            .replace("%killedname%", module.getPlayerName())
+                            .replace("%count%", String.valueOf(killstreak.getCount()))
+                    );
 
                 killstreak.getCommands().forEach(s -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ColorConverter.filterString(s)
                         .replace("%killername%", module.getKillerName())
