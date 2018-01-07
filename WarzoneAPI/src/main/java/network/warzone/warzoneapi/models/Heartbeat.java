@@ -11,12 +11,14 @@ import java.util.List;
 public class Heartbeat {
     @Getter private final String name;
     @Getter private final String id;
-    @Getter private List<String> players; //object ids
+    @Getter private List<String> players;
     @Getter private int playerCount;
     @Getter private int spectatorCount;
     @Getter private int maxPlayers;
     @Getter private String map;
     @Getter private String gametype;
+
+    @Getter private long startedAt;
 
     @SerializedName("_id")
     @Getter private ObjectId serverId;
