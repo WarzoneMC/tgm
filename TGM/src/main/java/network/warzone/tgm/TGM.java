@@ -2,6 +2,8 @@ package network.warzone.tgm;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import network.warzone.tgm.command.PrivateMessageCommands;
+import network.warzone.tgm.command.PunishmentCommands;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.client.http.HttpClientConfig;
@@ -99,6 +101,8 @@ public class TGM extends JavaPlugin {
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
         commandManager.register(CycleCommands.class);
+        commandManager.register(PunishmentCommands.class); // Made by michael / Thrasilias
+        commandManager.register(PrivateMessageCommands.class); // Made by michael / Thrasilias
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
