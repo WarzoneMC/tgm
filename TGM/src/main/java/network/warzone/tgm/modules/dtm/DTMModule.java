@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static network.warzone.warzoneapi.models.UserProfile.XP_PER_WOOL_BREAK;
+
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
@@ -72,6 +74,7 @@ public class DTMModule extends MatchModule implements Listener {
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
+                    player.sendMessage("§a+" + XP_PER_WOOL_BREAK + " §bXP §7| §6Damaged an objective");
 
 
                     //TODO
@@ -87,7 +90,7 @@ public class DTMModule extends MatchModule implements Listener {
 
                     PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
                     playerContext.getUserProfile().addWoolDestroy();
-                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
                     Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
 
                 }
@@ -100,6 +103,7 @@ public class DTMModule extends MatchModule implements Listener {
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
+                    player.sendMessage("§a+" + XP_PER_WOOL_BREAK + " §bXP §7| §6Destroyed an objective");
 
                     for (MatchTeam owner : monument.getOwners()) {
                         if (getAliveMonuments(owner).isEmpty()) {
@@ -111,7 +115,7 @@ public class DTMModule extends MatchModule implements Listener {
                     if (TGM.get().getApiManager().isStatsDisabled()) return;
                     PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
                     playerContext.getUserProfile().addWoolDestroy();
-                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
                     Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
                 }
             });
