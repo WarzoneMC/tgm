@@ -94,7 +94,7 @@ public class ColorConverter {
             case ORANGE:
                 return ChatColor.GOLD;
             case MAGENTA:
-                return ChatColor.LIGHT_PURPLE;
+                return ChatColor.DARK_PURPLE;
             case LIGHT_BLUE:
                 return ChatColor.BLUE;
             case YELLOW:
@@ -102,7 +102,8 @@ public class ColorConverter {
             case LIME:
                 return ChatColor.GREEN;
             case PINK:
-                return ChatColor.RED;
+                //return ChatColor.RED;
+                return ChatColor.LIGHT_PURPLE;
             case GRAY:
                 return ChatColor.DARK_GRAY;
             case SILVER:
