@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.v1_12_R1.EntityPlayer;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
@@ -23,6 +24,7 @@ import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -386,7 +388,18 @@ public class CycleCommands {
             viewStats(player, cmd.getString(0));
         }
     }
-
+    @Command(aliases = {"ping"}, desc = "View a player's ping", usage = "(online player)")
+    public static void ping(final CommandContext cmd, CommandSender sender) {
+        Player player;
+        if (cmd.argsLength() == 0 && sender instanceof Player) {
+            player = (Player) sender;
+        } else {
+            player = Bukkit.getPlayer(cmd.getString(0));
+        }
+        CraftPlayer cp = (CraftPlayer) player;
+        EntityPlayer ep = cp.getHandle();
+        sender.sendMessage(ChatColor.RED + player.getName() + ChatColor.GREEN + "'s ping: " + String.valueOf(ep.ping));
+    }
     public static void viewStats(Player player, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
