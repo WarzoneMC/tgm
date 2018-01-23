@@ -91,7 +91,7 @@ public class WoolObjective implements Listener {
     public void onWoolCraft(CraftItemEvent event) {
         if (event.getRecipe().getResult().getType() == Material.WOOL) {
             event.setCancelled(true);
-            event.getWhoClicked().sendMessage(ChatColor.RED + "You are now allowed to craft wool.");
+            event.getWhoClicked().sendMessage(ChatColor.RED + "You are not allowed to craft wool.");
         }
     }
 
