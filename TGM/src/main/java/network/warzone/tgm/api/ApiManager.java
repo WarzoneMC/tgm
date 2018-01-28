@@ -17,16 +17,11 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ApiManager implements Listener {
 
@@ -50,17 +45,13 @@ public class ApiManager implements Listener {
                     e.printStackTrace();
                 }
             }
-            int maxPlayers = 0;
+            int maxPlayers = Bukkit.getMaxPlayers();
             int spectatorCount = 0;
-            int playerCount = 0;
+            int playerCount = playerNames.size();
             for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
                 if (matchTeam.isSpectator()) {
                     spectatorCount += matchTeam.getMembers().size();
-                    continue;
                 }
-
-                maxPlayers += matchTeam.getMax();
-                playerCount += matchTeam.getMembers().size();
             }
             Heartbeat heartbeat = new Heartbeat(
                     TGM.get().getConfig().getString("server.name"),
