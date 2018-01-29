@@ -47,7 +47,7 @@ public class ApiManager implements Listener {
             }
             int maxPlayers = Bukkit.getMaxPlayers();
             int spectatorCount = 0;
-            int playerCount = playerNames.size();
+            int playerCount = Bukkit.getOnlinePlayers().size();
             for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
                 if (matchTeam.isSpectator()) {
                     spectatorCount += matchTeam.getMembers().size();
