@@ -12,6 +12,7 @@ public class Heartbeat {
     @Getter private final String name;
     @Getter private final String id;
     @Getter private List<String> players; //object ids
+    @Getter private List<String> playerNames;
     @Getter private int playerCount;
     @Getter private int spectatorCount;
     @Getter private int maxPlayers;
