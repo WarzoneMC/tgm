@@ -14,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 public class UserProfile {
 
-    public static final int XP_PER_KILL = 1,
+    public static final int XP_PER_KILL = 2,
                             XP_PER_WIN = 10,
                             XP_PER_LOSS = 5,
-                            XP_PER_WOOL_BREAK = 7;
+                            XP_PER_WOOL_BREAK = 3;
 
     @SerializedName("_id")
     @Getter private ObjectId id;
