@@ -75,12 +75,14 @@ public class StartCountdown extends BossBarCountdown {
         getBossBar().setVisible(false);
         TGM.get().getMatchManager().startMatch();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 2);
-            if (!TGM.get().getModule(TeamManagerModule.class).getSpectators().containsPlayer(player)) {
-                player.sendTitle(ChatColor.GREEN + "GO!", "", 0, 5, 15);
-            }
-        }
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+            Bukkit.getOnlinePlayers().stream().forEach(player -> {
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 1, 2);
+                if (!TGM.get().getModule(TeamManagerModule.class).getSpectators().containsPlayer(player)) {
+                    player.sendTitle(ChatColor.GREEN + "GO!", "", 0, 5, 15);
+                }
+            });
+        }, 2L);
     }
 
     @Override
