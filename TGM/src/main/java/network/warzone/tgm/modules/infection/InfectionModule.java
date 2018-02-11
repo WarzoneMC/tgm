@@ -183,12 +183,13 @@ public class InfectionModule extends MatchModule implements Listener {
     private void refresh(PlayerContext playerContext, MatchTeam matchTeam) {
         Players.reset(playerContext.getPlayer(), true);
 
-        matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-        playerContext.getPlayer().updateInventory();
-        playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-        playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
-        playerContext.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
-
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+            matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+            playerContext.getPlayer().updateInventory();
+            playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
+            playerContext.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
+        }, 1L);
     }
 
     @EventHandler
