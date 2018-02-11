@@ -9,7 +9,6 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
-import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.PublicMenu;
 import org.bukkit.Bukkit;
@@ -130,7 +129,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {
-        Players.reset(playerContext.getPlayer(), false);
+
         playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().setAllowFlight(true);
