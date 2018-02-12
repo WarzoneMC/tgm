@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.killstreak;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.damage.grave.event.PlayerDeathEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -142,20 +143,22 @@ public class KillstreakModule extends MatchModule implements Listener {
 
         killstreaks.forEach(killstreak -> {
             if (!killstreak.isRepeat() && players.get(killerUuid) == killstreak.getCount() || killstreak.isRepeat() && players.get(killerUuid) % killstreak.getCount() == 0) {
-                if (killstreak.getMessage() != null && !killstreak.getMessage().isEmpty())
-                    Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
+                Bukkit.getScheduler().runTask(TGM.get(), () -> {
+                    if (killstreak.getMessage() != null && !killstreak.getMessage().isEmpty())
+                        Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
+                                .replace("%killername%", module.getKillerName())
+                                .replace("%killercolor%", module.getKillerTeam().getColor().toString())
+                                .replace("%killedname%", module.getPlayerName())
+                                .replace("%count%", String.valueOf(killstreak.getCount()))
+                        );
+
+                    killstreak.getCommands().forEach(s -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ColorConverter.filterString(s)
                             .replace("%killername%", module.getKillerName())
                             .replace("%killercolor%", module.getKillerTeam().getColor().toString())
                             .replace("%killedname%", module.getPlayerName())
-                            .replace("%count%", String.valueOf(killstreak.getCount()))
+                            .replace("%count%", String.valueOf(killstreak.getCount())))
                     );
-
-                killstreak.getCommands().forEach(s -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ColorConverter.filterString(s)
-                        .replace("%killername%", module.getKillerName())
-                        .replace("%killercolor%", module.getKillerTeam().getColor().toString())
-                        .replace("%killedname%", module.getPlayerName())
-                        .replace("%count%", String.valueOf(killstreak.getCount())))
-                );
+                });
             }
         });
     }
