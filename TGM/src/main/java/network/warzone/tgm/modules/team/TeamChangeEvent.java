@@ -1,8 +1,8 @@
 package network.warzone.tgm.modules.team;
 
-import network.warzone.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -14,13 +14,13 @@ import org.bukkit.event.HandlerList;
  * 2. The map cycles.
  */
 
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class TeamChangeEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
-    @Getter PlayerContext playerContext;
-    @Getter MatchTeam team;
-    @Getter MatchTeam oldTeam;
+    private PlayerContext playerContext;
+    private MatchTeam team;
+    private MatchTeam oldTeam;
 
     @Override
     public HandlerList getHandlers() {
