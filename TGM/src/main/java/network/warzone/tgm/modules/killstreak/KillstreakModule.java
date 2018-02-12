@@ -2,16 +2,16 @@ package network.warzone.tgm.modules.killstreak;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.tgm.damage.grave.event.PlayerDeathEvent;
+import lombok.Getter;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.util.ColorConverter;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -109,7 +109,7 @@ public class KillstreakModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST) // DeathMessageModule sets killer to null so this has to be first
     public void onKill(PlayerDeathEvent event) {
-        DeathModule module = deathModule.getPlayer(event.getPlayer());
+        DeathModule module = deathModule.getPlayer(event.getEntity());
 
         if (module.getKiller() == null) {
             if (players.getOrDefault(module.getPlayer().getUniqueId().toString(), 0) >= 5) {

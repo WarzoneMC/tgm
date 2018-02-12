@@ -9,7 +9,9 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.SpawnPointHandlerModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -25,12 +27,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -51,8 +54,11 @@ public class BlitzModule extends MatchModule implements Listener {
     private String subtitle = ChatColor.GREEN + "Remaining lives:  " + ChatColor.YELLOW + "%lives%";
     private String actionbar = "";
 
+    private Match match;
+
     @Override
     public void load(Match match) {
+        this.match = match;
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         JsonObject mapInfo = match.getMapContainer().getMapInfo().getJsonObject();
         if (mapInfo.has("blitz")) {
@@ -135,7 +141,7 @@ public class BlitzModule extends MatchModule implements Listener {
         if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManagerModule.getTeam(player).isSpectator()) return;
         if (player.getHealth() - event.getFinalDamage() >= 0.5) return;
 
-        createDeath(event);
+        createDeath((Player) event.getEntity());
         removeLife(player);
 
         event.setDamage(0);
@@ -172,17 +178,13 @@ public class BlitzModule extends MatchModule implements Listener {
         }
     }
 
-    public void createDeath(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
-        if (TGM.get().getApiManager().isStatsDisabled()) {
-            return;
-        }
+    public void createDeath(Player player) {
+        if (TGM.get().getApiManager().isStatsDisabled()) return;
 
-        Player player = (Player) event.getEntity();
-        List<ItemStack> drops = Arrays.asList(player.getInventory().getContents());
-
-        TGM.get().getGrave().getPlayerListener().onEntityDeath(new EntityDeathEvent(player, drops, player.getTotalExperience()));
-
+        DeathModule deathModule = match.getModule(DeathModule.class).getPlayer(player);
+        Bukkit.getScheduler().runTask(TGM.get(), () -> Bukkit.getPluginManager().callEvent(
+                new TGMPlayerDeathEvent(player, deathModule.getKiller(), deathModule.getCause(), deathModule.getItem()))
+        );
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
