@@ -52,7 +52,7 @@ public class StatsModule extends MatchModule implements Listener{
         player.sendMessage(ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "----------------------------------------");
         player.sendMessage(ChatColor.GREEN +  "" +  ChatColor.BOLD + " Level up!" + ChatColor.GREEN + " You are now level " + ChatColor.RED + event.getToLevel());
         player.sendMessage(ChatColor.AQUA + "" + ChatColor.STRIKETHROUGH + "----------------------------------------");
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
+        player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.ENTITY_PLAYER_LEVELUP, 1000, 1);
     }
 
 }
