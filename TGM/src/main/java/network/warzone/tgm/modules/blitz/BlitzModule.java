@@ -141,50 +141,50 @@ public class BlitzModule extends MatchModule implements Listener {
         if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManagerModule.getTeam(player).isSpectator()) return;
         if (player.getHealth() - event.getFinalDamage() >= 0.5) return;
 
-        createDeath((Player) event.getEntity());
-        removeLife(player);
-
         event.setDamage(0);
-        TGM.get().getModule(SpawnPointHandlerModule.class).spawnPlayer(TGM.get().getPlayerManager().getPlayerContext(player), teamManagerModule.getTeam(player), false);
+        Bukkit.getScheduler().runTask(TGM.get(), () -> {
+            createDeath((Player) event.getEntity());
+            removeLife(player);
 
-        if (getLives(player) <= 0) {
-            player.setGameMode(GameMode.SPECTATOR);
-            player.setAllowFlight(true);
-            player.setFlying(true);
-            player.getInventory().clear();
+            TGM.get().getModule(SpawnPointHandlerModule.class).spawnPlayer(TGM.get().getPlayerManager().getPlayerContext(player), teamManagerModule.getTeam(player), false);
 
-            if (player.getLocation().getY() < 0) {
+            if (getLives(player) <= 0) {
+                player.setGameMode(GameMode.SPECTATOR);
+                player.setAllowFlight(true);
+                player.setFlying(true);
+                player.getInventory().clear();
+
+                if (player.getLocation().getY() < 0) {
+                    player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                }
+
+                MatchTeam team = teamManagerModule.getTeam(player);
+                updateScoreboardTeamLine(team, getAlivePlayers(team).size());
+
+                Bukkit.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
+                player.sendTitle("", ChatColor.RED + "You have been eliminated.");
+
+            } else {
+                showLives(player);
                 player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
 
-            MatchTeam team = teamManagerModule.getTeam(player);
-            updateScoreboardTeamLine(team, getAlivePlayers(team).size());
-
-            Bukkit.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
-            player.sendTitle("", ChatColor.RED + "You have been eliminated.");
-
-        } else {
-            showLives(player);
-            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-        }
-
-        if (lastTeamAlive()) {
-            MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst().get();
-            if (winnerTeam == null) {
-                winnerTeam = teamManagerModule.getTeams().get(1);
+            if (lastTeamAlive()) {
+                MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst().get();
+                if (winnerTeam == null) {
+                    winnerTeam = teamManagerModule.getTeams().get(1);
+                }
+                TGM.get().getMatchManager().endMatch(winnerTeam);
+                return;
             }
-            TGM.get().getMatchManager().endMatch(winnerTeam);
-            return;
-        }
+        });
     }
 
     public void createDeath(Player player) {
         if (TGM.get().getApiManager().isStatsDisabled()) return;
 
         DeathModule deathModule = match.getModule(DeathModule.class).getPlayer(player);
-        Bukkit.getScheduler().runTask(TGM.get(), () -> Bukkit.getPluginManager().callEvent(
-                new TGMPlayerDeathEvent(player, deathModule.getKiller(), deathModule.getCause(), deathModule.getItem()))
-        );
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathModule.getKiller(), deathModule.getCause(), deathModule.getItem()));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
