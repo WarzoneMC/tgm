@@ -34,4 +34,8 @@ public interface TeamClient {
 
     IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest);
 
+    PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest);
+
+    RevertPunishmentResponse revertPunishment(String id);
+
 }

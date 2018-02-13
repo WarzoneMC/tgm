@@ -11,5 +11,6 @@ public class IssuePunishmentResponse {
     private boolean kickable;
 
     private String name;
+    private String ip;
 
 }

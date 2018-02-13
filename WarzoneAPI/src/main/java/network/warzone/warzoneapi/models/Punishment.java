@@ -2,8 +2,10 @@ package network.warzone.warzoneapi.models;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -17,11 +19,26 @@ public class Punishment {
 
     private String type;
 
+    private String ip;
+    private boolean ip_ban;
+
     private long issued;
     private long expires;
 
     private String reason;
 
-    private boolean reverted;
+    @Setter private boolean reverted;
+
+    public boolean isActive() {
+        if (this.reverted) {
+            return false;
+        } else {
+            if (this.expires == -1) {
+                return true;
+            } else {
+                return this.expires > new Date().getTime();
+            }
+        }
+    }
 
 }

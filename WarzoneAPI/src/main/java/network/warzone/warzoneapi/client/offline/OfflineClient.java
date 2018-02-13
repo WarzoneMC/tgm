@@ -22,7 +22,7 @@ public class OfflineClient implements TeamClient {
     public UserProfile login(PlayerLogin playerLogin) {
         return new UserProfile(new ObjectId(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
                 playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Arrays.asList(playerLogin.getIp()), new ArrayList<>(),
-                0, 0, 0, 0, 0, new ArrayList<>());
+                0, 0, 0, 0, 0, new ArrayList<>(), new ArrayList<>());
     }
 
     @Override
@@ -52,6 +52,16 @@ public class OfflineClient implements TeamClient {
 
     @Override
     public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
+        return null;
+    }
+
+    @Override
+    public PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest) {
+        return null;
+    }
+
+    @Override
+    public RevertPunishmentResponse revertPunishment(String id) {
         return null;
     }
 }
