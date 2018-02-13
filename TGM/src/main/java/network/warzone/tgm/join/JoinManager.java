@@ -1,13 +1,14 @@
 package network.warzone.tgm.join;
 
-import network.warzone.warzoneapi.models.UserProfile;
-import network.warzone.warzoneapi.models.PlayerLogin;
-import network.warzone.tgm.TGM;
-import network.warzone.tgm.match.MatchPostLoadEvent;
-import network.warzone.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.MatchPostLoadEvent;
+import network.warzone.tgm.user.PlayerContext;
+import network.warzone.warzoneapi.models.PlayerLogin;
+import network.warzone.warzoneapi.models.Punishment;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,6 +60,16 @@ public class JoinManager implements Listener {
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.KICK_BANNED)) return;
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
+        Punishment punishment;
+        if ((punishment = userProfile.getLatestBan()) != null) {
+            event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
+                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
+                    + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
+                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC"
+            );
+            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
+            return;
+        }
         Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString());
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }

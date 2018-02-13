@@ -2,14 +2,13 @@ package network.warzone.tgm.api;
 
 import lombok.Getter;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
-import network.warzone.tgm.damage.grave.event.PlayerDeathEvent;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.ParsedTeam;
 import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
@@ -17,16 +16,11 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ApiManager implements Listener {
 
@@ -41,29 +35,28 @@ public class ApiManager implements Listener {
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(TGM.get(), () -> {
             List<String> players = new ArrayList<>();
+            List<String> playerNames = new ArrayList<>();
             for (PlayerContext playerContext : TGM.get().getPlayerManager().getPlayers()) {
                 try {
                     players.add(playerContext.getUserProfile().getId().toString());
+                    playerNames.add(playerContext.getUserProfile().getName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            int maxPlayers = 0;
+            int maxPlayers = Bukkit.getMaxPlayers();
             int spectatorCount = 0;
-            int playerCount = 0;
+            int playerCount = Bukkit.getOnlinePlayers().size();
             for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
                 if (matchTeam.isSpectator()) {
                     spectatorCount += matchTeam.getMembers().size();
-                    continue;
                 }
-
-                maxPlayers += matchTeam.getMax();
-                playerCount += matchTeam.getMembers().size();
             }
             Heartbeat heartbeat = new Heartbeat(
                     TGM.get().getConfig().getString("server.name"),
                     TGM.get().getConfig().getString("server.id"),
                     players,
+                    playerNames,
                     playerCount,
                     spectatorCount,
                     maxPlayers,
@@ -138,19 +131,19 @@ public class ApiManager implements Listener {
     }
 
     @EventHandler
-    public void onKill(PlayerDeathEvent event) {
+    public void onKill(TGMPlayerDeathEvent event) {
         if (isStatsDisabled()) return;
-        DeathModule module = deathModule.getPlayer(event.getPlayer());
+        DeathModule module = deathModule.getPlayer(event.getVictim());
 
         PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(module.getPlayer());
 
         killed.getUserProfile().addDeath();
 
-        String playerItem = event.getPlayer().getInventory().getItemInMainHand() == null ? "" : event.getPlayer().getInventory().getItemInMainHand().getType().toString();
+        String playerItem = module.getPlayer().getInventory().getItemInMainHand() == null ? "" : module.getPlayer().getInventory().getItemInMainHand().getType().toString();
         String killerItem = module.getItem() == null ? "" : module.getItem().getType().toString();
         String killerId = null;
 
-        if (event instanceof PlayerDeathByPlayerEvent) {
+        if (module.getKiller() != null) {
             PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(module.getKiller());
             if (context == null) return;
             context.getUserProfile().addKill();

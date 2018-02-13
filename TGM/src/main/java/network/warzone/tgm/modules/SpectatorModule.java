@@ -9,7 +9,6 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
-import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.PublicMenu;
 import org.bukkit.Bukkit;
@@ -24,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -37,7 +37,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,7 +128,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {
-        Players.reset(playerContext.getPlayer(), false);
+
         playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().setAllowFlight(true);
@@ -169,13 +168,15 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onVoidDamage(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player && isSpectating((Player) event.getEntity())) {
-            if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                event.setCancelled(true); //
-                event.getEntity().setVelocity(new Vector(event.getEntity().getVelocity().getX(),
-                        event.getEntity().getVelocity().getZ() + 10.0, event.getEntity().getVelocity().getZ()));
-                ((Player) event.getEntity()).setAllowFlight(true); // Prevent IllegalArgumentException: Cannot make player fly if getAllowFlight() is false.
-                ((Player) event.getEntity()).setFlying(true);
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+
+            if (isSpectating(player) && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                event.setCancelled(true);
+
+                player.setAllowFlight(true);
+                player.getVelocity().setY(2.0); // Get out of that void!
+                player.setFlying(true);
             }
         }
     }
@@ -203,7 +204,14 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onInventoryMove(InventoryMoveItemEvent event) {
-        if (event instanceof Player && isSpectating((Player) event.getInitiator().getHolder())) {
+        if (event.getInitiator().getHolder() instanceof Player && isSpectating((Player) event.getInitiator().getHolder())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getWhoClicked() instanceof Player && isSpectating((Player) event.getWhoClicked())) {
             event.setCancelled(true);
         }
     }

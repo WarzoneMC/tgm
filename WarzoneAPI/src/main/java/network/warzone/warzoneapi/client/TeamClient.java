@@ -31,4 +31,11 @@ public interface TeamClient {
     void finishMatch(MatchFinishPacket matchFinishPacket);
 
     void destroyWool(DestroyWoolRequest destroyWoolRequest);
+
+    IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest);
+
+    PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest);
+
+    RevertPunishmentResponse revertPunishment(String id);
+
 }

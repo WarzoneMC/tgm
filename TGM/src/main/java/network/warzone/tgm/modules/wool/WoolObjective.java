@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules.wool;
 
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.TimeModule;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
@@ -91,7 +91,7 @@ public class WoolObjective implements Listener {
     public void onWoolCraft(CraftItemEvent event) {
         if (event.getRecipe().getResult().getType() == Material.WOOL) {
             event.setCancelled(true);
-            event.getWhoClicked().sendMessage(ChatColor.RED + "You are now allowed to craft wool.");
+            event.getWhoClicked().sendMessage(ChatColor.RED + "You are not allowed to craft wool.");
         }
     }
 

@@ -12,6 +12,7 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.visibility.VisibilityModule;
 
 import java.util.ArrayList;

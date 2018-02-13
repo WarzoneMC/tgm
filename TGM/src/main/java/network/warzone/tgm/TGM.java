@@ -2,13 +2,14 @@ package network.warzone.tgm;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import network.warzone.warzoneapi.client.TeamClient;
-import network.warzone.warzoneapi.client.http.HttpClient;
-import network.warzone.warzoneapi.client.http.HttpClientConfig;
-import network.warzone.warzoneapi.client.offline.OfflineClient;
+import network.warzone.tgm.command.PunishCommands;
+import com.sk89q.bukkit.util.CommandsManagerRegistration;
+import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+import com.sk89q.minecraft.util.commands.CommandsManager;
+import lombok.Getter;
 import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.command.CycleCommands;
-import network.warzone.tgm.damage.grave.GravePlugin;
 import network.warzone.tgm.damage.tracker.plugin.TrackerPlugin;
 import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapInfo;
@@ -17,11 +18,10 @@ import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
 import network.warzone.tgm.player.PlayerManager;
-import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.minecraft.util.commands.CommandsManager;
-import lombok.Getter;
+import network.warzone.warzoneapi.client.TeamClient;
+import network.warzone.warzoneapi.client.http.HttpClient;
+import network.warzone.warzoneapi.client.http.HttpClientConfig;
+import network.warzone.warzoneapi.client.offline.OfflineClient;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -48,7 +48,6 @@ public class TGM extends JavaPlugin {
     @Getter private PlayerManager playerManager;
     @Getter private JoinManager joinManager;
     @Getter private TrackerPlugin tracker;
-    @Getter private GravePlugin grave;
     @Getter private ApiManager apiManager;
 
     public static TGM get() {
@@ -94,11 +93,11 @@ public class TGM extends JavaPlugin {
         joinManager = new JoinManager();
 //        playerListManager = new PlayerListManager();
         tracker = new TrackerPlugin(this);
-        grave = new GravePlugin(this);
         apiManager = new ApiManager();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
         commandManager.register(CycleCommands.class);
+        if (apiConfig.getBoolean("enabled", false)) commandManager.register(PunishCommands.class);
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
