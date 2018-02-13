@@ -153,4 +153,52 @@ public class HttpClient implements TeamClient {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
+        try {
+            HttpResponse<IssuePunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/issue_punishment")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(issuePunishmentRequest)
+                    .asObject(IssuePunishmentResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest) {
+        try {
+            HttpResponse<PunishmentsListResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/punishments")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(punishmentsListRequest)
+                    .asObject(PunishmentsListResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public RevertPunishmentResponse revertPunishment(String id) {
+        try {
+            HttpResponse<RevertPunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/revert_punishment")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(new RevertPunishmentRequest(new ObjectId(id)))
+                    .asObject(RevertPunishmentResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
