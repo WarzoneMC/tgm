@@ -2,16 +2,17 @@ package network.warzone.tgm.modules.killstreak;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.tgm.damage.grave.event.PlayerDeathEvent;
+import lombok.Getter;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.util.ColorConverter;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -109,53 +110,56 @@ public class KillstreakModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST) // DeathMessageModule sets killer to null so this has to be first
     public void onKill(PlayerDeathEvent event) {
-        DeathModule module = deathModule.getPlayer(event.getPlayer());
+        DeathModule module = deathModule.getPlayer(event.getEntity());
 
-        if (module.getKiller() == null) {
-            if (players.getOrDefault(module.getPlayer().getUniqueId().toString(), 0) >= 5) {
+        Bukkit.getScheduler().runTask(TGM.get(), () -> {
+            if (module.getKiller() == null) {
+                if (players.getOrDefault(module.getPlayer().getUniqueId().toString(), 0) >= 5) {
+                    Bukkit.broadcastMessage(ColorConverter.filterString(
+                            module.getPlayerTeam().getColor().toString() + module.getPlayerName() + "&7" + (module.getPlayerName().endsWith("s") ? "'" : "'s") +
+                                    " kill streak of &c&l" + players.get(module.getPlayer().getUniqueId().toString() + "&r&7 was shutdown")
+                    ));
+                }
+
+                players.put(module.getPlayer().getUniqueId().toString(), 0);
+                return;
+            }
+
+            if (module.getKillerTeam().isSpectator()) return; // Stupid spectators
+
+            String killerUuid = module.getKiller().getUniqueId().toString();
+            String killedUuid = module.getPlayer().getUniqueId().toString();
+
+            players.put(killerUuid, players.getOrDefault(killerUuid, 0) + 1);
+
+            if (players.get(killedUuid) != null && players.get(killedUuid) >= 5) {
                 Bukkit.broadcastMessage(ColorConverter.filterString(
-                        module.getPlayerTeam().getColor().toString() + module.getPlayerName() + "&7" + (module.getPlayerName().endsWith("s") ? "'" : "'s") +
-                                " kill streak of &c&l" + players.get(module.getPlayer().getUniqueId().toString() + "&r&7 was shutdown")
+                        module.getKillerTeam().getColor().toString() + module.getKillerName() + " &7shutdown " +
+                                module.getPlayerTeam().getColor().toString() + module.getPlayerName() + "&7" + (module.getPlayerName().endsWith("s") ? "'" : "'s") + " kill streak of &c&l" + players.get(killedUuid)
                 ));
+
             }
 
-            players.put(module.getPlayer().getUniqueId().toString(), 0);
-            return;
-        }
+            players.put(killedUuid, 0);
 
-        if (module.getKillerTeam().isSpectator()) return; // Stupid spectators
+            killstreaks.forEach(killstreak -> {
+                if (!killstreak.isRepeat() && players.get(killerUuid) == killstreak.getCount() || killstreak.isRepeat() && players.get(killerUuid) % killstreak.getCount() == 0) {
+                    if (killstreak.getMessage() != null && !killstreak.getMessage().isEmpty())
+                        Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
+                                .replace("%killername%", module.getKillerName())
+                                .replace("%killercolor%", module.getKillerTeam().getColor().toString())
+                                .replace("%killedname%", module.getPlayerName())
+                                .replace("%count%", String.valueOf(killstreak.getCount()))
+                        );
 
-        String killerUuid = module.getKiller().getUniqueId().toString();
-        String killedUuid = module.getPlayer().getUniqueId().toString();
-
-        players.put(killerUuid, players.getOrDefault(killerUuid, 0) + 1);
-
-        if (players.get(killedUuid) != null && players.get(killedUuid) >= 5) {
-            Bukkit.broadcastMessage(ColorConverter.filterString(
-                    module.getKillerTeam().getColor().toString() + module.getKillerName() + " &7shutdown " +
-                    module.getPlayerTeam().getColor().toString() + module.getPlayerName() + "&7" + (module.getPlayerName().endsWith("s") ? "'" : "'s") + " kill streak of &c&l" + players.get(killedUuid)
-            ));
-
-        }
-
-        players.put(killedUuid, 0);
-
-        killstreaks.forEach(killstreak -> {
-            if (!killstreak.isRepeat() && players.get(killerUuid) == killstreak.getCount() || killstreak.isRepeat() && players.get(killerUuid) % killstreak.getCount() == 0) {
-                Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
-                        .replace("%killername%", module.getKillerName())
-                        .replace("%killercolor%", module.getKillerTeam().getColor().toString())
-                        .replace("%killedname%", module.getPlayerName())
-                        .replace("%count%", String.valueOf(killstreak.getCount()))
-                );
-
-                killstreak.getCommands().forEach(s -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ColorConverter.filterString(s)
-                        .replace("%killername%", module.getKillerName())
-                        .replace("%killercolor%", module.getKillerTeam().getColor().toString())
-                        .replace("%killedname%", module.getPlayerName())
-                        .replace("%count%", String.valueOf(killstreak.getCount())))
-                );
-            }
+                    killstreak.getCommands().forEach(s -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ColorConverter.filterString(s)
+                            .replace("%killername%", module.getKillerName())
+                            .replace("%killercolor%", module.getKillerTeam().getColor().toString())
+                            .replace("%killedname%", module.getPlayerName())
+                            .replace("%count%", String.valueOf(killstreak.getCount())))
+                    );
+                }
+            });
         });
     }
 

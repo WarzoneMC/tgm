@@ -1,9 +1,8 @@
 package network.warzone.tgm.modules;
 
-import network.warzone.tgm.damage.grave.event.PlayerDeathByPlayerEvent;
-import network.warzone.tgm.damage.grave.event.PlayerDeathEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,8 +25,8 @@ public class DeathMessageModule extends MatchModule implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onTGMDeath(PlayerDeathEvent event) {
-        DeathModule module = deathModule.getPlayer(event.getPlayer());
+    public void onTGMDeath(TGMPlayerDeathEvent event) {
+        DeathModule module = deathModule.getPlayer(event.getVictim());
 
         if (module.getPlayerTeam().isSpectator()) return; //stupid spectators
 
@@ -38,7 +37,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
         MatchTeam playerTeam = module.getPlayerTeam();
         MatchTeam killerTeam = module.getKillerTeam();
 
-        if (event instanceof PlayerDeathByPlayerEvent && module.getKillerName() != null) {
+        if (module.getKiller() != null && module.getKillerName() != null) {
             if (cause.equals(DamageCause.FALL)) {
                 if (weapon != null && weapon.getType().equals(Material.BOW))
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was shot off a high place by " +
@@ -87,7 +86,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
         module.getPlayer().getWorld().playSound(module.getPlayerLocation(), Sound.ENTITY_IRONGOLEM_DEATH, 2, 2);
 
         if (message.length() > 0) {
-            broadcastDeathMessage(event.getPlayer(), module.getKiller(), message);
+            broadcastDeathMessage(module.getPlayer(), module.getKiller(), message);
 
             module.setKiller(null);
             module.setKillerName(null);

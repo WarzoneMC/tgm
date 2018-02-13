@@ -15,7 +15,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,8 +54,7 @@ public class MatchManager {
                 matchTeam.getMembers().forEach(playerContext -> {
                     playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
                     playerContext.getPlayer().setAllowFlight(true);
-                    playerContext.getPlayer().setVelocity(new Vector(playerContext.getPlayer().getVelocity().getX(),
-                            playerContext.getPlayer().getVelocity().getZ() + 1.0, playerContext.getPlayer().getVelocity().getZ()));
+                    playerContext.getPlayer().getVelocity().setY(1.0); // Weeee!
                     playerContext.getPlayer().setFlying(true);
                 });
 
