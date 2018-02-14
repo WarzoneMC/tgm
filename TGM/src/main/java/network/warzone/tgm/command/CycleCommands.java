@@ -391,7 +391,7 @@ public class CycleCommands {
     public static void xp(CommandContext cmd, CommandSender sender) {
         Player player = (Player) sender;
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        player.sendMessage(ChatColor.GREEN + "You Need: " + Levels.getXPRequiredForNextLevel(player) + "XP to Level Up!"  + ChatColor.GRAY + "( " + Levels.getLevelProgress(player) + "/" + Levels.getTotalXPRequiredForNextLevel(player));
+        player.sendMessage(ChatColor.GREEN + "You Need: " + Levels.getXPRequiredForNextLevel(player) + "XP to Level Up!"  + ChatColor.GRAY + "( " + Levels.getLevelProgress(player) + "/" + Levels.getTotalXPRequiredForNextLevel(player) + ")");
 
 
     }
