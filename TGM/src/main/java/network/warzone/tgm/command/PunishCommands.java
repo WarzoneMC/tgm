@@ -153,21 +153,25 @@ public class PunishCommands {
                 for (RevertPunishmentResponse.LoadedUser loadedUser : revertPunishmentResponse.getLoadedUsers()) {
                     userMappings.put(loadedUser.getId(), loadedUser.getName());
                 }
-                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.revert")).forEach(player ->
-                        player.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + sender.getName() + " reverted "),
-                                punishmentToTextComponent(
-                                        revertPunishmentResponse.getPunishment(),
-                                        userMappings.get(revertPunishmentResponse.getPunishment().getPunished()),
-                                        userMappings.get(revertPunishmentResponse.getPunishment().getPunisher()),
-                                        false)
-                        )
-                );
-                TGM.get().getPlayerManager().getPlayers().forEach(playerContext -> {
-                    Punishment punishment;
-                    if ((punishment = playerContext.getUserProfile().getPunishment(revertPunishmentResponse.getPunishment().getId())) != null) {
-                        punishment.setReverted(true);
-                    }
-                });
+                if (revertPunishmentResponse.isSuccess()) {
+                    Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.revert")).forEach(player ->
+                            player.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + sender.getName() + " reverted "),
+                                    punishmentToTextComponent(
+                                            revertPunishmentResponse.getPunishment(),
+                                            userMappings.get(revertPunishmentResponse.getPunishment().getPunished()),
+                                            userMappings.get(revertPunishmentResponse.getPunishment().getPunisher()),
+                                            false)
+                            )
+                    );
+                    TGM.get().getPlayerManager().getPlayers().forEach(playerContext -> {
+                        Punishment punishment;
+                        if ((punishment = playerContext.getUserProfile().getPunishment(revertPunishmentResponse.getPunishment().getId())) != null) {
+                            punishment.setReverted(true);
+                        }
+                    });
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Punishment was already reverted.");
+                }
             }
         });
     }
