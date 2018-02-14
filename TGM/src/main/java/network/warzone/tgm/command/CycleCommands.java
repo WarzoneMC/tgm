@@ -54,7 +54,7 @@ public class CycleCommands {
                     maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
                 }
                 TextComponent message = new TextComponent(maps[i]);
-                    message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
                         .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
                         .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
