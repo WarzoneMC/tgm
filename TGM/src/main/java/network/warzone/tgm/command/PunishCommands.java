@@ -132,7 +132,7 @@ public class PunishCommands {
                     map.put(loadedUser.getId(), loadedUser.getName());
                 }
                 for (Punishment punishment : punishmentsListResponse.getPunishments()) {
-                    sender.spigot().sendMessage(punishmentToTextComponent(punishment, map.get(punishment.getPunished()), map.get(punishment.getPunisher()), true));
+                    sender.spigot().sendMessage(punishmentToTextComponent(punishment, map.get(punishment.getPunished()), map.getOrDefault(punishment.getPunisher(), "Console"), true));
                 }
             }
         });
@@ -153,21 +153,25 @@ public class PunishCommands {
                 for (RevertPunishmentResponse.LoadedUser loadedUser : revertPunishmentResponse.getLoadedUsers()) {
                     userMappings.put(loadedUser.getId(), loadedUser.getName());
                 }
-                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.revert")).forEach(player ->
-                        player.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + sender.getName() + " reverted "),
-                                punishmentToTextComponent(
-                                        revertPunishmentResponse.getPunishment(),
-                                        userMappings.get(revertPunishmentResponse.getPunishment().getPunished()),
-                                        userMappings.get(revertPunishmentResponse.getPunishment().getPunisher()),
-                                        false)
-                        )
-                );
-                TGM.get().getPlayerManager().getPlayers().forEach(playerContext -> {
-                    Punishment punishment;
-                    if ((punishment = playerContext.getUserProfile().getPunishment(revertPunishmentResponse.getPunishment().getId())) != null) {
-                        punishment.setReverted(true);
-                    }
-                });
+                if (revertPunishmentResponse.isSuccess()) {
+                    Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.revert")).forEach(player ->
+                            player.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + sender.getName() + " reverted "),
+                                    punishmentToTextComponent(
+                                            revertPunishmentResponse.getPunishment(),
+                                            userMappings.get(revertPunishmentResponse.getPunishment().getPunished()),
+                                            userMappings.get(revertPunishmentResponse.getPunishment().getPunisher()),
+                                            false)
+                            )
+                    );
+                    TGM.get().getPlayerManager().getPlayers().forEach(playerContext -> {
+                        Punishment punishment;
+                        if ((punishment = playerContext.getUserProfile().getPunishment(revertPunishmentResponse.getPunishment().getId())) != null) {
+                            punishment.setReverted(true);
+                        }
+                    });
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Punishment was already reverted.");
+                }
             }
         });
     }
@@ -202,14 +206,16 @@ public class PunishCommands {
             if (response.isNotFound()) {
                 punisher.sendMessage(ChatColor.RED + "Player not found!");
             } else {
-                broadcastPunishment(response.getName(), response.getIp(), punisher instanceof Player ? punisher.getName() : "Console", verb, timeUnitPair, reason, time);
-                if (response.isKickable()) {
-                    kickPlayer(response.getPunishment(), response.getName());
-                }
-                Player target;
-                if (response.getName() != null && (target = Bukkit.getPlayer(response.getName())) != null) {
-                    TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addPunishment(response.getPunishment());
-                }
+                Bukkit.getScheduler().runTask(TGM.get(), () -> {
+                    broadcastPunishment(response.getName(), response.getIp(), punisher instanceof Player ? punisher.getName() : "Console", verb, timeUnitPair, reason, time);
+                    if (response.isKickable()) {
+                        kickPlayer(response.getPunishment(), response.getName());
+                    }
+                    Player target;
+                    if (response.getName() != null && (target = Bukkit.getPlayer(response.getName())) != null) {
+                        TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addPunishment(response.getPunishment());
+                    }
+                });
             }
         });
     }
@@ -218,11 +224,11 @@ public class PunishCommands {
         if (name != null) {
             if (time) {
                 Bukkit.broadcastMessage(ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
-                                " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
-                                " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
+                        " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
+                        " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
             } else {
                 Bukkit.broadcastMessage(ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
-                                " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
+                        " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
             }
         } else {
             if (time) {
@@ -245,23 +251,25 @@ public class PunishCommands {
                 if (punishment.isIp_ban()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         if (player.getAddress().getHostString().equals(punishment.getIp())) {
-                            Bukkit.getScheduler().runTask(TGM.get(), () -> player.kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
+                            player.kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
                                             + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                                             + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
                                             (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                                            + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC"));
+                                            + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                                            + ChatColor.GRAY + "ID: " + punishment.getId().toString());
                         }
                     }
                 } else {
                     if (Bukkit.getPlayer(name) != null)
-                        Bukkit.getScheduler().runTask(TGM.get(), () -> Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
+                        Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
                                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
                                     (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC"));
+                                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                                    + ChatColor.GRAY + "ID: " + punishment.getId().toString());
                 }
             } else {
-                Bukkit.getScheduler().runTask(TGM.get(), () -> Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been kicked from the server. Reason:\n" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason())));
+                Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been kicked from the server. Reason:\n" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()));
             }
 
     }

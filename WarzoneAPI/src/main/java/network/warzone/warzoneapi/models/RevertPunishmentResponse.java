@@ -16,6 +16,8 @@ public class RevertPunishmentResponse {
     private List<LoadedUser> loadedUsers;
     private boolean notFound;
 
+    private boolean success;
+
     @AllArgsConstructor @Getter
     public static class LoadedUser {
 
