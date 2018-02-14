@@ -191,7 +191,7 @@ public class InfectionModule extends MatchModule implements Listener {
             playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
             playerContext.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
-        }, 1L);
+        }, 2L);
     }
 
     @EventHandler
