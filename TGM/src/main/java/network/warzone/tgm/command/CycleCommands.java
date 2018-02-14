@@ -54,7 +54,7 @@ public class CycleCommands {
                     maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
                 }
                 TextComponent message = new TextComponent(maps[i]);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
+                    message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
                         .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
                         .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
@@ -64,7 +64,7 @@ public class CycleCommands {
             }
         } catch (IndexOutOfBoundsException ignored) { }
     }
-
+    
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
     public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
@@ -385,6 +385,15 @@ public class CycleCommands {
         } else {
             viewStats(player, cmd.getString(0));
         }
+    }
+    
+    @Command(aliases= {"xp"}, desc ="View required xp until next level.")
+    public static void xp(CommandContext cmd, CommandSender sender) {
+        Player player = (Player) sender;
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+        player.sendMessage(ChatColor.GREEN + "You Need: " + Levels.getXPRequiredForNextLevel(player) + "XP to Level Up!"  + ChatColor.GRAY + "( " + Levels.getLevelProgress(player) + "/" + Levels.getTotalXPRequiredForNextLevel(player));
+
+
     }
 
     public static void viewStats(Player player, String target) {
