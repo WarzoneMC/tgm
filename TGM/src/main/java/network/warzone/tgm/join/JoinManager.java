@@ -32,7 +32,7 @@ public class JoinManager implements Listener {
 
     private List<QueuedJoin> queuedJoins = new ArrayList<>();
     private List<LoginService> loginServices = new ArrayList<>();
-
+ 
     public JoinManager() {
         TGM.registerEvents(this);
 
@@ -65,7 +65,8 @@ public class JoinManager implements Listener {
             event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC"
+                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                    + ChatColor.GRAY + "ID: " + punishment.getId().toString()
             );
             event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
             return;
