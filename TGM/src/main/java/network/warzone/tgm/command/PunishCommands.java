@@ -110,7 +110,7 @@ public class PunishCommands {
         issuePunishment("warn", name, sender, "warned", new TimeUnitPair(1, ChronoUnit.MILLIS), reason, false);
     }
 
-    @Command(aliases = "punishments", desc = "Get player punishments", min = 1, max = 1, usage = "(name)")
+    @Command(aliases = {"punishments", "p"}, desc = "Get player punishments", min = 1, max = 1, usage = "(name|ip)")
     @CommandPermissions({"tgm.punish.list"})
     public static void punishments(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
@@ -301,6 +301,8 @@ public class PunishCommands {
         if (s.equalsIgnoreCase("permanent") ||
                 s.equalsIgnoreCase("perm") ||
                 s.equalsIgnoreCase("p") ||
+                s.equalsIgnoreCase("forever") ||
+                s.equalsIgnoreCase("f") ||
                 s.equalsIgnoreCase("-1")) return new TimeUnitPair(1, ChronoUnit.FOREVER);
         ChronoUnit timeUnit = ChronoUnit.SECONDS;
 
