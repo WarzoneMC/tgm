@@ -275,7 +275,7 @@ public class PunishCommands {
     }
 
     private static TextComponent punishmentToTextComponent(Punishment punishment, String punished, String punisher, boolean revertOption) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         TextComponent textComponent = new TextComponent(ChatColor.GRAY + "[" + dateFormat.format(new Date(punishment.getIssued())) + "] "
                 + (punishment.isReverted() ? ChatColor.STRIKETHROUGH + "" : (punishment.isActive() ? ChatColor.RED : ChatColor.YELLOW))
                 + punishment.getType() + ChatColor.RESET + " " + (punished == null ? punishment.getIp() : punished));
