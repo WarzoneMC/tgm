@@ -57,6 +57,12 @@
                                     </includes>
                                 </filter>
                             </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.mashape.unirest</pattern>
+                                    <shadedPattern>network.warzone.shade.unirest</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
