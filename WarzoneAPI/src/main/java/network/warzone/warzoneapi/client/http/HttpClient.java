@@ -27,6 +27,8 @@ public class HttpClient implements TeamClient {
         builder.registerTypeAdapter(ObjectId.class, (JsonDeserializer<ObjectId>) (json, typeOfT, context) -> new ObjectId(json.getAsJsonPrimitive().getAsString()));
         builder.registerTypeAdapter(ObjectId.class, (JsonSerializer<ObjectId>) (src, typeOfT, context) -> new JsonPrimitive(src.toString()));
 
+        builder.setFieldNamingPolicy(FieldNamingPolicy.IDENTITY);
+
         this.gson = builder.create();
 
         //serialize objects using gson
