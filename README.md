@@ -41,7 +41,7 @@ As an example, a map should be able to provide different spawn points as the mat
  
 2. Create a `maps` folder inside of the server and insert a supported TGM map. Use the repository `Maps` folder for some packaged example maps. 
  
-3. Create a file named `rotation` in the root server folder. This is a list of maps that the plugin will automatically cycle to. Put any of your maps on their own line in the file. If you are using Fracture, simply put "Fracture" on the first line and save the file. It's important to know that the name of the map specified in the map.json file is used here, not the folder name.
+3. Create a file named `rotation.txt` in the `maps` server folder. This is a list of maps that the plugin will automatically cycle to. Put any of your maps on their own line in the file. If you are using Fracture, simply put "Fracture" on the first line and save the file. It's important to know that the name of the map specified in the map.json file is used here, not the folder name.
  
 4. (Optional) Install WorldEdit to enable the Teleport Tool. 
  
@@ -51,4 +51,4 @@ As an example, a map should be able to provide different spawn points as the mat
 
 1. We use Lombok. Make sure you have the Lombok plugin installed on your preferred IDE.
 
-2. We use maven. Like any other maven project, run `mvn clean install` in the top level folder to generate the required libraries.
+2. We use Maven. Like any other maven project, run `mvn clean install` in the top level folder to generate the required libraries.
