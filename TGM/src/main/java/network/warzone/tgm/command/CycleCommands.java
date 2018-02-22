@@ -333,7 +333,7 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
     }
 
-    @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
+    @Command(aliases = {"t", "tc" "teamchat"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
