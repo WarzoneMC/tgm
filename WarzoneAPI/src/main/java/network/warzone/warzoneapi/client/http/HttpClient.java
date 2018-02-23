@@ -172,16 +172,34 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void updateRank(String name, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest) {
+    public RankUpdateResponse updateRank(String name, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/" + name + "/rank/" + action.name().toLowerCase())
+            HttpResponse<RankUpdateResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/" + name + "/rank/" + action.name().toLowerCase())
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .body(rankUpdateRequest)
-                    .asJson();
+                    .asObject(RankUpdateResponse.class);
+            return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest) {
+        try {
+            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/" + action.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(rankManageRequest)
+                    .asObject(RankManageResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

@@ -57,7 +57,12 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public void updateRank(RankUpdateRequest destroyWoolRequest) {
+    public RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest){
+        return null;
+    };
 
+    @Override
+    public RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest) {
+        return null;
     }
 }

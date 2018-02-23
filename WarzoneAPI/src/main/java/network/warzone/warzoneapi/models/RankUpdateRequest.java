@@ -11,10 +11,8 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 public class RankUpdateRequest {
 
-    @Getter private ObjectId rankId;
     @Getter private String rankName;
 
-    @AllArgsConstructor
     public static enum Action {
         ADD(),
         REMOVE();

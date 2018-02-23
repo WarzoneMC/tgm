@@ -36,5 +36,7 @@ public interface TeamClient {
 
     List<Rank> retrieveRanks();
 
-    void updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest);
+    RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest);
+
+    RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest);
 }
