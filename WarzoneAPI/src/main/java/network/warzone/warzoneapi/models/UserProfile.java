@@ -81,6 +81,11 @@ public class UserProfile {
         return ranksLoaded;
     }
 
+    public void addRank(Rank rank) {
+        if (ranksLoaded == null) ranksLoaded = new ArrayList<>();
+        ranksLoaded.add(rank);
+    }
+
     public String getKDR() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits(2);
@@ -103,7 +108,7 @@ public class UserProfile {
             for (Rank rank : ranksLoaded) {
                 if (highest.getPriority() < rank.getPriority()) highest = rank;
             }
-            return highest.getPrefix();
+            return highest.getPrefix() != null && !highest.getPrefix().isEmpty() ? highest.getPrefix() : null;
         }
         else return null;
     }
