@@ -11,9 +11,8 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 public class RankUpdateRequest {
 
-    @Getter private String player;
-    @Getter private ObjectId rank;
-    @Getter private Action action;
+    @Getter private ObjectId rankId;
+    @Getter private String rankName;
 
     @AllArgsConstructor
     public static enum Action {

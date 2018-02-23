@@ -160,24 +160,11 @@ public class HttpClient implements TeamClient {
     @Override
     public List<Rank> retrieveRanks() {
         try {
-            HttpResponse<JsonObject> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")
+            HttpResponse<List<Rank>> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
-                    .header("Content-Type", "application/json").asObject(JsonObject.class);
-            List<Rank> ranks = new ArrayList<>();
-            for (JsonElement element : ranksResponse.getBody().getAsJsonArray("ranks")) {
-                JsonObject rankObject = (JsonObject) element;
-                ObjectId id = new ObjectId(rankObject.get("_id").getAsString());
-                int priority = (rankObject.has("priority") ? rankObject.get("priority").getAsInt() : 0);
-                String prefix = (rankObject.has("prefix") ? rankObject.get("prefix").getAsString() : null);
-                boolean staff = (rankObject.has("staff") ? rankObject.get("staff").getAsBoolean() : false);
-                List<String> permissions = new ArrayList<>();
-                if (rankObject.has("permissions")) {
-                    for (JsonElement permission : rankObject.get("permissions").getAsJsonArray()) permissions.add(permission.getAsString());
-                }
-                ranks.add(new Rank(id, priority, prefix, permissions, staff));
-            }
-            return ranks;
+                    .header("Content-Type", "application/json").asObject(List.class);
+            return ranksResponse.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
             return new ArrayList<>();
@@ -185,9 +172,9 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void updateRank(RankUpdateRequest rankUpdateRequest) {
+    public void updateRank(String name, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/" + rankUpdateRequest.getPlayer() + "/rank/" + rankUpdateRequest.getAction().name().toLowerCase())
+            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/" + name + "/rank/" + action.name().toLowerCase())
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
