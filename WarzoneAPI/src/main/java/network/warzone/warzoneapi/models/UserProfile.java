@@ -86,6 +86,27 @@ public class UserProfile {
         ranksLoaded.add(rank);
     }
 
+    public void removeRank(Rank r) {
+        if (ranksLoaded == null) ranksLoaded = new ArrayList<>();
+        for (Rank rank : ranksLoaded) {
+            if (rank.getId().equals(r.getId())) {
+                ranksLoaded.remove(rank);
+                return;
+            }
+        }
+    }
+
+    public boolean isStaff() {
+        if (!ranksLoaded.isEmpty()) {
+            Rank highest = ranksLoaded.get(0);
+            for (Rank rank : ranksLoaded) {
+                if (highest.getPriority() < rank.getPriority()) highest = rank;
+            }
+            return highest.isStaff();
+        }
+        else return false;
+    }
+
     public String getKDR() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits(2);

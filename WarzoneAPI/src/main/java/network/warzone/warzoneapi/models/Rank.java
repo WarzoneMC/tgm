@@ -3,6 +3,7 @@ package network.warzone.warzoneapi.models;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -11,15 +12,23 @@ import java.util.List;
  * Created by Jorge on 10/22/2017.
  */
 
-@AllArgsConstructor
+@AllArgsConstructor @Getter @Setter
 public class Rank {
 
     @SerializedName("_id")
-    @Getter private ObjectId id;
-    @Getter private String name;
-    @Getter private int priority;
-    @Getter private String prefix;
-    @Getter private List<String> permissions;
-    @Getter private boolean staff;
+    private ObjectId id;
+    private String name;
+    private int priority;
+    private String prefix;
+    private List<String> permissions;
+    private boolean staff;
+
+    public void set(Rank rank) {
+        this.name = rank.name;
+        this.priority = rank.priority;
+        this.prefix = rank.prefix;
+        this.permissions = rank.permissions;
+        this.staff = rank.staff;
+    }
 
 }

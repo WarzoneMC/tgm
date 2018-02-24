@@ -34,9 +34,13 @@ public interface TeamClient {
 
     void destroyWool(DestroyWoolRequest destroyWoolRequest);
 
-    List<Rank> retrieveRanks();
+    RankList retrieveRanks();
 
     RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest);
 
     RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest);
+
+    RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest);
+
+    RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest);
 }

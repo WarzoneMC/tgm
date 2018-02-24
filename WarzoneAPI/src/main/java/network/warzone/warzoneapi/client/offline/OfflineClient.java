@@ -7,7 +7,6 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by luke on 4/27/17.
@@ -52,8 +51,8 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public List<Rank> retrieveRanks() {
-        return new ArrayList<>();
+    public RankList retrieveRanks() {
+        return new RankList();
     }
 
     @Override
@@ -63,6 +62,16 @@ public class OfflineClient implements TeamClient {
 
     @Override
     public RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest) {
+        return null;
+    }
+
+    @Override
+    public RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest) {
+        return null;
+    }
+
+    @Override
+    public RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest) {
         return null;
     }
 }

@@ -1,14 +1,16 @@
 package network.warzone.tgm.join;
 
-import network.warzone.warzoneapi.models.UserProfile;
-import network.warzone.warzoneapi.models.PlayerLogin;
-import network.warzone.tgm.TGM;
-import network.warzone.tgm.match.MatchPostLoadEvent;
-import network.warzone.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.MatchPostLoadEvent;
+import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.Ranks;
+import network.warzone.warzoneapi.models.PlayerLogin;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,9 +19,10 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.permissions.PermissionAttachment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by luke on 4/27/17.
@@ -29,8 +32,6 @@ public class JoinManager implements Listener {
 
     private List<QueuedJoin> queuedJoins = new ArrayList<>();
     private List<LoginService> loginServices = new ArrayList<>();
-
-    private Map<UUID, PermissionAttachment> attachments = new HashMap<>();
 
     public JoinManager() {
         TGM.registerEvents(this);
@@ -75,8 +76,8 @@ public class JoinManager implements Listener {
         PlayerContext playerContext = new PlayerContext(event.getPlayer(), queuedJoin.getUserProfile());
         TGM.get().getPlayerManager().addPlayer(playerContext);
 
-        createAttachment(event.getPlayer());
-        playerContext.getUserProfile().getRanksLoaded().stream().forEach(rank -> addPermissions(event.getPlayer(), rank.getPermissions()));
+        Ranks.createAttachment(event.getPlayer());
+        playerContext.getUserProfile().getRanksLoaded().stream().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
 
         for (LoginService loginService : loginServices) {
             loginService.login(playerContext);
@@ -98,7 +99,12 @@ public class JoinManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
-        event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " joined.");
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff()){
+            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            event.setJoinMessage(ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.");
+            Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
+        }
+        else event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " joined.");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -117,7 +123,7 @@ public class JoinManager implements Listener {
 
     public void handleQuit(Player player) {
         TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
-        removeAttachment(player);
+        Ranks.removeAttachment(player);
     }
 
     @AllArgsConstructor @Getter
@@ -125,26 +131,6 @@ public class JoinManager implements Listener {
         private UUID uuid;
         private UserProfile userProfile;
         private long time;
-    }
-
-    private void createAttachment(Player player) {
-        attachments.put(player.getUniqueId(), player.addAttachment(TGM.get()));
-    }
-
-    private void addPermissions(Player player, List<String> permissions) {
-        permissions.stream().forEach(permission -> addPermission(player, permission));
-    }
-
-    private void addPermission(Player player, String permission) {
-        if (attachments.containsKey(player.getUniqueId())) {
-            attachments.get(player.getUniqueId()).setPermission(permission, true);
-        }
-    }
-
-    private void removeAttachment(Player player) {
-        if (attachments.containsKey(player.getUniqueId())) {
-            attachments.remove(player.getUniqueId());
-        }
     }
 
 }

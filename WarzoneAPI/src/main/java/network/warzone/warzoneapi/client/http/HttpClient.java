@@ -11,9 +11,6 @@ import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by luke on 4/27/17.
  */
@@ -158,16 +155,17 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public List<Rank> retrieveRanks() {
+    public RankList retrieveRanks() {
         try {
-            HttpResponse<List<Rank>> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")
+            HttpResponse<RankList> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
-                    .header("Content-Type", "application/json").asObject(List.class);
+                    .header("Content-Type", "application/json")
+                    .asObject(RankList.class);
             return ranksResponse.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
-            return new ArrayList<>();
+            return new RankList();
         }
     }
 
@@ -195,6 +193,38 @@ public class HttpClient implements TeamClient {
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .body(rankManageRequest)
+                    .asObject(RankManageResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest) {
+        try {
+            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/set/" + field.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(rankEditRequest)
+                    .asObject(RankManageResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest) {
+        try {
+            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/permissions/" + action.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(permissionsUpdateRequest)
                     .asObject(RankManageResponse.class);
             return response.getBody();
         } catch (UnirestException e) {
