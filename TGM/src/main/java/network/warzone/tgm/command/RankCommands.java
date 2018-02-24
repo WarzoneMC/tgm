@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class RankCommands {
 
-    @Command(aliases = {"rank", "ranks"}, desc = "Rank management command.", min = 1, usage = "(player|list|info|create|delete|set|permissions)")
+    @Command(aliases = {"rank", "ranks"}, desc = "Rank management command.", min = 1, usage = "(player|list|info|create|delete|edit|permissions)")
     @CommandPermissions({"tgm.command.rank"})
     public static void rank(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("player")) {
@@ -146,10 +146,10 @@ public class RankCommands {
                 }
             });
 
-        } else if (cmd.getString(0).equalsIgnoreCase("set")) {
+        } else if (cmd.getString(0).equalsIgnoreCase("edit")) {
 
             if (cmd.argsLength() < 4) {
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " set <name> <prefix|staff|priority|permissions> <value>");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <name> <prefix|staff|priority|permissions> <value>");
                 return;
             }
             String name = cmd.getString(1);
@@ -200,6 +200,8 @@ public class RankCommands {
                     Ranks.update(response.getRank());
                 }
             });
+        } else {
+            sender.sendMessage(ChatColor.RED + "Unknown subcommand.");
         }
     }
 
