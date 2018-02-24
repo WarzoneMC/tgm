@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Jorge on 2/23/2018.
@@ -29,14 +30,14 @@ public class RankCommands {
     public static void rank(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("player")) {
             if (cmd.argsLength() < 4) {
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " player <player> <add|remove> <rank>");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " player <player|UUID> <add|remove> <rank>");
                 return;
             }
 
             RankUpdateRequest.Action action = RankUpdateRequest.Action.valueOf(cmd.getString(2).toUpperCase());
             if (action == null) {
                 sender.sendMessage(ChatColor.RED + "Unknown action: " + cmd.getString(2));
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " player <player> <add|remove> <rank>");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " player <player|UUID> <add|remove> <rank>");
                 return;
             }
 
@@ -46,7 +47,9 @@ public class RankCommands {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
                     return;
                 } else {
-                    Player target = Bukkit.getPlayer(cmd.getString(1));
+                    Player target;
+                    if (cmd.getString(1).length() == 36) target = Bukkit.getPlayer(UUID.fromString(cmd.getString(1)));
+                    else target = Bukkit.getPlayer(cmd.getString(1));
                     switch (action) {
                         case ADD:
                             if (target != null) {
