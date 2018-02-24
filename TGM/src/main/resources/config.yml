@@ -8,3 +8,6 @@ rotation: maps/rotation.txt
 map:
   sources:
   - maps
+server:
+  name: "Warzone"
+  id: "warzone"

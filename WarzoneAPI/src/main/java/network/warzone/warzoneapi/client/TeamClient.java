@@ -33,7 +33,7 @@ public interface TeamClient {
     void finishMatch(MatchFinishPacket matchFinishPacket);
 
     void destroyWool(DestroyWoolRequest destroyWoolRequest);
-
+    
     RankList retrieveRanks();
 
     RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest);
@@ -43,4 +43,11 @@ public interface TeamClient {
     RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest);
 
     RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest);
+
+    IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest);
+
+    PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest);
+
+    RevertPunishmentResponse revertPunishment(String id);
+
 }

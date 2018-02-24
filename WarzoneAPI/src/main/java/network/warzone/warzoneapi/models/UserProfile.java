@@ -15,10 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 public class UserProfile {
 
-    public static final int XP_PER_KILL = 1,
+    public static final int XP_PER_KILL = 2,
                             XP_PER_WIN = 10,
                             XP_PER_LOSS = 5,
-                            XP_PER_WOOL_BREAK = 7;
+                            XP_PER_WOOL_BREAK = 3;
 
     @SerializedName("_id")
     @Getter private ObjectId id;
@@ -38,6 +38,40 @@ public class UserProfile {
     @Getter private int deaths = 0;
     @Getter private int wool_destroys = 0;
     @Getter private List<String> matches;
+
+    @Getter private List<Punishment> punishments;
+
+    public void addPunishment(Punishment punishment) {
+        if (punishments == null) punishments = new ArrayList<>();
+        punishments.add(0, punishment);
+    }
+
+    public Punishment getLatestMute() {
+        if (punishments != null && !punishments.isEmpty()) {
+            for (Punishment punishment : getPunishments()) {
+                if (punishment.getType().toLowerCase().equals("mute") && punishment.isActive()) return punishment;
+            }
+        }
+        return null;
+    }
+
+    public Punishment getLatestBan() {
+        if (punishments != null && !punishments.isEmpty()) {
+            for (Punishment punishment : getPunishments()) {
+                if (punishment.getType().toLowerCase().equals("ban") && punishment.isActive()) return punishment;
+            }
+        }
+        return null;
+    }
+
+    public Punishment getPunishment(ObjectId objectId) {
+        if (punishments != null && !punishments.isEmpty()) {
+            for (Punishment punishment : getPunishments()) {
+                if (punishment.getId().equals(objectId)) return punishment;
+            }
+        }
+        return null;
+    }
 
     public void addWin() {
         wins++;

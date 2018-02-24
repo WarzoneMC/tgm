@@ -60,20 +60,22 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {
         Players.reset(playerContext.getPlayer(), true);
 
-        if (matchTeam.isSpectator()) {
-            spectatorModule.applySpectatorKit(playerContext);
-            if (teleport) {
-                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-            }
-        } else {
-            matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-            playerContext.getPlayer().updateInventory();
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+            if (matchTeam.isSpectator()) {
+                spectatorModule.applySpectatorKit(playerContext);
+                if (teleport) {
+                    playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                }
+            } else {
+                matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                playerContext.getPlayer().updateInventory();
 
-            if (teleport) {
-                playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
+                if (teleport) {
+                    playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
+                }
             }
-        }
+        }, 1L);
     }
 
     @Override

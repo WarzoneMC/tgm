@@ -27,6 +27,8 @@ public class HttpClient implements TeamClient {
         builder.registerTypeAdapter(ObjectId.class, (JsonDeserializer<ObjectId>) (json, typeOfT, context) -> new ObjectId(json.getAsJsonPrimitive().getAsString()));
         builder.registerTypeAdapter(ObjectId.class, (JsonSerializer<ObjectId>) (src, typeOfT, context) -> new JsonPrimitive(src.toString()));
 
+        builder.setFieldNamingPolicy(FieldNamingPolicy.IDENTITY);
+
         this.gson = builder.create();
 
         //serialize objects using gson
@@ -232,4 +234,50 @@ public class HttpClient implements TeamClient {
             return null;
         }
     }
+
+    public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
+        try {
+            HttpResponse<IssuePunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/issue_punishment")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(issuePunishmentRequest)
+                    .asObject(IssuePunishmentResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest) {
+        try {
+            HttpResponse<PunishmentsListResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/punishments")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(punishmentsListRequest)
+                    .asObject(PunishmentsListResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public RevertPunishmentResponse revertPunishment(String id) {
+        try {
+            HttpResponse<RevertPunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/revert_punishment")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(new RevertPunishmentRequest(new ObjectId(id)))
+                    .asObject(RevertPunishmentResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

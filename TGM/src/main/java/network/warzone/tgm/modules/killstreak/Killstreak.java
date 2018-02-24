@@ -15,6 +15,7 @@ public class Killstreak {
     private int count = 0;
     private String message = "";
     private List<String> commands = new ArrayList<>();
+    private boolean repeat = false;
 
     // Return 'this' for chaining
     public Killstreak setCount(int count) {
@@ -29,6 +30,11 @@ public class Killstreak {
 
     public Killstreak setCommands(List<String> commands) {
         this.commands = commands;
+        return this;
+    }
+
+    public Killstreak setRepeat(boolean repeat) {
+        this.repeat = repeat;
         return this;
     }
 
