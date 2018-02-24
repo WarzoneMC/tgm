@@ -157,6 +157,84 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
+    public RankList retrieveRanks() {
+        try {
+            HttpResponse<RankList> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(RankList.class);
+            return ranksResponse.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return new RankList();
+        }
+    }
+
+    @Override
+    public RankUpdateResponse updateRank(String name, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest) {
+        try {
+            HttpResponse<RankUpdateResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/" + name + "/rank/" + action.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(rankUpdateRequest)
+                    .asObject(RankUpdateResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest) {
+        try {
+            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/" + action.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(rankManageRequest)
+                    .asObject(RankManageResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest) {
+        try {
+            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/set/" + field.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(rankEditRequest)
+                    .asObject(RankManageResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest) {
+        try {
+            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/permissions/" + action.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(permissionsUpdateRequest)
+                    .asObject(RankManageResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
         try {
             HttpResponse<IssuePunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/issue_punishment")
@@ -172,7 +250,6 @@ public class HttpClient implements TeamClient {
         }
     }
 
-    @Override
     public PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest) {
         try {
             HttpResponse<PunishmentsListResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/punishments")
@@ -188,7 +265,6 @@ public class HttpClient implements TeamClient {
         }
     }
 
-    @Override
     public RevertPunishmentResponse revertPunishment(String id) {
         try {
             HttpResponse<RevertPunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/revert_punishment")
@@ -203,4 +279,5 @@ public class HttpClient implements TeamClient {
             return null;
         }
     }
+
 }

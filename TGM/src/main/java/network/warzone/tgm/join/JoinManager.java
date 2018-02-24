@@ -6,10 +6,12 @@ import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.PlayerLogin;
 import network.warzone.warzoneapi.models.Punishment;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -60,6 +62,9 @@ public class JoinManager implements Listener {
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.KICK_BANNED)) return;
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
+
+        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + userProfile.getRanks().size() + " (loaded/total)");
+
         Punishment punishment;
         if ((punishment = userProfile.getLatestBan()) != null) {
             event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
@@ -72,6 +77,7 @@ public class JoinManager implements Listener {
             return;
         }
         Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString());
+
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }
 
@@ -86,6 +92,9 @@ public class JoinManager implements Listener {
 
         PlayerContext playerContext = new PlayerContext(event.getPlayer(), queuedJoin.getUserProfile());
         TGM.get().getPlayerManager().addPlayer(playerContext);
+
+        Ranks.createAttachment(event.getPlayer());
+        playerContext.getUserProfile().getRanksLoaded().stream().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
 
         for (LoginService loginService : loginServices) {
             loginService.login(playerContext);
@@ -107,7 +116,12 @@ public class JoinManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
-        event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " joined.");
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty()){
+            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            event.setJoinMessage(ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.");
+            Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
+        }
+        else event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " joined.");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -126,6 +140,7 @@ public class JoinManager implements Listener {
 
     public void handleQuit(Player player) {
         TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
+        Ranks.removeAttachment(player);
     }
 
     @AllArgsConstructor @Getter

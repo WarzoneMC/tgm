@@ -10,6 +10,7 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import lombok.Getter;
 import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.command.CycleCommands;
+import network.warzone.tgm.command.RankCommands;
 import network.warzone.tgm.damage.tracker.plugin.TrackerPlugin;
 import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapInfo;
@@ -97,7 +98,11 @@ public class TGM extends JavaPlugin {
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
         commandManager.register(CycleCommands.class);
-        if (apiConfig.getBoolean("enabled", false)) commandManager.register(PunishCommands.class);
+        if (apiConfig.getBoolean("enabled", false)) {
+            commandManager.register(PunishCommands.class);
+            commandManager.register(RankCommands.class);
+
+        }
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 

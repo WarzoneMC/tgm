@@ -30,7 +30,8 @@ public class UserProfile {
     @Getter private long lastOnlineDate;
 
     @Getter private List<String> ips;
-    @Getter private List<String> ranks;
+    private List<String> ranks;
+    private List<Rank> ranksLoaded;
     @Getter private int wins = 0;
     @Getter private int losses = 0;
     @Getter private int kills = 0;
@@ -104,6 +105,42 @@ public class UserProfile {
         return (0.6 * Math.sqrt(getXP())) + 1;
     }
 
+    public List<String> getRanks() {
+        if (ranks == null) ranks = new ArrayList<>();
+        return ranks;
+    }
+
+    public List<Rank> getRanksLoaded() {
+        if (ranksLoaded == null) ranksLoaded = new ArrayList<>();
+        return ranksLoaded;
+    }
+
+    public void addRank(Rank rank) {
+        if (ranksLoaded == null) ranksLoaded = new ArrayList<>();
+        ranksLoaded.add(rank);
+    }
+
+    public void removeRank(Rank r) {
+        if (ranksLoaded == null) ranksLoaded = new ArrayList<>();
+        for (Rank rank : ranksLoaded) {
+            if (rank.getId().equals(r.getId())) {
+                ranksLoaded.remove(rank);
+                return;
+            }
+        }
+    }
+
+    public boolean isStaff() {
+        if (!ranksLoaded.isEmpty()) {
+            Rank highest = ranksLoaded.get(0);
+            for (Rank rank : ranksLoaded) {
+                if (highest.getPriority() < rank.getPriority()) highest = rank;
+            }
+            return highest.isStaff();
+        }
+        else return false;
+    }
+
     public String getKDR() {
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits(2);
@@ -118,5 +155,16 @@ public class UserProfile {
         nf.setMinimumFractionDigits(2);
         if (getLosses() == 0) return nf.format((double) getWins());
         return nf.format((double) getWins()/getLosses());
+    }
+
+    public String getPrefix() {
+        if (!ranksLoaded.isEmpty()) {
+            Rank highest = ranksLoaded.get(0);
+            for (Rank rank : ranksLoaded) {
+                if (highest.getPriority() < rank.getPriority()) highest = rank;
+            }
+            return highest.getPrefix() != null && !highest.getPrefix().isEmpty() ? highest.getPrefix() : null;
+        }
+        else return null;
     }
 }
