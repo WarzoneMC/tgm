@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.countdown.Countdown;
+import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
@@ -179,8 +180,14 @@ public class PunishCommands {
     @Command(aliases = {"sc", "staffchat", "staffc"}, desc = "Staff chat", min = 1, usage = "(message)")
     @CommandPermissions({"tgm.staffchat"})
     public static void staffchat(CommandContext cmd, CommandSender sender) {
-        String message = cmd.getRemainingString(0);
-        String result = ChatColor.DARK_RED + "[STAFF] " + ChatColor.GRAY + sender.getName() + ": " + ChatColor.RESET + message;
+        String prefix;
+        if (sender instanceof Player) {
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
+            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+        } else {
+            prefix = "";
+        }
+        String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + sender.getName() + ": " + ChatColor.RESET + cmd.getRemainingString(0);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
         }
