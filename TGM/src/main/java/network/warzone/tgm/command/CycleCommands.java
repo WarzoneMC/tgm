@@ -64,7 +64,7 @@ public class CycleCommands {
             }
         } catch (IndexOutOfBoundsException ignored) { }
     }
-
+    
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
     public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
@@ -385,6 +385,15 @@ public class CycleCommands {
         } else {
             viewStats(player, cmd.getString(0));
         }
+    }
+    
+    @Command(aliases= {"xp"}, desc ="View required xp until next level.")
+    public static void xp(CommandContext cmd, CommandSender sender) {
+        Player player = (Player) sender;
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+        player.sendMessage(ChatColor.GREEN + "You Need: " + Levels.getXPRequiredForNextLevel(player) + "XP to Level Up!"  + ChatColor.GRAY + "( " + Levels.getLevelProgress(player) + "/" + Levels.getTotalXPRequiredForNextLevel(player) + ")");
+
+
     }
 
     public static void viewStats(Player player, String target) {
