@@ -117,7 +117,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                 if (players.getOrDefault(module.getPlayer().getUniqueId().toString(), 0) >= 5) {
                     Bukkit.broadcastMessage(ColorConverter.filterString(
                             module.getPlayerTeam().getColor().toString() + module.getPlayerName() + "&7" + (module.getPlayerName().endsWith("s") ? "'" : "'s") +
-                                    " kill streak of &c&l" + players.get(module.getPlayer().getUniqueId().toString() + "&r&7 was shutdown")
+                                    " kill streak of &c&l" + players.get(module.getPlayer().getUniqueId().toString()) + "&r&7 was shutdown"
                     ));
                 }
 
