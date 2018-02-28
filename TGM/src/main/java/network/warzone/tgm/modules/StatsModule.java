@@ -38,7 +38,7 @@ public class StatsModule extends MatchModule implements Listener{
             JsonObject statsObj = (JsonObject) match.getMapContainer().getMapInfo().getJsonObject().get("stats");
             if (statsObj.has("disable")) statsDisabled = statsObj.get("disable").getAsBoolean();
             if (statsObj.has("notifydisable")) notifyDisable = statsObj.get("notifydisable").getAsBoolean();
-            if (statsObj.has("showlevel")) showLevel = statsObj.get("showLevel").getAsBoolean();
+            if (statsObj.has("showlevel")) showLevel = statsObj.get("showlevel").getAsBoolean();
         }
         if (showLevel) xpBarTaskID = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
