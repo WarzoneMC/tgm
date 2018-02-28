@@ -8,6 +8,7 @@ import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.modules.StatsModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -159,6 +160,6 @@ public class ApiManager implements Listener {
     }
 
     public boolean isStatsDisabled() {
-        return !TGM.get().getConfig().getBoolean("api.stats.enabled");
+        return !TGM.get().getConfig().getBoolean("api.stats.enabled") || TGM.get().getModule(StatsModule.class).isStatsDisabled();
     }
 }
