@@ -18,6 +18,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import java.util.Random;
+
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     @Getter private TeamManagerModule teamManagerModule;
     @Getter private SpectatorModule spectatorModule;
@@ -89,8 +91,8 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         }
     }
 
-    private SpawnPoint getTeamSpawn(MatchTeam matchTeam) {
-        //todo: actually randomize spawn points instead of grabbing first one.
-        return matchTeam.getSpawnPoints().get(0);
+    public SpawnPoint getTeamSpawn(MatchTeam matchTeam) {
+        int i = (int) (Math.random() * (matchTeam.getSpawnPoints().size() - 1));
+        return matchTeam.getSpawnPoints().get(i);
     }
 }

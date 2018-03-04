@@ -138,7 +138,7 @@ public class MatchManager {
 
                         unloadMatchTask.cancel();
                         return;
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         return;
                     }
