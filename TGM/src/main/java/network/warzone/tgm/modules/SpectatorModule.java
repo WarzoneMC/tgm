@@ -25,10 +25,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemFlag;
@@ -156,6 +153,17 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+
+        if (isSpectating(player) && event.getTo().getY() <= -5.0) {
+            player.setAllowFlight(true);
+            player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
+            player.setFlying(true);
+        }
+    }
+
+    @EventHandler
     public void onDamage(PlayerDamageEvent event) {
         if (isSpectating(event.getEntity())) {
             event.setCancelled(true);
@@ -175,7 +183,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 event.setCancelled(true);
 
                 player.setAllowFlight(true);
-                player.getVelocity().setY(2.0); // Get out of that void!
+                player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
                 player.setFlying(true);
             }
         }
