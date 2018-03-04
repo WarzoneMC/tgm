@@ -18,9 +18,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+@Getter
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
-    @Getter private TeamManagerModule teamManagerModule;
-    @Getter private SpectatorModule spectatorModule;
+    private TeamManagerModule teamManagerModule;
+    private SpectatorModule spectatorModule;
 
     @Override
     public void load(Match match) {
@@ -49,31 +50,23 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
         event.setRespawnLocation(getTeamSpawn(matchTeam).getLocation());
 
-        Bukkit.getScheduler().runTaskLater(TGM.get(), new Runnable() {
-            @Override
-            public void run() {
-                spawnPlayer(playerContext, matchTeam, false);
-            }
-        }, 0L);
+        Bukkit.getScheduler().runTask(TGM.get(), () -> spawnPlayer(playerContext, matchTeam, false));
     }
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {
         Players.reset(playerContext.getPlayer(), true);
 
+        if (teleport) {
+            playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            if (!matchTeam.isSpectator()) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
+        }
+
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
             if (matchTeam.isSpectator()) {
                 spectatorModule.applySpectatorKit(playerContext);
-                if (teleport) {
-                    playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                }
             } else {
                 matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
                 playerContext.getPlayer().updateInventory();
-
-                if (teleport) {
-                    playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                    playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
-                }
             }
         }, 1L);
     }

@@ -34,7 +34,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.util.List;
 
 public class TGM extends JavaPlugin {
@@ -106,11 +105,7 @@ public class TGM extends JavaPlugin {
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
-        try {
-            matchManager.cycleNextMatch();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        matchManager.cycleNextMatch();
     }
 
     @Override
