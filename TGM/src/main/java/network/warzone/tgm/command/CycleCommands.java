@@ -340,6 +340,16 @@ public class CycleCommands {
             TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, cmd.getJoinedStrings(0));
         }
     }
+    
+    @Command(aliases = {"website", "web", "site"}, desc = "View the official warzone website")
+    public static void website(CommandContext cmd, CommandSender sender) {
+        sender.sendMessage(ChatColor.AQUA + "Access our website at https://warz.one/ ");
+    }
+    
+    @Command(aliases = {"buy", "store"}, desc = "View the official warzone store")
+    public static void buy(CommandContext cmd, CommandSender sender) {
+        sender.sendMessage(ChatColor.AQUA + "Access our store at http://warzone.store/ ");
+    }
 
     @Command(aliases = {"next"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
@@ -410,7 +420,6 @@ public class CycleCommands {
         player.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
         player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
     }
-
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin) {
         attemptJoinTeam(player, matchTeam, autoJoin, false);
