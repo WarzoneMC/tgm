@@ -23,7 +23,8 @@ public class TimeModule extends MatchModule {
     @Getter @Setter private boolean timeLimited = false;
     @Getter @Setter private int timeLimit = 20*60; // Default
     @Getter private MatchTeam defaultWinner = null;
-    @Getter private List<TimeLimitService> services = new ArrayList<>();
+    //@Getter private List<TimeLimitService> services = new ArrayList<>();
+    @Getter @Setter private TimeLimitService timeLimitService;
 
     private int taskID;
 
@@ -65,19 +66,18 @@ public class TimeModule extends MatchModule {
             }
             if (isTimeLimited()) {
                 if (time >= timeLimit) {
-                    MatchTeam winnerTeam = defaultWinner;
-                    for (TimeLimitService service : this.services) {
-                        winnerTeam = service.getWinnerTeam();
-                    }
-                    TGM.get().getMatchManager().endMatch(winnerTeam);
-                    //TGM.get().getMatchManager().endMatch(TGM.get().getModule(TeamManagerModule.class).getTeams().get(0));
+                    endMatch();
                 }
             }
         }, 20, 20).getTaskId();
     }
 
-    public void addTimeLimitService(TimeLimitService service) {
-        this.services.add(service);
+    public void endMatch() {
+        MatchTeam winnerTeam = defaultWinner;
+        if (getTimeLimitService() != null) {
+            winnerTeam = getTimeLimitService().getWinnerTeam();
+        }
+        TGM.get().getMatchManager().endMatch(winnerTeam);
     }
 
     @Override

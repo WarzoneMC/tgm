@@ -13,6 +13,8 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.time.TimeLimitService;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.wool.WoolObjective;
 import network.warzone.tgm.modules.wool.WoolObjectiveService;
 import network.warzone.tgm.modules.wool.WoolStatus;
@@ -29,9 +31,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CTWModule extends MatchModule implements Listener {
     public static final String SYMBOL_WOOL_INCOMPLETE = "\u2b1c";   // ⬜
@@ -128,6 +129,41 @@ public class CTWModule extends MatchModule implements Listener {
         for (WoolObjective woolObjective : wools) {
             woolObjective.load();
         }
+
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
+            @Override
+            public MatchTeam getWinnerTeam() {
+                return getWinningTeam();
+            }
+        });
+    }
+
+    private MatchTeam getWinningTeam() {
+        Map<MatchTeam, Integer> teamScores = new HashMap<>();
+        Map.Entry<MatchTeam, Integer> highest = null;
+        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+            if (matchTeam.isSpectator()) continue;
+            int score = 0;
+            for (WoolObjective woolObjective : this.wools) {
+                if (!woolObjective.getOwner().equals(matchTeam)) continue;
+                if (woolObjective.isCompleted()) score += 2;
+                else if (!woolObjective.getTouches().isEmpty()) score += 1;
+            }
+            teamScores.put(matchTeam, score);
+
+            if (highest == null) {
+                highest = new AbstractMap.SimpleEntry<>(matchTeam, score);
+                continue;
+            }
+            if (score > highest.getValue()) highest = new AbstractMap.SimpleEntry<>(matchTeam, score);
+        }
+        if (highest != null) {
+            final Map.Entry<MatchTeam, Integer> entry = highest;
+            int amount = teamScores.entrySet().stream().filter(en -> entry.getValue() == en.getValue()).collect(Collectors.toList()).size();
+            if (amount > 1) return null;
+            else return entry.getKey();
+        }
+        return null;
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
