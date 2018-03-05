@@ -26,6 +26,9 @@ public class SimpleScoreboard {
     private List<Integer> removed;
     private Set<String> updated;
 
+    private final UUID invalidUserUUID = UUID.nameUUIDFromBytes("InvalidUsername".getBytes(Charsets.UTF_8));
+    private Constructor<?> craftOfflinePlayerConstructor;
+
     public SimpleScoreboard(String title) {
         this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.title = ChatColor.translateAlternateColorCodes('&', title);
@@ -57,8 +60,7 @@ public class SimpleScoreboard {
 
         scores.remove(toRemove);
 
-        if(b)
-            removed.add(score);
+        if (b) removed.add(score);
 
         return true;
     }
@@ -75,8 +77,7 @@ public class SimpleScoreboard {
 
         scores.remove(toRemove);
         removed.add(score);
-        if(b)
-            removed.add(score);
+        if  (b) removed.add(score);
 
         return true;
     }
@@ -111,8 +112,7 @@ public class SimpleScoreboard {
         ChatColor color = ChatColor.values()[pos];
         OfflinePlayer result;
 
-        if (!cache.containsKey(color.toString()))
-            cache.put(color.toString(), getOfflinePlayerSkipLookup(color.toString()));
+        if (!cache.containsKey(color.toString())) cache.put(color.toString(), getOfflinePlayerSkipLookup(color.toString()));
 
         result = cache.get(color.toString());
 
@@ -233,9 +233,6 @@ public class SimpleScoreboard {
         for (Player p : players)
             p.setScoreboard(scoreboard);
     }
-
-    private final UUID invalidUserUUID = UUID.nameUUIDFromBytes("InvalidUsername".getBytes(Charsets.UTF_8));
-    private Constructor<?> craftOfflinePlayerConstructor;
 
     @SuppressWarnings("deprecation")
     private OfflinePlayer getOfflinePlayerSkipLookup(String name) {
