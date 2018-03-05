@@ -74,10 +74,12 @@ public class ApiManager implements Listener {
         if (isStatsDisabled()) return;
 
         List<String> winners = new ArrayList<>();
-        for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
-            winners.add(playerContext.getUserProfile().getId().toString());
-            playerContext.getUserProfile().addWin();
-            Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP()));
+        if (event.getWinningTeam() != null) {
+            for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
+                winners.add(playerContext.getUserProfile().getId().toString());
+                playerContext.getUserProfile().addWin();
+                Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP()));
+            }
         }
 
         List<String> losers = new ArrayList<>();
@@ -107,7 +109,7 @@ public class ApiManager implements Listener {
                 TGM.get().getModule(ChatModule.class).getChatLog(),
                 winners,
                 losers,
-                event.getWinningTeam().getId(),
+                event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,
                 teamMappings);
         TGM.get().getTeamClient().finishMatch(matchFinishPacket);
     }

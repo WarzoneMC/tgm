@@ -61,7 +61,7 @@ public class FFAModule extends MatchModule implements Listener {
             TimeModule timeModule = match.getModule(TimeModule.class);
             timeModule.setTimeLimited(timeLimitEnabled);
             timeModule.setTimeLimit(timeLimit);
-            timeModule.addTimeLimitService(new TimeLimitService() {
+            timeModule.setTimeLimitService(new TimeLimitService() {
                 @Override
                 public MatchTeam getWinnerTeam() {
                     return getWinner();
@@ -207,7 +207,7 @@ public class FFAModule extends MatchModule implements Listener {
         }
 
         MatchTeam winnerTeam = this.teamManagerModule.getTeamByAlias("winner");
-        winnerTeam.setAlias(player);
+        winnerTeam.setAlias(player != null ? player : "None");
 
         if (player != null && Bukkit.getPlayer(player) != null) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(Bukkit.getPlayer(player));

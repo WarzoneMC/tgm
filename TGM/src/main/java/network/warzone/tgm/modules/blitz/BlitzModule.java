@@ -11,6 +11,8 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.SpawnPointHandlerModule;
+import network.warzone.tgm.modules.time.TimeLimitService;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
@@ -77,6 +79,33 @@ public class BlitzModule extends MatchModule implements Listener {
                 teamLives.put(team, 1);
             }
         }
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
+            @Override
+            public MatchTeam getWinnerTeam() {
+                return getBiggestTeam();
+            }
+        });
+    }
+
+    private MatchTeam getBiggestTeam() {
+        MatchTeam highest = null;
+        for (MatchTeam team : teamManagerModule.getTeams()) {
+            if (team.isSpectator()) continue;
+            if (highest == null) {
+                highest = team;
+                continue;
+            }
+            if (getAlivePlayers(team).size() > getAlivePlayers(highest).size()) {
+                highest = team;
+            }
+        }
+        if (highest != null) {
+            final MatchTeam team = highest;
+            int amount = teamManagerModule.getTeams().stream().filter(t -> getAlivePlayers(team) == getAlivePlayers(t) && !t.isSpectator()).collect(Collectors.toList()).size();
+            if (amount > 1) return null;
+            else return team;
+        }
+        return null;
     }
 
     @Override

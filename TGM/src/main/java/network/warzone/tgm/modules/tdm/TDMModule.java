@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.modules.monument.Monument;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
@@ -11,6 +12,8 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import lombok.Getter;
+import network.warzone.tgm.modules.time.TimeLimitService;
+import network.warzone.tgm.modules.time.TimeModule;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,6 +22,8 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 9/4/2017.
@@ -47,6 +52,33 @@ public class TDMModule extends MatchModule implements Listener {
 
         pointsModule = TGM.get().getModule(PointsModule.class);
         pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
+
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
+            @Override
+            public MatchTeam getWinnerTeam() {
+                return getHighestPointsTeam();
+            }
+        });
+    }
+
+    private MatchTeam getHighestPointsTeam() {
+        Map.Entry<MatchTeam, Integer> highest = null;
+        for (Map.Entry<MatchTeam, Integer> entry : pointsModule.getPoints().entrySet()) {
+            if (highest == null) {
+                highest = entry;
+                continue;
+            }
+            if (entry.getValue() > highest.getValue()) {
+                highest = entry;
+            }
+        }
+        if (highest != null) {
+            final Map.Entry<MatchTeam, Integer> entry = highest;
+            int amount = pointsModule.getPoints().entrySet().stream().filter(en -> entry.getValue() == en.getValue()).collect(Collectors.toList()).size();
+            if (amount > 1) return null;
+            else return entry.getKey();
+        }
+        return null;
     }
 
     @EventHandler

@@ -43,7 +43,7 @@ public class MatchResultModule extends MatchModule implements Listener {
             } else {
                 player.sendMessage(ChatColor.DARK_PURPLE + "" + ChatColor.YELLOW + "  Tie!" + ChatColor.YELLOW + "");
             }
-            if (event.getWinningTeam().containsPlayer(player)) {
+            if (event.getWinningTeam() != null && event.getWinningTeam().containsPlayer(player)) {
                 player.sendMessage(ChatColor.GRAY + "  Congratulations!");
             }  else if (TGM.get().getModule(TeamManagerModule.class).getTeam(player) != null && TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator()) {
                 player.sendMessage(ChatColor.GRAY + "  Play next game?");

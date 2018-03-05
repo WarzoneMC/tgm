@@ -11,6 +11,8 @@ import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.time.TimeLimitService;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import network.warzone.warzoneapi.models.Death;
@@ -48,6 +50,13 @@ public class InfectionModule extends MatchModule implements Listener {
         length = json.get("length").getAsInt();
         teamManager = match.getModule(TeamManagerModule.class);
         this.match = match;
+
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
+            @Override
+            public MatchTeam getWinnerTeam() {
+                return getWinningTeam();
+            }
+        });
     }
 
     @Override
@@ -71,6 +80,9 @@ public class InfectionModule extends MatchModule implements Listener {
         match.getModule(InfectedTimeLimit.class).startCountdown(length);
     }
 
+    private MatchTeam getWinningTeam() {
+        return teamManager.getTeamByAlias("humans");
+    }
 //    @EventHandler
 //    public void onPlayerDeath(PlayerDeathEvent event) {
 //        // If the player isn't on the spectator team, they must be either human or infected.
