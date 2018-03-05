@@ -160,7 +160,7 @@ public class ControlPoint implements Listener {
                 controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), false);
             }
 
-            if (progress == 0) {
+            if (progress <= 0) {
                 progressingTowardsTeam = matchTeam; //change directions
 
                 if (controller != null) {

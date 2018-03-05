@@ -54,7 +54,7 @@ public class MatchManager {
                 matchTeam.getMembers().forEach(playerContext -> {
                     playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
                     playerContext.getPlayer().setAllowFlight(true);
-                    playerContext.getPlayer().getVelocity().setY(1.0); // Weeee!
+                    playerContext.getPlayer().setVelocity(playerContext.getPlayer().getVelocity().setY(1.0)); // Weeee!
                     playerContext.getPlayer().setFlying(true);
                 });
 
@@ -68,7 +68,7 @@ public class MatchManager {
         Bukkit.getPluginManager().callEvent(new MatchResultEvent(match, winningTeam, losers));
     }
 
-    public void cycleNextMatch() throws IOException {
+    public void cycleNextMatch() {
         Bukkit.getScheduler().runTask(TGM.get(), () -> {
             matchNumber++;
 

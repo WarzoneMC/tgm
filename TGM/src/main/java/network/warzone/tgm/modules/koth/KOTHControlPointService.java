@@ -12,11 +12,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class KOTHControlPointService implements ControlPointService {
-    @Getter private KOTHModule kothModule;
-    @Getter private Match match;
-    @Getter private ControlPointDefinition definition;
+
+    private KOTHModule kothModule;
+    private Match match;
+    private ControlPointDefinition definition;
 
     @Override
     public void holding(MatchTeam matchTeam) {
@@ -30,13 +31,11 @@ public class KOTHControlPointService implements ControlPointService {
 
     @Override
     public void captured(MatchTeam matchTeam) {
-        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE
-                + " took control of " + ChatColor.AQUA + ChatColor.BOLD.toString() + definition.getName());
-
+        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
+                " took control of " + ChatColor.AQUA + ChatColor.BOLD.toString() + definition.getName());
 
         kothModule.incrementPoints(matchTeam, definition.getPointsPerTick());
         kothModule.updateScoreboardControlPointLine(definition);
-
 
         for (MatchTeam team : match.getModule(TeamManagerModule.class).getTeams()) {
             for (PlayerContext playerContext : team.getMembers()) {
@@ -52,7 +51,7 @@ public class KOTHControlPointService implements ControlPointService {
     @Override
     public void lost(MatchTeam matchTeam) {
         kothModule.updateScoreboardControlPointLine(definition);
-        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE
-                + " lost control of " + ChatColor.AQUA + ChatColor.BOLD.toString() + definition.getName());
+        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
+                " lost control of " + ChatColor.AQUA + ChatColor.BOLD.toString() + definition.getName());
     }
 }

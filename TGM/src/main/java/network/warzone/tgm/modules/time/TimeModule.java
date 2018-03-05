@@ -2,11 +2,10 @@ package network.warzone.tgm.modules.time;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
-import lombok.Getter;
-import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Bukkit;
 

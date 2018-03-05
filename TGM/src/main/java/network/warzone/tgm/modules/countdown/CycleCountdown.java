@@ -1,14 +1,12 @@
 package network.warzone.tgm.modules.countdown;
 
+import com.sk89q.minecraft.util.commands.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
-import com.sk89q.minecraft.util.commands.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-
-import java.io.IOException;
 
 public class CycleCountdown extends BossBarCountdown {
     public static int START_TIME = 20;
@@ -52,11 +50,8 @@ public class CycleCountdown extends BossBarCountdown {
     @Override
     protected void onFinish() {
         getBossBar().setVisible(false);
-        try {
-            TGM.get().getMatchManager().cycleNextMatch();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        TGM.get().getMatchManager().cycleNextMatch();
     }
 
     @Override

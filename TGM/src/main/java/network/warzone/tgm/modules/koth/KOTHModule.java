@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.koth;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -15,7 +16,6 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,14 +24,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Getter
 public class KOTHModule extends MatchModule implements Listener {
-    @Getter private final List<ControlPoint> controlPoints = new ArrayList<>();
-    @Getter private PointsModule pointsModule;
 
-    @Getter
+    private final List<ControlPoint> controlPoints = new ArrayList<>();
+    private PointsModule pointsModule;
+
     private final HashMap<ControlPointDefinition, Integer> controlPointScoreboardLines = new HashMap<>();
 
-    @Getter
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
@@ -92,7 +92,7 @@ public class KOTHModule extends MatchModule implements Listener {
 
     public ControlPoint getControlPointByDefinition(ControlPointDefinition definition) {
         for (ControlPoint controlPoint : controlPoints) {
-            if(controlPoint.getDefinition() == definition) return controlPoint;
+            if (controlPoint.getDefinition() == definition) return controlPoint;
         }
         return null;
     }
@@ -100,12 +100,10 @@ public class KOTHModule extends MatchModule implements Listener {
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
-
-
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
         int i;
-        for(i = 0; i < controlPoints.size(); i++) {
+        for (i = 0; i < controlPoints.size(); i++) {
             ControlPoint controlPoint = controlPoints.get(i);
 
             controlPointScoreboardLines.put(controlPoint.getDefinition(), i);
@@ -117,7 +115,7 @@ public class KOTHModule extends MatchModule implements Listener {
 
         i++;
         for (MatchTeam matchTeam : teams) {
-            if(matchTeam.isSpectator()) continue;
+            if (matchTeam.isSpectator()) continue;
 
             simpleScoreboard.add(getTeamScoreLine(matchTeam), i);
             teamScoreboardLines.put(matchTeam, i);

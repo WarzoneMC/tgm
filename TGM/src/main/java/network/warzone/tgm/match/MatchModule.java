@@ -8,8 +8,10 @@ import java.util.logging.Logger;
 /**
  * Created by luke on 4/27/17.
  */
+@Getter
 public abstract class MatchModule {
-    @Getter private Logger logger = Bukkit.getLogger();
+
+    private Logger logger = Bukkit.getLogger();
 
     /**
      * Called immediately after a match is loaded.
