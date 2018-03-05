@@ -18,8 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.Random;
-
 @Getter
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
