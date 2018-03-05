@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
+import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Bukkit;
 
@@ -21,6 +22,8 @@ public class TimeModule extends MatchModule {
 
     @Getter @Setter private boolean timeLimited = false;
     @Getter @Setter private int timeLimit = 20*60; // Default
+    @Getter private MatchTeam defaultWinner = null;
+    @Getter private List<TimeLimitService> services = new ArrayList<>();
 
     private int taskID;
 
@@ -32,15 +35,21 @@ public class TimeModule extends MatchModule {
                 timeLimit = timeObject.get("limit").getAsInt();
                 setTimeLimited(true);
             }
+            if (timeObject.has("defaultWinner")) defaultWinner = match.getModule(TeamManagerModule.class).getTeamById(timeObject.get("defaultWinner").getAsString());
             if (timeObject.has("broadcasts") && timeObject.get("broadcasts").isJsonArray()) {
                 for (JsonElement element : timeObject.getAsJsonArray("broadcasts")) {
                     JsonObject broadcast = (JsonObject) element;
                     BroadcastTimeType type = BroadcastTimeType.valueOf(broadcast.get("type").getAsString().toUpperCase());
-                    String message = broadcast.get("message").getAsString();
+                    String message = broadcast.has("message") ? broadcast.get("message").getAsString() : null;
+                    List<String> commands = new ArrayList<>();
+                    for (JsonElement cmdElement : broadcast.get("commands").getAsJsonArray()) {
+                        String command = cmdElement.getAsString();
+                        commands.add(command);
+                    }
                     int interval = broadcast.get("value").getAsInt();
                     List<Integer> excludedTimes = new ArrayList<>();
                     if (broadcast.has("exclude") && broadcast.get("exclude").isJsonArray()) broadcast.get("exclude").getAsJsonArray().forEach(jsonElement -> excludedTimes.add(jsonElement.getAsInt()));
-                    broadcasts.add(new Broadcast(type, message, interval, excludedTimes));
+                    broadcasts.add(new Broadcast(type, message, commands, interval, excludedTimes));
                 }
             }
         }
@@ -56,10 +65,19 @@ public class TimeModule extends MatchModule {
             }
             if (isTimeLimited()) {
                 if (time >= timeLimit) {
-                    TGM.get().getMatchManager().endMatch(TGM.get().getModule(TeamManagerModule.class).getTeams().get(0));
+                    MatchTeam winnerTeam = defaultWinner;
+                    for (TimeLimitService service : this.services) {
+                        winnerTeam = service.getWinnerTeam();
+                    }
+                    TGM.get().getMatchManager().endMatch(winnerTeam);
+                    //TGM.get().getMatchManager().endMatch(TGM.get().getModule(TeamManagerModule.class).getTeams().get(0));
                 }
             }
         }, 20, 20).getTaskId();
+    }
+
+    public void addTimeLimitService(TimeLimitService service) {
+        this.services.add(service);
     }
 
     @Override

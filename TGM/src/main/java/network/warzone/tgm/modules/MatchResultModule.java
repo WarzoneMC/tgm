@@ -39,7 +39,7 @@ public class MatchResultModule extends MatchModule implements Listener {
 
             player.sendMessage("" + ChatColor.AQUA + ChatColor.STRIKETHROUGH + "---------------------");
             if (event.getWinningTeam() != null) {
-                player.sendMessage(ChatColor.DARK_PURPLE + "  Winning Team: " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias());
+                player.sendMessage(ChatColor.DARK_PURPLE + "  Winner: " + event.getWinningTeam().getColor() + event.getWinningTeam().getAlias());
             } else {
                 player.sendMessage(ChatColor.DARK_PURPLE + "" + ChatColor.YELLOW + "  Tie!" + ChatColor.YELLOW + "");
             }

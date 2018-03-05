@@ -19,6 +19,7 @@ public class Broadcast {
 
     @Getter private BroadcastTimeType timeType;
     @Getter private String message;
+    @Getter private List<String> commands;
     @Getter int interval;
     @Getter private List<Integer> excludedTimes;
 
@@ -27,10 +28,12 @@ public class Broadcast {
         if (timeType.equals(BroadcastTimeType.ABSOLUTE)) {
             if (time == interval) {
                 Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', message).replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time)));
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time))));
             }
         } else if (timeType.equals(BroadcastTimeType.MULTIPLE)) {
             if (time % interval == 0 && !excludedTimes.contains(time)) {
                 Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', message).replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time)));
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time))));
             }
         }
     }
