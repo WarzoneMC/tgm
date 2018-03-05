@@ -145,12 +145,17 @@ public class CTWModule extends MatchModule implements Listener {
             if (matchTeam.isSpectator()) continue;
             int score = 0;
             for (WoolObjective woolObjective : this.wools) {
+                if (!woolObjective.getOwner().equals(matchTeam)) continue;
                 if (woolObjective.isCompleted()) score += 2;
-                else if (woolObjective.getTouches().isEmpty()) score += 1;
+                else if (!woolObjective.getTouches().isEmpty()) score += 1;
             }
             teamScores.put(matchTeam, score);
 
-            if (highest == null) highest = new AbstractMap.SimpleEntry<>(matchTeam, score);
+            if (highest == null) {
+                highest = new AbstractMap.SimpleEntry<>(matchTeam, score);
+                continue;
+            }
+            if (score > highest.getValue()) highest = new AbstractMap.SimpleEntry<>(matchTeam, score);
         }
         if (highest != null) {
             final Map.Entry<MatchTeam, Integer> entry = highest;
