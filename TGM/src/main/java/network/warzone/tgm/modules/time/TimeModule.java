@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
+import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Bukkit;
 
