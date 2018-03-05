@@ -343,7 +343,8 @@ public class CycleCommands {
 
     @Command(aliases = {"next"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
-        sender.sendMessage(ChatColor.YELLOW + "Next Map: " + ChatColor.GRAY + TGM.get().getMatchManager().getNextMap().getMapInfo().getName());
+        MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
+        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
     }
     
     @Command(aliases = {"map"}, desc = "View the map info for the current map")
