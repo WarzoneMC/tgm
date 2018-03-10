@@ -2,6 +2,8 @@ package network.warzone.tgm.modules.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import network.warzone.tgm.modules.time.TimeLimitService;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.warzoneapi.models.DestroyWoolRequest;
 import network.warzone.warzoneapi.models.UserProfile;
 import network.warzone.tgm.TGM;
@@ -33,6 +35,7 @@ import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class DTMModule extends MatchModule implements Listener {
@@ -121,6 +124,12 @@ public class DTMModule extends MatchModule implements Listener {
         for (Monument monument : monuments) {
             monument.load();
         }
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
+            @Override
+            public MatchTeam getWinnerTeam() {
+                return getHighestHealthTeam();
+            }
+        });
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
@@ -195,6 +204,26 @@ public class DTMModule extends MatchModule implements Listener {
                 simpleScoreboard.update();
             }
         }
+    }
+
+    private MatchTeam getHighestHealthTeam() {
+        Monument highest = null;
+        for (Monument monument : monuments) {
+            if (highest == null) {
+                highest = monument;
+                continue;
+            }
+            if (monument.getHealth() > highest.getHealth()) {
+                highest = monument;
+            }
+        }
+        if (highest != null) {
+            final Monument monument = highest;
+            int amount = monuments.stream().filter(mon -> mon.getHealth() == monument.getHealth()).collect(Collectors.toList()).size();
+            if (amount > 1) return null;
+            else return monument.getOwners().get(0);
+        }
+        return null;
     }
 
     private String getTeamScoreboardString(MatchTeam matchTeam) {

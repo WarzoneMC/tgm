@@ -1,13 +1,16 @@
 package network.warzone.tgm.modules.scoreboard;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.mojang.authlib.GameProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,9 +22,12 @@ public class SimpleScoreboard {
     private String title;
     private Map<String, Integer> scores;
     private Objective obj;
-    private List<Object> teams;
+    private List<Team> teams;
     private List<Integer> removed;
-    private Set<Object> updated;
+    private Set<String> updated;
+
+    private final UUID invalidUserUUID = UUID.nameUUIDFromBytes("InvalidUsername".getBytes(Charsets.UTF_8));
+    private Constructor<?> craftOfflinePlayerConstructor;
 
     public SimpleScoreboard(String title) {
         this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -60,6 +66,10 @@ public class SimpleScoreboard {
     }
 
     public boolean remove(Integer score) {
+        return remove(score, true);
+    }
+
+    public boolean remove(Integer score, boolean b) {
         String toRemove = get(score);
 
         if (toRemove == null)
@@ -67,6 +77,7 @@ public class SimpleScoreboard {
 
         scores.remove(toRemove);
         removed.add(score);
+        if  (b) removed.add(score);
 
         return true;
     }
@@ -101,8 +112,7 @@ public class SimpleScoreboard {
         ChatColor color = ChatColor.values()[pos];
         OfflinePlayer result;
 
-        if (!cache.containsKey(color.toString()))
-            cache.put(color.toString(), Bukkit.getOfflinePlayer(color.toString()));
+        if (!cache.containsKey(color.toString())) cache.put(color.toString(), getOfflinePlayerSkipLookup(color.toString()));
 
         result = cache.get(color.toString());
 
@@ -124,16 +134,13 @@ public class SimpleScoreboard {
 
         team.setPrefix(prefix);
 
-        if (!team.hasEntry(result.getName()))
-            team.addEntry(result.getName());
+        if(!team.hasPlayer(result)) team.addPlayer(result);
 
         if (text.length() > 16) {
             String prefixColor = ChatColor.getLastColors(prefix);
             String suffix = iterator.next();
 
-            //TODO Change to the symbols
-
-            if (prefix.endsWith("nn")) {
+            if (prefix.endsWith(String.valueOf(ChatColor.COLOR_CHAR))) {
                 prefix = prefix.substring(0, prefix.length() - 1);
                 team.setPrefix(prefix);
                 prefixColor = ChatColor.getByChar(suffix.charAt(0)).toString();
@@ -162,19 +169,16 @@ public class SimpleScoreboard {
             obj.setDisplaySlot(DisplaySlot.SIDEBAR);
         }
 
-        for (int i : removed) {
+        removed.stream().forEach((remove) -> {
             for (String s : scoreboard.getEntries()) {
                 Score score = obj.getScore(s);
-
-                if (score == null)
-                    continue;
-
-                if (score.getScore() != i)
-                    continue;
+                
+                if (score == null) continue;
+                if (score.getScore() != remove) continue;
 
                 scoreboard.resetScores(s);
             }
-        }
+        });
 
         removed.clear();
 
@@ -184,16 +188,12 @@ public class SimpleScoreboard {
             Team t = scoreboard.getTeam(ChatColor.values()[text.getValue()].toString());
             Map.Entry<Team, OfflinePlayer> team;
 
-            if (!updated.contains(text.getKey())) {
-                continue;
-            }
+            if(!updated.contains(text.getKey())) continue;
 
-            if (t != null) {
+            if(t != null) {
                 String color = ChatColor.values()[text.getValue()].toString();
 
-                if (!cache.containsKey(color)) {
-                    cache.put(color, Bukkit.getOfflinePlayer(color));
-                }
+                if (!cache.containsKey(color)) cache.put(color, getOfflinePlayerSkipLookup(color));
 
                 team = new AbstractMap.SimpleEntry<>(t, cache.get(color));
                 applyText(team.getKey(), text.getKey(), team.getValue());
@@ -206,7 +206,7 @@ public class SimpleScoreboard {
 
             Integer score = text.getValue() != null ? text.getValue() : index;
 
-            obj.getScore(team.getValue().getName()).setScore(score);
+            obj.getScore(team.getValue()).setScore(score);
             index -= 1;
         }
 
@@ -216,13 +216,11 @@ public class SimpleScoreboard {
     public void setTitle(String title) {
         this.title = ChatColor.translateAlternateColorCodes('&', title);
 
-        if (obj != null)
-            obj.setDisplayName(title);
+        if(obj != null) obj.setDisplayName(this.title);
     }
 
     public void reset() {
-        for (Object t : teams)
-            ((Objective) t).unregister();
+        for (Team t : teams) t.unregister();
         teams.clear();
         scores.clear();
     }
@@ -236,4 +234,19 @@ public class SimpleScoreboard {
             p.setScoreboard(scoreboard);
     }
 
+    @SuppressWarnings("deprecation")
+    private OfflinePlayer getOfflinePlayerSkipLookup(String name) {
+        try {
+            if (craftOfflinePlayerConstructor == null) {
+                Class<?> craftOfflinePlayerClass = Class.forName(Bukkit.getServer().getClass().getName().replace("CraftServer", "CraftOfflinePlayer"));
+                craftOfflinePlayerConstructor = craftOfflinePlayerClass.getDeclaredConstructor(Bukkit.getServer().getClass(), GameProfile.class);
+                craftOfflinePlayerConstructor.setAccessible(true);
+            }
+            GameProfile gameProfile = new GameProfile(invalidUserUUID, name);
+            Object craftOfflinePlayer = craftOfflinePlayerConstructor.newInstance(Bukkit.getServer(), gameProfile);
+            return (OfflinePlayer) craftOfflinePlayer;
+        } catch (Throwable t) { // Fallback if fail
+            return Bukkit.getOfflinePlayer(name);
+        }
+    }
 }

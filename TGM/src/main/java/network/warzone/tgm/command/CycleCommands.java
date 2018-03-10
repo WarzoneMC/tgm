@@ -19,6 +19,7 @@ import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -139,7 +140,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"end"}, desc = "End the match.")
+    @Command(aliases = {"end"}, desc = "End the match.", anyFlags = true, flags = "f")
     @CommandPermissions({"tgm.end"})
     public static void end(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
@@ -152,7 +153,11 @@ public class CycleCommands {
                 }
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
-                TGM.get().getMatchManager().endMatch(TGM.get().getModule(TeamManagerModule.class).getTeams().get(1));
+                if (cmd.hasFlag('f')) {
+                    TGM.get().getMatchManager().endMatch(null);
+                } else {
+                    TGM.get().getModule(TimeModule.class).endMatch();
+                }
             }
         } else {
             sender.sendMessage(ChatColor.RED + "No match in progress.");
@@ -343,7 +348,8 @@ public class CycleCommands {
 
     @Command(aliases = {"next"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
-        sender.sendMessage(ChatColor.YELLOW + "Next Map: " + ChatColor.GRAY + TGM.get().getMatchManager().getNextMap().getMapInfo().getName());
+        MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
+        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
     }
     
     @Command(aliases = {"map"}, desc = "View the map info for the current map")

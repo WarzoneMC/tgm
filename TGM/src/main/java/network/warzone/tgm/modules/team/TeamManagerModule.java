@@ -42,6 +42,9 @@ public class TeamManagerModule extends MatchModule implements Listener {
         }
     }
 
+    public void addTeam(MatchTeam team) {
+        teams.add(team);
+    }
 
     @EventHandler
     public void onMatchJoin(MatchJoinEvent event) {
