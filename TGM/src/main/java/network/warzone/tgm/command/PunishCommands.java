@@ -51,7 +51,7 @@ public class PunishCommands {
         } else {
             Player target;
             if ((target = Bukkit.getPlayer(name)) != null) {
-                issuePunishment("ban", name, target.getAddress().getHostString(), true, sender, "banned", timeUnitPair, reason, true);
+                issuePunishment("ban", name, target.getAddress().getHostString(), true, sender, "IP banned", timeUnitPair, reason, true);
             } else {
                 issuePunishment("ban", name, null, true, sender, "IP banned", timeUnitPair, reason, true);
             }
