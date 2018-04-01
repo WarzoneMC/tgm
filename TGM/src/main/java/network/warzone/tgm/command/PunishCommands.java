@@ -34,7 +34,7 @@ public class PunishCommands {
         return IP_PATTERN.matcher(ip).matches();
     }
 
-    @Command(aliases = {"ban-ip", "banip"}, desc = "IP Ban a rulebreaker", min = 2, usage = "(name|ip) (length) (reason...)")
+    @Command(aliases = {"ban-ip", "banip"}, desc = "IP Ban a rulebreaker", min = 2, usage = "(name|ip) (length) (reason...)", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.punish.ban-ip"})
     public static void banIP(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
@@ -47,18 +47,18 @@ public class PunishCommands {
 
         String reason = cmd.argsLength() > 2 ? cmd.getRemainingString(2) : "Inappropriate Behavior";
         if (isIP(name)) {
-            issuePunishment("ban", null, name, true, sender, "IP banned", timeUnitPair, reason, true);
+            issuePunishment("ban", null, name, true, sender, "IP banned", timeUnitPair, reason, true, !cmd.hasFlag('s'));
         } else {
             Player target;
             if ((target = Bukkit.getPlayer(name)) != null) {
-                issuePunishment("ban", name, target.getAddress().getHostString(), true, sender, "IP banned", timeUnitPair, reason, true);
+                issuePunishment("ban", name, target.getAddress().getHostString(), true, sender, "IP banned", timeUnitPair, reason, true, !cmd.hasFlag('s'));
             } else {
-                issuePunishment("ban", name, null, true, sender, "IP banned", timeUnitPair, reason, true);
+                issuePunishment("ban", name, null, true, sender, "IP banned", timeUnitPair, reason, true, !cmd.hasFlag('s'));
             }
         }
     }
 
-    @Command(aliases = "ban", desc = "Ban a rulebreaker", min = 2, usage = "(name) (length) (reason...)")
+    @Command(aliases = "ban", desc = "Ban a rulebreaker", min = 2, usage = "(name) (length) (reason...)", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.punish.ban"})
     public static void ban(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
@@ -71,20 +71,20 @@ public class PunishCommands {
 
         String reason = cmd.argsLength() > 2 ? cmd.getRemainingString(2) : "Inappropriate Behavior";
 
-        issuePunishment("ban", name, sender, "banned", timeUnitPair, reason, true);
+        issuePunishment("ban", name, sender, "banned", timeUnitPair, reason, true, !cmd.hasFlag('s'));
     }
 
-    @Command(aliases = "kick", desc = "Kick a rulebreaker", min = 1, usage = "(name) (reason...)")
+    @Command(aliases = "kick", desc = "Kick a rulebreaker", min = 1, usage = "(name) (reason...)", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.punish.kick"})
     public static void kick(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
         String reason = cmd.argsLength() > 1 ? cmd.getRemainingString(1) : "Inappropriate Behavior";
 
-        issuePunishment("kick", name, sender, "kicked", new TimeUnitPair(1, ChronoUnit.MILLIS), reason, false);
+        issuePunishment("kick", name, sender, "kicked", new TimeUnitPair(1, ChronoUnit.MILLIS), reason, false, !cmd.hasFlag('s'));
     }
 
-    @Command(aliases = "mute", desc = "Mute a rulebreaker", min = 2, usage = "(name) (length) (reason...)")
+    @Command(aliases = "mute", desc = "Mute a rulebreaker", min = 2, usage = "(name) (length) (reason...)", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.punish.mute"})
     public static void mute(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
@@ -97,18 +97,18 @@ public class PunishCommands {
 
         String reason = cmd.argsLength() > 2 ? cmd.getRemainingString(2) : "Inappropriate Behavior";
 
-        issuePunishment("mute", name, sender, "muted", timeUnitPair, reason, true);
+        issuePunishment("mute", name, sender, "muted", timeUnitPair, reason, true, !cmd.hasFlag('s'));
 
     }
 
-    @Command(aliases = "warn", desc = "Warn a rulebreaker", min = 1, usage = "(name) (reason...)")
+    @Command(aliases = "warn", desc = "Warn a rulebreaker", min = 1, usage = "(name) (reason...)", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.punish.warn"})
     public static void warn(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
         String reason = cmd.argsLength() > 1 ? cmd.getRemainingString(1) : "Inappropriate Behavior";
 
-        issuePunishment("warn", name, sender, "warned", new TimeUnitPair(1, ChronoUnit.MILLIS), reason, false);
+        issuePunishment("warn", name, sender, "warned", new TimeUnitPair(1, ChronoUnit.MILLIS), reason, false, !cmd.hasFlag('s'));
     }
 
     @Command(aliases = {"punishments", "p"}, desc = "Get player punishments", min = 1, max = 1, usage = "(name|ip)")
@@ -194,11 +194,11 @@ public class PunishCommands {
         Bukkit.getConsoleSender().sendMessage(result);
     }
 
-    private static void issuePunishment(String type, String name, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time) {
-        issuePunishment(type, name, null, false, punisher, verb, timeUnitPair, reason, time);
+    private static void issuePunishment(String type, String name, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
+        issuePunishment(type, name, null, false, punisher, verb, timeUnitPair, reason, time, broadcast);
     }
 
-    private static void issuePunishment(String type, String name, String ip, boolean ip_ban, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time) {
+    private static void issuePunishment(String type, String name, String ip, boolean ip_ban, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             IssuePunishmentResponse response = TGM.get().getTeamClient().issuePunishment(
                     new IssuePunishmentRequest(
@@ -214,7 +214,7 @@ public class PunishCommands {
                 punisher.sendMessage(ChatColor.RED + "Player not found!");
             } else {
                 Bukkit.getScheduler().runTask(TGM.get(), () -> {
-                    broadcastPunishment(response.getName(), response.getIp(), punisher instanceof Player ? punisher.getName() : "Console", verb, timeUnitPair, reason, time);
+                    broadcastPunishment(response.getName(), response.getIp(), punisher instanceof Player ? punisher.getName() : "Console", verb, timeUnitPair, reason, time, broadcast);
                     if (response.isKickable()) {
                         kickPlayer(response.getPunishment(), response.getName());
                     }
@@ -227,27 +227,36 @@ public class PunishCommands {
         });
     }
 
-    private static void broadcastPunishment(String name, String ip, String punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time) {
+    private static void broadcastPunishment(String name, String ip, String punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean everyone) {
         if (name != null) {
             if (time) {
-                Bukkit.broadcastMessage(ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
+                if (everyone) Bukkit.broadcastMessage(ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
                         " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
+                else {
+                    Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list") || player.getName().equalsIgnoreCase(name)).forEach(player -> player.sendMessage(ChatColor.GRAY + "[SILENT] " + ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
+                            " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
+                            " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason)));
+                }
             } else {
-                Bukkit.broadcastMessage(ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
+                if (everyone) Bukkit.broadcastMessage(ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
+                else {
+                    Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list") || player.getName().equalsIgnoreCase(name)).forEach(player -> player.sendMessage(ChatColor.GRAY + "[SILENT] " + ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + name + ChatColor.GRAY +
+                            " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason)));
+                }
             }
         } else {
             if (time) {
-                String result = ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + ip + ChatColor.GRAY +
+                String result = ChatColor.GRAY + "[SILENT] " + ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + ip + ChatColor.GRAY +
                         " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason);
-                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.ban-ip")).forEach(player -> player.sendMessage(result));
+                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list")).forEach(player -> player.sendMessage(result));
                 Bukkit.getConsoleSender().sendMessage(result);
             } else {
-                String result = ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + ip + ChatColor.GRAY +
+                String result = ChatColor.GRAY + "[SILENT] " + ChatColor.YELLOW + punisher + ChatColor.GRAY + " " + verb + " " + ChatColor.RED + ip + ChatColor.GRAY +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason);
-                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.ban-ip")).forEach(player -> player.sendMessage(result));
+                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list")).forEach(player -> player.sendMessage(result));
                 Bukkit.getConsoleSender().sendMessage(result);
             }
         }
