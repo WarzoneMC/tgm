@@ -27,10 +27,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+@Getter
 public class ChatModule extends MatchModule implements Listener {
-    @Getter private TeamManagerModule teamManagerModule;
-    @Getter private TimeModule timeModule;
-    @Getter private final List<Chat> chatLog = new ArrayList<>();
+
+    private TeamManagerModule teamManagerModule;
+    private TimeModule timeModule;
+    private final List<Chat> chatLog = new ArrayList<>();
 
     @Override
     public void load(Match match) {
@@ -69,7 +71,8 @@ public class ChatModule extends MatchModule implements Listener {
         }
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
         String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-        event.setFormat(playerContext.getLevelString() + " " + prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
+        event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
+                prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
         if (!matchTeam.isSpectator()) chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), event.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), event.getMessage(), matchTeam.getId(), timeModule.getTimeElapsed(), false));
     }
 
