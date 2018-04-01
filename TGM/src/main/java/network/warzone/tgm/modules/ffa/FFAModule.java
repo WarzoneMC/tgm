@@ -57,17 +57,17 @@ public class FFAModule extends MatchModule implements Listener {
             if (ffaObj.has("killLimit")) killLimit = ffaObj.get("killLimit").getAsInt();
         }
 
+        TimeModule timeModule = match.getModule(TimeModule.class);
         if (timeLimitEnabled) {
-            TimeModule timeModule = match.getModule(TimeModule.class);
             timeModule.setTimeLimited(timeLimitEnabled);
             timeModule.setTimeLimit(timeLimit);
-            timeModule.setTimeLimitService(new TimeLimitService() {
-                @Override
-                public MatchTeam getWinnerTeam() {
-                    return getWinner();
-                }
-            });
         }
+        timeModule.setTimeLimitService(new TimeLimitService() {
+            @Override
+            public MatchTeam getWinnerTeam() {
+                return getWinner();
+            }
+        });
     }
 
     @Override
