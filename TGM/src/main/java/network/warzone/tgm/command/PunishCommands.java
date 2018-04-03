@@ -147,7 +147,6 @@ public class PunishCommands {
             } else {
                 sender.sendMessage(ChatColor.YELLOW + "Info for " + playerInfoResponse.getQueryFilter() + ":");
                 if (isIP(playerInfoResponse.getQueryFilter())) {
-                    String ip = playerInfoResponse.getQueryFilter();
                     sender.sendMessage(ChatColor.GRAY + "Users " + ChatColor.RESET + "(" + playerInfoResponse.getUsers().size() + ")" + ChatColor.GRAY + ":");
                     for (UserProfile profile : playerInfoResponse.getUsers()) {
                         sender.spigot().sendMessage(new ComponentBuilder(ChatColor.GRAY + " - " + ChatColor.RESET + profile.getName()).event(
@@ -162,7 +161,6 @@ public class PunishCommands {
                         ).create());
                     }
                 } else {
-                    String name = playerInfoResponse.getQueryFilter();
                     if (playerInfoResponse.getUsers().isEmpty()) return;
                     UserProfile profile = playerInfoResponse.getUsers().get(0);
                     sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
