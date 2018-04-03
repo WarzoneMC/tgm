@@ -137,7 +137,7 @@ public class PunishCommands {
     }
 
     @Command(aliases = {"lookup", "lu"}, desc = "Get player info", min = 1, max = 1, usage = "(name|ip)")
-    @CommandPermissions({"tgm.punish.lookup"})
+    @CommandPermissions({"tgm.lookup"})
     public static void lookup(CommandContext cmd, CommandSender sender) {
         String filter = cmd.getString(0);
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
@@ -163,10 +163,7 @@ public class PunishCommands {
                     }
                 } else {
                     String name = playerInfoResponse.getQueryFilter();
-                    if (playerInfoResponse.getUsers().isEmpty()) {
-                        System.out.println("Empty list");
-                        return;
-                    }
+                    if (playerInfoResponse.getUsers().isEmpty()) return;
                     UserProfile profile = playerInfoResponse.getUsers().get(0);
                     sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
                             "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
