@@ -50,4 +50,6 @@ public interface TeamClient {
 
     RevertPunishmentResponse revertPunishment(String id);
 
+    PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest);
+
 }
