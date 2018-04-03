@@ -89,4 +89,9 @@ public class OfflineClient implements TeamClient {
     public RevertPunishmentResponse revertPunishment(String id) {
         return null;
     }
+
+    @Override
+    public PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest) {
+        return null;
+    }
 }

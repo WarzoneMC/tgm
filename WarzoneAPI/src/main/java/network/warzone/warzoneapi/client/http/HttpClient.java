@@ -280,4 +280,19 @@ public class HttpClient implements TeamClient {
         }
     }
 
+    @Override
+    public PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest) {
+        try {
+            HttpResponse<PlayerInfoResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/lookup")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(playerInfoRequest)
+                    .asObject(PlayerInfoResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

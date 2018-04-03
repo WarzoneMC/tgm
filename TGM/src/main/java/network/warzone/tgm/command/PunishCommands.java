@@ -6,10 +6,7 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.user.PlayerContext;
@@ -139,6 +136,43 @@ public class PunishCommands {
         });
     }
 
+    @Command(aliases = {"lookup", "lu"}, desc = "Get player info", min = 1, max = 1, usage = "(name|ip)")
+    @CommandPermissions({"tgm.lookup"})
+    public static void lookup(CommandContext cmd, CommandSender sender) {
+        String filter = cmd.getString(0);
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            PlayerInfoResponse playerInfoResponse = TGM.get().getTeamClient().getPlayerInfo(new PlayerInfoRequest(isIP(filter) ? null : filter, isIP(filter) ? filter : null));
+            if (playerInfoResponse.isError()) {
+                sender.sendMessage(ChatColor.RED + playerInfoResponse.getMessage());
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "Info for " + playerInfoResponse.getQueryFilter() + ":");
+                if (isIP(playerInfoResponse.getQueryFilter())) {
+                    sender.sendMessage(ChatColor.GRAY + "Users " + ChatColor.RESET + "(" + playerInfoResponse.getUsers().size() + ")" + ChatColor.GRAY + ":");
+                    for (UserProfile profile : playerInfoResponse.getUsers()) {
+                        sender.spigot().sendMessage(new ComponentBuilder(ChatColor.GRAY + " - " + ChatColor.RESET + profile.getName()).event(
+                                new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
+                                        ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
+                                            "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
+                                            "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
+                                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
+                                            "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1)
+                                ).create())).event(
+                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lookup " + profile.getName())
+                        ).create());
+                    }
+                } else {
+                    if (playerInfoResponse.getUsers().isEmpty()) return;
+                    UserProfile profile = playerInfoResponse.getUsers().get(0);
+                    sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
+                            "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
+                            "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
+                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
+                            "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1) +
+                            "\n" + ChatColor.GRAY + "IPs: [" + ChatColor.RESET + String.join(ChatColor.GRAY + ", " + ChatColor.RESET, profile.getIps()) + ChatColor.GRAY + "]");
+                }
+            }
+        });
+    }
 
 
     @Command(aliases = "revert", desc = "Revert a punishment", min = 1, max = 1, usage = "(id)")
