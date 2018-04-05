@@ -250,10 +250,10 @@ public class PunishCommands {
                 punisher.sendMessage(ChatColor.RED + "Player not found!");
             } else {
                 Bukkit.getScheduler().runTask(TGM.get(), () -> {
-                    broadcastPunishment(response.getName(), response.getIp(), punisher instanceof Player ? punisher.getName() : "Console", verb, timeUnitPair, reason, time, broadcast);
                     if (response.isKickable()) {
                         kickPlayer(response.getPunishment(), response.getName());
                     }
+                    broadcastPunishment(response.getName(), response.getIp(), punisher instanceof Player ? punisher.getName() : "Console", verb, timeUnitPair, reason, time, broadcast);
                     Player target;
                     if (response.getName() != null && (target = Bukkit.getPlayer(response.getName())) != null) {
                         TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addPunishment(response.getPunishment());
