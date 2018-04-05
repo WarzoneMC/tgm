@@ -154,6 +154,7 @@ public class PunishCommands {
                                         ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
                                             "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
                                             "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
+                                            "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
                                             "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
                                             "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1)
                                 ).create())).event(
@@ -166,6 +167,7 @@ public class PunishCommands {
                     sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
                             "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
                             "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
+                            "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
                             "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
                             "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1) +
                             "\n" + ChatColor.GRAY + "IPs: [" + ChatColor.RESET + String.join(ChatColor.GRAY + ", " + ChatColor.RESET, profile.getIps()) + ChatColor.GRAY + "]");
