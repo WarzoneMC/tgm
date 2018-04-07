@@ -40,7 +40,7 @@ public class ChatModule extends MatchModule implements Listener {
         timeModule = match.getModule(TimeModule.class);
     }
 
-    private final List<String> blockdCmds = Arrays.asList("t ", "w ", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
+    private final List<String> blockdCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
