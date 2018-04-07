@@ -14,7 +14,6 @@ import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +30,6 @@ public class MatchManager {
     private MapRotation mapRotation;
     private Match match = null;
     private int matchNumber = 0;
-
-    private BukkitTask unloadMatchTask;
 
     @Setter private MapContainer forcedNextMap = null;
 
@@ -92,6 +89,7 @@ public class MatchManager {
         worldCreator.generator(new NullChunkGenerator());
         //worldCreator.environment(World.Environment.NETHER);
         World world = worldCreator.createWorld();
+        world.setAutoSave(false);
 
         /**
          * Initialize a match manifest based on the map's gametype.
@@ -129,8 +127,9 @@ public class MatchManager {
         if (oldMatch != null) {
             Bukkit.unloadWorld(oldMatch.getWorld(), false);
 
-            Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(),() -> {
+            Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
                 try {
+                    TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
                     FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
                 } catch (IOException e) {
                     e.printStackTrace();
