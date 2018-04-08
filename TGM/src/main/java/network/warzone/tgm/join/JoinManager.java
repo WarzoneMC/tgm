@@ -124,7 +124,7 @@ public class JoinManager implements Listener {
         }
         else joinMsg = ChatColor.GRAY + event.getPlayer().getName() + " joined.";
 
-        if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.GREEN + " [NEW]";
+        if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
         event.setJoinMessage(joinMsg);
     }
 
