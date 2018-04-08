@@ -55,7 +55,7 @@ public class ChatModule extends MatchModule implements Listener {
 
     private boolean startsWith(String msg) {
         for (String cmd : blockdCmds) {
-            if (msg.startsWith("/" + cmd) || msg.startsWith(cmd)) return true;
+            if (msg.toLowerCase().startsWith("/" + cmd) || msg.toLowerCase().startsWith(cmd)) return true;
         }
         return false;
     }
