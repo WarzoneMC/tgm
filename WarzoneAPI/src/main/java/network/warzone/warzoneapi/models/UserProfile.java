@@ -41,6 +41,9 @@ public class UserProfile {
 
     @Getter private List<Punishment> punishments;
 
+    @SerializedName("new")
+    @Getter private boolean isNew;
+
     public void addPunishment(Punishment punishment) {
         if (punishments == null) punishments = new ArrayList<>();
         punishments.add(0, punishment);

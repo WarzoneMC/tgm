@@ -116,12 +116,16 @@ public class JoinManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
+        String joinMsg;
         if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty()){
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-            event.setJoinMessage(ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.");
+            joinMsg = ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.";
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
         }
-        else event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " joined.");
+        else joinMsg = ChatColor.GRAY + event.getPlayer().getName() + " joined.";
+
+        if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.GREEN + " [NEW]";
+        event.setJoinMessage(joinMsg);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
