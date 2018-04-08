@@ -58,25 +58,25 @@ public class JoinManager implements Listener {
         getLoginServices().add(loginService);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        if (event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.KICK_BANNED)) return;
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
 
         Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + userProfile.getRanks().size() + " (loaded/total)");
 
-        Punishment punishment;
-        if ((punishment = userProfile.getLatestBan()) != null) {
+        //TODO Custom ban messages
+        Punishment punishment = userProfile.getLatestBan();
+        if (punishment != null) {
             event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                    + ChatColor.AQUA + "Appeal at https://discord.io/Warzone\n"
                     + ChatColor.GRAY + "ID: " + punishment.getId().toString()
             );
             event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
             return;
         }
-        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString());
+        //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
 
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }
@@ -94,7 +94,7 @@ public class JoinManager implements Listener {
         TGM.get().getPlayerManager().addPlayer(playerContext);
 
         Ranks.createAttachment(event.getPlayer());
-        playerContext.getUserProfile().getRanksLoaded().stream().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
+        playerContext.getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
 
         for (LoginService loginService : loginServices) {
             loginService.login(playerContext);

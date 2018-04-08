@@ -12,8 +12,8 @@ import java.util.List;
  * Created by luke on 4/28/17.
  */
 public class PlayerManager {
-    @Getter
-    List<PlayerContext> players = new ArrayList<>();
+
+    @Getter List<PlayerContext> players = new ArrayList<>();
 
     public void addPlayer(PlayerContext playerContext) {
         this.players.add(playerContext);

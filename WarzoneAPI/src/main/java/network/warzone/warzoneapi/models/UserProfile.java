@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by luke on 4/27/17.
  */
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class UserProfile {
 
     public static final int XP_PER_KILL = 2,
@@ -21,28 +21,28 @@ public class UserProfile {
                             XP_PER_WOOL_BREAK = 3;
 
     @SerializedName("_id")
-    @Getter private ObjectId id;
+    private ObjectId id;
 
-    @Getter private String name;
-    @Getter private String nameLower;
-    @Getter private String uuid;
-    @Getter private long initialJoinDate;
-    @Getter private long lastOnlineDate;
+    private String name;
+    private String nameLower;
+    private String uuid;
+    private long initialJoinDate;
+    private long lastOnlineDate;
 
-    @Getter private List<String> ips;
+    private List<String> ips;
     private List<String> ranks;
     private List<Rank> ranksLoaded;
-    @Getter private int wins = 0;
-    @Getter private int losses = 0;
-    @Getter private int kills = 0;
-    @Getter private int deaths = 0;
-    @Getter private int wool_destroys = 0;
-    @Getter private List<String> matches;
+    private int wins = 0;
+    private int losses = 0;
+    private int kills = 0;
+    private int deaths = 0;
+    private int wool_destroys = 0;
+    private List<String> matches;
 
-    @Getter private List<Punishment> punishments;
+    private List<Punishment> punishments;
 
     @SerializedName("new")
-    @Getter private boolean isNew;
+    private boolean isNew;
 
     public void addPunishment(Punishment punishment) {
         if (punishments == null) punishments = new ArrayList<>();
