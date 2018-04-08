@@ -8,7 +8,6 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
@@ -253,7 +252,7 @@ public class PunishCommands {
                     if (response.isKickable()) {
                         kickPlayer(response.getPunishment(), response.getName());
                     }
-                    broadcastPunishment(response.getName(), response.getIp(), punisher instanceof Player ? punisher.getName() : "Console", verb, timeUnitPair, reason, time, broadcast);
+                    broadcastPunishment(response.getName(), response.getIp(), punisher.getName().replace("CONSOLE", "Console"), verb, timeUnitPair, reason, time, broadcast);
                     Player target;
                     if (response.getName() != null && (target = Bukkit.getPlayer(response.getName())) != null) {
                         TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addPunishment(response.getPunishment());
