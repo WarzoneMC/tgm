@@ -3,7 +3,6 @@ package network.warzone.tgm.modules;
 import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.damage.tracker.event.PlayerDamageEvent;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -12,6 +11,7 @@ import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.PublicMenu;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -46,6 +46,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     private final ItemStack compassItem;
     private final ItemStack teamSelectionItem;
+    private final ItemStack leatherHelmet;
 
     private int teamSelectionRunnable;
 
@@ -54,6 +55,11 @@ public class SpectatorModule extends MatchModule implements Listener {
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Team Selection");
+
+        leatherHelmet = new ItemStack(Material.LEATHER_HELMET);
+        LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
+        leatherHelmetMeta.setColor(Color.fromRGB(85, 255, 255));
+        leatherHelmet.setItemMeta(leatherHelmetMeta);
     }
 
     @Override
@@ -125,7 +131,6 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {
-
         playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().setAllowFlight(true);
@@ -135,6 +140,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().setCanPickupItems(false);
         playerContext.getPlayer().setCollidable(false);
 
+        playerContext.getPlayer().getInventory().setHelmet(leatherHelmet);
         playerContext.getPlayer().getInventory().setItem(0, compassItem);
         playerContext.getPlayer().getInventory().setItem(2, teamSelectionItem);
     }
@@ -164,27 +170,18 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onDamage(PlayerDamageEvent event) {
-        if (isSpectating(event.getEntity())) {
-            event.setCancelled(true);
-        } else if (event.getInfo().getResolvedDamager() instanceof Player) {
-            if (isSpectating((Player) event.getInfo().getResolvedDamager())) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onVoidDamage(EntityDamageEvent event) {
+    public void onDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
-            if (isSpectating(player) && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            if (isSpectating(player)) {
                 event.setCancelled(true);
 
-                player.setAllowFlight(true);
-                player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
-                player.setFlying(true);
+                if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+                    player.setAllowFlight(true);
+                    player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
+                    player.setFlying(true);
+                }
             }
         }
     }
@@ -245,7 +242,6 @@ public class SpectatorModule extends MatchModule implements Listener {
 
             if (event.getItem() != null && event.getItem().isSimilar(teamSelectionItem)) {
                 teamSelectionMenu.open(event.getPlayer());
-                Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getPlayer().updateInventory(), 1L); //client side glitch shows hat on head until this is called.
             }
         }
     }
