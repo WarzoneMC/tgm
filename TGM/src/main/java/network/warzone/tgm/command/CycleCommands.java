@@ -204,7 +204,7 @@ public class CycleCommands {
 
     @Command(aliases = {"leave", "quit"}, desc = "Leave the match, and join observer team.")
     public static void leave(CommandContext cmd, CommandSender sender) {
-        Bukkit.getServer().dispatchCommand(sender, "join spectator");//
+        Bukkit.getServer().dispatchCommand(sender, "join spectator");
     }
 
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
