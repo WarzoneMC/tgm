@@ -5,6 +5,8 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -17,14 +19,18 @@ import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 3/2/2018.
@@ -43,6 +49,12 @@ public class FFAModule extends MatchModule implements Listener {
 
     private MatchTeam playersTeam;
 
+    private String title;
+
+    @Getter private boolean blitzMode;
+    private int lives;
+    private Map<String, Integer> playerLives = new HashMap<>(); // Username, lives
+
     @Override
     public void load(Match match) {
         this.match = match;
@@ -55,7 +67,18 @@ public class FFAModule extends MatchModule implements Listener {
                 if (ffaObj.get("timeLimit").getAsJsonObject().has("limit")) timeLimit = ffaObj.get("timeLimit").getAsJsonObject().get("limit").getAsInt();
             }
             if (ffaObj.has("killLimit")) killLimit = ffaObj.get("killLimit").getAsInt();
+            if (ffaObj.has("title")) title = ffaObj.get("title").getAsString();
+            if (ffaObj.has("lives")) {
+                blitzMode = true;
+                lives = ffaObj.get("lives").getAsInt();
+            }
         }
+        if (title == null) {
+            if (!blitzMode) title = "&bFFA - %killLimit% Kill" + (killLimit != 1 ? "s" : "");
+            else title = "&bFFA - %lives% Li" + (killLimit != 1 ? "fes" : "ve");
+        }
+
+        title = title.replace("%killLimit%", String.valueOf(killLimit)).replace("%lives%", String.valueOf(lives));
 
         TimeModule timeModule = match.getModule(TimeModule.class);
         if (timeLimitEnabled) {
@@ -86,9 +109,33 @@ public class FFAModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        if (event.getTeam().isSpectator()) return;
-        scores.put(event.getPlayerContext().getPlayer().getName(), scores.getOrDefault(event.getPlayerContext().getPlayer().getName(), 0));
+        if (event.getTeam().isSpectator()) {
+            if (blitzMode && match.getMatchStatus().equals(MatchStatus.MID) && hasWinner()) {
+               TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
+            }
+        } else {
+            if (blitzMode && event.getTeam().equals(playersTeam)) {
+                playerLives.put(event.getPlayerContext().getPlayer().getName(), lives);
+            }
+            else {
+                scores.put(event.getPlayerContext().getPlayer().getName(), scores.getOrDefault(event.getPlayerContext().getPlayer().getName(), 0));
+            }
+        }
         refreshScoreboards();
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onQuit(PlayerQuitEvent event) {
+        if (blitzMode) {
+            removeLives(event.getPlayer());
+            if (match.getMatchStatus().equals(MatchStatus.MID) && hasWinner()) TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
+            refreshScoreboards();
+        }
+    }
+
+    public void createDeath(Player player) {
+        DeathModule deathModule = match.getModule(DeathModule.class).getPlayer(player);
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathModule.getKiller(), deathModule.getCause(), deathModule.getItem()));
     }
 
     @EventHandler
@@ -103,14 +150,36 @@ public class FFAModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDeath(TGMPlayerDeathEvent event) {
-        if (event.getKiller() == null) return;
-        addPoints(event.getKiller(), 1);
-        if (hasWinner()) {
-            MatchTeam winner = getWinner();
-            TGM.get().getMatchManager().endMatch(winner);
-            winner.getMembers().forEach(playerContext -> playerContext.getPlayer().setAllowFlight(true));
+        if (blitzMode) {
+            removeLife(event.getVictim());
+            if (getLives(event.getVictim()) <= 0) {
+                MatchTeam team = teamManagerModule.getTeam(event.getVictim());
+                Bukkit.broadcastMessage(team.getColor() + event.getVictim().getName() + ChatColor.RED + " has been eliminated!");
+                event.getVictim().sendTitle("", ChatColor.RED + "You have been eliminated.", 10, 20, 10);
+            }
+            if (match.getMatchStatus().equals(MatchStatus.MID) && hasWinner()) TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
+        } else {
+            if (event.getKiller() != null) {
+                addPoints(event.getKiller(), 1);
+                if (hasWinner()) {
+                    MatchTeam winner = getWinner();
+                    TGM.get().getMatchManager().endMatch(winner);
+                    winner.getMembers().forEach(playerContext -> playerContext.getPlayer().setAllowFlight(true));
+                }
+            }
         }
         refreshScoreboards();
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        if (blitzMode && match.getMatchStatus().equals(MatchStatus.MID) && getLives(event.getPlayer()) <= 0) {
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                event.getPlayer().setGameMode(GameMode.SPECTATOR);
+                event.getPlayer().setAllowFlight(true);
+                event.getPlayer().setFlying(true);
+            }, 1);
+        }
     }
 
     public void refreshScoreboards() {
@@ -121,7 +190,7 @@ public class FFAModule extends MatchModule implements Listener {
     }
 
     public void refreshScoreboard(SimpleScoreboard simpleScoreboard) {
-        simpleScoreboard.setTitle(ChatColor.AQUA + "FFA - " + killLimit + " Kills");
+        simpleScoreboard.setTitle(ChatColor.translateAlternateColorCodes('&', title));
         int line = 0;
         for (int i : playerScoreboardLines.keySet()) {
             simpleScoreboard.add(playerScoreboardLines.get(i), i);
@@ -129,7 +198,6 @@ public class FFAModule extends MatchModule implements Listener {
         }
         line++;
         simpleScoreboard.add(ChatColor.RESET + "", line++);
-        //simpleScoreboard.add(ChatColor.RESET + "Objective: " + ChatColor.AQUA + "" + ChatColor.BOLD + killLimit + " kills", line);
         simpleScoreboard.update();
     }
 
@@ -137,7 +205,10 @@ public class FFAModule extends MatchModule implements Listener {
         playerScoreboardLines.clear();
         List<String> lines = new ArrayList<>();
 
-        Object[] a = scores.entrySet().toArray();
+        Object[] a;
+        if (blitzMode) a = playerLives.entrySet().toArray();
+        else a = scores.entrySet().toArray();
+
         Arrays.sort(a, new Comparator() {
             public int compare(Object o1, Object o2) {
                 return ((Map.Entry<String, Integer>) o1).getValue().compareTo(((Map.Entry<String, Integer>) o2).getValue());
@@ -150,10 +221,13 @@ public class FFAModule extends MatchModule implements Listener {
             if (lines.size() > 14) {
                 lines.remove(0);
             }
-            if (player.equals( ((Map.Entry<String, Integer>) a[a.length - 1]).getKey() )) {
-                lines.add(ChatColor.YELLOW + player + ChatColor.GRAY + ": " + ChatColor.RESET + score);
-            } else {
-                lines.add(this.playersTeam.getColor() + player + "" + ChatColor.GRAY + ": " + ChatColor.RESET + score);
+            if (blitzMode) lines.add(this.playersTeam.getColor() + player + "" + ChatColor.GRAY + ": " + ChatColor.RESET + score);
+            else {
+                if (player.equals(((Map.Entry<String, Integer>) a[a.length - 1]).getKey())) {
+                    lines.add(ChatColor.YELLOW + player + ChatColor.GRAY + ": " + ChatColor.RESET + score);
+                } else {
+                    lines.add(this.playersTeam.getColor() + player + "" + ChatColor.GRAY + ": " + ChatColor.RESET + score);
+                }
             }
         }
         int i = 0;
@@ -175,10 +249,30 @@ public class FFAModule extends MatchModule implements Listener {
         return scores.getOrDefault(player, 0);
     }
 
+    public int getLives(Player player) {
+        return playerLives.getOrDefault(player.getName(), lives);
+    }
+
+    public void removeLife(Player player) {
+        playerLives.put(player.getName(), getLives(player) - 1);
+    }
+
+    public void removeLives(Player player) {
+        playerLives.remove(player);
+    }
+
+    public List<PlayerContext> getAlivePlayers() {
+        return playersTeam.getMembers().stream().filter(playerContext -> getLives(playerContext.getPlayer()) > 0).collect(Collectors.toList());
+    }
+
     private boolean hasWinner() {
-        for (int i : scores.values()) {
-            if (i >= killLimit) {
-                return true;
+        if (blitzMode) {
+            return getAlivePlayers().size() == 1;
+        } else {
+            for (int i : scores.values()) {
+                if (i >= killLimit) {
+                    return true;
+                }
             }
         }
         return false;
@@ -194,6 +288,10 @@ public class FFAModule extends MatchModule implements Listener {
             }
         }
         return setupTeam(player);
+    }
+
+    public MatchTeam forceWinner(Player player) {
+        return setupTeam(player.getName());
     }
 
     private MatchTeam setupTeam(String player) {

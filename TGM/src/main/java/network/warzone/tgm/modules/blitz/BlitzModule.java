@@ -11,15 +11,15 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.SpawnPointHandlerModule;
-import network.warzone.tgm.modules.time.TimeLimitService;
-import network.warzone.tgm.modules.time.TimeModule;
-import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.time.TimeLimitService;
+import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -160,7 +160,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
     private void showLives(Player player) {
         player.sendTitle(ChatColor.translateAlternateColorCodes('&', title.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())),
-                        ChatColor.translateAlternateColorCodes('&', subtitle.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())));
+                        ChatColor.translateAlternateColorCodes('&', subtitle.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())), 10, 20, 10);
     }
 
     @EventHandler
@@ -171,7 +171,7 @@ public class BlitzModule extends MatchModule implements Listener {
         if (player.getHealth() - event.getFinalDamage() >= 0.5) return;
 
         event.setDamage(0);
-        Bukkit.getScheduler().runTask(TGM.get(), () -> {
+        Bukkit.getScheduler().runTask(TGM.get(), () -> { // run sync in case of async events
             createDeath((Player) event.getEntity());
             removeLife(player);
 
@@ -191,7 +191,7 @@ public class BlitzModule extends MatchModule implements Listener {
                 updateScoreboardTeamLine(team, getAlivePlayers(team).size());
 
                 Bukkit.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
-                player.sendTitle("", ChatColor.RED + "You have been eliminated.");
+                player.sendTitle("", ChatColor.RED + "You have been eliminated.", 10, 20, 10);
 
             } else {
                 showLives(player);
@@ -210,8 +210,6 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     public void createDeath(Player player) {
-        if (TGM.get().getApiManager().isStatsDisabled()) return;
-
         DeathModule deathModule = match.getModule(DeathModule.class).getPlayer(player);
         Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathModule.getKiller(), deathModule.getCause(), deathModule.getItem()));
     }
