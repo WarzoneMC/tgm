@@ -124,12 +124,7 @@ public class DTMModule extends MatchModule implements Listener {
         for (Monument monument : monuments) {
             monument.load();
         }
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
-            @Override
-            public MatchTeam getWinnerTeam() {
-                return getHighestHealthTeam();
-            }
-        });
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getHighestHealthTeam());
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {

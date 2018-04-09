@@ -52,12 +52,7 @@ public class TDMModule extends MatchModule implements Listener {
         pointsModule = TGM.get().getModule(PointsModule.class);
         pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
 
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
-            @Override
-            public MatchTeam getWinnerTeam() {
-                return getHighestPointsTeam();
-            }
-        });
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getHighestPointsTeam());
     }
 
     private MatchTeam getHighestPointsTeam() {

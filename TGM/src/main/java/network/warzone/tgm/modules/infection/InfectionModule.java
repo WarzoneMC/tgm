@@ -51,12 +51,7 @@ public class InfectionModule extends MatchModule implements Listener {
         teamManager = match.getModule(TeamManagerModule.class);
         this.match = match;
 
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
-            @Override
-            public MatchTeam getWinnerTeam() {
-                return getWinningTeam();
-            }
-        });
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getWinningTeam());
     }
 
     @Override

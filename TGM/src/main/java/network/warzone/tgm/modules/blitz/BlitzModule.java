@@ -79,12 +79,7 @@ public class BlitzModule extends MatchModule implements Listener {
                 teamLives.put(team, 1);
             }
         }
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
-            @Override
-            public MatchTeam getWinnerTeam() {
-                return getBiggestTeam();
-            }
-        });
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getBiggestTeam());
     }
 
     private MatchTeam getBiggestTeam() {

@@ -130,12 +130,7 @@ public class CTWModule extends MatchModule implements Listener {
             woolObjective.load();
         }
 
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(new TimeLimitService() {
-            @Override
-            public MatchTeam getWinnerTeam() {
-                return getWinningTeam();
-            }
-        });
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getWinningTeam());
     }
 
     private MatchTeam getWinningTeam() {

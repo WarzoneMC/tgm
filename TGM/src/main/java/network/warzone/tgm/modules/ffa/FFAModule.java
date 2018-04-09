@@ -85,12 +85,7 @@ public class FFAModule extends MatchModule implements Listener {
             timeModule.setTimeLimited(timeLimitEnabled);
             timeModule.setTimeLimit(timeLimit);
         }
-        timeModule.setTimeLimitService(new TimeLimitService() {
-            @Override
-            public MatchTeam getWinnerTeam() {
-                return getWinner();
-            }
-        });
+        timeModule.setTimeLimitService(() -> getWinner());
     }
 
     @Override
