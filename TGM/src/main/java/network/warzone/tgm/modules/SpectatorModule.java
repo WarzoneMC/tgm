@@ -46,7 +46,6 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     private final ItemStack compassItem;
     private final ItemStack teamSelectionItem;
-    private final ItemStack leatherHelmet;
 
     private int teamSelectionRunnable;
 
@@ -54,12 +53,8 @@ public class SpectatorModule extends MatchModule implements Listener {
         this.teamSelectionMenu = new PublicMenu(TGM.get(), ChatColor.UNDERLINE + "Team Selection", 9);
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
-        teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Team Selection");
+        teamSelectionItem = ItemFactory.createItem(Material.NETHER_STAR, ChatColor.YELLOW + "Team Selection");
 
-        leatherHelmet = new ItemStack(Material.LEATHER_HELMET);
-        LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
-        leatherHelmetMeta.setColor(Color.fromRGB(85, 255, 255));
-        leatherHelmet.setItemMeta(leatherHelmetMeta);
     }
 
     @Override
@@ -95,7 +90,6 @@ public class SpectatorModule extends MatchModule implements Listener {
                     ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
                     LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
                     leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
-//                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
                     leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                     leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                     leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match.", "", ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString() + " spectating."));
@@ -140,7 +134,6 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().setCanPickupItems(false);
         playerContext.getPlayer().setCollidable(false);
 
-        playerContext.getPlayer().getInventory().setHelmet(leatherHelmet);
         playerContext.getPlayer().getInventory().setItem(0, compassItem);
         playerContext.getPlayer().getInventory().setItem(2, teamSelectionItem);
     }
