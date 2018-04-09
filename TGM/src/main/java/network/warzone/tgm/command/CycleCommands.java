@@ -22,7 +22,6 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
-import org.apache.http.util.Args;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -203,9 +202,9 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"leave", "quit"}, desc = "leave the match, and join observer team.")
-    public static void leaveMatch(CommandContext cmd, CommandSender sender) {
-        Bukkit.getServer().dispatchCommand(sender,"join spectator");//
+    @Command(aliases = {"leave", "quit"}, desc = "Leave the match, and join observer team.")
+    public static void leave(CommandContext cmd, CommandSender sender) {
+        Bukkit.getServer().dispatchCommand(sender, "join spectator");//
     }
 
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
