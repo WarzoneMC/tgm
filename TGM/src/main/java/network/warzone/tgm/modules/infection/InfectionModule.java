@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.api.ApiManager;
-import network.warzone.tgm.damage.tracker.event.PlayerDamageEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
@@ -22,6 +21,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -118,75 +118,67 @@ public class InfectionModule extends MatchModule implements Listener {
 //    }
 
     @EventHandler
-    public void onDamage(PlayerDamageEvent event) {
-        if (event.getEntity().getHealth() - event.getDamage() < 1) {
-            // DED :)
-            // So if it's a kill blowing, I can cancel the event so they don't die, but instead just broadcast the message and infect them.
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        Player killer = (Player) event.getDamager();
 
-            event.setDamage(0);
-            Bukkit.getScheduler().runTask(TGM.get(), () -> {
-                // "humans" = humans; "infected" = infected;
-                if (teamManager.getTeam(event.getEntity()).getId().equalsIgnoreCase("humans")) {
+        if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManager.getTeam(player).isSpectator() ||
+                player.getHealth() - event.getFinalDamage() >= 0.5) return;
 
-                    if (event.getInfo().getResolvedDamager() instanceof Player) {
-                        Player killer = (Player) event.getInfo().getResolvedDamager();
+        event.setDamage(0);
+        Bukkit.getScheduler().runTask(TGM.get(), () -> {
+            MatchTeam humans = teamManager.getTeamById("humans");
+            MatchTeam infected = teamManager.getTeamById("infected");
 
-                        broadcastMessage(String.format("%s%s &7has been infected by %s%s",
-                                teamManager.getTeam(event.getEntity()).getColor(),
-                                event.getEntity().getName(),
-                                teamManager.getTeam(killer).getColor(),
-                                killer.getName()));
-                    } else {
-                        broadcastMessage(String.format("%s%s &7has been taken by the environment",
-                                teamManager.getTeam(event.getEntity()).getColor(),
-                                event.getEntity().getName()));
-                    }
-
-                    infect(event.getEntity());
-                } else if (teamManager.getTeam(event.getEntity()).getId().equalsIgnoreCase("infected")) {
-                    if (event.getInfo().getResolvedDamager() instanceof Player) {
-                        Player killer = (Player) event.getInfo().getResolvedDamager();
-
-                        if (teamManager.getTeam(killer).getId().equalsIgnoreCase("infected")) {
-                            return;
-                        }
-                        broadcastMessage(String.format("%s%s &7has been slain by %s%s",
-                                teamManager.getTeam(event.getEntity()).getColor(),
-                                event.getEntity().getName(),
-                                teamManager.getTeam(killer).getColor(),
-                                killer.getName()
-                        ));
-                    }
-                    refresh(TGM.get().getPlayerManager().getPlayerContext(event.getEntity()), teamManager.getTeam(event.getEntity()));
+            if (humans.containsPlayer(player)) {
+                if (event.getDamager() instanceof Player) {
+                    broadcastMessage(String.format("%s%s &7has been infected by %s%s",
+                            teamManager.getTeam(player).getColor(),
+                            event.getEntity().getName(),
+                            teamManager.getTeam(killer).getColor(),
+                            killer.getName()));
+                } else {
+                    broadcastMessage(String.format("%s%s &7has been taken by the environment",
+                            teamManager.getTeam(player).getColor(),
+                            event.getEntity().getName()));
                 }
-            });
 
-            if (TGM.get().getApiManager().isStatsDisabled()) {
-                return;
-            }
-
-            PlayerContext player = TGM.get().getPlayerManager().getPlayerContext(event.getEntity()); //dead
-
-            String playerItem = "";
-            if (event.getEntity().getInventory().getItemInMainHand() != null) {
-                playerItem = event.getEntity().getInventory().getItemInMainHand().getType().toString();
-            }
-
-            String killerItem = "";
-            String killerId = null;
-            if (event.getInfo().getResolvedDamager() instanceof Player) {
-                killerId = TGM.get().getPlayerManager().getPlayerContext(((Player) event.getInfo().getResolvedDamager())).getUserProfile().getId().toString();
-                if (event.getInfo().getResolvedDamager() != null) {
-                    killerItem = ((Player) event.getInfo().getResolvedDamager()).getInventory().getItemInMainHand().getType().toString();
+                infect(player);
+            } else if (infected.containsPlayer(player)) {
+                if (event.getDamager() instanceof Player) {
+                    broadcastMessage(String.format("%s%s &7has been slain by %s%s",
+                            teamManager.getTeam(player).getColor(),
+                            event.getEntity().getName(),
+                            teamManager.getTeam(killer).getColor(),
+                            killer.getName()
+                    ));
+                    }
+                    refresh(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeam(player));
                 }
-            }
+        });
 
-            ApiManager api = TGM.get().getApiManager();
+        if (TGM.get().getApiManager().isStatsDisabled())
+            return;
 
-            Death death = new Death(player.getUserProfile().getId().toString(), killerId, playerItem,
-                    killerItem, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
-            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
+        PlayerContext playerContect = TGM.get().getPlayerManager().getPlayerContext(player);
+
+        String playerItem = "";
+        if (player.getInventory().getItemInMainHand() != null) {
+            playerItem = player.getInventory().getItemInMainHand().getType().toString();
         }
+
+        String killerItem = "";
+        String killerId = TGM.get().getPlayerManager().getPlayerContext(killer).getUserProfile().getId().toString();
+        if (killer.getInventory().getItemInMainHand() != null) {
+            killerItem = killer.getInventory().getItemInMainHand().getType().toString();
+        }
+
+        ApiManager api = TGM.get().getApiManager();
+
+        Death death = new Death(playerContect.getUserProfile().getId().toString(), killerId, playerItem,
+                killerItem, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }
 
     private void refresh(PlayerContext playerContext, MatchTeam matchTeam) {

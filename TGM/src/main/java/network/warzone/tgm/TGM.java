@@ -2,16 +2,16 @@ package network.warzone.tgm;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import network.warzone.tgm.command.PunishCommands;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.CommandsManager;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.command.CycleCommands;
+import network.warzone.tgm.command.PunishCommands;
 import network.warzone.tgm.command.RankCommands;
-import network.warzone.tgm.damage.tracker.plugin.TrackerPlugin;
 import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.MapInfoDeserializer;
@@ -24,10 +24,8 @@ import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.client.http.HttpClientConfig;
 import network.warzone.warzoneapi.client.offline.OfflineClient;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -36,33 +34,33 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 
+@Getter
 public class TGM extends JavaPlugin {
-    public static TGM tgm;
-    @Getter private Gson gson;
-    @Getter private TeamClient teamClient;
+
+    public static TGM instance;
+
+    private Gson gson;
+    private TeamClient teamClient;
+
+    private MatchManager matchManager;
+    private PlayerManager playerManager;
+    private JoinManager joinManager;
+    private ApiManager apiManager;
 
     private CommandsManager<CommandSender> commands;
     private CommandsManagerRegistration commandManager;
 
-    @Getter private MatchManager matchManager;
-    @Getter private PlayerManager playerManager;
-    @Getter private JoinManager joinManager;
-    @Getter private TrackerPlugin tracker;
-    @Getter private ApiManager apiManager;
-
     public static TGM get() {
-        return tgm;
+        return instance;
     }
 
     @Override
     public void onEnable() {
-        tgm = this;
+        instance = this;
         FileConfiguration fileConfiguration = getConfig();
         saveDefaultConfig();
 
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(MapInfo.class, new MapInfoDeserializer());
-        this.gson = gsonBuilder.create();
+        gson = new GsonBuilder().registerTypeAdapter(MapInfo.class, new MapInfoDeserializer()).create();
 
         ConfigurationSection apiConfig = fileConfiguration.getConfigurationSection("api");
         if (apiConfig.getBoolean("enabled")) {
@@ -81,26 +79,24 @@ public class TGM extends JavaPlugin {
             teamClient = new OfflineClient();
         }
 
-        this.commands = new CommandsManager<CommandSender>() {
+        commands = new CommandsManager<CommandSender>() {
             @Override
             public boolean hasPermission(CommandSender sender, String perm) {
-                return sender instanceof ConsoleCommandSender || sender.hasPermission(perm);
+                return sender.isOp() || sender.hasPermission(perm);
             }
         };
 
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
-//        playerListManager = new PlayerListManager();
-        tracker = new TrackerPlugin(this);
         apiManager = new ApiManager();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
+
         commandManager.register(CycleCommands.class);
         if (apiConfig.getBoolean("enabled", false)) {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
-
         }
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world

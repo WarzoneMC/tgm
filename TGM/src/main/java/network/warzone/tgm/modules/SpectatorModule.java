@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules;
 
-import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -51,7 +51,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     private int teamSelectionRunnable;
 
     public SpectatorModule() {
-        this.teamSelectionMenu = new PublicMenu(TGM.get(), ChatColor.UNDERLINE + "Team Selection", 9);
+        this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Team Selection");

@@ -33,6 +33,11 @@ public class ItemRemoveModule extends MatchModule implements Listener {
         }
     }
 
+    @Override
+    public void unload() {
+        removed.clear();
+    }
+
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         List<ItemStack> toRemove = new ArrayList<>();

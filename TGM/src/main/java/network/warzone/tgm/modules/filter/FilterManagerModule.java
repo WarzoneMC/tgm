@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.filter;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -17,7 +18,6 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
-import com.sk89q.minecraft.util.commands.ChatColor;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -35,7 +35,7 @@ public class FilterManagerModule extends MatchModule {
                 for (FilterType filterType : initFilter(match, filterJson)) {
                     filterTypes.add(filterType);
                     if (filterType instanceof Listener) {
-                        TGM.get().registerEvents((Listener) filterType);
+                        TGM.registerEvents((Listener) filterType);
                     }
                 }
             }

@@ -20,15 +20,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 /**
  * Created by Jorge on 10/6/2017.
  */
+@Getter
 public class StatsModule extends MatchModule implements Listener{
 
     private Match match;
 
-    private int xpBarTaskID;
+    private int xpBarTaskId;
 
-    @Getter private boolean statsDisabled = false;
-    @Getter private boolean notifyDisable = true;
-    @Getter private boolean showLevel = true;
+    private boolean statsDisabled = false;
+    private boolean notifyDisable = true;
+    private boolean showLevel = true;
 
     @Override
     public void load(Match match) {
@@ -40,13 +41,13 @@ public class StatsModule extends MatchModule implements Listener{
             if (statsObj.has("notifydisable")) notifyDisable = statsObj.get("notifydisable").getAsBoolean();
             if (statsObj.has("showlevel")) showLevel = statsObj.get("showlevel").getAsBoolean();
         }
-        if (showLevel) xpBarTaskID = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+        if (showLevel) xpBarTaskId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.setLevel(TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().getLevel());
                 player.setExp((float) Levels.getLevelProgress(player) / 100);
             }
         }, 2, 2).getTaskId();
-        if (statsDisabled && notifyDisable) Bukkit.getOnlinePlayers().forEach(player -> notifyDisable(player));
+        if (statsDisabled && notifyDisable) Bukkit.getOnlinePlayers().forEach(this::notifyDisable);
     }
 
     private void notifyDisable(Player player) {
@@ -61,7 +62,7 @@ public class StatsModule extends MatchModule implements Listener{
     @Override
     public void unload() {
         this.match = null;
-        if (isShowLevel()) Bukkit.getScheduler().cancelTask(xpBarTaskID);
+        if (isShowLevel()) Bukkit.getScheduler().cancelTask(xpBarTaskId);
     }
 
     @EventHandler

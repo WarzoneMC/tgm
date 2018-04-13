@@ -3,8 +3,6 @@ package network.warzone.tgm.modules.blitz;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -17,7 +15,6 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
@@ -48,7 +45,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
     @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
-    private int taskId;
+    private int livesDisplayTaskId;
 
     private TeamManagerModule teamManagerModule;
 
@@ -63,11 +60,14 @@ public class BlitzModule extends MatchModule implements Listener {
         this.match = match;
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         JsonObject mapInfo = match.getMapContainer().getMapInfo().getJsonObject();
+
         if (mapInfo.has("blitz")) {
-            if (mapInfo.getAsJsonObject("blitz").has("death-title")) title = mapInfo.getAsJsonObject("blitz").get("death-title").getAsString();
-            if (mapInfo.getAsJsonObject("blitz").has("death-subtitle")) subtitle = mapInfo.getAsJsonObject("blitz").get("death-subtitle").getAsString();
-            if (mapInfo.getAsJsonObject("blitz").has("actionbar")) actionbar = mapInfo.getAsJsonObject("blitz").get("actionbar").getAsString();
-            for (JsonElement teamElement : mapInfo.getAsJsonObject("blitz").getAsJsonArray("lives")) {
+            JsonObject blitz = mapInfo.getAsJsonObject("blitz");
+
+            if (blitz.has("death-title")) title = blitz.get("death-title").getAsString();
+            if (blitz.has("death-subtitle")) subtitle = blitz.get("death-subtitle").getAsString();
+            if (blitz.has("actionbar")) actionbar = blitz.get("actionbar").getAsString();
+            for (JsonElement teamElement : blitz.getAsJsonArray("lives")) {
                 JsonObject teamObject = (JsonObject) teamElement;
                 MatchTeam team = teamManagerModule.getTeamById(teamObject.get("team").getAsString());
                 if (team == null || team.isSpectator()) continue;
@@ -79,7 +79,8 @@ public class BlitzModule extends MatchModule implements Listener {
                 teamLives.put(team, 1);
             }
         }
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getBiggestTeam());
+
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getBiggestTeam);
     }
 
     private MatchTeam getBiggestTeam() {
@@ -112,12 +113,12 @@ public class BlitzModule extends MatchModule implements Listener {
                 showLives(player.getPlayer());
             }
         }
-        taskId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+        livesDisplayTaskId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (teamManagerModule.getTeam(player).isSpectator()) return;
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName()))));
+                player.sendActionBar(ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())));
             }
-        }, 0L, 2L).getTaskId();
+        }, 2L, 2L).getTaskId();
     }
 
     @EventHandler
@@ -154,8 +155,11 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     private void showLives(Player player) {
-        player.sendTitle(ChatColor.translateAlternateColorCodes('&', title.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())),
-                        ChatColor.translateAlternateColorCodes('&', subtitle.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())), 10, 20, 10);
+        player.sendTitle(
+                ChatColor.translateAlternateColorCodes('&', title.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())),
+                ChatColor.translateAlternateColorCodes('&', subtitle.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())),
+                10, 20, 10
+        );
     }
 
     @EventHandler
@@ -194,17 +198,15 @@ public class BlitzModule extends MatchModule implements Listener {
             }
 
             if (lastTeamAlive()) {
-                MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst().get();
-                if (winnerTeam == null) {
-                    winnerTeam = teamManagerModule.getTeams().get(1);
-                }
+                MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst()
+                        .orElseGet(() -> teamManagerModule.getTeams().get(1));
+
                 TGM.get().getMatchManager().endMatch(winnerTeam);
-                return;
             }
         });
     }
 
-    public void createDeath(Player player) {
+    private void createDeath(Player player) {
         DeathModule deathModule = match.getModule(DeathModule.class).getPlayer(player);
         Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathModule.getKiller(), deathModule.getCause(), deathModule.getItem()));
     }
@@ -217,12 +219,10 @@ public class BlitzModule extends MatchModule implements Listener {
         if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) return;
 
         if (lastTeamAlive()) {
-            MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst().get();
-            if (winnerTeam == null) {
-                winnerTeam = teamManagerModule.getTeams().get(1);
-            }
+            MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst()
+                    .orElseGet(() -> teamManagerModule.getTeams().get(1));
+
             TGM.get().getMatchManager().endMatch(winnerTeam);
-            return;
         }
     }
 
@@ -232,37 +232,38 @@ public class BlitzModule extends MatchModule implements Listener {
         if (!event.getTeam().isSpectator()) updateScoreboardTeamLine(event.getTeam(), getAlivePlayers(event.getTeam()).size());
 
         playerLives.put(event.getPlayerContext().getPlayer(), teamLives.getOrDefault(event.getTeam(), 1));
-
     }
 
     @Override
     public void unload() {
+        Bukkit.getScheduler().cancelTask(livesDisplayTaskId);
+
         teamLives.clear();
         playerLives.clear();
-        Bukkit.getScheduler().cancelTask(taskId);
+        teamScoreboardLines.clear();
     }
 
-    public void removeLife(Player player) {
+    private void removeLife(Player player) {
         playerLives.put(player, (playerLives.getOrDefault(player, 0) > 0 ? playerLives.get(player) - 1 : 0));
     }
 
-    public int getLives(Player player) {
+    private int getLives(Player player) {
         return playerLives.getOrDefault(player, 0);
     }
 
-    public boolean lastTeamAlive() {
+    private boolean lastTeamAlive() {
         List<MatchTeam> aliveTeams = new ArrayList<>();
+
         for (MatchTeam team : teamManagerModule.getTeams()) {
             if (team.isSpectator()) continue;
-            if (getAlivePlayers(team).size() > 0) aliveTeams.add(team);
+            if (getAlivePlayers(team).size() > 0)
+                aliveTeams.add(team);
         }
-        if (aliveTeams.size() <= 1) {
-            return true;
-        }
-        return false;
+
+        return aliveTeams.size() <= 1;
     }
 
-    public List<PlayerContext> getAlivePlayers(MatchTeam matchTeam) {
+    private List<PlayerContext> getAlivePlayers(MatchTeam matchTeam) {
         return matchTeam.getMembers().stream().filter(playerContext -> !playerContext.getPlayer().getGameMode().equals(GameMode.SPECTATOR)).collect(Collectors.toList());
     }
 

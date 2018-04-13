@@ -112,4 +112,5 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
     public void unload() {
         this.scoreboards.clear();
     }
+
 }

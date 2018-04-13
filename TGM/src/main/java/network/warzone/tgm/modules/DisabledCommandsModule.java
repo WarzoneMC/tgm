@@ -24,4 +24,9 @@ public class DisabledCommandsModule extends MatchModule implements Listener {
             event.getPlayer().sendMessage(ChatColor.RED + event.getMessage().split(" ")[0] + " is a disabled command.");
         }
     }
+
+    @Override
+    public void unload() {
+        disabledCommands.clear();
+    }
 }

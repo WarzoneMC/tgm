@@ -20,9 +20,9 @@ import org.bukkit.ChatColor;
 
 public class MatchProgressNotifications extends MatchModule {
 
-
     @Override
     public void enable() {
         Bukkit.broadcastMessage(ChatColor.GREEN + "The match has started!");
     }
+
 }

@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules.countdown;
 
-import com.sk89q.minecraft.util.commands.ChatColor;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.team.TeamManagerModule;

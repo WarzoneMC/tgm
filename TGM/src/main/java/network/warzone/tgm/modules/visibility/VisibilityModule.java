@@ -57,9 +57,9 @@ public class VisibilityModule extends MatchModule implements Listener {
 
             boolean canSee = visibilityController.canSee(eyes, player);
             if (canSee) {
-                eyes.showPlayer(player);
+                eyes.showPlayer(TGM.get(), player);
             } else {
-                eyes.hidePlayer(player);
+                eyes.hidePlayer(TGM.get(), player);
             }
         }
 
@@ -69,9 +69,9 @@ public class VisibilityModule extends MatchModule implements Listener {
 
             boolean canSee = visibilityController.canSee(player, target);
             if (canSee) {
-                player.showPlayer(target);
+                player.showPlayer(TGM.get(), target);
             } else {
-                player.hidePlayer(target);
+                player.hidePlayer(TGM.get(), target);
             }
         }
     }
