@@ -22,6 +22,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -359,6 +360,52 @@ public class CycleCommands {
     public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
         sender.sendMessage(ChatColor.GRAY + "Currently playing " + ChatColor.YELLOW + info.getGametype() + ChatColor.GRAY + " on map " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
+    }
+
+    @Command(aliases = {"time"}, desc = "Time options")
+    public static void time(CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() <= 0) {
+            ChatColor timeColor = ChatColor.GREEN;
+            MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
+            if (matchStatus == MatchStatus.PRE) {
+                timeColor = ChatColor.GOLD;
+            } else if (matchStatus == MatchStatus.POST) {
+                timeColor = ChatColor.RED;
+            }
+            sender.sendMessage(ChatColor.AQUA + "Time elapsed: " + timeColor + Strings.formatTime(TGM.get().getModule(TimeModule.class).getTimeElapsed()));
+            return;
+        }
+        if (cmd.getString(0).equalsIgnoreCase("limit")) {
+            if (!sender.hasPermission("tgm.time.limit")) {
+                sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+                return;
+            }
+            if (cmd.argsLength() == 1 || cmd.argsLength() > 2) {
+                sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
+                return;
+            }
+            
+            TimeModule timeModule = TGM.get().getModule(TimeModule.class);
+            if (cmd.getString(1).equalsIgnoreCase("on") || cmd.getString(1).equalsIgnoreCase("true")) {
+                timeModule.setTimeLimited(true);
+                sender.sendMessage(ChatColor.AQUA + "Time limit: " + ChatColor.GREEN + "true");
+                return;
+            } else if (cmd.getString(1).equalsIgnoreCase("off") || cmd.getString(1).equalsIgnoreCase("false")) {
+                timeModule.setTimeLimited(false);
+                sender.sendMessage(ChatColor.AQUA + "Time limit: " + ChatColor.RED + "false");
+                return;
+            }
+
+            try {
+                timeModule.setTimeLimit(cmd.getInteger(1));
+                timeModule.setTimeLimited(true);
+                sender.sendMessage(ChatColor.AQUA + "Set time limit to: " + ChatColor.GREEN + timeModule.getTimeLimit() + " seconds");
+            } catch (CommandNumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
+            }
+        } else {
+            sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
+        }
     }
 
     @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
