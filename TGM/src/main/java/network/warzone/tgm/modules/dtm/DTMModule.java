@@ -32,9 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -202,21 +200,29 @@ public class DTMModule extends MatchModule implements Listener {
     }
 
     private MatchTeam getHighestHealthTeam() {
-        Monument highest = null;
+        Map<MatchTeam, Integer> teams = new HashMap<>(); // team, health
         for (Monument monument : monuments) {
-            if (highest == null) {
-                highest = monument;
-                continue;
-            }
-            if (monument.getHealth() > highest.getHealth()) {
-                highest = monument;
+            for (MatchTeam team : monument.getOwners()) {
+                teams.put(team, teams.getOrDefault(team, 0) + monument.getHealth());
             }
         }
+
+        MatchTeam highest = null;
+        for (Map.Entry<MatchTeam, Integer> team : teams.entrySet()) {
+            if (highest == null) {
+                highest = team.getKey();
+                continue;
+            }
+            if (teams.get(highest) < team.getValue()) {
+                highest = team.getKey();
+            }
+        }
+
         if (highest != null) {
-            final Monument monument = highest;
-            int amount = monuments.stream().filter(mon -> mon.getHealth() == monument.getHealth()).collect(Collectors.toList()).size();
+            final MatchTeam team = highest;
+            int amount = teams.entrySet().stream().filter(entry -> teams.get(team) == entry.getValue()).collect(Collectors.toList()).size();
             if (amount > 1) return null;
-            else return monument.getOwners().get(0);
+            else return team;
         }
         return null;
     }
