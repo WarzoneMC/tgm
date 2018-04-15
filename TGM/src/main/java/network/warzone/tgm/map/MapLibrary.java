@@ -1,7 +1,6 @@
 package network.warzone.tgm.map;
 
 import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -31,10 +30,7 @@ public class MapLibrary {
         for (File source : sources) {
             List<MapContainer> loaded = mapLoader.loadMaps(source);
             Bukkit.getLogger().info("Found " + loaded.size() + " maps in source " + source);
-            for (MapContainer mapContainer : loaded) {
-                maps.add(mapContainer);
-                Bukkit.getLogger().info(ChatColor.AQUA + "Loaded " + mapContainer.getMapInfo().getName() + " (" + mapContainer.getMapInfo().getVersion() + ")");
-            }
+            maps.addAll(loaded);
         }
     }
 }
