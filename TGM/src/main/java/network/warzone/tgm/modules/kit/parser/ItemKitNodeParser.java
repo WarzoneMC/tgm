@@ -128,7 +128,7 @@ public class ItemKitNodeParser implements KitNodeParser {
             if (jsonObject.getAsJsonObject("potion").has("effects")) {
                 for (JsonElement element : jsonObject.getAsJsonObject("potion").getAsJsonArray("effects")) {
                     String[] split = element.getAsString().replace(": ", ":").split(":");
-                    PotionEffectType effectType = PotionEffectType.getByName(split[0]);
+                    PotionEffectType effectType = PotionEffectType.getByName(Strings.getTechnicalName(split[0]));
                     int duration;
                     int level = 0;
                     if (split[1].contains(" ")) {
@@ -153,10 +153,9 @@ public class ItemKitNodeParser implements KitNodeParser {
             }
             */
             if (jsonObject.getAsJsonObject("potion").has("type")) {
-                PotionType type;
+                PotionType type = PotionType.valueOf(Strings.getTechnicalName(jsonObject.getAsJsonObject("potion").get("type").getAsString()));
                 boolean extended = false;
                 boolean upgraded = false;
-                type = PotionType.valueOf(jsonObject.getAsJsonObject("potion").get("type").getAsString().toUpperCase().replace(" ", "_"));
                 if (type == null) type = PotionType.UNCRAFTABLE;
                 if (jsonObject.getAsJsonObject("potion").has("extend")) extended = jsonObject.getAsJsonObject("potion").get("type").getAsBoolean();
                 if (jsonObject.getAsJsonObject("potion").has("upgrade")) upgraded = jsonObject.getAsJsonObject("potion").get("upgrade").getAsBoolean();
