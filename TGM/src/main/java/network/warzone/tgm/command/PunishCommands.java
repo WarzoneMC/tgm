@@ -229,6 +229,20 @@ public class PunishCommands {
         Bukkit.getConsoleSender().sendMessage(result);
     }
 
+    @Command(aliases = {"togglechat", "freezechat"}, desc = "Toggle server chat.")
+    @CommandPermissions({"tgm.togglechat"})
+    public static void togglechat(CommandContext cmd, CommandSender sender) {
+        if (TGM.get().getConfig().getBoolean("chat.enabled")) {
+            TGM.get().getConfig().set("chat.enabled", false);
+            TGM.get().saveConfig();
+            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
+        } else {
+            TGM.get().getConfig().set("chat.enabled", true);
+            TGM.get().saveConfig();
+            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
+        }
+    }    
+
     private static void issuePunishment(String type, String name, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
         issuePunishment(type, name, null, false, punisher, verb, timeUnitPair, reason, time, broadcast);
     }

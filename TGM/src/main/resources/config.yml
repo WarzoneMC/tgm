@@ -5,6 +5,8 @@ api:
   stats:
     enabled: true
 rotation: maps/rotation.txt
+chat:
+  enabled: true
 map:
   sources:
   - maps
