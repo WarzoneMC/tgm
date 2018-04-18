@@ -241,7 +241,7 @@ public class PunishCommands {
             TGM.get().saveConfig();
             Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
         }
-    }    
+    }
 
     private static void issuePunishment(String type, String name, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
         issuePunishment(type, name, null, false, punisher, verb, timeUnitPair, reason, time, broadcast);

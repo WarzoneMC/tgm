@@ -40,7 +40,7 @@ public class ChatModule extends MatchModule implements Listener {
         timeModule = match.getModule(TimeModule.class);
     }
 
-    private final List<String> blockdCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
+    private final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
@@ -53,7 +53,7 @@ public class ChatModule extends MatchModule implements Listener {
     }
 
     private boolean startsWith(String msg) {
-        for (String cmd : blockdCmds) {
+        for (String cmd : blockedCmds) {
             if (msg.toLowerCase().startsWith("/" + cmd) || msg.toLowerCase().startsWith(cmd)) return true;
         }
         return false;
