@@ -21,10 +21,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by luke on 4/27/17.
@@ -32,8 +29,8 @@ import java.util.UUID;
 @Getter
 public class JoinManager implements Listener {
 
-    private List<QueuedJoin> queuedJoins = new ArrayList<>();
-    private List<LoginService> loginServices = new ArrayList<>();
+    private Set<QueuedJoin> queuedJoins = new HashSet<>();
+    private Set<LoginService> loginServices = new HashSet<>();
  
     public JoinManager() {
         TGM.registerEvents(this);
