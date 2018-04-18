@@ -229,7 +229,7 @@ public class PunishCommands {
         Bukkit.getConsoleSender().sendMessage(result);
     }
 
-    @Command(aliases = {"togglechat", "freezechat"}, desc = "Toggle server chat.")
+    @Command(aliases = {"togglechat", "mutechat"}, desc = "Toggle server chat.")
     @CommandPermissions({"tgm.togglechat"})
     public static void togglechat(CommandContext cmd, CommandSender sender) {
         if (TGM.get().getConfig().getBoolean("chat.enabled")) {
