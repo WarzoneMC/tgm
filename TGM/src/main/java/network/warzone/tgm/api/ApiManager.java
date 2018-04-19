@@ -9,10 +9,10 @@ import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.StatsModule;
-import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
@@ -21,12 +21,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+@Getter
 public class ApiManager implements Listener {
 
     private ObjectId serverId;
-    @Getter private MatchInProgress matchInProgress;
+    private MatchInProgress matchInProgress;
 
     private DeathModule deathModule;
 
@@ -34,9 +37,13 @@ public class ApiManager implements Listener {
         this.serverId = new ObjectId();
         TGM.registerEvents(this);
 
+        Set<String> players = new HashSet<>();
+        Set<String> playerNames = new HashSet<>();
+
         Bukkit.getScheduler().runTaskTimerAsynchronously(TGM.get(), () -> {
-            List<String> players = new ArrayList<>();
-            List<String> playerNames = new ArrayList<>();
+            players.clear();
+            playerNames.clear();
+
             for (PlayerContext playerContext : TGM.get().getPlayerManager().getPlayers()) {
                 try {
                     players.add(playerContext.getUserProfile().getId().toString());
@@ -53,7 +60,7 @@ public class ApiManager implements Listener {
                     spectatorCount += matchTeam.getMembers().size();
                 }
             }
-            Heartbeat heartbeat = new Heartbeat(
+            Heartbeat heartbeat = new Heartbeat(serverId,
                     TGM.get().getConfig().getString("server.name"),
                     TGM.get().getConfig().getString("server.id"),
                     players,
@@ -62,11 +69,10 @@ public class ApiManager implements Listener {
                     spectatorCount,
                     maxPlayers,
                     TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getName(),
-                    TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().getName(),
-                    serverId
+                    TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().getName()
             );
             TGM.get().getTeamClient().heartbeat(heartbeat);
-        }, 20L, 20L);
+        }, 40L, 20L);
     }
 
     @EventHandler
@@ -112,6 +118,10 @@ public class ApiManager implements Listener {
                 event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,
                 teamMappings);
         TGM.get().getTeamClient().finishMatch(matchFinishPacket);
+
+        winners.clear();
+        losers.clear();
+        teamMappings.clear();
     }
 
     @EventHandler
@@ -131,6 +141,8 @@ public class ApiManager implements Listener {
             matchInProgress = TGM.get().getTeamClient().loadMatch(new MatchLoadRequest(mapLoadResponse.getMap()));
             Bukkit.getLogger().info("Match successfully loaded [" + matchInProgress.getMap() + "]");
         });
+
+        teams.clear();
     }
 
     @EventHandler

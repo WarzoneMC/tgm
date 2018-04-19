@@ -2,10 +2,7 @@ package network.warzone.tgm.modules.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.tgm.modules.time.TimeLimitService;
-import network.warzone.tgm.modules.time.TimeModule;
-import network.warzone.warzoneapi.models.DestroyWoolRequest;
-import network.warzone.warzoneapi.models.UserProfile;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -19,12 +16,14 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.FireworkUtil;
 import network.warzone.tgm.util.Parser;
-import lombok.Getter;
+import network.warzone.warzoneapi.models.DestroyWoolRequest;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -32,7 +31,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -122,7 +124,7 @@ public class DTMModule extends MatchModule implements Listener {
         for (Monument monument : monuments) {
             monument.load();
         }
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getHighestHealthTeam());
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getHighestHealthTeam);
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
@@ -259,8 +261,8 @@ public class DTMModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
-        for (Monument monument : monuments) {
-            monument.unload();
-        }
+        monuments.forEach(Monument::unload);
+
+        monuments.clear();
     }
 }

@@ -26,5 +26,6 @@ public class TaskedModuleManager extends MatchModule {
     @Override
     public void unload() {
         Bukkit.getScheduler().cancelTask(runnableId);
+        taskedModules.clear();
     }
 }

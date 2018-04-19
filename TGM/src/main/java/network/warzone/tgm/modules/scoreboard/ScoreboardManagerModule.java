@@ -28,9 +28,10 @@ import java.util.HashMap;
  * direct access to SimpleScoreboard objects through TGM.get().getModule(ScoreboardManagerModule.class)
  * to control scoreboards as needed.
  */
-@ModuleData(load = ModuleLoadTime.EARLIEST)
+@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
 public class ScoreboardManagerModule extends MatchModule implements Listener {
-    @Getter private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
+
+    private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
@@ -110,7 +111,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
-        this.scoreboards.clear();
+        scoreboards.clear();
     }
 
 }

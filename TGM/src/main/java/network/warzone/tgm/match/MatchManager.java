@@ -12,7 +12,6 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.io.File;
@@ -109,9 +108,8 @@ public class MatchManager {
         }
 
         // Transport all players to the new world so we can unload the old one.
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-        }
+        Bukkit.getOnlinePlayers().forEach(player ->
+                player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
 
         //create and load the match.
         Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
@@ -125,6 +123,8 @@ public class MatchManager {
 
         //if a match is currently running, unload it.
         if (oldMatch != null) {
+            oldMatch.getWorld().getPlayers().forEach(player ->
+                    player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
             Bukkit.unloadWorld(oldMatch.getWorld(), false);
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
@@ -134,7 +134,7 @@ public class MatchManager {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }, 60L); // 3 seconds
+            }, 80L); // 4 seconds
         }
     }
 

@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.tdm;
 
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -10,8 +11,6 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import lombok.Getter;
-import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -27,14 +26,15 @@ import java.util.stream.Collectors;
 /**
  * Created by Jorge on 9/4/2017.
  */
+@Getter
 public class TDMModule extends MatchModule implements Listener {
     
-    @Getter private Match match;
-    @Getter private PointsModule pointsModule;
-    @Getter private TeamManagerModule teamManager;
-    @Getter private TDMObjective tdmObjective = TDMObjective.KILLS;
+    private Match match;
+    private PointsModule pointsModule;
+    private TeamManagerModule teamManager;
+    private TDMObjective tdmObjective = TDMObjective.KILLS;
 
-    @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -53,6 +53,11 @@ public class TDMModule extends MatchModule implements Listener {
         pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
 
         TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getHighestPointsTeam());
+    }
+
+    @Override
+    public void unload() {
+        teamScoreboardLines.clear();
     }
 
     private MatchTeam getHighestPointsTeam() {

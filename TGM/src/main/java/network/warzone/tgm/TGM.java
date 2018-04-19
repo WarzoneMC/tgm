@@ -29,6 +29,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -125,6 +126,10 @@ public class TGM extends JavaPlugin {
 
     public static void registerEvents(Listener listener) {
         Bukkit.getPluginManager().registerEvents(listener, TGM.get());
+    }
+
+    public static void unregisterEvents(Listener listener) {
+        HandlerList.unregisterAll(listener);
     }
 
     @SuppressWarnings("unchecked")

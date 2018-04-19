@@ -27,59 +27,55 @@ public class KillstreakModule extends MatchModule implements Listener {
     private DeathModule deathModule;
 
     private final Map<String, Integer> players = new HashMap<>(); // String is player's uuid
-    private final List<Killstreak> killstreaks = new ArrayList<>();
-
-    public KillstreakModule() {
-
-    }
+    private final Set<Killstreak> killstreaks = new HashSet<>();
 
     @Override
     public void load(Match match) {
         deathModule = match.getModule(DeathModule.class);
 
-        if (!match.getMapContainer().getMapInfo().getJsonObject().has("killstreaks")) { // Default
-            killstreaks.addAll(Arrays.asList(
-                new Killstreak()
-                        .setCount(5)
-                        .setMessage("%killercolor%%killername% &7is on a kill streak of &2&l%count%&r&7!")
-                        .setCommands(Collections.singletonList(
-                                "execute %killername% ~ ~ ~ playsound entity.zombie.death master @a ~ ~ ~ 3"
-                        )),
+        killstreaks.addAll(Arrays.asList( //TODO Add option to disable it
+            new Killstreak()
+                    .setCount(5)
+                    .setMessage("%killercolor%%killername% &7is on a kill streak of &2&l%count%&r&7!")
+                    .setCommands(Collections.singletonList(
+                            "execute %killername% ~ ~ ~ playsound entity.zombie.death master @a ~ ~ ~ 3"
+                    )),
 
-                new Killstreak()
-                        .setCount(10)
-                        .setMessage("%killercolor%%killername% &7is on a kill streak of &6&l%count%&r&7!")
-                        .setCommands(Arrays.asList(
-                                "execute %killername% ~ ~ ~ playsound entity.wither.ambient master @a ~ ~ ~ 7",
-                                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
-                        )),
+            new Killstreak()
+                    .setCount(10)
+                    .setMessage("%killercolor%%killername% &7is on a kill streak of &6&l%count%&r&7!")
+                    .setCommands(Arrays.asList(
+                            "execute %killername% ~ ~ ~ playsound entity.wither.ambient master @a ~ ~ ~ 7",
+                            "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:4,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
+                    )),
 
-                new Killstreak()
-                        .setCount(25)
-                        .setMessage("%killercolor%%killername% &7is on a kill streak of &c&l%count%&r&7!")
-                        .setCommands(Arrays.asList(
-                                "execute %killername% ~ ~ ~ playsound entity.enderdragon.growl master @a ~ ~ ~ 1000",
-                                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
-                        )),
+            new Killstreak()
+                    .setCount(25)
+                    .setMessage("%killercolor%%killername% &7is on a kill streak of &c&l%count%&r&7!")
+                    .setCommands(Arrays.asList(
+                            "execute %killername% ~ ~ ~ playsound entity.enderdragon.growl master @a ~ ~ ~ 1000",
+                            "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
+                    )),
 
-                new Killstreak()
-                        .setCount(50)
-                        .setMessage("%killercolor%%killername% &7is on a kill streak of &3&l%count%&r&7!")
-                        .setCommands(Arrays.asList(
-                                "execute %killername% ~ ~ ~ playsound entity.wither.spawn master @a ~ ~ ~ 1000 1.4", // 1.4 so it doesn't sound the same as the game end sound
-                                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
-                        )),
+            new Killstreak()
+                    .setCount(50)
+                    .setMessage("%killercolor%%killername% &7is on a kill streak of &3&l%count%&r&7!")
+                    .setCommands(Arrays.asList(
+                            "execute %killername% ~ ~ ~ playsound entity.wither.spawn master @a ~ ~ ~ 1000 1.4", // 1.4 so it doesn't sound the same as the game end sound
+                            "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
+                    )),
 
-                new Killstreak()
-                        .setCount(100)
-                        .setMessage("%killercolor%%killername% &7is on a kill streak of &5&l%count%&r&7!")
-                        .setCommands(Arrays.asList(
-                                "execute @a ~ ~ ~ playsound ui.toast.challenge_complete master @p ~ ~100 ~ 1000",
-                                "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Colors:[I;16766776],FadeColors:[I;16774912]}]}}}}"//,
-                                //"ban %killername% &c&lDETECTED FOR KILL FARMING&r" // :facepalm:
-                        ))
-            ));
-        } else { // If json contains killstreaks, read it
+            new Killstreak()
+                    .setCount(100)
+                    .setMessage("%killercolor%%killername% &7is on a kill streak of &5&l%count%&r&7!")
+                    .setCommands(Arrays.asList(
+                            "execute @a ~ ~ ~ playsound ui.toast.challenge_complete master @p ~ ~100 ~ 1000",
+                            "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:2,Colors:[I;16766776],FadeColors:[I;16774912]}]}}}}"//,
+                            //"ban %killername% &c&lDETECTED FOR KILL FARMING&r" // :facepalm:
+                    ))
+        ));
+
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("killstreaks")) { // If json contains killstreaks, read it
             for (JsonElement streakElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("killstreaks")) {
                 Killstreak killstreak = new Killstreak();
 

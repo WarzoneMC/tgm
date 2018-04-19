@@ -16,7 +16,6 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -182,5 +181,9 @@ public class KOTHModule extends MatchModule implements Listener {
         for (ControlPoint controlPoint : controlPoints) {
             controlPoint.unload();
         }
+
+        controlPoints.clear();
+        controlPointScoreboardLines.clear();
+        teamScoreboardLines.clear();
     }
 }

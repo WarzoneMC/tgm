@@ -5,20 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bson.types.ObjectId;
 
-import java.util.List;
+import java.util.Set;
 
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class Heartbeat {
-    @Getter private final String name;
-    @Getter private final String id;
-    @Getter private List<String> players; //object ids
-    @Getter private List<String> playerNames;
-    @Getter private int playerCount;
-    @Getter private int spectatorCount;
-    @Getter private int maxPlayers;
-    @Getter private String map;
-    @Getter private String gametype;
 
     @SerializedName("_id")
-    @Getter private ObjectId serverId;
+    private ObjectId serverId;
+
+    private final String name;
+    private final String id;
+    private Set<String> players; //object ids
+    private Set<String> playerNames;
+    private int playerCount;
+    private int spectatorCount;
+    private int maxPlayers;
+    private String map;
+    private String gametype;
+
 }

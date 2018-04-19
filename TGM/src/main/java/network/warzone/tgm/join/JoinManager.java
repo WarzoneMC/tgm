@@ -35,15 +35,18 @@ public class JoinManager implements Listener {
     public JoinManager() {
         TGM.registerEvents(this);
 
+        Set<QueuedJoin> toRemove = new HashSet<>();
+
         //empty queued joins when the connection didn't follow through for an unknown reason.
         Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
-            List<QueuedJoin> toRemove = new ArrayList<>();
             for (QueuedJoin queuedJoin : queuedJoins) {
                 if (System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000) {
                     toRemove.add(queuedJoin);
                 }
             }
+
             queuedJoins.removeAll(toRemove);
+            toRemove.clear();
         }, 20 * 10L, 20 * 10L);
     }
 
@@ -93,10 +96,7 @@ public class JoinManager implements Listener {
         Ranks.createAttachment(event.getPlayer());
         playerContext.getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
 
-        for (LoginService loginService : loginServices) {
-            loginService.login(playerContext);
-        }
-
+        loginServices.forEach(loginService -> loginService.login(playerContext));
         queuedJoins.remove(queuedJoin);
     }
 
@@ -139,7 +139,7 @@ public class JoinManager implements Listener {
         handleQuit(event.getPlayer());
     }
 
-    public void handleQuit(Player player) {
+    private void handleQuit(Player player) {
         TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
         Ranks.removeAttachment(player);
     }

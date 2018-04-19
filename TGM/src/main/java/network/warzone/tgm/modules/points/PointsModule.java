@@ -15,14 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-@ModuleData(load = ModuleLoadTime.EARLIEST)
+@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
 public class PointsModule extends MatchModule {
-    @Getter private final HashMap<MatchTeam, Integer> points = new HashMap<>();
+    private final HashMap<MatchTeam, Integer> points = new HashMap<>();
 
     //amount of points the team has to reach to win the game.
-    @Getter private final HashMap<MatchTeam, Integer> targets = new HashMap<>();
-
-    @Getter private final List<PointService> services = new ArrayList<>();
+    private final HashMap<MatchTeam, Integer> targets = new HashMap<>();
+    private final List<PointService> services = new ArrayList<>();
 
     @Override
     public void load(Match match) {
@@ -40,6 +39,13 @@ public class PointsModule extends MatchModule {
                 //todo: per team target parsing
             }
         }
+    }
+
+    @Override
+    public void unload() {
+        points.clear();
+        targets.clear();
+        services.clear();
     }
 
     public void incrementPoints(MatchTeam matchTeam, int amount) {
