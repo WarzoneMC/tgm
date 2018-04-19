@@ -229,17 +229,27 @@ public class PunishCommands {
         Bukkit.getConsoleSender().sendMessage(result);
     }
 
-    @Command(aliases = {"togglechat", "mutechat"}, desc = "Toggle server chat.")
-    @CommandPermissions({"tgm.togglechat"})
-    public static void togglechat(CommandContext cmd, CommandSender sender) {
-        if (TGM.get().getConfig().getBoolean("chat.enabled")) {
-            TGM.get().getConfig().set("chat.enabled", false);
-            TGM.get().saveConfig();
-            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
-        } else {
-            TGM.get().getConfig().set("chat.enabled", true);
-            TGM.get().saveConfig();
-            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
+    @Command(aliases = {"chat"}, desc = "Control chat settings", min = 1, usage = "(mute|clear)")
+    @CommandPermissions({"tgm.chat.control"})
+    public static void chat(CommandContext cmd, CommandSender sender) {
+        String action = cmd.getString(0);
+        if (action.equalsIgnoreCase("mute")) {
+            if (TGM.get().getConfig().getBoolean("chat.enabled")) {
+                TGM.get().getConfig().set("chat.enabled", false);
+                TGM.get().saveConfig();
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
+            } else {
+                TGM.get().getConfig().set("chat.enabled", true);
+                TGM.get().saveConfig();
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
+            }
+        } else if (action.equalsIgnoreCase("clear")) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                for(int i=0; i <= 100; i++){
+                    player.sendMessage("");
+                }
+            }
+            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
         }
     }
 
