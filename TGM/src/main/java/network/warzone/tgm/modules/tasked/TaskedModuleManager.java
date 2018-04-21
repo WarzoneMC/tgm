@@ -20,7 +20,7 @@ public class TaskedModuleManager extends MatchModule {
 
         runnableId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> taskedModules.forEach(matchModule -> {
             ((TaskedModule) matchModule).tick();
-        }), 0L, 0L).getTaskId();
+        }), 1L, 1L).getTaskId();
     }
 
     @Override
