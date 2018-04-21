@@ -80,6 +80,8 @@ public class TGM extends JavaPlugin {
                     return apiConfig.getString("auth");
                 }
             });
+
+            apiManager = new ApiManager();
         } else {
             teamClient = new OfflineClient();
         }
@@ -94,7 +96,6 @@ public class TGM extends JavaPlugin {
         matchManager = new MatchManager(fileConfiguration);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
-        apiManager = new ApiManager();
         broadcastManager = new BroadcastManager();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
