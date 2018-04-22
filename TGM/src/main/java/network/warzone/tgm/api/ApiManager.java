@@ -14,6 +14,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
@@ -40,7 +41,7 @@ public class ApiManager implements Listener {
         Set<String> players = new HashSet<>();
         Set<String> playerNames = new HashSet<>();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(TGM.get(), () -> {
+        if (TGM.get().getTeamClient() instanceof HttpClient) Bukkit.getScheduler().runTaskTimerAsynchronously(TGM.get(), () -> {
             players.clear();
             playerNames.clear();
 
