@@ -137,9 +137,7 @@ public class ItemKitNodeParser implements KitNodeParser {
                     } else {
                         duration = Integer.valueOf(split[1]);
                     }
-                    if (effectType != null) {
-                        potionMeta.addCustomEffect(new PotionEffect(effectType, duration, level), true);
-                    }
+                    if (effectType != null) potionMeta.addCustomEffect(new PotionEffect(effectType, duration, level), true);
                 }
             }
 
