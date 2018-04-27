@@ -1,6 +1,7 @@
 package network.warzone.tgm.broadcast;
 
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.user.PlayerContext;
@@ -37,7 +38,7 @@ public class BroadcastEventTrigger implements Listener{
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onMatchCycle(MatchResultEvent event) {
-        Bukkit.getOnlinePlayers().forEach(player -> trigger(player, "onMatchResult"));
+        trigger("onMatchResult");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -46,10 +47,22 @@ public class BroadcastEventTrigger implements Listener{
         trigger(event.getPlayerContext().getPlayer(), "onTeamJoin");
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onMatchLoad(MatchLoadEvent event) {
+        trigger("onMatchLoad");
+    }
+
     private void trigger(Player player, String name) {
         List<Broadcast> broadcasts = this.manager.getOnEvents(name);
         for (Broadcast broadcast : broadcasts) {
             this.manager.broadcast(player, broadcast);
+        }
+    }
+
+    private void trigger(String name) {
+        List<Broadcast> broadcasts = this.manager.getOnEvents(name);
+        for (Broadcast broadcast : broadcasts) {
+            this.manager.broadcast(broadcast);
         }
     }
 
