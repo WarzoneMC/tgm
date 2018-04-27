@@ -3,6 +3,7 @@ package network.warzone.tgm.broadcast;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +27,11 @@ public class BroadcastEventTrigger implements Listener{
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
+        if (playerContext.getUserProfile().isNew()) {
+            trigger(event.getPlayer(), "onFirstJoin");
+            return;
+        }
         trigger(event.getPlayer(), "onJoin");
     }
 
