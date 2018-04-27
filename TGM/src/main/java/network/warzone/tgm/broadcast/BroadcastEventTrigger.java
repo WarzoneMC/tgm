@@ -53,17 +53,11 @@ public class BroadcastEventTrigger implements Listener{
     }
 
     private void trigger(Player player, String name) {
-        List<Broadcast> broadcasts = this.manager.getOnEvents(name);
-        for (Broadcast broadcast : broadcasts) {
-            this.manager.broadcast(player, broadcast);
-        }
+        this.manager.getOnEvents(name).forEach(broadcast -> this.manager.broadcast(player, broadcast));
     }
 
     private void trigger(String name) {
-        List<Broadcast> broadcasts = this.manager.getOnEvents(name);
-        for (Broadcast broadcast : broadcasts) {
-            this.manager.broadcast(broadcast);
-        }
+        this.manager.getOnEvents(name).forEach(broadcast -> this.manager.broadcast(broadcast));
     }
 
 }
