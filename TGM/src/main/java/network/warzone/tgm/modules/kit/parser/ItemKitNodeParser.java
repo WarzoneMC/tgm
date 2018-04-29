@@ -102,7 +102,7 @@ public class ItemKitNodeParser implements KitNodeParser {
                 int level = Integer.valueOf(split[1]);
                 Enchantment enchantment = Enchantment.getByName(split[0]);
                 if (enchantment != null) {
-                    itemStack.addUnsafeEnchantment(enchantment, level);
+                    itemMeta.addEnchant(enchantment, level, true);
                 }
             }
         }
