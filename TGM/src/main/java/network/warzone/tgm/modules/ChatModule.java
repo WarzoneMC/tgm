@@ -63,7 +63,7 @@ public class ChatModule extends MatchModule implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         // Run this code if the chat is currently muted
         if (!TGM.get().getConfig().getBoolean("chat.enabled") && !event.getPlayer().hasPermission("tgm.chat.bypass")) {
-            event.getPlayer().sendMessage(ChatColor.RED + "Chat is currently disabled. If you believe this is an error, please contact a staff member on our Discord.");
+            event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', TGM.get().getConfig().getString("chat.messages.muted")));
             event.setCancelled(true);
             return;
         }
