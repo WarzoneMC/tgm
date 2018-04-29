@@ -244,11 +244,10 @@ public class PunishCommands {
                 Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
             }
         } else if (action.equalsIgnoreCase("clear")) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                for(int i=0; i <= 100; i++){
-                    player.sendMessage("");
-                }
-            }
+            Bukkit.getOnlinePlayers().forEach((Player player) -> {
+                String repeated = new String(new char[250]).replace("\0", "\n");
+                player.sendMessage(repeated);
+            });
             Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
         }
     }
