@@ -263,16 +263,17 @@ public class PunishCommands {
     }
 
     private static void broadcastPunishment(String name, String ip, String punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean everyone) {
-        ChatColor punisherColor = ChatColor.LIGHT_PURPLE;
-        ChatColor punishedColor = ChatColor.DARK_PURPLE;
+        ChatColor punisherColor = ChatColor.DARK_PURPLE;
+        ChatColor punishedColor = ChatColor.LIGHT_PURPLE;
+        ChatColor durationColor = ChatColor.LIGHT_PURPLE;
         if (name != null) {
             if (time) {
                 if (everyone) Bukkit.broadcastMessage(punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                        " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
+                        " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
                 else {
                     Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list") || player.getName().equalsIgnoreCase(name)).forEach(player -> player.sendMessage(ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                            " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
+                            " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
                             " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason)));
                 }
             } else {
@@ -286,7 +287,7 @@ public class PunishCommands {
         } else {
             if (time) {
                 String result = ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + ip + ChatColor.GRAY +
-                        " for " + ChatColor.RED + timeUnitPair.getTimeWord() + ChatColor.GRAY +
+                        " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason);
                 Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list")).forEach(player -> player.sendMessage(result));
                 Bukkit.getConsoleSender().sendMessage(result);
