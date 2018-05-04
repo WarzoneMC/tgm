@@ -1,3 +1,5 @@
+[![Build Status](https://jenkins.warzone.network/buildStatus/icon?job=TGM)](https://jenkins.warzone.network/job/TGM)
+
 # Warzone
 Team Oriented Minecraft PVP Suite
 

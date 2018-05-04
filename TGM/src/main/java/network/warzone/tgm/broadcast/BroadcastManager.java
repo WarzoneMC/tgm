@@ -82,7 +82,7 @@ public class BroadcastManager {
         HttpResponse<JsonNode> broadcasts = Unirest.get(url).asObject(JsonNode.class);
         Gson gson = new Gson();
         if (this.broadcasts != null && !this.broadcasts.isEmpty()) this.broadcasts.clear();
-        this.broadcasts = Arrays.asList(gson.fromJson(broadcasts.getBody().toString(), Broadcast[].class));
+        this.broadcasts = new ArrayList(Arrays.asList(gson.fromJson(broadcasts.getBody().toString(), Broadcast[].class)));
     }
 
     private void readFromFile() {
@@ -91,7 +91,7 @@ public class BroadcastManager {
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(broadcastsFile));
             if (this.broadcasts != null && !this.broadcasts.isEmpty()) this.broadcasts.clear();
-            this.broadcasts = gson.fromJson(reader, new TypeToken<List<Broadcast>>() {}.getType());
+            this.broadcasts = new ArrayList(gson.fromJson(reader, new TypeToken<List<Broadcast>>() {}.getType()));
         } catch (FileNotFoundException e) {
             System.out.println("Could not load broadcasts file.");
             e.printStackTrace();
