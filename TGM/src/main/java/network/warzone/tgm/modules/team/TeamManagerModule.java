@@ -21,12 +21,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleData(load = ModuleLoadTime.EARLIEST)
+@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter @Setter
 public class TeamManagerModule extends MatchModule implements Listener {
-    @Getter
+
     private List<MatchTeam> teams = new ArrayList<>();
 
-    @Getter @Setter private TeamJoinController teamJoinController;
+    private TeamJoinController teamJoinController;
 
     public TeamManagerModule() {
         teamJoinController = new TeamJoinControllerImpl(this);
@@ -34,12 +34,16 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teams.clear();
-
         teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true, Integer.MAX_VALUE, 0));
+
         for (ParsedTeam parsedTeam : match.getMapContainer().getMapInfo().getTeams()) {
             teams.add(new MatchTeam(parsedTeam.getId(), parsedTeam.getAlias(), parsedTeam.getTeamColor(), false, parsedTeam.getMax(), parsedTeam.getMin()));
         }
+    }
+
+    @Override
+    public void unload() {
+        teams.clear();
     }
 
     public void addTeam(MatchTeam team) {

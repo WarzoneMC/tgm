@@ -8,12 +8,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -30,11 +31,10 @@ public class WoolChestModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        runnableId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-            for (InventoryHolder inventory : woolChests.keySet()) {
-                fillInventoryWithWool(inventory.getInventory(), woolChests.get(inventory));
-            }
-        }, 1L, 1L).getTaskId();
+        runnableId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () ->
+                woolChests.forEach((inventory, color) ->
+                        fillInventoryWithWool(inventory.getInventory(), color)
+                ), 1L, 1L).getTaskId();
     }
 
     @Override
@@ -45,22 +45,45 @@ public class WoolChestModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onOpen(InventoryOpenEvent event) {
-        if (event.getInventory().getType() == InventoryType.CHEST) {
-            if (event.getInventory().getLocation().getBlock().getState() instanceof Chest) {
+        //if (event.getInventory().getType() == InventoryType.CHEST) {
+            BlockState state = event.getInventory().getLocation().getBlock().getState();
+
+            if (state instanceof Chest) {
                 Chest chest = (Chest) event.getInventory().getLocation().getBlock().getState();
 
                 if (!isWoolChest(chest)) {
                     registerInventory(event.getInventory());
                 }
+            } else if (state instanceof DoubleChest) {
+                DoubleChest chest = (DoubleChest) event.getInventory().getLocation().getBlock().getState();
+
+                if (!isWoolChest(chest.getRightSide())) {
+                    registerInventory(chest.getRightSide().getInventory());
+                }
+
+                if (!isWoolChest(chest.getLeftSide())) {
+                    registerInventory(chest.getLeftSide().getInventory());
+                }
             }
-        }
+        //}
     }
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         if (event.getBlock().getType() == Material.CHEST) {
-            if (event.getBlock().getState() instanceof Chest) {
-                if (isWoolChest(((Chest) event.getBlock().getState()).getBlockInventory().getHolder())) {
+            BlockState state = event.getBlock().getLocation().getBlock().getState();
+
+            if (state instanceof Chest) {
+                Chest chest = (Chest) state;
+
+                if (isWoolChest(chest)) {
+                    event.setCancelled(true);
+                    event.getPlayer().sendMessage(ChatColor.RED + "You cannot break the wool chest!");
+                }
+            } else if (state instanceof DoubleChest) {
+                DoubleChest chest = (DoubleChest) state;
+
+                if (isWoolChest(chest.getRightSide()) || isWoolChest(chest.getLeftSide())) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage(ChatColor.RED + "You cannot break the wool chest!");
                 }

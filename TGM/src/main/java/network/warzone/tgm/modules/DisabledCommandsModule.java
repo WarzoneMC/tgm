@@ -6,11 +6,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DisabledCommandsModule extends MatchModule implements Listener {
-    private final List<String> disabledCommands = new ArrayList<>();
+
+    private final Set<String> disabledCommands = new HashSet<>();
 
     public DisabledCommandsModule() {
         disabledCommands.add("/me");

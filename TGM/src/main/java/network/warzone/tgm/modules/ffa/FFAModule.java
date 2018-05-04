@@ -13,7 +13,6 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
@@ -85,7 +84,14 @@ public class FFAModule extends MatchModule implements Listener {
             timeModule.setTimeLimited(timeLimitEnabled);
             timeModule.setTimeLimit(timeLimit);
         }
-        timeModule.setTimeLimitService(() -> getWinner());
+        timeModule.setTimeLimitService(this::getWinner);
+    }
+
+    @Override
+    public void unload() {
+        scores.clear();
+        playerScoreboardLines.clear();
+        playerLives.clear();
     }
 
     @Override
@@ -204,11 +210,7 @@ public class FFAModule extends MatchModule implements Listener {
         if (blitzMode) a = playerLives.entrySet().toArray();
         else a = scores.entrySet().toArray();
 
-        Arrays.sort(a, new Comparator() {
-            public int compare(Object o1, Object o2) {
-                return ((Map.Entry<String, Integer>) o1).getValue().compareTo(((Map.Entry<String, Integer>) o2).getValue());
-            }
-        });
+        Arrays.sort(a, (Comparator) Comparator.comparing(o -> ((Map.Entry<String, Integer>) o).getValue()));
         for (Object e : a) {
             Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>) e;
             String player = entry.getKey();

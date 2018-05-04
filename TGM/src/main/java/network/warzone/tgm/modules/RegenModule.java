@@ -57,7 +57,7 @@ public class RegenModule extends MatchModule implements Listener {
     }
 
     @Override
-    public void disable() {
+    public void unload() {
         healTimes.clear();
     }
 

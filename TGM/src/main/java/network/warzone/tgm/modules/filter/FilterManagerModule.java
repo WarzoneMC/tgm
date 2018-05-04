@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FilterManagerModule extends MatchModule {
+
     private List<FilterType> filterTypes = new ArrayList<>();
 
     @Override
@@ -49,6 +50,7 @@ public class FilterManagerModule extends MatchModule {
                 HandlerList.unregisterAll((Listener) filterType);
             }
         }
+        filterTypes.clear();
     }
 
     private List<FilterType> initFilter(Match match, JsonObject jsonObject) {

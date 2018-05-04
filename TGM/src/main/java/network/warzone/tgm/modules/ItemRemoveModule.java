@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemRemoveModule extends MatchModule implements Listener {
+
     private final List<Material> removed = new ArrayList<>();
 
     @Override

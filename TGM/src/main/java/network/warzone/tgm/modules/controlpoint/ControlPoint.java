@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.controlpoint;
 
 import com.google.common.collect.Sets;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.region.Region;
@@ -10,7 +11,6 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Blocks;
 import network.warzone.tgm.util.ColorConverter;
-import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,14 +26,15 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.util.BlockVector;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Not a module! Other modules should initialize these and keep track of them.
  *
  * Must register listener on load.
  */
-
+@Getter
 public class ControlPoint implements Listener {
     public static final ChatColor COLOR_NEUTRAL_TEAM = ChatColor.WHITE;
 
@@ -42,22 +43,20 @@ public class ControlPoint implements Listener {
 
     public static final long TICK_RATE = 10;
 
-    @Getter private final ControlPointDefinition definition;
+    private final ControlPointDefinition definition;
 
-    @Getter private final Region region;
-    @Getter private final RegionSave regionSave;
-    @Getter private final ControlPointService controlPointService;
+    private final Region region;
+    private final RegionSave regionSave;
+    private final ControlPointService controlPointService;
 
-    @Getter
     private final Set<Player> playersOnPoint = Sets.newHashSet();
 
-    @Getter
     private MatchTeam controller = null;
 
-    @Getter private int progress = 0;
-    @Getter private MatchTeam progressingTowardsTeam = null;
+    private int progress = 0;
+    private MatchTeam progressingTowardsTeam = null;
 
-    @Getter private int runnableId = -1;
+    private int runnableId = -1;
 
     public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
         this.definition = controlPointDefinition;
@@ -218,5 +217,7 @@ public class ControlPoint implements Listener {
     public void unload() {
         Bukkit.getScheduler().cancelTask(runnableId);
         HandlerList.unregisterAll(this);
+
+        playersOnPoint.clear();
     }
 }

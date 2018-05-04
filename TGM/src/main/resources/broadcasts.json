@@ -1,0 +1,19 @@
+[
+  {
+    "id": "bc-1",
+    "message": "\n&eJoin our Discord server\n"
+  },
+  {
+    "id": "bc-2",
+    "message": "\n&aHave you joined our Discord server yet?\n"
+  },
+  {
+    "id": "twitter-1",
+    "message": "\n&bFollow us on Twitter\n"
+  },
+  {
+    "id": "donor-1",
+    "message": "&6Message for donors!",
+    "permission": "tgm.donor"
+  }
+]

@@ -9,6 +9,8 @@ import com.sk89q.minecraft.util.commands.CommandsManager;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.api.ApiManager;
+import network.warzone.tgm.broadcast.BroadcastManager;
+import network.warzone.tgm.command.BroadcastCommands;
 import network.warzone.tgm.command.CycleCommands;
 import network.warzone.tgm.command.PunishCommands;
 import network.warzone.tgm.command.RankCommands;
@@ -29,6 +31,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -46,6 +49,8 @@ public class TGM extends JavaPlugin {
     private PlayerManager playerManager;
     private JoinManager joinManager;
     private ApiManager apiManager;
+
+    private BroadcastManager broadcastManager;
 
     private CommandsManager<CommandSender> commands;
     private CommandsManagerRegistration commandManager;
@@ -90,10 +95,12 @@ public class TGM extends JavaPlugin {
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
         apiManager = new ApiManager();
+        broadcastManager = new BroadcastManager();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 
         commandManager.register(CycleCommands.class);
+        commandManager.register(BroadcastCommands.class);
         if (apiConfig.getBoolean("enabled", false)) {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
@@ -125,6 +132,10 @@ public class TGM extends JavaPlugin {
 
     public static void registerEvents(Listener listener) {
         Bukkit.getPluginManager().registerEvents(listener, TGM.get());
+    }
+
+    public static void unregisterEvents(Listener listener) {
+        HandlerList.unregisterAll(listener);
     }
 
     @SuppressWarnings("unchecked")

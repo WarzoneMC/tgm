@@ -12,9 +12,10 @@ import org.bukkit.Location;
 
 import java.util.HashMap;
 
-@ModuleData(load = ModuleLoadTime.EARLIEST)
+@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
 public class RegionManagerModule extends MatchModule {
-    @Getter private final HashMap<String, Region> regions = new HashMap<>();
+
+    private final HashMap<String, Region> regions = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -27,6 +28,11 @@ public class RegionManagerModule extends MatchModule {
                 getRegion(match, regionElement);
             }
         }
+    }
+
+    @Override
+    public void unload() {
+        regions.clear();
     }
 
     /**

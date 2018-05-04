@@ -13,18 +13,18 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.List;
 
-@ModuleData(load = ModuleLoadTime.EARLIEST)
+@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
 public class TimeModule extends MatchModule {
-    @Getter private long startedTimeStamp = 0;
-    @Getter private long endedTimeStamp = 0;
+    private long startedTimeStamp = 0;
+    private long endedTimeStamp = 0;
 
     private List<Broadcast> broadcasts = new ArrayList<>();
 
-    @Getter @Setter private boolean timeLimited = false;
-    @Getter @Setter private int timeLimit = 20*60; // Default
-    @Getter private MatchTeam defaultWinner = null;
+    @Setter private boolean timeLimited = false;
+    @Setter private int timeLimit = 20*60; // Default
+    private MatchTeam defaultWinner = null;
     //@Getter private List<TimeLimitService> services = new ArrayList<>();
-    @Getter @Setter private TimeLimitService timeLimitService;
+    @Setter private TimeLimitService timeLimitService;
 
     private int taskID;
 
@@ -85,6 +85,8 @@ public class TimeModule extends MatchModule {
         endedTimeStamp = System.currentTimeMillis();
         setTimeLimited(false);
         Bukkit.getScheduler().cancelTask(taskID);
+
+        broadcasts.clear();
     }
 
     public double getTimeElapsed() {

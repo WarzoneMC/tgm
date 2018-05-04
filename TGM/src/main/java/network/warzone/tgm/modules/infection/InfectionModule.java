@@ -161,7 +161,7 @@ public class InfectionModule extends MatchModule implements Listener {
         if (TGM.get().getApiManager().isStatsDisabled())
             return;
 
-        PlayerContext playerContect = TGM.get().getPlayerManager().getPlayerContext(player);
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
 
         String playerItem = "";
         if (player.getInventory().getItemInMainHand() != null) {
@@ -176,7 +176,7 @@ public class InfectionModule extends MatchModule implements Listener {
 
         ApiManager api = TGM.get().getApiManager();
 
-        Death death = new Death(playerContect.getUserProfile().getId().toString(), killerId, playerItem,
+        Death death = new Death(playerContext.getUserProfile().getId().toString(), killerId, playerItem,
                 killerItem, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }
