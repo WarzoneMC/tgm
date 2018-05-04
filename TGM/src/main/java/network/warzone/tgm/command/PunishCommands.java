@@ -10,6 +10,7 @@ import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
+import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -244,11 +245,10 @@ public class PunishCommands {
                 Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
             }
         } else if (action.equalsIgnoreCase("clear")) {
+            String clearString = StringUtils.repeat("\\n", 99) + ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.";
             Bukkit.getOnlinePlayers().forEach((Player player) -> {
-                String repeated = new String(new char[250]).replace("\0", "\n");
-                player.sendMessage(repeated);
+                player.sendMessage(clearString);
             });
-            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
         }
     }
 
