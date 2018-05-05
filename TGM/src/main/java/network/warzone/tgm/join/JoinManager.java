@@ -1,14 +1,17 @@
 package network.warzone.tgm.join;
 
-import network.warzone.warzoneapi.models.UserProfile;
-import network.warzone.warzoneapi.models.PlayerLogin;
-import network.warzone.tgm.TGM;
-import network.warzone.tgm.match.MatchPostLoadEvent;
-import network.warzone.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.MatchPostLoadEvent;
+import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.Ranks;
+import network.warzone.warzoneapi.models.PlayerLogin;
+import network.warzone.warzoneapi.models.Punishment;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,9 +21,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by luke on 4/27/17.
@@ -28,21 +29,24 @@ import java.util.UUID;
 @Getter
 public class JoinManager implements Listener {
 
-    private List<QueuedJoin> queuedJoins = new ArrayList<>();
-    private List<LoginService> loginServices = new ArrayList<>();
-
+    private Set<QueuedJoin> queuedJoins = new HashSet<>();
+    private Set<LoginService> loginServices = new HashSet<>();
+ 
     public JoinManager() {
         TGM.registerEvents(this);
 
+        Set<QueuedJoin> toRemove = new HashSet<>();
+
         //empty queued joins when the connection didn't follow through for an unknown reason.
         Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
-            List<QueuedJoin> toRemove = new ArrayList<>();
             for (QueuedJoin queuedJoin : queuedJoins) {
                 if (System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000) {
                     toRemove.add(queuedJoin);
                 }
             }
+
             queuedJoins.removeAll(toRemove);
+            toRemove.clear();
         }, 20 * 10L, 20 * 10L);
     }
 
@@ -54,11 +58,26 @@ public class JoinManager implements Listener {
         getLoginServices().add(loginService);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        if (event.getLoginResult().equals(AsyncPlayerPreLoginEvent.Result.KICK_BANNED)) return;
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
-        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString());
+
+        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + userProfile.getRanks().size() + " (loaded/total)");
+
+        //TODO Custom ban messages
+        Punishment punishment = userProfile.getLatestBan();
+        if (punishment != null) {
+            event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
+                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
+                    + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
+                    + ChatColor.AQUA + "Appeal at https://discord.io/Warzone\n"
+                    + ChatColor.GRAY + "ID: " + punishment.getId().toString()
+            );
+            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
+            return;
+        }
+        //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
+
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }
 
@@ -74,10 +93,10 @@ public class JoinManager implements Listener {
         PlayerContext playerContext = new PlayerContext(event.getPlayer(), queuedJoin.getUserProfile());
         TGM.get().getPlayerManager().addPlayer(playerContext);
 
-        for (LoginService loginService : loginServices) {
-            loginService.login(playerContext);
-        }
+        Ranks.createAttachment(event.getPlayer());
+        playerContext.getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
 
+        loginServices.forEach(loginService -> loginService.login(playerContext));
         queuedJoins.remove(queuedJoin);
     }
 
@@ -94,7 +113,16 @@ public class JoinManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
-        event.setJoinMessage(ChatColor.GRAY + event.getPlayer().getName() + " joined.");
+        String joinMsg;
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty()){
+            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            joinMsg = ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.";
+            Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
+        }
+        else joinMsg = ChatColor.GRAY + event.getPlayer().getName() + " joined.";
+
+        if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
+        event.setJoinMessage(joinMsg);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -111,8 +139,9 @@ public class JoinManager implements Listener {
         handleQuit(event.getPlayer());
     }
 
-    public void handleQuit(Player player) {
+    private void handleQuit(Player player) {
         TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
+        Ranks.removeAttachment(player);
     }
 
     @AllArgsConstructor @Getter

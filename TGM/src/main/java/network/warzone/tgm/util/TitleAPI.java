@@ -4,13 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
 
-public class TitleAPI extends JavaPlugin implements Listener {
+public class TitleAPI implements Listener {
 
     @Deprecated
     public static void sendTitle(Player player, Integer fadeIn, Integer stay, Integer fadeOut, String message) {

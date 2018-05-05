@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.ctw;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -13,6 +14,7 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.wool.WoolObjective;
 import network.warzone.tgm.modules.wool.WoolObjectiveService;
 import network.warzone.tgm.modules.wool.WoolStatus;
@@ -21,7 +23,6 @@ import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.FireworkUtil;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
-import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -29,22 +30,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Getter
 public class CTWModule extends MatchModule implements Listener {
-    public static final String SYMBOL_WOOL_INCOMPLETE = "\u2b1c";   // ⬜
-    public static final String SYMBOL_WOOL_TOUCHED = "\u2592";      // ▒
-    public static final String SYMBOL_WOOL_COMPLETE = "\u2b1b";     // ⬛
 
-    @Getter
+    private static final String SYMBOL_WOOL_INCOMPLETE = "\u2b1c";  // ⬜
+    private static final String SYMBOL_WOOL_TOUCHED = "\u2592";     // ▒
+    private static final String SYMBOL_WOOL_COMPLETE = "\u2b1b";    // ⬛
+
     private final List<WoolObjective> wools = new ArrayList<>();
-
-    @Getter
     private final HashMap<WoolObjective, List<Integer>> woolScoreboardLines = new HashMap<>();
-
-    @Getter
     private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
@@ -62,6 +59,8 @@ public class CTWModule extends MatchModule implements Listener {
             for (MatchTeam matchTeam : teams) {
                 wools.add(new WoolObjective(name, color, matchTeam, region));
             }
+
+            teams.clear();
         }
 
         TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
@@ -128,6 +127,36 @@ public class CTWModule extends MatchModule implements Listener {
         for (WoolObjective woolObjective : wools) {
             woolObjective.load();
         }
+
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getWinningTeam);
+    }
+
+    private MatchTeam getWinningTeam() {
+        Map<MatchTeam, Integer> teamScores = new HashMap<>();
+        Map.Entry<MatchTeam, Integer> highest = null;
+        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+            if (matchTeam.isSpectator()) continue;
+            int score = 0;
+            for (WoolObjective woolObjective : this.wools) {
+                if (!woolObjective.getOwner().equals(matchTeam)) continue;
+                if (woolObjective.isCompleted()) score += 2;
+                else if (!woolObjective.getTouches().isEmpty()) score += 1;
+            }
+            teamScores.put(matchTeam, score);
+
+            if (highest == null) {
+                highest = new AbstractMap.SimpleEntry<>(matchTeam, score);
+                continue;
+            }
+            if (score > highest.getValue()) highest = new AbstractMap.SimpleEntry<>(matchTeam, score);
+        }
+        if (highest != null) {
+            final Map.Entry<MatchTeam, Integer> entry = highest;
+            int amount = teamScores.entrySet().stream().filter(en -> entry.getValue().equals(en.getValue())).collect(Collectors.toList()).size();
+            if (amount > 1) return null;
+            else return entry.getKey();
+        }
+        return null;
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
@@ -226,5 +255,9 @@ public class CTWModule extends MatchModule implements Listener {
         for (WoolObjective woolObjective : wools) {
             woolObjective.unload();
         }
+
+        wools.clear();
+        woolScoreboardLines.clear();
+        teamScoreboardLines.clear();
     }
 }

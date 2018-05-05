@@ -1,9 +1,14 @@
 package network.warzone.tgm.user;
 
-import network.warzone.warzoneapi.models.UserProfile;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.util.Ranks;
+import network.warzone.warzoneapi.models.Rank;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by luke on 4/27/17.
@@ -31,8 +36,39 @@ public class PlayerContext {
         }
         else if (level < 40) {
             return ChatColor.GREEN + "[" + level + "]";
-        } else {
+        }
+        else if (level < 60) {
             return ChatColor.RED + "[" + level + "]";
         }
+        else if (level < 80) {
+            return ChatColor.LIGHT_PURPLE + "[" + level + "]";
+        }
+        else if (level < 100) {
+            return ChatColor.DARK_PURPLE + "[" + level + "]";
+        } else {
+            return ChatColor.GOLD + "[" + level + "]";
+        }
+    }
+
+    public void updateRank(Rank r) {
+        updateRank(r, false);
+    }
+
+    public void updateRank(Rank r, boolean forceUpdate) {
+        List<String> oldPermissions = new ArrayList<>();
+        boolean update = false;
+        for (Rank rank : getUserProfile().getRanksLoaded()) {
+            oldPermissions.addAll(rank.getPermissions());
+            if (rank.getId().equals(r.getId())) {
+                rank.set(r);
+                update = true;
+            }
+        }
+        if (update || forceUpdate) {
+            oldPermissions.addAll(r.getPermissions());
+            Ranks.removePermissions(player, oldPermissions);
+            getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(player, rank.getPermissions()));
+        }
+
     }
 }

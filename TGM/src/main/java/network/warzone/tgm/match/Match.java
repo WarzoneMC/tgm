@@ -111,11 +111,11 @@ public class Match {
      */
     public void unload() {
         for (MatchModule module : modules) {
-            module.unload();
-
             if (module instanceof Listener) {
                 HandlerList.unregisterAll((Listener) module);
             }
+
+            module.unload();
         }
     }
 

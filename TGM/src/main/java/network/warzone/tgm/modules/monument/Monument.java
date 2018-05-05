@@ -1,12 +1,12 @@
 package network.warzone.tgm.modules.monument;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -89,6 +89,10 @@ public class Monument implements Listener {
 
     public void unload() {
         HandlerList.unregisterAll(this);
+
+        owners.clear();
+        materials.clear();
+        services.clear();
     }
 
 

@@ -5,10 +5,12 @@ import network.warzone.tgm.modules.tasked.TaskedModule;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter @Setter
 public abstract class Countdown extends MatchModule implements TaskedModule {
-    @Getter @Setter private boolean cancelled = true;
 
-    @Getter @Setter private double timeLeft, timeMax; //ticks
+    private double timeLeft, timeMax; //ticks
+
+    private boolean cancelled = true;
 
 
     public void start(double countdown) {

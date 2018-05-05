@@ -28,9 +28,10 @@ import java.util.HashMap;
  * direct access to SimpleScoreboard objects through TGM.get().getModule(ScoreboardManagerModule.class)
  * to control scoreboards as needed.
  */
-@ModuleData(load = ModuleLoadTime.EARLIEST)
+@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
 public class ScoreboardManagerModule extends MatchModule implements Listener {
-    @Getter private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
+
+    private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
@@ -68,15 +69,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         SimpleScoreboard simpleScoreboard = new SimpleScoreboard(ChatColor.AQUA + "Objectives");
 
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-            Team team = simpleScoreboard.getScoreboard().registerNewTeam(matchTeam.getId());
-            team.setPrefix(matchTeam.getColor().toString());
-            team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
-            team.setAllowFriendlyFire(false);
-            team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
-
-            for (PlayerContext player : matchTeam.getMembers()) {
-                team.addEntry(player.getPlayer().getName());
-            }
+            registerScoreboardTeam(simpleScoreboard, matchTeam, playerContext);
         }
 
         Bukkit.getPluginManager().callEvent(new ScoreboardInitEvent(playerContext.getPlayer(), simpleScoreboard));
@@ -87,6 +80,19 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         simpleScoreboard.update();
 
         return simpleScoreboard;
+    }
+
+    public Team registerScoreboardTeam(SimpleScoreboard simpleScoreboard, MatchTeam matchTeam, PlayerContext playerContext) {
+        Team team = simpleScoreboard.getScoreboard().registerNewTeam(matchTeam.getId());
+        team.setPrefix(matchTeam.getColor().toString());
+        team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
+        team.setAllowFriendlyFire(false);
+        team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+
+        for (PlayerContext player : matchTeam.getMembers()) {
+            team.addEntry(player.getPlayer().getName());
+        }
+        return team;
     }
 
     @EventHandler
@@ -105,6 +111,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
-        this.scoreboards.clear();
+        scoreboards.clear();
     }
+
 }

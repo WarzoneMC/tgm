@@ -1,19 +1,19 @@
 package network.warzone.tgm.player;
 
-import network.warzone.tgm.user.PlayerContext;
 import lombok.Getter;
+import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by luke on 4/28/17.
  */
 public class PlayerManager {
-    @Getter
-    List<PlayerContext> players = new ArrayList<>();
+
+    @Getter Collection<PlayerContext> players = new ConcurrentLinkedQueue<>();
 
     public void addPlayer(PlayerContext playerContext) {
         this.players.add(playerContext);

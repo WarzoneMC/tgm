@@ -1,5 +1,6 @@
 package network.warzone.tgm.util.menu;
 
+import network.warzone.tgm.TGM;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 
@@ -16,14 +16,13 @@ import java.util.HashMap;
  * Created by katie on 2/14/17.
  */
 public abstract class Menu implements Listener {
-    protected JavaPlugin javaPlugin;
-    protected Inventory inventory;
-    protected HashMap<Integer, MenuAction> actions = new HashMap<>();
 
-    public Menu(JavaPlugin javaPlugin, String name, int slots) {
-        this.javaPlugin = javaPlugin;
+    private Inventory inventory;
+    private HashMap<Integer, MenuAction> actions = new HashMap<>();
+
+    public Menu(String name, int slots) {
         this.inventory = Bukkit.createInventory(null, slots, name);
-        Bukkit.getPluginManager().registerEvents(this, javaPlugin);
+        TGM.registerEvents(this);
     }
 
     public void open(Player player) {

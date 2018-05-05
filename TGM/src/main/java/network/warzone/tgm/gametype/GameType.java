@@ -13,7 +13,8 @@ public enum GameType {
     DTM("Destroy the Monument", DTMManifest.class),
     CTW("Capture the Wool", CTWManifest.class),
     Infected("Infection", InfectionManifest.class),
-    Blitz("Blitz", BlitzManifest.class);
+    Blitz("Blitz", BlitzManifest.class),
+    FFA("FFA", FFAManifest.class);
 
     private String name;
     private Class manifest;

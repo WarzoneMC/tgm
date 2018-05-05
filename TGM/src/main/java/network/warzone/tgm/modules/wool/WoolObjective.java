@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules.wool;
 
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.TimeModule;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;

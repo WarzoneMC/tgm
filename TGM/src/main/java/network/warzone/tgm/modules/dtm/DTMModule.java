@@ -2,8 +2,7 @@ package network.warzone.tgm.modules.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.warzoneapi.models.DestroyWoolRequest;
-import network.warzone.warzoneapi.models.UserProfile;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -17,12 +16,14 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.FireworkUtil;
 import network.warzone.tgm.util.Parser;
-import lombok.Getter;
+import network.warzone.warzoneapi.models.DestroyWoolRequest;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -33,6 +34,8 @@ import org.bukkit.event.Listener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 public class DTMModule extends MatchModule implements Listener {
@@ -121,6 +124,7 @@ public class DTMModule extends MatchModule implements Listener {
         for (Monument monument : monuments) {
             monument.load();
         }
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getHighestHealthTeam);
     }
 
     private void playFireworkEffect(ChatColor color, Location location) {
@@ -197,6 +201,34 @@ public class DTMModule extends MatchModule implements Listener {
         }
     }
 
+    private MatchTeam getHighestHealthTeam() {
+        Map<MatchTeam, Integer> teams = new HashMap<>(); // team, health
+        for (Monument monument : monuments) {
+            for (MatchTeam team : monument.getOwners()) {
+                teams.put(team, teams.getOrDefault(team, 0) + monument.getHealth());
+            }
+        }
+
+        MatchTeam highest = null;
+        for (Map.Entry<MatchTeam, Integer> team : teams.entrySet()) {
+            if (highest == null) {
+                highest = team.getKey();
+                continue;
+            }
+            if (teams.get(highest) < team.getValue()) {
+                highest = team.getKey();
+            }
+        }
+
+        if (highest != null) {
+            final MatchTeam team = highest;
+            int amount = teams.entrySet().stream().filter(entry -> teams.get(team) == entry.getValue()).collect(Collectors.toList()).size();
+            if (amount > 1) return null;
+            else return team;
+        }
+        return null;
+    }
+
     private String getTeamScoreboardString(MatchTeam matchTeam) {
         return matchTeam.getColor() + matchTeam.getAlias();
     }
@@ -229,8 +261,8 @@ public class DTMModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
-        for (Monument monument : monuments) {
-            monument.unload();
-        }
+        monuments.forEach(Monument::unload);
+
+        monuments.clear();
     }
 }

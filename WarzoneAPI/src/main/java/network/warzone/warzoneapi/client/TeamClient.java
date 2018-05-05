@@ -2,6 +2,8 @@ package network.warzone.warzoneapi.client;
 
 import network.warzone.warzoneapi.models.*;
 
+import java.util.List;
+
 /**
  * Created by luke on 4/27/17.
  */
@@ -31,4 +33,23 @@ public interface TeamClient {
     void finishMatch(MatchFinishPacket matchFinishPacket);
 
     void destroyWool(DestroyWoolRequest destroyWoolRequest);
+    
+    RankList retrieveRanks();
+
+    RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest);
+
+    RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest);
+
+    RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest);
+
+    RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest);
+
+    IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest);
+
+    PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest);
+
+    RevertPunishmentResponse revertPunishment(String id);
+
+    PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest);
+
 }

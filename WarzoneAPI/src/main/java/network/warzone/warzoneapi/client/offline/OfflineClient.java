@@ -5,7 +5,7 @@ import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -21,8 +21,8 @@ public class OfflineClient implements TeamClient {
     @Override
     public UserProfile login(PlayerLogin playerLogin) {
         return new UserProfile(new ObjectId(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
-                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Arrays.asList(playerLogin.getIp()), new ArrayList<>(),
-                0, 0, 0, 0, 0, new ArrayList<>());
+                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), new ArrayList<>(), new ArrayList<>(),
+                0, 0, 0, 0, 0, new ArrayList<>(), new ArrayList<>(), false);
     }
 
     @Override
@@ -48,5 +48,50 @@ public class OfflineClient implements TeamClient {
     @Override
     public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
 
+    }
+
+    @Override
+    public RankList retrieveRanks() {
+        return new RankList();
+    }
+
+    @Override
+    public RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest){
+        return null;
+    };
+
+    @Override
+    public RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest) {
+        return null;
+    }
+
+    @Override
+    public RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest) {
+        return null;
+    }
+
+    @Override
+    public RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest) {
+        return null;
+    }
+
+    @Override
+    public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
+        return null;
+    }
+
+    @Override
+    public PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest) {
+        return null;
+    }
+
+    @Override
+    public RevertPunishmentResponse revertPunishment(String id) {
+        return null;
+    }
+
+    @Override
+    public PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest) {
+        return null;
     }
 }

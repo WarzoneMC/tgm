@@ -1,14 +1,15 @@
 package network.warzone.tgm.modules;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -104,6 +105,12 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 0L);
+        DeathModule module = getPlayer(event.getEntity());
+        Bukkit.getScheduler().runTask(TGM.get(), () -> Bukkit.getPluginManager().callEvent(
+                new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()))
+        );
+
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);
     }
+
 }

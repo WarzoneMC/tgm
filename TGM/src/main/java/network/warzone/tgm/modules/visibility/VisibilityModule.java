@@ -1,19 +1,19 @@
 package network.warzone.tgm.modules.visibility;
 
+import lombok.Getter;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.damage.grave.event.PlayerDeathEvent;
 import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class VisibilityModule extends MatchModule implements Listener {
@@ -30,7 +30,7 @@ public class VisibilityModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        refreshPlayer(event.getPlayer());
+        refreshPlayer(event.getEntity());
     }
 
     @EventHandler
@@ -57,9 +57,9 @@ public class VisibilityModule extends MatchModule implements Listener {
 
             boolean canSee = visibilityController.canSee(eyes, player);
             if (canSee) {
-                eyes.showPlayer(player);
+                eyes.showPlayer(TGM.get(), player);
             } else {
-                eyes.hidePlayer(player);
+                eyes.hidePlayer(TGM.get(), player);
             }
         }
 
@@ -69,9 +69,9 @@ public class VisibilityModule extends MatchModule implements Listener {
 
             boolean canSee = visibilityController.canSee(player, target);
             if (canSee) {
-                player.showPlayer(target);
+                player.showPlayer(TGM.get(), target);
             } else {
-                player.hidePlayer(target);
+                player.hidePlayer(TGM.get(), target);
             }
         }
     }

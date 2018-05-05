@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.tdm;
 
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -10,7 +11,7 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import lombok.Getter;
+import network.warzone.tgm.modules.time.TimeModule;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,18 +20,21 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 9/4/2017.
  */
+@Getter
 public class TDMModule extends MatchModule implements Listener {
     
-    @Getter private Match match;
-    @Getter private PointsModule pointsModule;
-    @Getter private TeamManagerModule teamManager;
-    @Getter private TDMObjective tdmObjective = TDMObjective.KILLS;
+    private Match match;
+    private PointsModule pointsModule;
+    private TeamManagerModule teamManager;
+    private TDMObjective tdmObjective = TDMObjective.KILLS;
 
-    @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -47,6 +51,33 @@ public class TDMModule extends MatchModule implements Listener {
 
         pointsModule = TGM.get().getModule(PointsModule.class);
         pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
+
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getHighestPointsTeam());
+    }
+
+    @Override
+    public void unload() {
+        teamScoreboardLines.clear();
+    }
+
+    private MatchTeam getHighestPointsTeam() {
+        Map.Entry<MatchTeam, Integer> highest = null;
+        for (Map.Entry<MatchTeam, Integer> entry : pointsModule.getPoints().entrySet()) {
+            if (highest == null) {
+                highest = entry;
+                continue;
+            }
+            if (entry.getValue() > highest.getValue()) {
+                highest = entry;
+            }
+        }
+        if (highest != null) {
+            final Map.Entry<MatchTeam, Integer> entry = highest;
+            int amount = pointsModule.getPoints().entrySet().stream().filter(en -> entry.getValue() == en.getValue()).collect(Collectors.toList()).size();
+            if (amount > 1) return null;
+            else return entry.getKey();
+        }
+        return null;
     }
 
     @EventHandler

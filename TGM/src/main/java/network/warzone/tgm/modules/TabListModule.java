@@ -6,6 +6,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.TitleAPI;
 import lombok.Getter;
