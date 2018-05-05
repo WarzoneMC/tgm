@@ -100,7 +100,7 @@ public class ItemKitNodeParser implements KitNodeParser {
             for (JsonElement element : jsonObject.getAsJsonArray("enchantments")) {
                 String[] split = element.getAsString().split(":");
                 int level = Integer.valueOf(split[1]);
-                Enchantment enchantment = Enchantment.getByName(split[0]);
+                Enchantment enchantment = Enchantment.getByName(Strings.getTechnicalName(split[0]));
                 if (enchantment != null) {
                     itemMeta.addEnchant(enchantment, level, true);
                 }
