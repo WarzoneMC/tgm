@@ -18,6 +18,8 @@ public class ColorConverter {
         } else if (color == ChatColor.LIGHT_PURPLE) {
             return Color.FUCHSIA;
         } else if (color == ChatColor.GREEN) {
+            return Color.LIME;
+        } else if (color == ChatColor.DARK_GREEN) {
             return Color.GREEN;
         } else if (color == ChatColor.YELLOW) {
             return Color.YELLOW;
@@ -27,6 +29,8 @@ public class ColorConverter {
             return Color.AQUA;
         } else if (color == ChatColor.DARK_PURPLE) {
             return Color.PURPLE;
+        } else if (color == ChatColor.DARK_AQUA) {
+            return Color.TEAL;
         } else {
             return Color.WHITE;
         }
