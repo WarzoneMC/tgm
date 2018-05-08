@@ -125,15 +125,16 @@ public class MatchManager {
         if (oldMatch != null) {
             oldMatch.getWorld().getPlayers().forEach(player ->
                     player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
-            Bukkit.unloadWorld(oldMatch.getWorld(), false);
 
-            Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
-                try {
-                    TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
-                    FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
+
+                Bukkit.unloadWorld(oldMatch.getWorld(), false);
+                //try {
+                //    FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
+                //} catch (IOException e) {
+                //    e.printStackTrace();
+                //}
             }, 80L); // 4 seconds
         }
     }
