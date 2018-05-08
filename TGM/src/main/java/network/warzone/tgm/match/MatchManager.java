@@ -126,16 +126,18 @@ public class MatchManager {
             oldMatch.getWorld().getPlayers().forEach(player ->
                     player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
 
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-                TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
+            TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
 
-                Bukkit.unloadWorld(oldMatch.getWorld(), false);
+            Bukkit.unloadWorld(oldMatch.getWorld(), false);
+
+            //.getScheduler().runTaskLater(TGM.get(), () -> {
+
                 //try {
                 //    FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
                 //} catch (IOException e) {
                 //    e.printStackTrace();
                 //}
-            }, 80L); // 4 seconds
+            //}, 80L); // 4 seconds
         }
     }
 
