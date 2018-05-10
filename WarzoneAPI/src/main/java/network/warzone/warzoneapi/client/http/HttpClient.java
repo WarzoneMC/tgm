@@ -14,9 +14,11 @@ import org.bson.types.ObjectId;
 /**
  * Created by luke on 4/27/17.
  */
+@Getter
 public class HttpClient implements TeamClient {
-    @Getter private HttpClientConfig config;
-    @Getter private final Gson gson;
+
+    private HttpClientConfig config;
+    private final Gson gson;
 
     public HttpClient(HttpClientConfig config) {
         this.config = config;
@@ -55,7 +57,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void heartbeat(Heartbeat heartbeat) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/server/heartbeat")
+            Unirest.post(config.getBaseUrl() + "/mc/server/heartbeat")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
@@ -131,7 +133,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void finishMatch(MatchFinishPacket matchFinishPacket) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/finish")
+            Unirest.post(config.getBaseUrl() + "/mc/match/finish")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
@@ -145,7 +147,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/destroy_wool")
+            Unirest.post(config.getBaseUrl() + "/mc/match/destroy_wool")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")

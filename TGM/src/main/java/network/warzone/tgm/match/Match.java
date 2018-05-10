@@ -10,9 +10,7 @@ import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by luke on 4/27/17.
@@ -21,7 +19,7 @@ import java.util.UUID;
 public class Match {
     private final UUID uuid;
     private final MatchManifest matchManifest;
-    private final List<MatchModule> modules = new ArrayList<>();
+    private final Set<MatchModule> modules = new HashSet<>();
     private final World world;
     private final MapContainer mapContainer;
     @Setter private MatchStatus matchStatus = MatchStatus.PRE;
