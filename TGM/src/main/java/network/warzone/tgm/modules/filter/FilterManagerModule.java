@@ -9,10 +9,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.filter.evaluate.AllowFilterEvaluator;
 import network.warzone.tgm.modules.filter.evaluate.DenyFilterEvaluator;
 import network.warzone.tgm.modules.filter.evaluate.FilterEvaluator;
-import network.warzone.tgm.modules.filter.type.BlockExplodeFilterType;
-import network.warzone.tgm.modules.filter.type.BuildFilterType;
-import network.warzone.tgm.modules.filter.type.EnterFilterType;
-import network.warzone.tgm.modules.filter.type.FilterType;
+import network.warzone.tgm.modules.filter.type.*;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -88,6 +85,21 @@ public class FilterManagerModule extends MatchModule {
             String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
 
             filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
+        } else if (type.equals("leave")) {
+            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
+            List<Region> regions = new ArrayList<>();
+
+            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+                if (region != null) {
+                    regions.add(region);
+                }
+            }
+
+            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
+            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+
+            filterTypes.add(new LeaveFilterType(matchTeams, regions, filterEvaluator, message));
         } else if (type.equals("block-explode")) {
             List<Region> regions = new ArrayList<>();
             for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {

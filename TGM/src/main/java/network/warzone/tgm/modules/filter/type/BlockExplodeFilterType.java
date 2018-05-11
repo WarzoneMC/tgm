@@ -16,10 +16,10 @@ import java.util.List;
 /**
  * Created by Jorge on 9/9/2017.
  */
-@AllArgsConstructor
+@AllArgsConstructor @Getter
 public class BlockExplodeFilterType implements FilterType, Listener {
-    @Getter private final List<Region> regions;
-    @Getter private final FilterEvaluator evaluator;
+    private final List<Region> regions;
+    private final FilterEvaluator evaluator;
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
