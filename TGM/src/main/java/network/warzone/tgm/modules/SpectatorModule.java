@@ -19,9 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -285,6 +283,13 @@ public class SpectatorModule extends MatchModule implements Listener {
         if (isSpectating((Player) event.getEntity())) {
             event.setCancelled(true);
             event.setFoodLevel(20);
+        }
+    }
+
+    @EventHandler
+    public void onTarget(EntityTargetLivingEntityEvent event) {
+        if  (event.getTarget() instanceof Player && isSpectating((Player) event.getTarget())) {
+            event.setTarget(null);
         }
     }
 
