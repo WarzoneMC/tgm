@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter @Setter
 public class TeamManagerModule extends MatchModule implements Listener {
@@ -163,10 +164,13 @@ public class TeamManagerModule extends MatchModule implements Listener {
                     smallest = matchTeam;
                     continue;
                 }
-
-                if (((double) matchTeam.getMembers().size()) / matchTeam.getMax() < ((double) smallest.getMembers().size()) / smallest.getMax()) {
+                double teamSize = ((double) matchTeam.getMembers().size()) / matchTeam.getMax();
+                double smallestTeamSize = ((double) smallest.getMembers().size()) / smallest.getMax();
+                if (teamSize < smallestTeamSize) {
                     smallest = matchTeam;
+                    continue;
                 }
+                if (teamSize == smallestTeamSize && new Random().nextBoolean()) smallest = matchTeam;
             }
         }
 
