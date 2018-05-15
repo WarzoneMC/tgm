@@ -108,44 +108,44 @@ public class ControlPoint implements Listener {
     }
 
     public void enable() {
-        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
-            @Override
-            public void run() {
-                HashMap<MatchTeam, Integer> holding = new HashMap<>();
-                for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-                    if(matchTeam.isSpectator()) continue;
+        HashMap<MatchTeam, Integer> holding = new HashMap<>();
 
-                    for (Player player : playersOnPoint) {
-                        if (matchTeam.containsPlayer(player)) {
-                            holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
-                        }
-                    }
-                }
+        runnableId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+            holding.clear();
 
-                MatchTeam most = null;
-                int mostCount = 0;
-                for (MatchTeam matchTeam : holding.keySet()) {
-                    if (most == null) {
-                        most = matchTeam;
-                    } else {
-                        if (holding.get(matchTeam) == holding.get(most)) {
-                            mostCount++;
-                        } else if (holding.get(matchTeam) > holding.get(most)) {
-                            most = matchTeam;
-                            mostCount = 0;
-                        }
-                    }
-                }
+            for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+                if (matchTeam.isSpectator()) continue;
 
-                if (most != null && mostCount == 0) {
-                    handleCap(most);
-                } else {
-                    if (controller != null) {
-                        controlPointService.holding(controller);
+                for (Player player : playersOnPoint) {
+                    if (matchTeam.containsPlayer(player)) {
+                        holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                     }
                 }
             }
-        }, TICK_RATE, TICK_RATE);
+
+            MatchTeam most = null;
+            int mostCount = 0;
+            for (MatchTeam matchTeam : holding.keySet()) {
+                if (most == null) {
+                    most = matchTeam;
+                } else {
+                    if (holding.get(matchTeam).equals(holding.get(most))) {
+                        mostCount++;
+                    } else if (holding.get(matchTeam) > holding.get(most)) {
+                        most = matchTeam;
+                        mostCount = 0;
+                    }
+                }
+            }
+
+            if (most != null && mostCount == 0) {
+                handleCap(most);
+            } else {
+                if (controller != null) {
+                    controlPointService.holding(controller);
+                }
+            }
+        }, TICK_RATE, TICK_RATE).getTaskId();
 
         TGM.registerEvents(this);
     }
@@ -157,7 +157,7 @@ public class ControlPoint implements Listener {
             controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
         } else {
             if (matchTeam == progressingTowardsTeam) {
-                if(progress < definition.getMaxProgress()) {
+                if (progress < definition.getMaxProgress()) {
                     progress++; //don't go over the max cap number.
                     controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
                 }
@@ -201,12 +201,12 @@ public class ControlPoint implements Listener {
         double x = center.getX();
         double z = center.getZ();
         double percent = Math.toRadians(getPercent() * 3.6);
-        for(Block block : region.getBlocks()) {
-            if(!Blocks.isVisualMaterial(block.getType())) continue;
+        for (Block block : region.getBlocks()) {
+            if (!Blocks.isVisualMaterial(block.getType())) continue;
             double dx = block.getX() - x;
             double dz = block.getZ() - z;
             double angle = Math.atan2(dz, dx);
-            if(angle < 0) angle += 2 * Math.PI;
+            if (angle < 0) angle += 2 * Math.PI;
             byte color = angle < percent ? color1 : color2;
             if (color == -1) {
                 Pair<Material,Byte> oldBlock = regionSave.getBlockAt(new BlockVector(block.getLocation().toVector()));
