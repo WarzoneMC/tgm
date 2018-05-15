@@ -9,6 +9,7 @@ import network.warzone.tgm.modules.region.RegionSave;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.Blocks;
 import network.warzone.tgm.util.ColorConverter;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,6 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.BlockVector;
 
 import java.util.HashMap;
@@ -78,6 +80,11 @@ public class ControlPoint implements Listener {
         } else {
             playersOnPoint.remove(player);
         }
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        handlePlayerMove(event.getPlayer(), event.getTo());
     }
 
     @EventHandler
