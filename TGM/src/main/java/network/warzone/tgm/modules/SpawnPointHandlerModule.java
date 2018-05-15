@@ -50,7 +50,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
         event.setRespawnLocation(getTeamSpawn(matchTeam).getLocation());
 
-        Bukkit.getScheduler().runTask(TGM.get(), () -> spawnPlayer(playerContext, matchTeam, false));
+        spawnPlayer(playerContext, matchTeam, false);
     }
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {

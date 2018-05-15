@@ -175,11 +175,9 @@ public class FFAModule extends MatchModule implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         if (blitzMode && match.getMatchStatus().equals(MatchStatus.MID) && getLives(event.getPlayer()) <= 0) {
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-                event.getPlayer().setGameMode(GameMode.SPECTATOR);
-                event.getPlayer().setAllowFlight(true);
-                event.getPlayer().setFlying(true);
-            }, 1);
+            event.getPlayer().setGameMode(GameMode.SPECTATOR);
+            event.getPlayer().setAllowFlight(true);
+            event.getPlayer().setFlying(true);
         }
     }
 

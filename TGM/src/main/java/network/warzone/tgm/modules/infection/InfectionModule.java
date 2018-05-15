@@ -10,7 +10,6 @@ import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
@@ -35,13 +34,13 @@ import java.util.Random;
 /**
  * Created by Draem on 7/31/2017.
  */
+@Getter
 public class InfectionModule extends MatchModule implements Listener {
 
-    @Getter private TeamManagerModule teamManager;
+    private Match match;
+    private TeamManagerModule teamManager;
 
-    @Getter private int length;
-
-    @Getter private Match match;
+    private int length;
 
     @Override
     public void load(Match match) {
@@ -51,7 +50,7 @@ public class InfectionModule extends MatchModule implements Listener {
         teamManager = match.getModule(TeamManagerModule.class);
         this.match = match;
 
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getWinningTeam());
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getWinningTeam);
     }
 
     @Override
@@ -127,36 +126,36 @@ public class InfectionModule extends MatchModule implements Listener {
                 player.getHealth() - event.getFinalDamage() >= 0.5) return;
 
         event.setDamage(0);
-        Bukkit.getScheduler().runTask(TGM.get(), () -> {
-            MatchTeam humans = teamManager.getTeamById("humans");
-            MatchTeam infected = teamManager.getTeamById("infected");
 
-            if (humans.containsPlayer(player)) {
-                if (event.getDamager() instanceof Player) {
-                    broadcastMessage(String.format("%s%s &7has been infected by %s%s",
-                            teamManager.getTeam(player).getColor(),
-                            event.getEntity().getName(),
-                            teamManager.getTeam(killer).getColor(),
-                            killer.getName()));
-                } else {
-                    broadcastMessage(String.format("%s%s &7has been taken by the environment",
-                            teamManager.getTeam(player).getColor(),
-                            event.getEntity().getName()));
-                }
+        MatchTeam humans = teamManager.getTeamById("humans");
+        MatchTeam infected = teamManager.getTeamById("infected");
 
-                infect(player);
-            } else if (infected.containsPlayer(player)) {
-                if (event.getDamager() instanceof Player) {
-                    broadcastMessage(String.format("%s%s &7has been slain by %s%s",
-                            teamManager.getTeam(player).getColor(),
-                            event.getEntity().getName(),
-                            teamManager.getTeam(killer).getColor(),
-                            killer.getName()
-                    ));
-                    }
-                    refresh(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeam(player));
-                }
-        });
+        if (humans.containsPlayer(player)) {
+            if (event.getDamager() instanceof Player) {
+                broadcastMessage(String.format("%s%s &7has been infected by %s%s",
+                        teamManager.getTeam(player).getColor(),
+                        event.getEntity().getName(),
+                        teamManager.getTeam(killer).getColor(),
+                        killer.getName()));
+            } else {
+                broadcastMessage(String.format("%s%s &7has been taken by the environment",
+                        teamManager.getTeam(player).getColor(),
+                        event.getEntity().getName()));
+            }
+
+            infect(player);
+        } else if (infected.containsPlayer(player)) {
+            if (event.getDamager() instanceof Player) {
+                broadcastMessage(String.format("%s%s &7has been slain by %s%s",
+                        teamManager.getTeam(player).getColor(),
+                        event.getEntity().getName(),
+                        teamManager.getTeam(killer).getColor(),
+                        killer.getName()
+                ));
+            }
+            refresh(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeam(player));
+        }
+
 
         if (TGM.get().getApiManager().isStatsDisabled())
             return;
@@ -175,9 +174,9 @@ public class InfectionModule extends MatchModule implements Listener {
         }
 
         ApiManager api = TGM.get().getApiManager();
+        Death death = new Death(playerContext.getUserProfile().getId().toString(), killerId, playerItem, killerItem,
+                api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
 
-        Death death = new Death(playerContext.getUserProfile().getId().toString(), killerId, playerItem,
-                killerItem, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }
 
@@ -190,7 +189,7 @@ public class InfectionModule extends MatchModule implements Listener {
             playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
             playerContext.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
-        }, 2L);
+        }, 1L);
     }
 
     @EventHandler
@@ -236,7 +235,8 @@ public class InfectionModule extends MatchModule implements Listener {
         player.getWorld().strikeLightningEffect(player.getLocation());
 
         teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"));
-        if (teamManager.getTeamById("humans").getMembers().size() > 0) player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
+        if (teamManager.getTeamById("humans").getMembers().size() > 0)
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
         player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
     }
 

@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by luke on 4/27/17.
@@ -29,24 +30,15 @@ import java.util.*;
 @Getter
 public class JoinManager implements Listener {
 
-    private Set<QueuedJoin> queuedJoins = new HashSet<>();
+    private Collection<QueuedJoin> queuedJoins = new ConcurrentLinkedQueue<>();
     private Set<LoginService> loginServices = new HashSet<>();
  
     public JoinManager() {
         TGM.registerEvents(this);
 
-        Set<QueuedJoin> toRemove = new HashSet<>();
-
         //empty queued joins when the connection didn't follow through for an unknown reason.
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
-            for (QueuedJoin queuedJoin : queuedJoins) {
-                if (System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000) {
-                    toRemove.add(queuedJoin);
-                }
-            }
-
-            queuedJoins.removeAll(toRemove);
-            toRemove.clear();
+        Bukkit.getScheduler().runTaskTimerAsynchronously(TGM.get(), () -> {
+            queuedJoins.removeIf(queuedJoin -> System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000);
         }, 20 * 10L, 20 * 10L);
     }
 
@@ -58,7 +50,7 @@ public class JoinManager implements Listener {
         getLoginServices().add(loginService);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
 
@@ -73,7 +65,7 @@ public class JoinManager implements Listener {
                     + ChatColor.AQUA + "Appeal at https://discord.io/Warzone\n"
                     + ChatColor.GRAY + "ID: " + punishment.getId().toString()
             );
-            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
+            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
             return;
         }
         //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
@@ -101,12 +93,7 @@ public class JoinManager implements Listener {
     }
 
     private QueuedJoin getQueuedUserProfile(Player player) {
-        for (QueuedJoin queuedJoin : queuedJoins) {
-            if (player.getUniqueId().equals(queuedJoin.getUuid())) {
-                return queuedJoin;
-            }
-        }
-        return null;
+        return queuedJoins.stream().filter(queuedJoin -> player.getUniqueId().equals(queuedJoin.getUuid())).findFirst().orElse(null);
     }
 
     @EventHandler

@@ -4,7 +4,6 @@ import network.warzone.tgm.match.MatchModule;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -20,7 +19,7 @@ public class EntityDamageModule extends MatchModule implements Listener {
         if (event.getEntityType() != EntityType.FISHING_HOOK &&
             event.getEntityType() != EntityType.SNOWBALL &&
             event.getEntityType() != EntityType.EGG) return;
-        ProjectileSource shooter = ((Projectile) event.getEntity()).getShooter();
+        ProjectileSource shooter = event.getEntity().getShooter();
         if (shooter != null && shooter instanceof Player && event.getHitEntity() instanceof Damageable) {
             ((Damageable) event.getHitEntity()).damage(0.01, (Player) shooter);
         }

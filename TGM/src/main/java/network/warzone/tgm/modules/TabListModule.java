@@ -28,7 +28,7 @@ public class TabListModule extends MatchModule implements Listener {
 
         refreshAllTabs();
 
-        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), this::refreshAllTabs, 20L, 20L);
+        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), this::refreshAllTabs, 10L, 10L);
     }
 
     @Override

@@ -83,7 +83,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         /**
          * Update the item values every second to keep player counts accurate.
          */
-        teamSelectionRunnable = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
+        teamSelectionRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             int totalMatchSize = 0;
             int totalMatchMaxSize = 0;
 
@@ -125,7 +125,7 @@ public class SpectatorModule extends MatchModule implements Listener {
             autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             autoJoinHelmet.setItemMeta(autoJoinHelmetMeta);
             teamSelectionMenu.setItem(0, autoJoinHelmet);
-        }, 0L, 20L);
+        }, 1L, 20L).getTaskId();
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {

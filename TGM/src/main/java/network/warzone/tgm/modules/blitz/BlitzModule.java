@@ -166,44 +166,44 @@ public class BlitzModule extends MatchModule implements Listener {
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         Player player = (Player) event.getEntity();
-        if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManagerModule.getTeam(player).isSpectator()) return;
+        if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManagerModule.getTeam(player).isSpectator())
+            return;
         if (player.getHealth() - event.getFinalDamage() >= 0.5) return;
 
         event.setDamage(0);
-        Bukkit.getScheduler().runTask(TGM.get(), () -> { // run sync in case of async events
-            createDeath((Player) event.getEntity());
-            removeLife(player);
 
-            TGM.get().getModule(SpawnPointHandlerModule.class).spawnPlayer(TGM.get().getPlayerManager().getPlayerContext(player), teamManagerModule.getTeam(player), false);
+        createDeath((Player) event.getEntity());
+        removeLife(player);
 
-            if (getLives(player) <= 0) {
-                player.setGameMode(GameMode.SPECTATOR);
-                player.setAllowFlight(true);
-                player.setFlying(true);
-                player.getInventory().clear();
+        TGM.get().getModule(SpawnPointHandlerModule.class).spawnPlayer(TGM.get().getPlayerManager().getPlayerContext(player), teamManagerModule.getTeam(player), false);
 
-                if (player.getLocation().getY() < 0) {
-                    player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                }
+        if (getLives(player) <= 0) {
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            player.getInventory().clear();
 
-                MatchTeam team = teamManagerModule.getTeam(player);
-                updateScoreboardTeamLine(team, getAlivePlayers(team).size());
-
-                Bukkit.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
-                player.sendTitle("", ChatColor.RED + "You have been eliminated.", 10, 20, 10);
-
-            } else {
-                showLives(player);
+            if (player.getLocation().getY() < 0) {
                 player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
 
-            if (lastTeamAlive()) {
-                MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst()
-                        .orElseGet(() -> teamManagerModule.getTeams().get(1));
+            MatchTeam team = teamManagerModule.getTeam(player);
+            updateScoreboardTeamLine(team, getAlivePlayers(team).size());
 
-                TGM.get().getMatchManager().endMatch(winnerTeam);
-            }
-        });
+            Bukkit.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
+            player.sendTitle("", ChatColor.RED + "You have been eliminated.", 10, 20, 10);
+
+        } else {
+            showLives(player);
+            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+        }
+
+        if (lastTeamAlive()) {
+            MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst()
+                    .orElseGet(() -> teamManagerModule.getTeams().get(1));
+
+            TGM.get().getMatchManager().endMatch(winnerTeam);
+        }
     }
 
     private void createDeath(Player player) {
@@ -264,7 +264,7 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     private List<PlayerContext> getAlivePlayers(MatchTeam matchTeam) {
-        return matchTeam.getMembers().stream().filter(playerContext -> !playerContext.getPlayer().getGameMode().equals(GameMode.SPECTATOR)).collect(Collectors.toList());
+        return matchTeam.getMembers().stream().filter(playerContext -> playerContext.getPlayer().getGameMode() != GameMode.SPECTATOR).collect(Collectors.toList());
     }
 
 }

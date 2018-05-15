@@ -106,9 +106,8 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         DeathModule module = getPlayer(event.getEntity());
-        Bukkit.getScheduler().runTask(TGM.get(), () -> Bukkit.getPluginManager().callEvent(
-                new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()))
-        );
+
+        new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()).callEvent();
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);
     }
