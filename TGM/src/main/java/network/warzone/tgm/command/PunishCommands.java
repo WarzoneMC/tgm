@@ -10,6 +10,7 @@ import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
+import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -227,6 +228,28 @@ public class PunishCommands {
             if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
         }
         Bukkit.getConsoleSender().sendMessage(result);
+    }
+
+    @Command(aliases = {"chat"}, desc = "Control chat settings", min = 1, usage = "(mute|clear)")
+    @CommandPermissions({"tgm.chat.control"})
+    public static void chat(CommandContext cmd, CommandSender sender) {
+        String action = cmd.getString(0);
+        if (action.equalsIgnoreCase("mute")) {
+            if (TGM.get().getConfig().getBoolean("chat.enabled")) {
+                TGM.get().getConfig().set("chat.enabled", false);
+                TGM.get().saveConfig();
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
+            } else {
+                TGM.get().getConfig().set("chat.enabled", true);
+                TGM.get().saveConfig();
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
+            }
+        } else if (action.equalsIgnoreCase("clear")) {
+            for (int i = 0; i < 100; i++) {
+                Bukkit.broadcastMessage("\n");
+            }
+            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
+        }
     }
 
     private static void issuePunishment(String type, String name, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
