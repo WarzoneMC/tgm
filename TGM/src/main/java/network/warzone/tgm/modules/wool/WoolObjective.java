@@ -185,7 +185,7 @@ public class WoolObjective implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
-        if (TGM.matchManager.match != null && TGM.matchManager.match.matchStatus == MatchStatus.MID) {
+        if (TGM.get().matchManager.match != null && TGM.get().matchManager.match.matchStatus == MatchStatus.MID) {
             handleWoolDrop(event.getPlayer());
         }
     }
