@@ -7,6 +7,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.ColorConverter;
+import network.warzone.tgm.match.MatchStatus;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -184,7 +185,9 @@ public class WoolObjective implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
-        handleWoolDrop(event.getPlayer());
+        if (TGM.matchManager.match != null && TGM.matchManager.match.matchStatus == MatchStatus.MID) {
+            handleWoolDrop(event.getPlayer());
+        }
     }
 
     public WoolStatus getStatus() {
