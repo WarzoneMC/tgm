@@ -43,6 +43,15 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             //we don't need to teleport them in this case. Let them stay in their position.
         }
     }
+    
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void checkItemFrameItemRemove(EntityDamageByEntityEvent event) {
+        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+            if(!matchTeam.isSpectator() && event.getEntity() instanceof ItemFrame && ((ItemFrame) event.getEntity()).getItem() != null) {
+                event.setCancelled(true);
+            }
+        }
+    }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
