@@ -3,9 +3,15 @@ package network.warzone.tgm.modules.killstreak;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
+import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.modules.team.MatchTeam;
+import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -154,6 +160,16 @@ public class KillstreakModule extends MatchModule implements Listener {
                 );
             }
         });
+    }
+    
+        public void onTeamChange(TeamChangeEvent e) {
+        MatchManager matchManager = TGM.get().getMatchManager();
+        MatchStatus matchStatus = matchManager.getMatch().getMatchStatus();
+        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+            if (!matchStatus.equals(MatchStatus.MID)){
+                killstreaks.clear();
+            }
+        }
     }
 
     public void unload() {
