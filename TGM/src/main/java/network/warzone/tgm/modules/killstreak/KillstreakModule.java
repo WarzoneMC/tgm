@@ -6,6 +6,7 @@ import lombok.Getter;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -160,6 +161,9 @@ public class KillstreakModule extends MatchModule implements Listener {
         players.clear();
         killstreaks.clear();
     }
+
+    @EventHandler
+    public void onTeamChange(TeamChangeEvent event) { players.put(event.getPlayerContext().getPlayer().getUniqueId().toString(), 0); }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
