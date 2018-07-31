@@ -72,7 +72,7 @@ public class CycleCommands {
     public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
-        int pages = (int) Math.ceil((rotation.size() + 7) / 8);
+        int pages = (int) Math.ceil((rotation.size() + 7) / 9);
 
         if ((index > pages) || (index <= 0)) {
             index = 1;
