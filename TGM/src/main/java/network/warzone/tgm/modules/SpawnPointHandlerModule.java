@@ -12,9 +12,11 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -41,6 +43,15 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         //player is swapping teams pre/post match.
         else {
             //we don't need to teleport them in this case. Let them stay in their position.
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void checkItemFrameItemRemove(EntityDamageByEntityEvent event) {
+        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+            if(!matchTeam.isSpectator() && event.getEntity() instanceof ItemFrame && ((ItemFrame) event.getEntity()).getItem() != null) {
+                event.setCancelled(true);
+            }
         }
     }
 
