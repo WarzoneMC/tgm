@@ -350,6 +350,13 @@ public class CycleCommands {
         }
     }
 
+    @Command(aliases = {"links"}, desc = "View important Warzone links")
+    public static void next(CommandContext cmd, CommandSender sender) {
+        sender.sendMessage(ChatColor.AQUA + "Discord: https://discord.gg/cBdJrRy");
+        sender.sendMessage(ChatColor.AQUA + "Website: https://warzone.network");
+        sender.sendMessage(ChatColor.AQUA + "Twitter: https://twitter.com/WarzoneMC");
+    }
+    
     @Command(aliases = {"next"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
