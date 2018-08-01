@@ -163,7 +163,9 @@ public class KillstreakModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onTeamChange(TeamChangeEvent event) { players.put(event.getPlayerContext().getPlayer().getUniqueId().toString(), 0); }
+    public void onTeamChange(TeamChangeEvent event) { 
+        players.put(event.getPlayerContext().getPlayer().getUniqueId().toString(), 0); 
+    }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
