@@ -416,6 +416,13 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.WHITE + "Stat uploading is set to \"" + TGM.get().getConfig().getBoolean("api.stats.enabled") + "\"");
                 return;
             }
+
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.WHITE + "Punishments is set to \"" + TGM.get().getConfig().getBoolean("api.punishments.enabled") + "\"");
+                return;
+            }
+
+
             if (cmd.getString(1).equalsIgnoreCase("off")) {
                 TGM.get().getConfig().set("api.stats.enabled", false);
                 TGM.get().saveConfig();
@@ -426,6 +433,21 @@ public class CycleCommands {
                 TGM.get().saveConfig();
 
                 sender.sendMessage(ChatColor.GREEN + "Enabled stat uploading.");
+            } else {
+                sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
+            }
+
+
+            if (cmd.getString(1).equalsIgnoreCase("off")) {
+                TGM.get().getConfig().set("api.punishments.enabled", false);
+                TGM.get().saveConfig();
+
+                sender.sendMessage(ChatColor.GREEN + "Disabled Punishments.");
+            } else if (cmd.getString(1).equalsIgnoreCase("on")) {
+                TGM.get().getConfig().set("api.punishments.enabled", true);
+                TGM.get().saveConfig();
+
+                sender.sendMessage(ChatColor.GREEN + "Enabled Punishments.");
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
             }
