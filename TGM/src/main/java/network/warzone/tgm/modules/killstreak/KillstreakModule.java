@@ -163,8 +163,12 @@ public class KillstreakModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onTeamChange(TeamChangeEvent event) { 
-        players.put(event.getPlayerContext().getPlayer().getUniqueId().toString(), 0); 
+    public void onTeamChange(TeamChangeEvent event) {
+        if(players.containsKey(event.getPlayerContext().getPlayer().getUniqueId().toString()) && players.get(event.getPlayerContext().getPlayer().getUniqueId().toString()) >= 5) {
+            int streakValue = players.get(event.getPlayerContext().getPlayer().getUniqueId().toString());
+            event.getPlayerContext().getPlayer().sendMessage(ColorConverter.filterString("&7You have lost your kill streak of &c&l") + streakValue + ColorConverter.filterString(" &7for switching teams."));
+            players.remove(event.getPlayerContext().getPlayer().getUniqueId().toString());
+        }
     }
 
     @EventHandler
