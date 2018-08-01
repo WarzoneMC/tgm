@@ -122,6 +122,16 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "A match is currently in progress.");
         }
     }
+    
+    @Command(aliases = {"links"}, desc = "Get's a list with all the links.")
+    public static void links(CommandContext cmd, CommandSender sender) {
+        sender.sendMessage(ChatColor.GOLD + "-- Links for Forums and Discord --");
+        sender.sendMessage("\n");
+        sender.sendMessage(ChatColor.GOLD + "Discord: discord.io/Warzone");
+        sender.sendMessage(ChatColor.GOLD + "Forums: warzone.network");
+        sender.sendMessage(ChatColor.GOLD + "Twitter: https://twitter.com/WarzoneMC");
+        sender.sendMessage("\n");
+    }
 
     @Command(aliases = {"start"}, desc = "Start the match.")
     @CommandPermissions({"tgm.start"})
