@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by luke on 4/27/17.Levels edited by PandaChan on 8/1/18.
+ * Created by luke on 4/27/17.
  */
 public class PlayerContext {
     @Getter private Player player;
