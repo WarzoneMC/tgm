@@ -51,8 +51,11 @@ public class PlayerContext {
         }
         else if (level < 140) {
             return ChatColor.YELLOW + "[" + level + "]";
-        } else {
+        }
+        else if (level < 160) {
             return ChatColor.GREEN + "[" + level + "]";
+        } else {
+            return ChatColor.DARK_GREEN + "[" + level + "]";
         }
     }
 
