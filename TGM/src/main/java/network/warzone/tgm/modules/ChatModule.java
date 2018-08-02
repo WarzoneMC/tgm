@@ -21,23 +21,31 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public class ChatModule extends MatchModule implements Listener {
 
+    public enum Channel {
+        ALL, TEAM, STAFF
+    }
+
     private TeamManagerModule teamManagerModule;
     private TimeModule timeModule;
     private final List<Chat> chatLog = new ArrayList<>();
+    private static final Map<String, Channel> channel = new HashMap<>();
 
     @Override
     public void load(Match match) {
         teamManagerModule = match.getModule(TeamManagerModule.class);
         timeModule = match.getModule(TimeModule.class);
+    }
+
+    public static Map getChannel() {
+        return channel;
     }
 
     private final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
@@ -75,11 +83,48 @@ public class ChatModule extends MatchModule implements Listener {
             event.setCancelled(true);
             return;
         }
-        MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-        String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-        event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
-                prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
+
+        if(!(channel.containsKey(event.getPlayer().getUniqueId().toString()))) {
+            channel.put(event.getPlayer().getUniqueId().toString(), Channel.ALL);
+        }
+
+        if(channel.get(event.getPlayer().getUniqueId().toString()) == Channel.TEAM) {
+            TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, event.getMessage());
+            event.setCancelled(true);
+            return;
+        }
+
+        if(channel.get(event.getPlayer().getUniqueId().toString()) == Channel.STAFF) {
+            String prefix;
+            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+
+            String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + event.getPlayer().getName() + ": " + ChatColor.RESET + event.getMessage();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
+            }
+            Bukkit.getConsoleSender().sendMessage(result);
+            event.setCancelled(true);
+            return;
+        }
+
+        if (channel.get(event.getPlayer().getUniqueId().toString()) == Channel.ALL) {
+            MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
+            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
+                    prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
+        }
+
         //if (!matchTeam.isSpectator()) chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), event.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), event.getMessage(), matchTeam.getId(), timeModule.getTimeElapsed(), false));
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        channel.remove(event.getPlayer().getUniqueId().toString());
+    }
+
+    @EventHandler
+    public void onKick(PlayerKickEvent event) {
+        channel.remove(event.getPlayer().getUniqueId().toString());
     }
 
     private void sendMutedMessage(Player player, Punishment punishment) {
