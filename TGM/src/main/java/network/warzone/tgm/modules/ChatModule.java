@@ -67,7 +67,7 @@ public class ChatModule extends MatchModule implements Listener {
         return false;
     }
 
-    @EventHandler(priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
         // Run this code if the chat is currently muted
         if (!TGM.get().getConfig().getBoolean("chat.enabled") && !event.getPlayer().hasPermission("tgm.chat.bypass")) {
