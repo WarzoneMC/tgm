@@ -9,6 +9,7 @@ import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;

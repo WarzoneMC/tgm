@@ -22,6 +22,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -37,7 +38,14 @@ public class CycleCommands {
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
-        int pages = (int) Math.ceil((mapLibrary.size() + 7) / 9);
+
+        int pagesRemainder = mapLibrary.size() % 9;
+        int pagesDivisible = mapLibrary.size() / 9;
+        int pages = pagesDivisible;
+
+        if(pagesRemainder >= 1) {
+            pages = pagesDivisible + 1;
+        }
 
         if ((index > pages) || (index <= 0)) {
             index = 1;
@@ -72,7 +80,14 @@ public class CycleCommands {
     public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
-        int pages = (int) Math.ceil((rotation.size() + 7) / 9);
+
+        int pagesRemainder = rotation.size() % 9;
+        int pagesDivisible = rotation.size() / 9;
+        int pages = pagesDivisible;
+
+        if(pagesRemainder >= 1) {
+            pages = pagesDivisible + 1;
+        }
 
         if ((index > pages) || (index <= 0)) {
             index = 1;
@@ -340,6 +355,33 @@ public class CycleCommands {
         TGM.get().getMatchManager().getMapLibrary().refreshMaps();
         TGM.get().getMatchManager().getMapRotation().refresh();
         sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
+    }
+
+    @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
+    public static void channel(CommandContext cmd, CommandSender sender) {
+        Player player = (Player) sender;
+
+        if(!(sender instanceof Player)) {
+            sender.sendMessage("Error: Only players can use this command.");
+            return;
+        }
+
+        if (cmd.getString(0).equalsIgnoreCase("all")) {
+            ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.ALL);
+            player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lALL&7."));
+        } else if (cmd.getString(0).equalsIgnoreCase("team")) {
+            ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.TEAM);
+            player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lTEAM&7."));
+        } else if (cmd.getString(0).equalsIgnoreCase("staff")) {
+            if(player.hasPermission("tgm.staffchat")) {
+                ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.STAFF);
+                player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lSTAFF&7."));
+            } else {
+                player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
+            }
+        } else {
+            sender.sendMessage(ColorConverter.filterString("&cUnknown subcommand."));
+        }
     }
 
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
