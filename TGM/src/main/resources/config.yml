@@ -1,17 +1,18 @@
 api:
   enabled: false
-  url: api.team.gg
+  url: api.warz.one
   auth: secret
   stats:
     enabled: true
-rotation: maps/rotation.txt
+rotation: Maps/rotation.txt
 chat:
   enabled: true
   messages:
     muted: "&cChat is currently disabled. If you believe this is an error, please contact a staff member on our Discord."
 map:
   sources:
-  - maps
+  - Maps
 server:
   name: "Warzone"
   id: "warzone"
+  
