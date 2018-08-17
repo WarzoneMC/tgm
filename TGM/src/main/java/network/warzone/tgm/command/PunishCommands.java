@@ -419,7 +419,7 @@ public class PunishCommands {
         public String getTimeWord() {
             if (timeUnit == ChronoUnit.FOREVER || toMilliseconds() == -1) return "permanent";
             if (value == 1) {
-                if (timeUnit == ChronoUnit.MILLENNIA) return value + " millenium";
+                if (timeUnit == ChronoUnit.MILLENNIA) return value + " millennium";
                 if (timeUnit == ChronoUnit.CENTURIES) return value + " century";
                 if (timeUnit.name().toLowerCase().endsWith("s")) {
                     return value + " " + timeUnit.name().substring(0, timeUnit.name().length() - 1).toLowerCase().replace("_", " ");
