@@ -89,12 +89,8 @@
         </repository>
 
         <repository>
-            <id>cubist-snapshots</id>
-            <url>https://repo.extension.ws/content/repositories/snapshots</url>
-        </repository>
-        <repository>
-            <id>cubist-releases</id>
-            <url>https://repo.extension.ws/content/repositories/releases</url>
+            <id>benny-repo</id>
+            <url>https://repo.bennydoesstuff.me/service/rest/repository/browse/public</url>
         </repository>
     </repositories>
 
