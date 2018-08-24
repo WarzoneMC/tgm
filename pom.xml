@@ -89,12 +89,12 @@
         </repository>
 
         <repository>
-            <id>cubist-snapshots</id>
-            <url>https://repo.extension.ws/content/repositories/snapshots</url>
+            <id>atdit-snapshots</id>
+            <url>http://atdit.de/content/repositories/snapshots</url>
         </repository>
         <repository>
-            <id>cubist-releases</id>
-            <url>https://repo.extension.ws/content/repositories/releases</url>
+            <id>atdit-releases</id>
+            <url>http://atdit.de/content/repositories/releases</url>
         </repository>
     </repositories>
 
