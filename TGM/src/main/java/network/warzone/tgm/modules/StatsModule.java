@@ -44,7 +44,7 @@ public class StatsModule extends MatchModule implements Listener{
         if (showLevel) xpBarTaskId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.setLevel(TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().getLevel());
-                player.setExp((float) Levels.getLevelProgress(player) / 160);
+                player.setExp((float) Levels.getLevelProgress(player) / 200);
             }
         }, 2, 2).getTaskId();
         if (statsDisabled && notifyDisable) Bukkit.getOnlinePlayers().forEach(this::notifyDisable);

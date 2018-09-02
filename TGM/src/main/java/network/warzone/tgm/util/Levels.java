@@ -18,7 +18,7 @@ public class Levels {
     */
     public static double getLevelProgress(Player player) {
         UserProfile profile = TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile();
-        return (((0.6 * Math.sqrt(profile.getXP())) + 1) - profile.getLevel()) * 100;
+        return (((0.6 * Math.sqrt(profile.getXP())) + 1) - profile.getLevel()) * 200;
     }
 
     /**
