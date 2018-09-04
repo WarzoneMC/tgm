@@ -1,4 +1,4 @@
-[![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM)
+[![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM) [![Discord Status](https://discordapp.com/api/guilds/333669866735271938/widget.png?style=shield)](https://discord.gg/2T3RqxJ)
 
 # Warzone
 Team Oriented Minecraft PVP Suite
@@ -40,7 +40,7 @@ As an example, a map should be able to provide different spawn points as the mat
 
 ## Local Server Setup
  
-1. Start with the latest stable [Paper (PaperSpigot)](https://ci.destroystokyo.com/job/Paper/) build. 
+1. Start with the latest stable [Paper (PaperSpigot)](https://destroystokyo.com/ci/job/Paper/) build. 
  
 2. Create a `maps` folder inside of the server and insert a supported TGM map. You can also just clone our `Maps` repository as a folder. 
  
