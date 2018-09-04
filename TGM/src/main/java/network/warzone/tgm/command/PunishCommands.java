@@ -362,7 +362,7 @@ public class PunishCommands {
                 new TextComponent(ChatColor.GRAY + "\nType: "           + ChatColor.RESET + punishment.getType().toUpperCase()),
                 new TextComponent(ChatColor.GRAY + "\nPunished IP: "    + ChatColor.RESET + punishment.getIp()),
                 new TextComponent(ChatColor.GRAY + "\nIP Punishment: "  + ChatColor.RESET + punishment.isIp_ban()),
-                new TextComponent(ChatColor.GRAY + "\nIsssued by: "     + ChatColor.RESET + punisher),
+                new TextComponent(ChatColor.GRAY + "\nIssued by: "      + ChatColor.RESET + punisher),
                 new TextComponent(ChatColor.GRAY + "\nReverted: "       + ChatColor.RESET + punishment.isReverted()),
                 new TextComponent(ChatColor.GRAY + "\nIssued: "         + ChatColor.RESET + new Date(punishment.getIssued()).toString()),
                 new TextComponent(ChatColor.GRAY + "\nExpires: "        + ChatColor.RESET + (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never")),
@@ -419,7 +419,7 @@ public class PunishCommands {
         public String getTimeWord() {
             if (timeUnit == ChronoUnit.FOREVER || toMilliseconds() == -1) return "permanent";
             if (value == 1) {
-                if (timeUnit == ChronoUnit.MILLENNIA) return value + " millenium";
+                if (timeUnit == ChronoUnit.MILLENNIA) return value + " millennium";
                 if (timeUnit == ChronoUnit.CENTURIES) return value + " century";
                 if (timeUnit.name().toLowerCase().endsWith("s")) {
                     return value + " " + timeUnit.name().substring(0, timeUnit.name().length() - 1).toLowerCase().replace("_", " ");
