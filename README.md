@@ -1,4 +1,5 @@
-[![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM) [![Discord Status](https://discordapp.com/api/guilds/333669866735271938/widget.png?style=shield)](https://discord.gg/2T3RqxJ)
+[![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM)
+[![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://discord.io/WarzoneMC)
 
 # Warzone
 Team Oriented Minecraft PVP Suite
