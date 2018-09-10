@@ -26,6 +26,7 @@ import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -217,7 +218,7 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "/sn <map_name>");
         }
     }
-
+    
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
@@ -282,6 +283,33 @@ public class CycleCommands {
             }
 
             attemptJoinTeam((Player) sender, matchTeam, false);
+        }
+    }
+
+    @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
+    public static void teleportCommmand(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can use this command,");
+            return;
+        }
+        Player player = (Player) sender;
+        MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
+        if (matchTeam != null) {
+            if (matchTeam.isSpectator()) {
+                if (cmd.argsLength() == 1) {
+                    Player tpTo = Bukkit.getPlayer(cmd.getString(0));
+                    if (tpTo == null) {
+                        player.sendMessage(ChatColor.RED + "Player not found");
+                        return;
+                    }
+                    player.teleport(tpTo.getLocation());
+                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
+                    return;
+                }
+                player.sendMessage(ChatColor.RED + "Usage: /tp <name>");
+            } else {
+                player.sendMessage(ChatColor.RED + "You can only execute this command as a spectator!");
+            }
         }
     }
 
