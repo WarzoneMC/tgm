@@ -50,7 +50,7 @@ public class BuildFilterType implements FilterType, Listener {
     }
 
     @EventHandler
-    public void onPlaceFluidOrEntities(PlayerInteractEvent event) {
+    public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             ItemStack item = event.getItem();
             if (item != null && item.getType() != Material.BOW) {
