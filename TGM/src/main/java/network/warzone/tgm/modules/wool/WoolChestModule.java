@@ -45,27 +45,26 @@ public class WoolChestModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onOpen(InventoryOpenEvent event) {
-        //if (event.getInventory().getType() == InventoryType.CHEST) {
-            BlockState state = event.getInventory().getLocation().getBlock().getState();
+        if (event.getInventory().getLocation() == null || event.getInventory().getLocation().getBlock() == null) return;
+        BlockState state = event.getInventory().getLocation().getBlock().getState();
 
-            if (state instanceof Chest) {
-                Chest chest = (Chest) event.getInventory().getLocation().getBlock().getState();
+        if (state instanceof Chest) {
+            Chest chest = (Chest) event.getInventory().getLocation().getBlock().getState();
 
-                if (!isWoolChest(chest)) {
-                    registerInventory(event.getInventory());
-                }
-            } else if (state instanceof DoubleChest) {
-                DoubleChest chest = (DoubleChest) event.getInventory().getLocation().getBlock().getState();
-
-                if (!isWoolChest(chest.getRightSide())) {
-                    registerInventory(chest.getRightSide().getInventory());
-                }
-
-                if (!isWoolChest(chest.getLeftSide())) {
-                    registerInventory(chest.getLeftSide().getInventory());
-                }
+            if (!isWoolChest(chest)) {
+                registerInventory(event.getInventory());
             }
-        //}
+        } else if (state instanceof DoubleChest) {
+            DoubleChest chest = (DoubleChest) event.getInventory().getLocation().getBlock().getState();
+
+            if (!isWoolChest(chest.getRightSide())) {
+                registerInventory(chest.getRightSide().getInventory());
+            }
+
+            if (!isWoolChest(chest.getLeftSide())) {
+                registerInventory(chest.getLeftSide().getInventory());
+            }
+        }
     }
 
     @EventHandler
