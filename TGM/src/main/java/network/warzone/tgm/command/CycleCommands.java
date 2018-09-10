@@ -296,10 +296,13 @@ public class CycleCommands {
         Player pSender = (Player) sender;
         MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(pSender);
 
-        if (matchTeam.isSpectator()) {
+        if (matchTeam != null && matchTeam.isSpectator()) {
             Player tpTo = Bukkit.getPlayer(cmd.getString(0));
 
-            if(tpTo == null) pSender.sendMessage(ChatColor.RED + "Player not found!");
+            if(tpTo == null) {
+                pSender.sendMessage(ChatColor.RED + "Player not found!");
+                return;
+            }
 
             pSender.teleport(tpTo.getLocation());
             pSender.playSound(pSender.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
