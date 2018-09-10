@@ -29,24 +29,33 @@ public class PlayerContext {
             return ChatColor.GRAY + "[" + level + "]";
         }
         else if (level < 20) {
-            return ChatColor.BLUE + "[" + level + "]";
+            return ChatColor.DARK_AQUA + "[" + level + "]";
         }
         else if (level < 30) {
-            return ChatColor.DARK_GREEN + "[" + level + "]";
+            return ChatColor.BLUE + "[" + level + "]";
         }
         else if (level < 40) {
-            return ChatColor.GREEN + "[" + level + "]";
-        }
-        else if (level < 60) {
-            return ChatColor.RED + "[" + level + "]";
-        }
-        else if (level < 80) {
             return ChatColor.LIGHT_PURPLE + "[" + level + "]";
         }
-        else if (level < 100) {
+        else if (level < 60) {
             return ChatColor.DARK_PURPLE + "[" + level + "]";
-        } else {
+        }
+        else if (level < 80) {
+            return ChatColor.DARK_RED + "[" + level + "]";
+        }
+        else if (level < 100) {
+            return ChatColor.RED + "[" + level + "]";
+        }
+        else if (level < 120) {
             return ChatColor.GOLD + "[" + level + "]";
+        }
+        else if (level < 140) {
+            return ChatColor.YELLOW + "[" + level + "]";
+        }
+        else if (level < 160) {
+            return ChatColor.GREEN + "[" + level + "]";
+        } else {
+            return ChatColor.DARK_GREEN + "[" + level + "]";
         }
     }
 
