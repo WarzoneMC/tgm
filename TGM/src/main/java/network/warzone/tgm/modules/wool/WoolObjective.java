@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.wool;
 
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -145,6 +146,10 @@ public class WoolObjective implements Listener {
     }
 
     private void handleWoolDrop(Player player) {
+        handleWoolDrop(player, touches.isEmpty());
+    }
+
+    private void handleWoolDrop(Player player, boolean broadcast) {
         if (completed) return;
 
         if (!owner.containsPlayer(player)) {
@@ -155,7 +160,6 @@ public class WoolObjective implements Listener {
             return;
         }
         touches.remove(player.getUniqueId());
-        boolean broadcast = touches.isEmpty();
 
         TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         MatchTeam matchTeam = teamManagerModule.getTeam(player);
@@ -184,7 +188,11 @@ public class WoolObjective implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
-        handleWoolDrop(event.getPlayer());
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST) {
+            handleWoolDrop(event.getPlayer(), false);
+        } else {
+            handleWoolDrop(event.getPlayer());
+        }
     }
 
     public WoolStatus getStatus() {
