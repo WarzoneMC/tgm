@@ -284,6 +284,11 @@ public class CycleCommands {
             attemptJoinTeam((Player) sender, matchTeam, false);
         }
     }
+    
+    @Command(aliases = {"leave", "quit"}, desc = "Leave the match, and join observer team.")
+    public static void leave(CommandContext cmd, CommandSender sender) {
+        Bukkit.getServer().dispatchCommand(sender, "join spectator");
+    }
 
     @Command(aliases = {"team"}, desc = "Manage teams.")
     @CommandPermissions({"tgm.team"})
