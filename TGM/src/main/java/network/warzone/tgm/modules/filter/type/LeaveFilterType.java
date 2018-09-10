@@ -25,6 +25,7 @@ public class LeaveFilterType implements FilterType, Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
+        if (event.getFrom().getX() == event.getTo().getX() && event.getFrom().getY() == event.getTo().getY() && event.getFrom().getZ() == event.getTo().getZ()) return;
         for (Region region : regions) {
             if (!region.contains(event.getTo())) {
                 for (MatchTeam matchTeam : teams) {
@@ -44,6 +45,7 @@ public class LeaveFilterType implements FilterType, Listener {
 
     @EventHandler
     public void onBoatMove(VehicleMoveEvent event) {
+        if (event.getFrom().getX() == event.getTo().getX() && event.getFrom().getY() == event.getTo().getY() && event.getFrom().getZ() == event.getTo().getZ()) return;
         for (Entity passenger : event.getVehicle().getPassengers()) {
             if (passenger instanceof Player) {
                 Player player = (Player) passenger;
@@ -53,7 +55,7 @@ public class LeaveFilterType implements FilterType, Listener {
                             if (matchTeam.containsPlayer(player)) {
                                 FilterResult filterResult = evaluator.evaluate(player);
                                 if (filterResult == FilterResult.DENY) {
-                                    event.getVehicle().teleport(event.getFrom());
+                                    event.getVehicle().teleport(event.getFrom().add(event.getTo().subtract(event.getFrom()).toVector().normalize().multiply(-1)));
                                     player.sendMessage(message);
                                 }
                             }
