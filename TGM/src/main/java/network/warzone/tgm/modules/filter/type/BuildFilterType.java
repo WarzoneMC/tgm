@@ -6,19 +6,19 @@ import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -43,6 +43,31 @@ public class BuildFilterType implements FilterType, Listener {
                         } else if (filterResult == FilterResult.ALLOW) {
                             event.setCancelled(false);
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlaceFluidOrEntities(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            ItemStack item = event.getItem();
+            if (item != null && (item.getType() == Material.LAVA_BUCKET || item.getType() == Material.WATER_BUCKET || item.getType() == Material.ITEM_FRAME)) {
+                for (Region region : regions) {
+                    if (region.contains(event.getClickedBlock().getRelative(event.getBlockFace()).getLocation())) {
+                        for (MatchTeam matchTeam : teams) {
+                            if (matchTeam.containsPlayer(event.getPlayer())) {
+                                FilterResult filterResult = evaluator.evaluate(event.getPlayer());
+                                if (filterResult == FilterResult.DENY) {
+                                    event.setCancelled(true);
+                                    event.getPlayer().sendMessage(message);
+                                } else if (filterResult == FilterResult.ALLOW) {
+                                    event.setCancelled(false);
+                                }
+                            }
+                        }
+                        return;
                     }
                 }
             }
