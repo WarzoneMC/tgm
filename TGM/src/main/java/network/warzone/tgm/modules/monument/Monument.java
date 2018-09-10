@@ -13,8 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +71,26 @@ public class Monument implements Listener {
             if (materials == null || materials.contains(event.getBlock().getType())) {
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBlockIgniteEvent(BlockIgniteEvent event) {
+        if (region.contains(event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        if (region.contains(event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        if (region.contains(event.getBlock().getLocation())) {
+            event.setCancelled(true);
         }
     }
 
