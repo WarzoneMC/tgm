@@ -92,6 +92,11 @@
             <id>benny-repo</id>
             <url>https://repo.bennydoesstuff.me/service/rest/repository/browse/public</url>
         </repository>
+
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>

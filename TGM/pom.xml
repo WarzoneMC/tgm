@@ -29,15 +29,21 @@
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.sk89q</groupId>
+            <groupId>com.github.OvercastNetwork.sk89q-command-framework</groupId>
             <artifactId>command-framework-bukkit</artifactId>
-            <version>1.9-SNAPSHOT</version>
+            <version>d1e29bedbe</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bukkit</groupId>
@@ -45,6 +51,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
