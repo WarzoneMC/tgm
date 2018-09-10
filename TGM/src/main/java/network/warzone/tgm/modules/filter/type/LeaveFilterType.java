@@ -24,7 +24,7 @@ public class LeaveFilterType implements FilterType, Listener {
     public void onMove(PlayerMoveEvent event) {
         if (event.getFrom().getX() == event.getTo().getX() && event.getFrom().getY() == event.getTo().getY() && event.getFrom().getZ() == event.getTo().getZ()) return;
         for (Region region : regions) {
-            if (!region.contains(event.getTo())) {
+            if (!region.contains(event.getFrom()) && region.contains(event.getTo())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
