@@ -287,27 +287,29 @@ public class CycleCommands {
     }
 
     @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
-    public static void teleport(CommandContext cmd, CommandSender sender) {
-        if(!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Silly man, don't try to teleport from console!");
+    public static void teleportCommmand(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can use this command,");
             return;
         }
-
-        Player pSender = (Player) sender;
-        MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(pSender);
-
-        if (matchTeam != null && matchTeam.isSpectator()) {
-            Player tpTo = Bukkit.getPlayer(cmd.getString(0));
-
-            if(tpTo == null) {
-                pSender.sendMessage(ChatColor.RED + "Player not found!");
-                return;
+        Player player = (Player) sender;
+        MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
+        if (matchTeam != null) {
+            if (matchTeam.isSpectator()) {
+                if (cmd.argsLength() == 1) {
+                    Player tpTo = Bukkit.getPlayer(cmd.getString(0));
+                    if (tpTo == null) {
+                        player.sendMessage(ChatColor.RED + "Player not found");
+                        return;
+                    }
+                    player.teleport(tpTo.getLocation());
+                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
+                    return;
+                }
+                player.sendMessage(ChatColor.RED + "Usage: /tp <name>");
+            } else {
+                player.sendMessage(ChatColor.RED + "You can only execute this command as a spectator!");
             }
-
-            pSender.teleport(tpTo.getLocation());
-            pSender.playSound(pSender.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
-        } else {
-            pSender.sendMessage(ChatColor.RED + "You can only execute this command as a spectator!");
         }
     }
 
