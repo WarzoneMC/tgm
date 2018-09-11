@@ -12,9 +12,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class WorldBorderModule extends MatchModule {
 
-    private int startingSize = 500; // Starting size in blocks radius
+    private int startingSize = 500; // Starting size in length of one side
     private int delay = 20; // Delay in seconds
-    private int endSize; // End size in blocks radius
+    private int endSize; // End size in length of one side
 
     private BukkitTask task;
 
