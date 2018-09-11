@@ -14,7 +14,7 @@ public class WorldBorderModule extends MatchModule {
 
     private int startingSize = 500; // Starting size in blocks radius
     private int delay = 20; // Delay in seconds
-    private int endSize = 400; // End size in blocks radius
+    private int endSize; // End size in blocks radius
 
     private BukkitTask task;
 
@@ -25,9 +25,16 @@ public class WorldBorderModule extends MatchModule {
         if (borderJson.has("startingSize")) startingSize = borderJson.get("startingSize").getAsInt();
         if (borderJson.has("delay")) delay = borderJson.get("delay").getAsInt();
         if (borderJson.has("endSize")) endSize = borderJson.get("endSize").getAsInt();
+            else endSize = startingSize;
+
         World world = TGM.get().getMatchManager().getMatch().getWorld();
         WorldBorder border = world.getWorldBorder();
+
+        border.setSize(startingSize);
         if (borderJson.has("center")) border.setCenter(Parser.convertLocation(world, borderJson.get("center")));
+
+        if (endSize == startingSize) return;
+
         int amount = Math.abs(startingSize - endSize) / delay;
         int rate = (startingSize - endSize) / amount;
         task = new BukkitRunnable() {
