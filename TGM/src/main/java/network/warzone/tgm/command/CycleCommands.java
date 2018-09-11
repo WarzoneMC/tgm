@@ -42,8 +42,10 @@ public class CycleCommands {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
 
-        int pagesRemainder = mapLibrary.size() % 9;
-        int pagesDivisible = mapLibrary.size() / 9;
+        int pageSize = 9;
+
+        int pagesRemainder = mapLibrary.size() % pageSize;
+        int pagesDivisible = mapLibrary.size() / pageSize;
         int pages = pagesDivisible;
 
         if(pagesRemainder >= 1) {
@@ -54,29 +56,25 @@ public class CycleCommands {
             index = 1;
         }
         sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
-        String[] maps = {"", "", "", "", "", "", "", "", ""};
+        for (int i = 0; i < pageSize; i++) {
+            int position = pageSize * (index - 1) + i;
+            MapContainer map = mapLibrary.get(position);
+            String mapName = ChatColor.GOLD + map.getMapInfo().getName();
 
-        try {
-            for (int i = 0; i <= maps.length - 1; i++) {
-                int position = 9 * (index - 1) + i;
-                MapContainer map = mapLibrary.get(position);
-                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
-
-                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
-                } else {
-                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
-                }
-                TextComponent message = new TextComponent(maps[i]);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
-                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
-                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
-                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
-
-                sender.spigot().sendMessage(message);
+            if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+                mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
+            } else {
+                mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
             }
-        } catch (IndexOutOfBoundsException ignored) { }
+            TextComponent message = new TextComponent(mapName);
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
+                    .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
+                    .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
+                    .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
+
+            sender.spigot().sendMessage(message);
+        }
     }
 
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
@@ -84,8 +82,10 @@ public class CycleCommands {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
 
-        int pagesRemainder = rotation.size() % 9;
-        int pagesDivisible = rotation.size() / 9;
+        int pageSize = 9;
+
+        int pagesRemainder = rotation.size() % pageSize;
+        int pagesDivisible = rotation.size() / pageSize;
         int pages = pagesDivisible;
 
         if(pagesRemainder >= 1) {
@@ -96,20 +96,19 @@ public class CycleCommands {
             index = 1;
         }
         sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
-        String[] maps = {"", "", "", "", "", "", "", "", ""};
 
         try {
-            for (int i = 0; i <= maps.length - 1; i++) {
+            for (int i = 0; i < pageSize; i++) {
                 int position = 9 * (index - 1) + i;
                 MapContainer map = rotation.get(position);
-                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
+                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
 
                 if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
+                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
                 } else {
-                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
+                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
                 }
-                TextComponent message = new TextComponent(maps[i]);
+                TextComponent message = new TextComponent(mapName);
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rotation.get(position).getMapInfo().getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + rotation.get(position).getMapInfo().getName()).append("\n\n")
                         .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(rotation.get(position).getMapInfo().getAuthors())).append("\n")
@@ -135,6 +134,7 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
+            sender.sendMessage(ChatColor.GREEN + "Cycling in " + time + " seconds.");
             TGM.get().getModule(CycleCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "A match is currently in progress.");
