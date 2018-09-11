@@ -172,6 +172,7 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                     return;
                 }
+                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
               sender.sendMessage(ChatColor.GREEN + "Ending match...");
