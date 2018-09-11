@@ -24,12 +24,14 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -389,29 +391,31 @@ public class CycleCommands {
 
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
-        Player player = (Player) sender;
-
         if(!(sender instanceof Player)) {
             sender.sendMessage("Error: Only players can use this command.");
             return;
         }
-
-        if (cmd.getString(0).equalsIgnoreCase("all")) {
-            ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.ALL);
-            player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lALL&7."));
-        } else if (cmd.getString(0).equalsIgnoreCase("team")) {
-            ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.TEAM);
-            player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lTEAM&7."));
-        } else if (cmd.getString(0).equalsIgnoreCase("staff")) {
-            if(player.hasPermission("tgm.staffchat")) {
-                ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.STAFF);
-                player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lSTAFF&7."));
-            } else {
-                player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
-            }
-        } else {
-            sender.sendMessage(ColorConverter.filterString("&cUnknown subcommand."));
+        Player player = (Player) sender;
+        if (cmd.argsLength() == 0) {
+          player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
+          return;
         }
+
+        String channelName = cmd.getString(0).toUpperCase();
+        ChatModule.Channel channel = ChatModule.Channel.byName(channelName);
+        if (channel == null) {
+          player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
+          player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatModule.Channel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
+          return;
+        }
+
+        if (!channel.hasPermission(player)) {
+          player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
+          return;
+        }
+
+        ChatModule.getChannels().put(player.getUniqueId().toString(), channel);
+        player.sendMessage(ColorConverter.filterString("&7You've been added to the channel &c&l" + channel.name() + "&7."));
     }
 
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)

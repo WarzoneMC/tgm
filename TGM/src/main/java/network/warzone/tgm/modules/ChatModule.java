@@ -1,6 +1,8 @@
 package network.warzone.tgm.modules;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -29,14 +31,30 @@ import java.util.*;
 @Getter
 public class ChatModule extends MatchModule implements Listener {
 
+    @AllArgsConstructor @NoArgsConstructor
     public enum Channel {
-        ALL, TEAM, STAFF
+        ALL, TEAM, STAFF("tgm.staffchat");
+
+        private String permission;
+
+        public boolean hasPermission(Player player) {
+            return permission == null || player.hasPermission(permission);
+        }
+
+        public static Channel byName(String name) {
+            for (Channel channel : values()) {
+                if (channel.name().equalsIgnoreCase(name)) {
+                    return channel;
+                }
+            }
+            return null;
+        }
     }
 
     private TeamManagerModule teamManagerModule;
     private TimeModule timeModule;
     private final List<Chat> chatLog = new ArrayList<>();
-    private static final Map<String, Channel> channel = new HashMap<>();
+    private static final Map<String, Channel> channels = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -44,8 +62,8 @@ public class ChatModule extends MatchModule implements Listener {
         timeModule = match.getModule(TimeModule.class);
     }
 
-    public static Map getChannel() {
-        return channel;
+    public static Map<String, Channel> getChannels() {
+        return channels;
     }
 
     private final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
@@ -84,17 +102,19 @@ public class ChatModule extends MatchModule implements Listener {
             return;
         }
 
-        if(!(channel.containsKey(event.getPlayer().getUniqueId().toString()))) {
-            channel.put(event.getPlayer().getUniqueId().toString(), Channel.ALL);
+        if(!(channels.containsKey(event.getPlayer().getUniqueId().toString()))) {
+            channels.put(event.getPlayer().getUniqueId().toString(), Channel.ALL);
         }
 
-        if(channel.get(event.getPlayer().getUniqueId().toString()) == Channel.TEAM) {
+        Channel channel = channels.get(event.getPlayer().getUniqueId().toString());
+
+        if(channel == Channel.TEAM) {
             TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, event.getMessage());
             event.setCancelled(true);
             return;
         }
 
-        if(channel.get(event.getPlayer().getUniqueId().toString()) == Channel.STAFF) {
+        if(channel == Channel.STAFF) {
             String prefix;
             prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
 
@@ -107,24 +127,22 @@ public class ChatModule extends MatchModule implements Listener {
             return;
         }
 
-        if (channel.get(event.getPlayer().getUniqueId().toString()) == Channel.ALL) {
+        if (channel == Channel.ALL) {
             MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
             event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
                     prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
         }
-
-        //if (!matchTeam.isSpectator()) chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), event.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), event.getMessage(), matchTeam.getId(), timeModule.getTimeElapsed(), false));
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        channel.remove(event.getPlayer().getUniqueId().toString());
+        channels.remove(event.getPlayer().getUniqueId().toString());
     }
 
     @EventHandler
     public void onKick(PlayerKickEvent event) {
-        channel.remove(event.getPlayer().getUniqueId().toString());
+        channels.remove(event.getPlayer().getUniqueId().toString());
     }
 
     private void sendMutedMessage(Player player, Punishment punishment) {
