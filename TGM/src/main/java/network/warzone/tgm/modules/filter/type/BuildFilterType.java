@@ -53,7 +53,7 @@ public class BuildFilterType implements FilterType, Listener {
     public void onInteract(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             ItemStack item = event.getItem();
-            if (item != null && item.getType() != Material.BOW) {
+            if (item != null && item.getType() != Material.BOW && !item.getType().isBlock()) {
                 for (Region region : regions) {
                     if (region.contains(event.getClickedBlock().getRelative(event.getBlockFace()).getLocation())) {
                         for (MatchTeam matchTeam : teams) {
