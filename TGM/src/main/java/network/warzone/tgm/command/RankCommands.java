@@ -34,7 +34,7 @@ public class RankCommands {
                 return;
             }
 
-            RankUpdateRequest.Action action = RankUpdateRequest.Action.valueOf(cmd.getString(2).toUpperCase());
+            RankUpdateRequest.Action action = RankUpdateRequest.Action.byName(cmd.getString(2).toUpperCase());
             if (action == null) {
                 sender.sendMessage(ChatColor.RED + "Unknown action: " + cmd.getString(2));
                 sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " player <player|UUID> <add|remove> <rank>");
@@ -46,27 +46,26 @@ public class RankCommands {
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
                     return;
-                } else {
-                    Player target;
-                    if (cmd.getString(1).length() == 36) target = Bukkit.getPlayer(UUID.fromString(cmd.getString(1)));
-                    else target = Bukkit.getPlayer(cmd.getString(1));
-                    switch (action) {
-                        case ADD:
-                            if (target != null) {
-                                TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addRank(response.getRank());
-                                TGM.get().getPlayerManager().getPlayerContext(target).updateRank(response.getRank());
-                            }
-                            sender.sendMessage(ChatColor.GRAY + "Added rank " + ChatColor.RESET + response.getRank().getName() + ChatColor.GRAY + " to " + ChatColor.RESET + (target != null ? target.getName() : cmd.getString(1)));
-                            break;
-                        case REMOVE:
-                            if (target != null) {
-                                TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().removeRank(response.getRank());
-                                TGM.get().getPlayerManager().getPlayerContext(target).updateRank(response.getRank(), true);
-                            }
-                            sender.sendMessage(ChatColor.GRAY + "Removed rank " + ChatColor.RESET + response.getRank().getName() + ChatColor.GRAY + " to " + ChatColor.RESET + (target != null ? target.getName() : cmd.getString(1)));
-                            break;
-                    }
+                }
 
+                Player target;
+                if (cmd.getString(1).length() == 36) target = Bukkit.getPlayer(UUID.fromString(cmd.getString(1)));
+                else target = Bukkit.getPlayer(cmd.getString(1));
+                switch (action) {
+                    case ADD:
+                        if (target != null) {
+                            TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addRank(response.getRank());
+                            TGM.get().getPlayerManager().getPlayerContext(target).updateRank(response.getRank());
+                        }
+                        sender.sendMessage(ChatColor.GRAY + "Added rank " + ChatColor.RESET + response.getRank().getName() + ChatColor.GRAY + " to " + ChatColor.RESET + (target != null ? target.getName() : cmd.getString(1)));
+                        break;
+                    case REMOVE:
+                        if (target != null) {
+                            TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().removeRank(response.getRank());
+                            TGM.get().getPlayerManager().getPlayerContext(target).updateRank(response.getRank(), true);
+                        }
+                        sender.sendMessage(ChatColor.GRAY + "Removed rank " + ChatColor.RESET + response.getRank().getName() + ChatColor.GRAY + " to " + ChatColor.RESET + (target != null ? target.getName() : cmd.getString(1)));
+                        break;
                 }
             });
 

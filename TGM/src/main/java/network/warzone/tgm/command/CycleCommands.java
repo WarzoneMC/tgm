@@ -24,12 +24,14 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,8 +42,10 @@ public class CycleCommands {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
 
-        int pagesRemainder = mapLibrary.size() % 9;
-        int pagesDivisible = mapLibrary.size() / 9;
+        int pageSize = 9;
+
+        int pagesRemainder = mapLibrary.size() % pageSize;
+        int pagesDivisible = mapLibrary.size() / pageSize;
         int pages = pagesDivisible;
 
         if(pagesRemainder >= 1) {
@@ -52,29 +56,25 @@ public class CycleCommands {
             index = 1;
         }
         sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
-        String[] maps = {"", "", "", "", "", "", "", "", ""};
+        for (int i = 0; i < pageSize; i++) {
+            int position = pageSize * (index - 1) + i;
+            MapContainer map = mapLibrary.get(position);
+            String mapName = ChatColor.GOLD + map.getMapInfo().getName();
 
-        try {
-            for (int i = 0; i <= maps.length - 1; i++) {
-                int position = 9 * (index - 1) + i;
-                MapContainer map = mapLibrary.get(position);
-                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
-
-                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
-                } else {
-                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
-                }
-                TextComponent message = new TextComponent(maps[i]);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
-                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
-                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
-                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
-
-                sender.spigot().sendMessage(message);
+            if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+                mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
+            } else {
+                mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
             }
-        } catch (IndexOutOfBoundsException ignored) { }
+            TextComponent message = new TextComponent(mapName);
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
+                    .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
+                    .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
+                    .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
+
+            sender.spigot().sendMessage(message);
+        }
     }
 
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
@@ -82,8 +82,10 @@ public class CycleCommands {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
 
-        int pagesRemainder = rotation.size() % 9;
-        int pagesDivisible = rotation.size() / 9;
+        int pageSize = 9;
+
+        int pagesRemainder = rotation.size() % pageSize;
+        int pagesDivisible = rotation.size() / pageSize;
         int pages = pagesDivisible;
 
         if(pagesRemainder >= 1) {
@@ -94,20 +96,19 @@ public class CycleCommands {
             index = 1;
         }
         sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
-        String[] maps = {"", "", "", "", "", "", "", "", ""};
 
         try {
-            for (int i = 0; i <= maps.length - 1; i++) {
+            for (int i = 0; i < pageSize; i++) {
                 int position = 9 * (index - 1) + i;
                 MapContainer map = rotation.get(position);
-                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
+                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
 
                 if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
+                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
                 } else {
-                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
+                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
                 }
-                TextComponent message = new TextComponent(maps[i]);
+                TextComponent message = new TextComponent(mapName);
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rotation.get(position).getMapInfo().getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + rotation.get(position).getMapInfo().getName()).append("\n\n")
                         .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(rotation.get(position).getMapInfo().getAuthors())).append("\n")
@@ -133,6 +134,7 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
+            sender.sendMessage(ChatColor.GREEN + "Cycling in " + time + " seconds.");
             TGM.get().getModule(CycleCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "A match is currently in progress.");
@@ -152,7 +154,8 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-            TGM.get().getModule(StartCountdown.class).start(time);
+          sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " seconds.");
+          TGM.get().getModule(StartCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -169,8 +172,10 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                     return;
                 }
+                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
+              sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 if (cmd.hasFlag('f')) {
                     TGM.get().getMatchManager().endMatch(null);
                 } else {
@@ -389,29 +394,31 @@ public class CycleCommands {
 
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
-        Player player = (Player) sender;
-
         if(!(sender instanceof Player)) {
             sender.sendMessage("Error: Only players can use this command.");
             return;
         }
-
-        if (cmd.getString(0).equalsIgnoreCase("all")) {
-            ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.ALL);
-            player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lALL&7."));
-        } else if (cmd.getString(0).equalsIgnoreCase("team")) {
-            ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.TEAM);
-            player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lTEAM&7."));
-        } else if (cmd.getString(0).equalsIgnoreCase("staff")) {
-            if(player.hasPermission("tgm.staffchat")) {
-                ChatModule.getChannel().put(player.getUniqueId().toString(), ChatModule.Channel.STAFF);
-                player.sendMessage(ColorConverter.filterString("&7You've been added to chat channel &c&lSTAFF&7."));
-            } else {
-                player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
-            }
-        } else {
-            sender.sendMessage(ColorConverter.filterString("&cUnknown subcommand."));
+        Player player = (Player) sender;
+        if (cmd.argsLength() == 0) {
+          player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
+          return;
         }
+
+        String channelName = cmd.getString(0).toUpperCase();
+        ChatModule.Channel channel = ChatModule.Channel.byName(channelName);
+        if (channel == null) {
+          player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
+          player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatModule.Channel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
+          return;
+        }
+
+        if (!channel.hasPermission(player)) {
+          player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
+          return;
+        }
+
+        ChatModule.getChannels().put(player.getUniqueId().toString(), channel);
+        player.sendMessage(ColorConverter.filterString("&7You've been added to the channel &c&l" + channel.name() + "&7."));
     }
 
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
@@ -425,7 +432,7 @@ public class CycleCommands {
     @Command(aliases = {"next"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
-        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
+        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors()));
     }
     
     @Command(aliases = {"map"}, desc = "View the map info for the current map")
