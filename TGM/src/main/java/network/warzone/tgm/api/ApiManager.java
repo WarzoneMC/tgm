@@ -118,7 +118,7 @@ public class ApiManager implements Listener {
                 losers,
                 event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,
                 teamMappings);
-        TGM.get().getTeamClient().finishMatch(matchFinishPacket);
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().finishMatch(matchFinishPacket));
 
         winners.clear();
         losers.clear();
