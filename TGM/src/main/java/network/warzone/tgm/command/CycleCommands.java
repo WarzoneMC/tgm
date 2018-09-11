@@ -154,7 +154,8 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-            TGM.get().getModule(StartCountdown.class).start(time);
+          sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " seconds.");
+          TGM.get().getModule(StartCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -173,6 +174,7 @@ public class CycleCommands {
                 }
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
+              sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 if (cmd.hasFlag('f')) {
                     TGM.get().getMatchManager().endMatch(null);
                 } else {
@@ -429,7 +431,7 @@ public class CycleCommands {
     @Command(aliases = {"next"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
-        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
+        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors()));
     }
     
     @Command(aliases = {"map"}, desc = "View the map info for the current map")
