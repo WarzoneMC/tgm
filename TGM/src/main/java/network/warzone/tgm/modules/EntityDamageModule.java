@@ -32,7 +32,7 @@ public class EntityDamageModule extends MatchModule implements Listener {
                 Player damaged = (Player) event.getHitEntity();
                 MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeam(damaged);
                 if (team != null && !team.isSpectator()) {
-                    ((Player) shooter).sendActionBar(team.getColor() + damaged.getName() + ChatColor.DARK_GRAY + " [" + ChatColor.WHITE + damaged.getHealth() + ChatColor.GRAY + "/" + damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() + ChatColor.DARK_GRAY + "]");
+                    ((Player) shooter).sendActionBar(team.getColor() + damaged.getName() + ChatColor.DARK_GRAY + " [" + ChatColor.WHITE + (int)damaged.getHealth() + ChatColor.GRAY + "/" + damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() + ChatColor.DARK_GRAY + "]");
                 }
             }
         }
