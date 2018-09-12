@@ -156,7 +156,7 @@ public class BuildFilterType implements FilterType, Listener {
         }
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPistonExtend(BlockPistonExtendEvent event) {
         if (!event.isCancelled()) {
             FilterResult filterResult = evaluator.evaluate();
@@ -176,9 +176,9 @@ public class BuildFilterType implements FilterType, Listener {
                 }
             }
         }
-    }
+    }*/
 
-    @EventHandler
+    /*@EventHandler
     public void onPistonRetract(BlockPistonRetractEvent event) {
         if (!event.isCancelled()) {
             FilterResult filterResult = evaluator.evaluate();
@@ -198,6 +198,6 @@ public class BuildFilterType implements FilterType, Listener {
                 }
             }
         }
-    }
+    }*/
 
 }
