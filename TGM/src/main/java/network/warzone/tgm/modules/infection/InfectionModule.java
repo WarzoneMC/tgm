@@ -197,6 +197,7 @@ public class InfectionModule extends MatchModule implements Listener {
         if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
             event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
         }
+        event.getPlayer().setGameMode(GameMode.ADVENTURE);
     }
 
     public void broadcastMessage(String msg) {
