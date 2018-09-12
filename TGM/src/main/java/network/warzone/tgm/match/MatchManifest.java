@@ -1,6 +1,7 @@
 package network.warzone.tgm.match;
 
 import network.warzone.tgm.modules.*;
+import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
@@ -70,7 +71,7 @@ public abstract class MatchManifest {
         modules.add(new KillstreakModule());
         modules.add(new StatsModule());
         modules.add(new PortalLoaderModule());
-
+        modules.add(new WorldBorderModule());
         return modules;
     }
 }
