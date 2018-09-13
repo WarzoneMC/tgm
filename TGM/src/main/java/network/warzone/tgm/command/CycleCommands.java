@@ -206,9 +206,12 @@ public class CycleCommands {
                     found = mapContainer;
                 }
             }
-            for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-                if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
-                    found = mapContainer;
+            
+            if (found == null) {
+                for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
+                    if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
+                        found = mapContainer;
+                    }
                 }
             }
 
