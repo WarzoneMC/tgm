@@ -85,6 +85,21 @@ public class FilterManagerModule extends MatchModule {
             String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
 
             filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
+        } else if (type.equals("disable-bow")) {
+            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
+            List<Region> regions = new ArrayList<>();
+
+            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+                if (region != null) {
+                    regions.add(region);
+                }
+            }
+
+            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
+            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+
+            filterTypes.add(new DisableBowFilterType(matchTeams, regions, filterEvaluator, message));
         } else if (type.equals("leave")) {
             List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
             List<Region> regions = new ArrayList<>();
