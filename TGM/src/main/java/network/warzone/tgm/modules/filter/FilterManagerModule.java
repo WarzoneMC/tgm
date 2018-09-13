@@ -85,7 +85,7 @@ public class FilterManagerModule extends MatchModule {
             String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
 
             filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("disable-bow")) {
+        } else if (type.equals("use-bow")) {
             List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
             List<Region> regions = new ArrayList<>();
 
