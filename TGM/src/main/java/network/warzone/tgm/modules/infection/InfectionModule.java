@@ -61,6 +61,7 @@ public class InfectionModule extends MatchModule implements Listener {
             for (int i = 0; i < zombies; i++) {
                 PlayerContext player = teamManager.getTeamById("humans").getMembers().get(new Random().nextInt(teamManager.getTeamById("humans").getMembers().size()));
                 broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
+                player.getPlayer().setGameMode(GameMode.ADVENTURE);
 
                 infect(player.getPlayer());
                 freeze(player.getPlayer());
@@ -77,49 +78,12 @@ public class InfectionModule extends MatchModule implements Listener {
     private MatchTeam getWinningTeam() {
         return teamManager.getTeamByAlias("humans");
     }
-//    @EventHandler
-//    public void onPlayerDeath(PlayerDeathEvent event) {
-//        // If the player isn't on the spectator team, they must be either human or infected.
-//        if (!teamManager.getTeam(event.getPlayer()).getId().equals("spectators")) {
-//
-//            // "infected" = zombie team; "humans" = human team;
-//            if (teamManager.getTeam(event.getPlayer()).getId().equals("humans")) {
-//                // Now to determine if the user got infected by a player, or died because of anything else (still infected).
-//                if (event instanceof PlayerDeathByPlayerEvent) {
-//                    broadcastMessage(String.format("%s%s &7has been infected by %s%s",
-//                            teamManager.getTeam(event.getPlayer()).getColor(),
-//                            event.getPlayer().getName(),
-//                            teamManager.getTeam(((PlayerDeathByPlayerEvent) event).getCause()).getColor(),
-//                            ((PlayerDeathByPlayerEvent) event).getCause().getName()));
-//
-//                } else {
-//                    broadcastMessage(String.format("%s%s &7has been taken by the environment",
-//                            teamManager.getTeam(event.getPlayer()).getColor(),
-//                            event.getPlayer().getName()));
-//                }
-//
-//                infect(event.getPlayer());
-//            } else if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
-//                if (event instanceof PlayerDeathByPlayerEvent) {
-//                    if (teamManager.getTeam(((PlayerDeathByPlayerEvent) event).getCause()).getId().equalsIgnoreCase("infected")) {
-//                        return;
-//                    }
-//                    broadcastMessage(String.format("%s%s &7has been slain by %s%s",
-//                            teamManager.getTeam(event.getPlayer()).getColor(),
-//                            event.getPlayer().getName(),
-//                            teamManager.getTeam(((PlayerDeathByPlayerEvent) event).getCause()).getColor(),
-//                            ((PlayerDeathByPlayerEvent) event).getCause().getName()
-//                            ));
-//                }
-//            }
-//
-//        }
-//    }
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         Player player = (Player) event.getEntity();
+        if (!(event.getDamager() instanceof Player)) return; // Can't assume the damager is a player
         Player killer = (Player) event.getDamager();
 
         if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManager.getTeam(player).isSpectator() ||
@@ -197,6 +161,7 @@ public class InfectionModule extends MatchModule implements Listener {
         if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
             event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
         }
+        event.getPlayer().setGameMode(GameMode.ADVENTURE);
     }
 
     public void broadcastMessage(String msg) {
@@ -218,6 +183,8 @@ public class InfectionModule extends MatchModule implements Listener {
         if (event.getTeam().getId().equalsIgnoreCase("infected")) {
             event.getPlayerContext().getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
         }
+
+        event.getPlayerContext().getPlayer().setGameMode(GameMode.ADVENTURE);
     }
 
     @EventHandler
@@ -238,6 +205,7 @@ public class InfectionModule extends MatchModule implements Listener {
         if (teamManager.getTeamById("humans").getMembers().size() > 0)
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
         player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
+        player.setGameMode(GameMode.ADVENTURE);
     }
 
     public void freeze(Player player) {
