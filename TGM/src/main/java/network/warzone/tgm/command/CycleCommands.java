@@ -202,7 +202,7 @@ public class CycleCommands {
         if (cmd.argsLength() > 0) {
             MapContainer found = null;
             for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-                if (mapContainer.getMapInfo().getName().equalsIgnoreCase(cmd.getJoinedStrings(0))) {
+                if (mapContainer.getMapInfo().getName().equalsIgnoreCase(cmd.getJoinedStrings(0).toLowerCase())) {
                     found = mapContainer;
                 }
             }
