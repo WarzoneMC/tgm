@@ -26,7 +26,7 @@ public class DisableBowFilterType implements FilterType, Listener {
     private final String message;
  
     @EventHandler
-    public void onShootBow(ShootBowEvent event) {
+    public void onPlayerShootArrow(EntityShootBowEvent event) {
         for (Region region : regions) {
             if (region.contains(event.getBow().getLocation())) {
                 for (MatchTeam matchTeam : teams) {
