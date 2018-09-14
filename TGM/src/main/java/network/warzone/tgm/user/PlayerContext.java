@@ -27,35 +27,32 @@ public class PlayerContext {
 
         if (level < 10) {
             return ChatColor.GRAY + "[" + level + "]";
-        }
-        else if (level < 20) {
-            return ChatColor.DARK_AQUA + "[" + level + "]";
-        }
-        else if (level < 30) {
-            return ChatColor.BLUE + "[" + level + "]";
-        }
-        else if (level < 40) {
-            return ChatColor.LIGHT_PURPLE + "[" + level + "]";
-        }
-        else if (level < 60) {
-            return ChatColor.DARK_PURPLE + "[" + level + "]";
-        }
-        else if (level < 80) {
-            return ChatColor.DARK_RED + "[" + level + "]";
-        }
-        else if (level < 100) {
+        } else if (level < 20) {
             return ChatColor.RED + "[" + level + "]";
-        }
-        else if (level < 120) {
-            return ChatColor.GOLD + "[" + level + "]";
-        }
-        else if (level < 140) {
+        } else if (level < 30) {
             return ChatColor.YELLOW + "[" + level + "]";
-        }
-        else if (level < 160) {
+        } else if (level < 40) {
             return ChatColor.GREEN + "[" + level + "]";
-        } else {
+        } else if (level < 50) {
+            return ChatColor.LIGHT_PURPLE + "[" + level + "]";
+        } else if (level < 70) {
+            return ChatColor.AQUA + "[" + level + "]";
+        } else if (level < 90) {
+            return ChatColor.GOLD + "[" + level + "]";
+        } else if (level < 100) {
+            return ChatColor.WHITE + "[" + level + "]";
+        } else if (level < 110) {
             return ChatColor.DARK_GREEN + "[" + level + "]";
+        } else if (level < 130) {
+            return ChatColor.DARK_RED + "[" + level + "]";
+        } else if (level < 150) {
+            return ChatColor.DARK_PURPLE + "[" + level + "]";
+        } else if (level < 170) {
+            return ChatColor.DARK_BLUE + "[" + level + "]";
+        } else if (level < 200) {
+            return ChatColor.BLACK + "[" + level + "]";
+        } else {
+            return ChatColor.DARK_AQUA + "[" + level + "]";
         }
     }
 
