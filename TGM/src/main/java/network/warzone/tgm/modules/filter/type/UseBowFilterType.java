@@ -18,7 +18,7 @@ import java.util.List;
  */
 
 @AllArgsConstructor @Getter
-public class DisableBowFilterType implements FilterType, Listener {
+public class UseBowFilterType implements FilterType, Listener {
 
     private final List<MatchTeam> teams;
     private final List<Region> regions;
