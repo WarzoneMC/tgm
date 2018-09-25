@@ -120,6 +120,7 @@ public class InfectionModule extends MatchModule implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
         Player player = (Player) event.getEntity();
+        if (!(event.getDamager() instanceof Player)) return; // Can't assume the damager is a player
         Player killer = (Player) event.getDamager();
 
         if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManager.getTeam(player).isSpectator() ||
@@ -197,6 +198,7 @@ public class InfectionModule extends MatchModule implements Listener {
         if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
             event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
         }
+        event.getPlayer().setGameMode(GameMode.ADVENTURE);
     }
 
     public void broadcastMessage(String msg) {
