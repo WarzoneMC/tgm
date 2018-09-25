@@ -513,36 +513,38 @@ public class CycleCommands {
 
     @Command(aliases = {"stats", "stat"}, desc = "View your stats.")
     public static void stats(final CommandContext cmd, CommandSender sender) {
-        Player player = (Player) sender;
-
         if (cmd.argsLength() == 0) {
-            viewStats(player, player.getName());
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.RED + "Consoles don't have stats.");
+                return;
+            }
+            viewStats(sender, sender.getName());
         } else {
-            viewStats(player, cmd.getString(0));
+            viewStats(sender, cmd.getString(0));
         }
     }
 
-    public static void viewStats(Player player, String target) {
+    public static void viewStats(CommandSender sender, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
-            player.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
+            sender.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
             return;
         }
 
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
-        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
-        player.sendMessage("");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
-        player.sendMessage("");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
-        player.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
-        player.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + targetUser.getUserProfile().getKDR());
-        player.sendMessage("");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
-        player.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());
-        player.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
-        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
+        sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + targetUser.getUserProfile().getKDR());
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
+        sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
     }
 
 
