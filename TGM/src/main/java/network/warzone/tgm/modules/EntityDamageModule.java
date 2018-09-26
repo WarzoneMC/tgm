@@ -32,8 +32,9 @@ public class EntityDamageModule extends MatchModule implements Listener {
             }
         }
         if (event.getEntityType() != EntityType.FISHING_HOOK &&
-            event.getEntityType() != EntityType.SNOWBALL &&
-            event.getEntityType() != EntityType.EGG) return;
+                event.getEntityType() != EntityType.SNOWBALL &&
+                event.getEntityType() != EntityType.SPLASH_POTION &&
+                event.getEntityType() != EntityType.EGG) return;
         if (event.getHitEntity() instanceof Damageable) {
             ((Damageable) event.getHitEntity()).damage(0.01, (Player) shooter);
         }
