@@ -17,7 +17,7 @@ import java.util.List;
  */
 
 @AllArgsConstructor @Getter
-public class ShearFilterType implements FilterType, Listener {
+public class UseShearFilterType implements FilterType, Listener {
 
     private final List<MatchTeam> teams;
     private final List<Region> regions;
