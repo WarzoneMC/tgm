@@ -114,11 +114,7 @@ public class FilterManagerModule extends MatchModule {
             FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
             String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
 
-            filterTypes.add(new UseShearFilterType(matchTeams, regions, filterEvaluator, message));
-            
-          }
-            
-            
+            filterTypes.add(new UseShearFilterType(matchTeams, regions, filterEvaluator, message));     
         } else if (type.equals("leave")) {
             List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
             List<Region> regions = new ArrayList<>();
