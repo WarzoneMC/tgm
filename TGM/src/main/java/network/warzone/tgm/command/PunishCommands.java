@@ -38,7 +38,7 @@ public class PunishCommands {
 
         TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -62,7 +62,7 @@ public class PunishCommands {
 
         TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -88,7 +88,7 @@ public class PunishCommands {
 
         TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -381,7 +381,7 @@ public class PunishCommands {
                 s.equalsIgnoreCase("forever") ||
                 s.equalsIgnoreCase("f") ||
                 s.equalsIgnoreCase("-1")) return new TimeUnitPair(1, ChronoUnit.FOREVER);
-        ChronoUnit timeUnit = ChronoUnit.SECONDS;
+        ChronoUnit timeUnit;
 
         String time = "";
         String unit = "";
@@ -397,6 +397,7 @@ public class PunishCommands {
             }
         }
         timeUnit = getTimeUnit(unit);
+        if (timeUnit == null) return null;
         return new TimeUnitPair(Integer.valueOf(time), timeUnit);
     }
 
@@ -407,7 +408,7 @@ public class PunishCommands {
                 return timeUnit;
             }
         }
-         return ChronoUnit.SECONDS;
+         return null;
     }
 
     @AllArgsConstructor @Getter
