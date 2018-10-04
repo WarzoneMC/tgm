@@ -24,6 +24,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -229,6 +230,10 @@ public class CycleCommands {
     
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
         MatchManager matchManager = TGM.get().getMatchManager();
         GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
@@ -297,7 +302,7 @@ public class CycleCommands {
     @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
     public static void teleport(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command,");
+            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
             return;
         }
         Player player = (Player) sender;
@@ -426,6 +431,10 @@ public class CycleCommands {
 
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
         if (cmd.argsLength() > 0) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
             TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, cmd.getJoinedStrings(0));
@@ -533,12 +542,12 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
             return;
         }
-
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
+        sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + targetUser.getUserProfile().getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(targetUser.getUserProfile().getLevel() + 1) + " (approx.)");
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
         sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());

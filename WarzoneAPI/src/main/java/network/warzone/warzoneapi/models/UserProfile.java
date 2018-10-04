@@ -170,4 +170,9 @@ public class UserProfile {
         }
         else return null;
     }
+
+    public static int getRequiredXP(int level) {
+        return (int)Math.floor(Math.pow((level - 1) / 0.6, 2));
+    }
+
 }
