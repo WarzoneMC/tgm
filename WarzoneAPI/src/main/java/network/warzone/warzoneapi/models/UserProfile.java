@@ -172,7 +172,7 @@ public class UserProfile {
     }
 
     public static int getRequiredXP(int level) {
-        return (int)Math.floor(Math.pow((level - 1) / 0.6, 2));
+        return (int) Math.round(Math.pow((level - 1)/0.6, 2) + 0.49);
     }
 
 }
