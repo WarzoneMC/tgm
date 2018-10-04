@@ -574,6 +574,7 @@ public class CycleCommands {
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
         TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
+        TGM.get().getServer().broadcastMessage(ChatColor.LIGHT_PURPLE + player.getName() + ChatColor.WHITE + " joined " + matchTeam.getColor() + ChatColor.BOLD + matchTeam.getAlias());
     }
 
 }
