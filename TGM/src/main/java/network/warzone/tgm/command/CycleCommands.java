@@ -24,6 +24,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -41,61 +42,74 @@ public class CycleCommands {
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
-        int pages = (int) Math.ceil((mapLibrary.size() + 7) / 9);
+
+        int pageSize = 9;
+
+        int pagesRemainder = mapLibrary.size() % pageSize;
+        int pagesDivisible = mapLibrary.size() / pageSize;
+        int pages = pagesDivisible;
+
+        if(pagesRemainder >= 1) {
+            pages = pagesDivisible + 1;
+        }
 
         if ((index > pages) || (index <= 0)) {
             index = 1;
         }
         sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
-        String[] maps = {"", "", "", "", "", "", "", "", ""};
+        for (int i = 0; i < pageSize; i++) {
+            int position = pageSize * (index - 1) + i;
+            MapContainer map = mapLibrary.get(position);
+            String mapName = ChatColor.GOLD + map.getMapInfo().getName();
 
-        try {
-            for (int i = 0; i <= maps.length - 1; i++) {
-                int position = 9 * (index - 1) + i;
-                MapContainer map = mapLibrary.get(position);
-                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
-
-                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
-                } else {
-                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
-                }
-                TextComponent message = new TextComponent(maps[i]);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
-                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
-                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
-                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
-
-                sender.spigot().sendMessage(message);
+            if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+                mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
+            } else {
+                mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
             }
-        } catch (IndexOutOfBoundsException ignored) { }
+            TextComponent message = new TextComponent(mapName);
+            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
+            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
+                    .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
+                    .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
+                    .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
+
+            sender.spigot().sendMessage(message);
+        }
     }
 
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
     public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
-        int pages = (int) Math.ceil((rotation.size() + 7) / 9);
+
+        int pageSize = 9;
+
+        int pagesRemainder = rotation.size() % pageSize;
+        int pagesDivisible = rotation.size() / pageSize;
+        int pages = pagesDivisible;
+
+        if(pagesRemainder >= 1) {
+            pages = pagesDivisible + 1;
+        }
 
         if ((index > pages) || (index <= 0)) {
             index = 1;
         }
         sender.sendMessage(ChatColor.YELLOW + "Rotation (" + index + "/" + pages + "): ");
-        String[] maps = {"", "", "", "", "", "", "", "", ""};
 
         try {
-            for (int i = 0; i <= maps.length - 1; i++) {
+            for (int i = 0; i < pageSize; i++) {
                 int position = 9 * (index - 1) + i;
                 MapContainer map = rotation.get(position);
-                maps[i] = maps[i] + ChatColor.GOLD + map.getMapInfo().getName();
+                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
 
                 if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    maps[i] = ChatColor.GREEN + "" + (position + 1) + ". " + maps[i];
+                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
                 } else {
-                    maps[i] = ChatColor.WHITE + "" + (position + 1) + ". " + maps[i];
+                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
                 }
-                TextComponent message = new TextComponent(maps[i]);
+                TextComponent message = new TextComponent(mapName);
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rotation.get(position).getMapInfo().getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + rotation.get(position).getMapInfo().getName()).append("\n\n")
                         .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(rotation.get(position).getMapInfo().getAuthors())).append("\n")
@@ -121,6 +135,7 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
+            sender.sendMessage(ChatColor.GREEN + "Cycling in " + time + " seconds.");
             TGM.get().getModule(CycleCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "A match is currently in progress.");
@@ -140,7 +155,8 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-            TGM.get().getModule(StartCountdown.class).start(time);
+          sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " seconds.");
+          TGM.get().getModule(StartCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -157,8 +173,10 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                     return;
                 }
+                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
+              sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 if (cmd.hasFlag('f')) {
                     TGM.get().getMatchManager().endMatch(null);
                 } else {
@@ -189,14 +207,17 @@ public class CycleCommands {
                     found = mapContainer;
                 }
             }
-            for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-                if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
-                    found = mapContainer;
+            
+            if (found == null) {
+                for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
+                    if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
+                        found = mapContainer;
+                    }
                 }
             }
 
             if (found == null) {
-                sender.sendMessage(ChatColor.RED + "Map not found. \"" + cmd.getJoinedStrings(0) + "\"");
+                sender.sendMessage(ChatColor.RED + "Map not found \"" + cmd.getJoinedStrings(0) + "\"");
                 return;
             }
 
@@ -206,9 +227,13 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "/sn <map_name>");
         }
     }
-
+    
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
         MatchManager matchManager = TGM.get().getMatchManager();
         GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
@@ -241,7 +266,7 @@ public class CycleCommands {
             MatchTeam matchTeam = teamManager.getTeamFromInput(cmd.getJoinedStrings(0));
 
             if (matchTeam == null) {
-                sender.sendMessage(ChatColor.RED + "Unable to find team." + cmd.getJoinedStrings(0) + "\"");
+                sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                 return;
             }
 
@@ -272,12 +297,12 @@ public class CycleCommands {
 
             attemptJoinTeam((Player) sender, matchTeam, false);
         }
-    } 
-    
-   @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
+    }
+
+    @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
     public static void teleport(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command,");
+            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
             return;
         }
         Player player = (Player) sender;
@@ -302,6 +327,7 @@ public class CycleCommands {
             player.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
         }
     }
+
     @Command(aliases = {"team"}, desc = "Manage teams.")
     @CommandPermissions({"tgm.team"})
     public static void team(CommandContext cmd, CommandSender sender) {
@@ -373,7 +399,7 @@ public class CycleCommands {
         TGM.get().getMatchManager().getMapRotation().refresh();
         sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
     }
-    
+
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
@@ -405,19 +431,23 @@ public class CycleCommands {
 
     @Command(aliases = {"t", "tc", "teamchat"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
         if (cmd.argsLength() > 0) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
             TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, cmd.getJoinedStrings(0));
         }
     }
 
-    @Command(aliases = {"next", "nextup"}, desc = "View the next map in the rotation.")
+    @Command(aliases = {"next", "nextup"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
-        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
+        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors()));
     }
     
-    @Command(aliases = {"map"}, desc = "View the map info for the current map.")
+    @Command(aliases = {"map"}, desc = "View the map info for the current map")
     public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
         sender.sendMessage(ChatColor.GRAY + "Currently playing " + ChatColor.YELLOW + info.getGametype() + ChatColor.GRAY + " on map " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
@@ -429,7 +459,7 @@ public class CycleCommands {
             ChatColor timeColor = ChatColor.GREEN;
             MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
             if (matchStatus == MatchStatus.PRE) {
-                timeColor = ChatColor.GOLDDARK_AQUA;
+                timeColor = ChatColor.GOLD;
             } else if (matchStatus == MatchStatus.POST) {
                 timeColor = ChatColor.RED;
             }
@@ -495,36 +525,38 @@ public class CycleCommands {
 
     @Command(aliases = {"stats", "stat"}, desc = "View your stats.")
     public static void stats(final CommandContext cmd, CommandSender sender) {
-        Player player = (Player) sender;
-
         if (cmd.argsLength() == 0) {
-            viewStats(player, player.getName());
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.RED + "Consoles don't have stats.");
+                return;
+            }
+            viewStats(sender, sender.getName());
         } else {
-            viewStats(player, cmd.getString(0));
+            viewStats(sender, cmd.getString(0));
         }
     }
 
-    public static void viewStats(Player player, String target) {
+    public static void viewStats(CommandSender sender, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
-            player.sendMessage(ChatColor.DARK_RED + "Unable to find online player. " + ChatColor.RED + target);
+            sender.sendMessage(ChatColor.DARK_RED + "Unable to find online player " + ChatColor.RED + target);
             return;
         }
-
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
-        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
-        player.sendMessage("");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
-        player.sendMessage("");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
-        player.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
-        player.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + targetUser.getUserProfile().getKDR());
-        player.sendMessage("");
-        player.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
-        player.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());
-        player.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
-        player.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
+        sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
+        sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + targetUser.getUserProfile().getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(targetUser.getUserProfile().getLevel() + 1) + " (approx.)");
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + targetUser.getUserProfile().getKDR());
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
+        sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
     }
 
 
@@ -548,9 +580,3 @@ public class CycleCommands {
                 return;
             }
         }
-
-        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
-    }
-
-}
