@@ -10,6 +10,7 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.PublicMenu;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
@@ -215,6 +216,9 @@ public class SpectatorModule extends MatchModule implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player && isSpectating((Player) event.getWhoClicked())) {
+            if (event.getWhoClicked().isOp()) return;
+            UserProfile profile = TGM.get().getPlayerManager().getPlayerContext((Player)event.getWhoClicked()).getUserProfile();
+            if (profile.isStaff()) return;
             event.setCancelled(true);
         }
     }

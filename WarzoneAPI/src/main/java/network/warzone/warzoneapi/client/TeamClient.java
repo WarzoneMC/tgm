@@ -15,6 +15,8 @@ public interface TeamClient {
      */
     void heartbeat(Heartbeat heartbeat);
 
+    GetPlayerByNameResponse player(String name);
+
     /**
      * Called when a player logs into the server.
      */
