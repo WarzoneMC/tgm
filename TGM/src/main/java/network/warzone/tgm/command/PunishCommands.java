@@ -183,7 +183,7 @@ public class PunishCommands {
         String id = cmd.getString(0);
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             RevertPunishmentResponse revertPunishmentResponse = TGM.get().getTeamClient().revertPunishment(id);
-            if (revertPunishmentResponse.isNotFound()) {
+            if (revertPunishmentResponse == null || revertPunishmentResponse.isNotFound()) {
                 sender.sendMessage(ChatColor.RED + "Punishment not found.");
             } else {
                 java.util.Map<ObjectId, String> userMappings = new HashMap<>();
