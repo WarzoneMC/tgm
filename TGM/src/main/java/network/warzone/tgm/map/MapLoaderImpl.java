@@ -18,7 +18,8 @@ public class MapLoaderImpl implements MapLoader {
     public List<MapContainer> loadMaps(File folder) {
         List<MapContainer> maps = new ArrayList<>();
 
-        for (File child : folder.listFiles()) {
+        File[] children = folder.listFiles();
+        if (children != null) for (File child : children) {
             if (child.isDirectory()) {
                 if (isMapFolder(child)) {
                     File mapJsonFile = new File(child, "map.json");
