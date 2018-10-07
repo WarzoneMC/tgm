@@ -294,6 +294,10 @@ public class HttpClient implements TeamClient {
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid ObjectID: " + id);
+            e.printStackTrace();
+            return null;
         }
     }
 
