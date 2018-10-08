@@ -10,7 +10,6 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.Menu;
-import network.warzone.tgm.util.menu.MenuAction;
 import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.PublicMenu;
 import network.warzone.warzoneapi.models.UserProfile;
@@ -258,7 +257,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 MatchTeam spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
                 List<Player> players = new ArrayList<>();
                 for (MatchTeam team : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-                    if (team == spectators) continue;
+                    if (team.equals(spectators)) continue;
                     players.addAll(team.getMembers().stream().map(PlayerContext::getPlayer).collect(Collectors.toList()));
                 }
                 int size = Math.min((int)Math.round((float)players.size() / 9.0) * 9, 54);
