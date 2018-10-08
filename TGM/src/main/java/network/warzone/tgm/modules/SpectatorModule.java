@@ -298,6 +298,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                           if (player.isOnline()) clicker.teleport(player);
                         });
                 i++;
+                if (i >= size) break;
               }
               teleportMenu.open(event.getPlayer());
             }
