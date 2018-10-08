@@ -23,7 +23,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
@@ -140,11 +139,6 @@ public class ChatModule extends MatchModule implements Listener {
         channels.remove(event.getPlayer().getUniqueId().toString());
     }
 
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
-        channels.remove(event.getPlayer().getUniqueId().toString());
-    }
-
     private void sendMutedMessage(Player player, Punishment punishment) {
         player.sendMessage(ChatColor.RED + "You have been muted for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + ( punishment.getExpires() >= 0 ? ChatColor.RED + " until " + ChatColor.GRAY + new Date(punishment.getExpires()).toString() : "") + ChatColor.RED + ".");
     }
@@ -162,6 +156,7 @@ public class ChatModule extends MatchModule implements Listener {
                 TextComponent message = new TextComponent(event.getFormat().replaceAll("%%", "%"));
                 BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString().replace("[", "").replace("]", "")),
                         new TextComponent("\n"),
+                        new TextComponent("\n" + ChatColor.AQUA + "XP: " + ChatColor.RESET + playerContext.getUserProfile().getXP()),
                         new TextComponent("\n" + ChatColor.AQUA + "Kills: " + ChatColor.RESET + playerContext.getUserProfile().getKills()),
                         new TextComponent("\n" + ChatColor.AQUA + "Deaths: " + ChatColor.RESET + playerContext.getUserProfile().getDeaths()),
                         new TextComponent("\n" + ChatColor.AQUA + "K/D: " + ChatColor.RESET + playerContext.getUserProfile().getKDR()),
