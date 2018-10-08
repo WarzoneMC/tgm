@@ -1,8 +1,6 @@
 package network.warzone.tgm.util.itemstack;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.SkullType;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -121,7 +119,12 @@ public class ItemFactory {
     public static ItemStack getPlayerSkull(String name) {
         ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
-        meta.setOwner(name);
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+        if (offlinePlayer != null) {
+            meta.setOwningPlayer(offlinePlayer);
+        } else {
+            meta.setOwner(name);
+        }
         skull.setItemMeta(meta);
         return skull;
     }
