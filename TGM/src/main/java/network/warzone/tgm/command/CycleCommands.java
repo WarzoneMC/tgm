@@ -17,6 +17,7 @@ import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.ffa.FFAModule;
+import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
@@ -24,7 +25,6 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
-import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -300,6 +300,32 @@ public class CycleCommands {
         }
     }
 
+    @Command(aliases = {"killstreak", "ks"}, desc = "See your current killstreak")
+    public static void killstreak(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can use this command");
+            return;
+        }
+        Player player = (Player) sender;
+        String playerUUID = player.getUniqueId().toString();
+
+        MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
+        int killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(playerUUID);
+
+        if (matchTeam != null) {
+            if (killstreak == 0 || matchTeam.isSpectator()) {
+                sender.sendMessage(ChatColor.RED + "You aren't on a killstreak.");
+                return;
+            } else {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou're on a kill streak of &2" + killstreak + "&a kill" + (String.valueOf(killstreak).endsWith("1") ? "" : "s") + "."));
+                return;
+            }
+        } else {
+            player.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
+            return;
+        }
+    }
+
     @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
     public static void teleport(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
@@ -540,28 +566,7 @@ public class CycleCommands {
     public static void viewStats(CommandSender sender, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
-            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                GetPlayerByNameResponse response = TGM.get().getTeamClient().player(target);
-                if (response == null || response.getUser() == null) {
-                    sender.sendMessage(ChatColor.RED + "Player not found!");
-                    return;
-                }
-                UserProfile up = response.getUser();
-                sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + up.getName());
-                sender.sendMessage("");
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + up.getLevel());
-                sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + up.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(up.getLevel() + 1) + " (approx.)");
-                sender.sendMessage("");
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + up.getKills());
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + up.getDeaths());
-                sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + up.getKDR());
-                sender.sendMessage("");
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + up.getWins());
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + up.getLosses());
-                sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + up.getWLR());
-                sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-            });
+            sender.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
             return;
         }
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
