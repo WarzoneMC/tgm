@@ -48,6 +48,9 @@ public class SpectatorModule extends MatchModule implements Listener {
     private final ItemStack leatherHelmet;
 
     private int teamSelectionRunnable;
+    private int afkTimerRunnable;
+
+    private Map<UUID, Long> lastMovement = new HashMap<>();
 
     public SpectatorModule() {
         this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
@@ -64,7 +67,9 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        this.spectators = match.getModule(TeamManagerModule.class).getSpectators();
+        TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
+
+        this.spectators = teamManagerModule.getSpectators();
 
         /**
          * Only assign the menu actions once. No need to update these every second.
@@ -72,7 +77,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         teamSelectionMenu.setItem(0, null, player -> player.performCommand("join"));
 
         int slot = 2;
-        for (MatchTeam matchTeam : match.getModule(TeamManagerModule.class).getTeams()) {
+        for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
             if (matchTeam.isSpectator()) {
                 teamSelectionMenu.setItem(8, null, player -> player.performCommand("join spectators"));
             } else {
@@ -90,7 +95,7 @@ public class SpectatorModule extends MatchModule implements Listener {
             int totalMatchMaxSize = 0;
 
             int i = 2;
-            for (MatchTeam matchTeam : match.getModule(TeamManagerModule.class).getTeams()) {
+            for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
                 if (matchTeam.isSpectator()) {
                     ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
                     LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
@@ -119,6 +124,18 @@ public class SpectatorModule extends MatchModule implements Listener {
                     i++;
                 }
             }
+
+            afkTimerRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (isSpectating(player)) continue;
+                    long moved = lastMovement.get(player.getUniqueId());
+                    if (moved == 0) continue;
+                    if (System.currentTimeMillis() > moved + (5 * 60 * 1000)) {
+                        teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators);
+                        lastMovement.remove(player.getUniqueId());
+                    }
+                }
+            }, 10 * 20, 10 * 20).getTaskId();
 
             ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
                     Arrays.asList("", ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
@@ -163,10 +180,14 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (isSpectating(player) && event.getTo().getY() <= -5.0) {
-            player.setAllowFlight(true);
-            player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
-            player.setFlying(true);
+        if (isSpectating(player)) {
+            if (event.getTo().getY() <= -5.0) {
+                player.setAllowFlight(true);
+                player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
+                player.setFlying(true);
+            }
+        } else if (event.getFrom().distance(event.getTo()) > 0) {
+            lastMovement.put(player.getUniqueId(), System.currentTimeMillis());
         }
     }
 
@@ -326,9 +347,16 @@ public class SpectatorModule extends MatchModule implements Listener {
         }
     }
 
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        lastMovement.remove(event.getPlayer().getUniqueId());
+    }
+
     @Override
     public void unload() {
         Bukkit.getScheduler().cancelTask(teamSelectionRunnable);
+        Bukkit.getScheduler().cancelTask(afkTimerRunnable);
+        lastMovement.clear();
         teamSelectionMenu.disable();
     }
 }
