@@ -335,8 +335,9 @@ public class CycleCommands {
         }
         Player player = (Player) sender;
         MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchTeam != null) {
-            if (matchTeam.isSpectator() || player.hasPermission("tgm.teleport")) { // allow staff to tp outside of spectator
+            if (matchTeam.isSpectator() || matchStatus == MatchStatus.POST || player.hasPermission("tgm.teleport")) { // allow staff to tp outside of spectator
                 if (cmd.argsLength() == 1) {
                     Player tpTo = Bukkit.getPlayer(cmd.getString(0));
                     if (tpTo == null) {
