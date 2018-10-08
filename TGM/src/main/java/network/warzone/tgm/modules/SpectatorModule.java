@@ -290,11 +290,16 @@ public class SpectatorModule extends MatchModule implements Listener {
                 }
                 Menu teleportMenu = new PlayerMenu(ChatColor.GRAY + "Teleport", size, event.getPlayer());
                 int i = 0;
-                players.forEach((player, teamColor) -> teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
+              for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
+                Player player = entry.getKey();
+                ChatColor teamColor = entry.getValue();
+                teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
                         clicker -> {
-                            if (player.isOnline()) clicker.teleport(player);
-                        }));
-                teleportMenu.open(event.getPlayer());
+                          if (player.isOnline()) clicker.teleport(player);
+                        });
+                i++;
+              }
+              teleportMenu.open(event.getPlayer());
             }
         }
     }
