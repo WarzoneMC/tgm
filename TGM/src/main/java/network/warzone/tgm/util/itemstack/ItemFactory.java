@@ -9,7 +9,9 @@ import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by luke on 10/17/15.
@@ -128,4 +130,22 @@ public class ItemFactory {
         skull.setItemMeta(meta);
         return skull;
     }
+
+    public static ItemStack getPlayerSkull(String name, String displayName, String... lore) {
+        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+        SkullMeta meta = (SkullMeta) skull.getItemMeta();
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+        if (offlinePlayer != null) {
+            meta.setOwningPlayer(offlinePlayer);
+        } else {
+            meta.setOwner(name);
+        }
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+        if (lore != null && lore.length > 0) {
+            meta.setLore(Arrays.stream(lore).map(str -> ChatColor.translateAlternateColorCodes('&', str)).collect(Collectors.toList()));
+        }
+        skull.setItemMeta(meta);
+        return skull;
+    }
+
 }

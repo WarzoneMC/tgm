@@ -275,7 +275,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 Menu teleportMenu = new PlayerMenu(ChatColor.GRAY + "Teleport", size, event.getPlayer());
                 for (int i = 0; i < size && i < players.size(); i++) {
                     Player player = players.get(i);
-                    teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName()),
+                    teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), "&b" + player.getName(), " ", "&fClick to teleport to " + player.getName()),
                             clicker -> {
                                 if (player.isOnline()) clicker.teleport(player);
                             });
