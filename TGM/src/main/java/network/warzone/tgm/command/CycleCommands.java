@@ -17,6 +17,7 @@ import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.ffa.FFAModule;
+import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
@@ -156,8 +157,8 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-          sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " seconds.");
-          TGM.get().getModule(StartCountdown.class).start(time);
+            sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
+            TGM.get().getModule(StartCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -297,6 +298,32 @@ public class CycleCommands {
             }
 
             attemptJoinTeam((Player) sender, matchTeam, false);
+        }
+    }
+
+    @Command(aliases = {"killstreak", "ks"}, desc = "See your current killstreak")
+    public static void killstreak(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can use this command");
+            return;
+        }
+        Player player = (Player) sender;
+        String playerUUID = player.getUniqueId().toString();
+
+        MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
+        int killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(playerUUID);
+
+        if (matchTeam != null) {
+            if (killstreak == 0 || matchTeam.isSpectator()) {
+                sender.sendMessage(ChatColor.RED + "You aren't on a killstreak.");
+                return;
+            } else {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou're on a kill streak of &2" + killstreak + "&a kill" + (killstreak == 1 ? "" : "s") + "."));
+                return;
+            }
+        } else {
+            player.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
+            return;
         }
     }
 

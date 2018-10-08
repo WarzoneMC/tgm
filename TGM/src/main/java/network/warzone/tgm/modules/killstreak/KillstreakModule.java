@@ -156,6 +156,14 @@ public class KillstreakModule extends MatchModule implements Listener {
         });
     }
 
+    public int getKillstreak(String uuid) {
+        if (!players.containsKey(uuid) || players.get(uuid) == null) {
+            return 0;
+        }
+
+        return players.get(uuid);
+    }
+
     public void unload() {
         players.clear();
         killstreaks.clear();
@@ -163,7 +171,7 @@ public class KillstreakModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        if(players.containsKey(event.getPlayerContext().getPlayer().getUniqueId().toString()) && players.get(event.getPlayerContext().getPlayer().getUniqueId().toString()) >= 5) {
+        if (players.containsKey(event.getPlayerContext().getPlayer().getUniqueId().toString()) && players.get(event.getPlayerContext().getPlayer().getUniqueId().toString()) >= 5) {
             int streakValue = players.get(event.getPlayerContext().getPlayer().getUniqueId().toString());
             event.getPlayerContext().getPlayer().sendMessage(ColorConverter.filterString("&7You have lost your kill streak of &c&l") + streakValue + ColorConverter.filterString(" &7for switching teams."));
             players.remove(event.getPlayerContext().getPlayer().getUniqueId().toString());
