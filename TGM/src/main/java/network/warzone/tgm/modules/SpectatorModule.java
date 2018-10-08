@@ -288,7 +288,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                     size /= 9;
                     size += 9;
                 }
-                Menu teleportMenu = new PlayerMenu(ChatColor.GRAY + "Teleport", size, event.getPlayer());
+                Menu teleportMenu = new PlayerMenu(ChatColor.UNDERLINE + "Teleport", size, event.getPlayer());
                 int i = 0;
               for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
                 Player player = entry.getKey();
