@@ -20,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,11 +52,6 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        players.remove(event.getPlayer());
-    }
-
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
         players.remove(event.getPlayer());
     }
 

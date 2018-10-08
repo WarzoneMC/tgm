@@ -9,6 +9,8 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.itemstack.ItemFactory;
+import network.warzone.tgm.util.menu.Menu;
+import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.PublicMenu;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
@@ -34,8 +36,11 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class SpectatorModule extends MatchModule implements Listener {
@@ -45,6 +50,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     private final ItemStack compassItem;
     private final ItemStack teamSelectionItem;
+    private final ItemStack teleportMenuItem;
+
     private final ItemStack leatherHelmet;
 
     private int teamSelectionRunnable;
@@ -53,7 +60,8 @@ public class SpectatorModule extends MatchModule implements Listener {
         this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
-        teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.YELLOW + "Team Selection");
+        teamSelectionItem = ItemFactory.createItem(Material.NETHER_STAR, ChatColor.YELLOW + "Team Selection");
+        teleportMenuItem = ItemFactory.createItem(Material.WATCH, ChatColor.YELLOW + "Player Teleport");
 
         leatherHelmet = new ItemStack(Material.LEATHER_HELMET);
         LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
@@ -140,8 +148,9 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().setCollidable(false);
 
         playerContext.getPlayer().getInventory().setHelmet(leatherHelmet);
-        playerContext.getPlayer().getInventory().setItem(0, compassItem);
-        playerContext.getPlayer().getInventory().setItem(2, teamSelectionItem);
+        playerContext.getPlayer().getInventory().setItem(2, compassItem);
+        playerContext.getPlayer().getInventory().setItem(4, teamSelectionItem);
+        playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
     }
 
     /**
@@ -239,11 +248,28 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        if (event.getItem() == null) return;
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
-
-            if (event.getItem() != null && event.getItem().isSimilar(teamSelectionItem)) {
+            if (event.getItem().isSimilar(teamSelectionItem)) {
                 teamSelectionMenu.open(event.getPlayer());
+            } else if (event.getItem().isSimilar(teleportMenuItem)) {
+                MatchTeam spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
+                List<Player> players = new ArrayList<>();
+                for (MatchTeam team : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+                    if (team.equals(spectators)) continue;
+                    players.addAll(team.getMembers().stream().map(PlayerContext::getPlayer).collect(Collectors.toList()));
+                }
+                int size = Math.min((int)Math.round((float)players.size() / 9.0) * 9, 54);
+                Menu teleportMenu = new PlayerMenu(ChatColor.GRAY + "Teleport", size, event.getPlayer());
+                for (int i = 0; i < size && i < players.size(); i++) {
+                    Player player = players.get(i);
+                    teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName()),
+                            clicker -> {
+                                if (player.isOnline()) clicker.teleport(player);
+                            });
+                }
+                teleportMenu.open(event.getPlayer());
             }
         }
     }

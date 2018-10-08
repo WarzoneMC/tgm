@@ -9,12 +9,10 @@ import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
@@ -174,11 +172,6 @@ public class KillstreakModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        players.remove(event.getPlayer().getUniqueId().toString());
-    }
-
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
         players.remove(event.getPlayer().getUniqueId().toString());
     }
 }

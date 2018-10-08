@@ -206,6 +206,7 @@ public class PunishCommands {
                             punishment.setReverted(true);
                         }
                     });
+                    sender.sendMessage(ChatColor.GREEN + "Punishment reverted.");
                 } else {
                     sender.sendMessage(ChatColor.RED + "Punishment was already reverted.");
                 }

@@ -23,7 +23,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
@@ -137,11 +136,6 @@ public class ChatModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        channels.remove(event.getPlayer().getUniqueId().toString());
-    }
-
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
         channels.remove(event.getPlayer().getUniqueId().toString());
     }
 
