@@ -2,6 +2,7 @@ package network.warzone.tgm.util.itemstack;
 
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -128,6 +129,7 @@ public class ItemFactory {
             meta.setOwner(name);
         }
         skull.setItemMeta(meta);
+        skull.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         return skull;
     }
 
@@ -145,6 +147,7 @@ public class ItemFactory {
             meta.setLore(Arrays.stream(lore).map(str -> ChatColor.translateAlternateColorCodes('&', str)).collect(Collectors.toList()));
         }
         skull.setItemMeta(meta);
+        skull.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         return skull;
     }
 
