@@ -25,6 +25,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -566,7 +567,28 @@ public class CycleCommands {
     public static void viewStats(CommandSender sender, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
-            sender.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {               sender.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
+                GetPlayerByNameResponse response = TGM.get().getTeamClient().player(target);    
+                if (response == null || response.getUser() == null) {   
+                    sender.sendMessage(ChatColor.RED + "Player not found!");    
+                    return; 
+                }   
+                UserProfile up = response.getUser();    
+                sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");    
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + up.getName()); 
+                sender.sendMessage(""); 
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + up.getLevel()); 
+                sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + up.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(up.getLevel() + 1) + " (approx.)");    
+                sender.sendMessage(""); 
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + up.getKills());   
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + up.getDeaths());   
+                sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + up.getKDR());    
+                sender.sendMessage(""); 
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + up.getWins()); 
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + up.getLosses());   
+                sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + up.getWLR());    
+                sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");    
+            });
             return;
         }
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
