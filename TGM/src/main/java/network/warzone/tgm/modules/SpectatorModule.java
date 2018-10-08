@@ -50,7 +50,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     private int teamSelectionRunnable;
     private int afkTimerRunnable;
 
-    private Map<UUID, Long> lastMovement = new HashMap<>();
+    private final Map<UUID, Long> lastMovement = new HashMap<>();
 
     public SpectatorModule() {
         this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
@@ -127,7 +127,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
             afkTimerRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (isSpectating(player)) continue;
+                    if (isSpectating(player) || !lastMovement.containsKey(player.getUniqueId())) continue;
                     long moved = lastMovement.get(player.getUniqueId());
                     if (moved == 0) continue;
                     if (System.currentTimeMillis() > moved + (5 * 60 * 1000)) {
