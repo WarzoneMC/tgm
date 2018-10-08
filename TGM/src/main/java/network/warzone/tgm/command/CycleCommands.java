@@ -156,7 +156,7 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-          sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " seconds.");
+          sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (String.valueOf(time).endsWith("1") ? "" : "s") + ".");
           TGM.get().getModule(StartCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
