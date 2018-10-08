@@ -1,7 +1,6 @@
 package network.warzone.tgm.modules;
 
 import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -13,10 +12,7 @@ import network.warzone.tgm.util.menu.Menu;
 import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.PublicMenu;
 import network.warzone.warzoneapi.models.UserProfile;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,10 +32,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ModuleData(load = ModuleLoadTime.EARLIER) @Getter
@@ -255,10 +248,11 @@ public class SpectatorModule extends MatchModule implements Listener {
                 teamSelectionMenu.open(event.getPlayer());
             } else if (event.getItem().isSimilar(teleportMenuItem)) {
                 MatchTeam spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
-                List<Player> players = new ArrayList<>();
-                for (MatchTeam team : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+                Map<Player, ChatColor> players = new HashMap<>();
+                TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+                for (MatchTeam team : teamManagerModule.getTeams()) {
                     if (team.equals(spectators)) continue;
-                    players.addAll(team.getMembers().stream().map(PlayerContext::getPlayer).collect(Collectors.toList()));
+                    players.putAll(team.getMembers().stream().collect(Collectors.toMap(PlayerContext::getPlayer, pc -> teamManagerModule.getTeam(pc.getPlayer()).getColor())));
                 }
                 if (players.size() <= 0) {
                     event.getPlayer().sendMessage(ChatColor.RED + "There are no players to teleport to!");
@@ -273,13 +267,11 @@ public class SpectatorModule extends MatchModule implements Listener {
                     size += 9;
                 }
                 Menu teleportMenu = new PlayerMenu(ChatColor.GRAY + "Teleport", size, event.getPlayer());
-                for (int i = 0; i < size && i < players.size(); i++) {
-                    Player player = players.get(i);
-                    teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), "&b" + player.getName(), " ", "&fClick to teleport to " + player.getName()),
-                            clicker -> {
-                                if (player.isOnline()) clicker.teleport(player);
-                            });
-                }
+                int i = 0;
+                players.forEach((player, teamColor) -> teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
+                        clicker -> {
+                            if (player.isOnline()) clicker.teleport(player);
+                        }));
                 teleportMenu.open(event.getPlayer());
             }
         }
