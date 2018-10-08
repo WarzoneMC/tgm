@@ -568,7 +568,6 @@ public class CycleCommands {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
             Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                sender.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
                 GetPlayerByNameResponse response = TGM.get().getTeamClient().player(target);    
                 if (response == null || response.getUser() == null) {   
                     sender.sendMessage(ChatColor.RED + "Player not found!");    
