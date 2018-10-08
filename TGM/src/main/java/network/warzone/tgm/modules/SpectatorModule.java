@@ -260,6 +260,10 @@ public class SpectatorModule extends MatchModule implements Listener {
                     if (team.equals(spectators)) continue;
                     players.addAll(team.getMembers().stream().map(PlayerContext::getPlayer).collect(Collectors.toList()));
                 }
+                if (players.size() <= 0) {
+                    event.getPlayer().sendMessage(ChatColor.RED + "There are no players to teleport to!");
+                    return;
+                }
                 int size = Math.min((int)Math.round((float)players.size() / 9.0) * 9, 54);
                 Menu teleportMenu = new PlayerMenu(ChatColor.GRAY + "Teleport", size, event.getPlayer());
                 for (int i = 0; i < size && i < players.size(); i++) {
