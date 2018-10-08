@@ -2,6 +2,7 @@ package network.warzone.tgm.modules;
 
 import lombok.Getter;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -345,6 +346,11 @@ public class SpectatorModule extends MatchModule implements Listener {
         if  (event.getTarget() instanceof Player && isSpectating((Player) event.getTarget())) {
             event.setTarget(null);
         }
+    }
+
+    @EventHandler
+    public void onMatchJoin(MatchJoinEvent event) {
+        lastMovement.put(event.getPlayerContext().getPlayer().getUniqueId(), System.currentTimeMillis());
     }
 
     @EventHandler
