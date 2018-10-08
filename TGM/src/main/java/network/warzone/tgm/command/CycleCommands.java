@@ -157,8 +157,8 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-          sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (String.valueOf(time).endsWith("1") ? "" : "s") + ".");
-          TGM.get().getModule(StartCountdown.class).start(time);
+            sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
+            TGM.get().getModule(StartCountdown.class).start(time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -318,7 +318,7 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.RED + "You aren't on a killstreak.");
                 return;
             } else {
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou're on a kill streak of &2" + killstreak + "&a kill" + (String.valueOf(killstreak).endsWith("1") ? "" : "s") + "."));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou're on a kill streak of &2" + killstreak + "&a kill" + (killstreak == 1 ? "" : "s") + "."));
                 return;
             }
         } else {
