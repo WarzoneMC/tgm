@@ -327,6 +327,7 @@ public class PunishCommands {
     private static void kickPlayer(Punishment punishment, String name) {
             if (punishment.getType().toLowerCase().equals("ban")) {
                 if (punishment.isIp_ban()) {
+                    boolean found = false;
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         if (player.getAddress().getHostString().equals(punishment.getIp())) {
                             player.kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
@@ -335,17 +336,19 @@ public class PunishCommands {
                                             (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
                                             + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
                                             + ChatColor.GRAY + "ID: " + punishment.getId().toString());
+                            found = true;
                         }
                     }
-                } else {
-                    if (Bukkit.getPlayer(name) != null)
-                        Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
-                                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
-                                    + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
-                                    (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
-                                    + ChatColor.GRAY + "ID: " + punishment.getId().toString());
+                    if (found) return;
                 }
+                Player player;
+                if ((player = Bukkit.getPlayer(name)) != null)
+                    player.kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
+                                + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
+                                + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
+                                (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
+                                + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                                + ChatColor.GRAY + "ID: " + punishment.getId().toString());
             } else {
                 Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been kicked from the server. Reason:\n" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()));
             }
