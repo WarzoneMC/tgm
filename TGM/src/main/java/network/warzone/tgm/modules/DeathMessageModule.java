@@ -70,9 +70,9 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 }
             } else {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
-                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was killed by " +
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was slain by " +
                             killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
-                            (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the the environment");
+                            (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the environment");
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
                 }
