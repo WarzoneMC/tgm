@@ -120,7 +120,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
     private void broadcastDeathMessage(Player dead, Player killer, String message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
 
-            /* TODO make look better and also fix
+             //TODO make look better and also fix
             //bold messages when the player is involved
             if (dead == player || (killer != null && killer == player)) {
                 message = message.replaceAll(dead.getName() + ChatColor.GRAY, ChatColor.BOLD + dead.getName() + ChatColor.GRAY + ChatColor.BOLD);
@@ -132,7 +132,6 @@ public class DeathMessageModule extends MatchModule implements Listener {
                     }
                 }
             }
-            */
 
             player.getPlayer().sendMessage(message);
         }
