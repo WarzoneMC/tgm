@@ -240,9 +240,6 @@ public class SpectatorModule extends MatchModule implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player && isSpectating((Player) event.getWhoClicked())) {
-            if (event.getWhoClicked().isOp()) return;
-            UserProfile profile = TGM.get().getPlayerManager().getPlayerContext((Player)event.getWhoClicked()).getUserProfile();
-            if (profile.isStaff()) return;
             event.setCancelled(true);
         }
     }
