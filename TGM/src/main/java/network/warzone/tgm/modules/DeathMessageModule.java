@@ -123,12 +123,12 @@ public class DeathMessageModule extends MatchModule implements Listener {
              //TODO make look better and also fix
             //bold messages when the player is involved
             if (dead == player || (killer != null && killer == player)) {
-                message = message.replaceAll(dead.getName() + ChatColor.GRAY, ChatColor.BOLD + dead.getName() + ChatColor.GRAY + ChatColor.BOLD);
+                message = message.replace(dead.getName() + ChatColor.GRAY, ChatColor.BOLD + dead.getName() + ChatColor.GRAY + ChatColor.BOLD);
                 if (killer != null) {
                     if (message.contains(killer.getName() + ChatColor.GRAY)) {
-                        message = message.replaceAll(killer.getName() + ChatColor.GRAY, ChatColor.BOLD + killer.getName() + ChatColor.GRAY + ChatColor.BOLD);
+                        message = message.replace(killer.getName() + ChatColor.GRAY, ChatColor.BOLD + killer.getName() + ChatColor.GRAY + ChatColor.BOLD);
                     } else {
-                        message = message.replaceAll(killer.getName(), ChatColor.BOLD + killer.getName());
+                        message = message.replace(killer.getName(), ChatColor.BOLD + killer.getName());
                     }
                 }
             }
