@@ -140,7 +140,7 @@ public class ChatModule extends MatchModule implements Listener {
     }
 
     private void sendMutedMessage(Player player, Punishment punishment) {
-        player.sendMessage(ChatColor.RED + "You have been muted for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + ( punishment.getExpires() >= 0 ? ChatColor.RED + " until " + ChatColor.GRAY + new Date(punishment.getExpires()).toString() : "") + ChatColor.RED + ".");
+        player.sendMessage(ChatColor.RED + "You are currently muted for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + ( punishment.getExpires() >= 0 ? ChatColor.RED + " until " + ChatColor.GRAY + new Date(punishment.getExpires()).toString() : "") + ChatColor.RED + ".");
     }
 
     /*
