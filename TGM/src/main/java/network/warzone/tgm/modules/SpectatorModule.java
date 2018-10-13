@@ -281,11 +281,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                     return;
                 }
                 int size = players.size();
-                if (size % 9 == 0) {
-                    size /= 9;
-                } else {
+                if (size % 9 != 0) {
                     size -= size % 9;
-                    size /= 9;
                     size += 9;
                 }
                 Menu teleportMenu = new PlayerMenu(ChatColor.UNDERLINE + "Teleport", size, event.getPlayer());
