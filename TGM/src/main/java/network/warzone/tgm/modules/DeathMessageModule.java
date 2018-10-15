@@ -64,17 +64,26 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot to breath";
                 }
-                
+
             } else if (cause.equals(DamageCause.PROJECTILE)) {
                 int distance = ((Double) module.getKillerLocation().distance(module.getPlayerLocation())).intValue();
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was shot by " +
                         killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " from " + distance + " blocks";
+                
             } else if (cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK)) {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was burned to death thanks too " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " burned to death";
                 }
+
+            } else if (cause.equals(DamageCause.BLOCK_EXPLOSION)) {
+                if (!module.getPlayerName().equals(module.getKillerName())) {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " blow up in pieces thanks too " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
+                } else {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " blow up in pieces";
+                }
+
             } else {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was slain by " +
@@ -95,6 +104,8 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " burned to death";
             } else if (cause.equals(DamageCause.DROWNING)) {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot to breath";
+            } else if (cause.equals(DamageCause.BLOCK_EXPLOSION) || cause.equals(DamageCause.ENTITY_EXPLOSION)) {
+                message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " blow up in pieces";
             } else {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
             }
