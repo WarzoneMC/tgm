@@ -41,9 +41,11 @@ As an example, a map should be able to provide different spawn points as the mat
 
 ## Local Server Setup
  
-1. Start with the latest stable [Paper (PaperSpigot)](https://destroystokyo.com/ci/job/Paper/) build. 
+1. Start with the latest stable [Paper (PaperSpigot)](https://papermc.io/ci/job/Paper/) build. 
+
+2. Compile the latest version of TGM or download it from our [Jenkins](https://jenkins.bennydoesstuff.me/job/TGM/).
  
-2. Create a `maps` folder inside of the server and insert a supported TGM map. You can also just clone our `Maps` repository as a folder. 
+3. Create a `Maps` folder inside of the server and insert a supported TGM map. You can also just clone our `Maps` repository as a folder. 
  
 4. (Optional) Install WorldEdit to enable the Teleport Tool. 
  
