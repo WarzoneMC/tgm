@@ -539,7 +539,7 @@ public class CycleCommands {
     public static void viewStats(CommandSender sender, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
-            sender.sendMessage(ChatColor.DARK_RED + "Unable to find online player " + ChatColor.RED + target);
+            sender.sendMessage(ChatColor.RED + "Unable to find online player " + ChatColor.YELLOW + target);
             return;
         }
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
