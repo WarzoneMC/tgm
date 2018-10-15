@@ -25,7 +25,10 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+patch-2
+=======
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
+master
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -98,7 +101,7 @@ public class CycleCommands {
         if ((index > pages) || (index <= 0)) {
             index = 1;
         }
-        sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
+        sender.sendMessage(ChatColor.YELLOW + "Rotation (" + index + "/" + pages + "): ");
 
         try {
             for (int i = 0; i < pageSize; i++) {
@@ -458,7 +461,7 @@ public class CycleCommands {
         player.sendMessage(ColorConverter.filterString("&7You've been added to the channel &c&l" + channel.name() + "&7."));
     }
 
-    @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
+    @Command(aliases = {"t", "tc", "teamchat"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
@@ -470,7 +473,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"next"}, desc = "View the next map in the rotation")
+    @Command(aliases = {"next", "nextup"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
         sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors()));
@@ -508,7 +511,7 @@ public class CycleCommands {
             TimeModule timeModule = TGM.get().getModule(TimeModule.class);
             if (cmd.getString(1).equalsIgnoreCase("on") || cmd.getString(1).equalsIgnoreCase("true")) {
                 timeModule.setTimeLimited(true);
-                sender.sendMessage(ChatColor.AQUA + "Time limit: " + ChatColor.GREEN + "true");
+                sender.sendMessage(ChatColor.AQUA + "Time limit: " + ChatColor.DARK_AQUA + "true");
                 return;
             } else if (cmd.getString(1).equalsIgnoreCase("off") || cmd.getString(1).equalsIgnoreCase("false")) {
                 timeModule.setTimeLimited(false);
@@ -519,7 +522,7 @@ public class CycleCommands {
             try {
                 timeModule.setTimeLimit(cmd.getInteger(1));
                 timeModule.setTimeLimited(true);
-                sender.sendMessage(ChatColor.AQUA + "Set time limit to: " + ChatColor.GREEN + timeModule.getTimeLimit() + " seconds");
+                sender.sendMessage(ChatColor.AQUA + "Set time limit to: " + ChatColor.DARK_AQUA + timeModule.getTimeLimit() + " seconds");
             } catch (CommandNumberFormatException e) {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
             }
@@ -630,9 +633,3 @@ public class CycleCommands {
                 return;
             }
         }
-
-        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
-    }
-
-}
