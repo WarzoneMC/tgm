@@ -3,6 +3,7 @@ package network.warzone.tgm.modules;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchResultEvent;
+import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Bukkit;
@@ -20,6 +21,12 @@ public class MatchResultModule extends MatchModule implements Listener {
         MatchTeam spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
 
         for (Player player : Bukkit.getOnlinePlayers()) {
+            int killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(player.getUniqueId().toString());
+
+            if (killstreak >= 5) {
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYour killstreak of &4" + killstreak + "&c ended."));
+            }
+
             Location location = player.getLocation().clone().add(0.0, 100.0, 0.0);
 
             if (spectators.containsPlayer(player)) {

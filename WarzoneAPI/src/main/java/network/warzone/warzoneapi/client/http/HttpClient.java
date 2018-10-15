@@ -23,6 +23,7 @@ public class HttpClient implements TeamClient {
     public HttpClient(HttpClientConfig config) {
         this.config = config;
 
+
         GsonBuilder builder = new GsonBuilder();
 
         // ObjectId
@@ -66,6 +67,20 @@ public class HttpClient implements TeamClient {
         } catch (UnirestException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public GetPlayerByNameResponse player(String name) {
+        try {
+            return Unirest.get(config.getBaseUrl() + "/mc/player/" + name)
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(GetPlayerByNameResponse.class).getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -277,6 +292,10 @@ public class HttpClient implements TeamClient {
                     .asObject(RevertPunishmentResponse.class);
             return response.getBody();
         } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid ObjectID: " + id);
             e.printStackTrace();
             return null;
         }

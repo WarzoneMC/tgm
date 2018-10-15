@@ -1,9 +1,8 @@
 package network.warzone.tgm.util.itemstack;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.SkullType;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -11,7 +10,9 @@ import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by luke on 10/17/15.
@@ -121,8 +122,33 @@ public class ItemFactory {
     public static ItemStack getPlayerSkull(String name) {
         ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
-        meta.setOwner(name);
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+        if (offlinePlayer != null) {
+            meta.setOwningPlayer(offlinePlayer);
+        } else {
+            meta.setOwner(name);
+        }
         skull.setItemMeta(meta);
+        skull.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         return skull;
     }
+
+    public static ItemStack getPlayerSkull(String name, String displayName, String... lore) {
+        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+        SkullMeta meta = (SkullMeta) skull.getItemMeta();
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+        if (offlinePlayer != null) {
+            meta.setOwningPlayer(offlinePlayer);
+        } else {
+            meta.setOwner(name);
+        }
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
+        if (lore != null && lore.length > 0) {
+            meta.setLore(Arrays.stream(lore).map(str -> ChatColor.translateAlternateColorCodes('&', str)).collect(Collectors.toList()));
+        }
+        skull.setItemMeta(meta);
+        skull.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        return skull;
+    }
+
 }

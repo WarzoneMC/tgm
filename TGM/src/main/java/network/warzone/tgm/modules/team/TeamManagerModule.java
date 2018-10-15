@@ -15,7 +15,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
@@ -69,11 +68,6 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        handleQuit(event.getPlayer());
-    }
-
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
         handleQuit(event.getPlayer());
     }
 

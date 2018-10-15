@@ -38,7 +38,7 @@ public class PunishCommands {
 
         TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -62,7 +62,7 @@ public class PunishCommands {
 
         TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -88,7 +88,7 @@ public class PunishCommands {
 
         TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -183,7 +183,7 @@ public class PunishCommands {
         String id = cmd.getString(0);
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             RevertPunishmentResponse revertPunishmentResponse = TGM.get().getTeamClient().revertPunishment(id);
-            if (revertPunishmentResponse.isNotFound()) {
+            if (revertPunishmentResponse == null || revertPunishmentResponse.isNotFound()) {
                 sender.sendMessage(ChatColor.RED + "Punishment not found.");
             } else {
                 java.util.Map<ObjectId, String> userMappings = new HashMap<>();
@@ -206,6 +206,7 @@ public class PunishCommands {
                             punishment.setReverted(true);
                         }
                     });
+                    sender.sendMessage(ChatColor.GREEN + "Punishment reverted.");
                 } else {
                     sender.sendMessage(ChatColor.RED + "Punishment was already reverted.");
                 }
@@ -326,6 +327,7 @@ public class PunishCommands {
     private static void kickPlayer(Punishment punishment, String name) {
             if (punishment.getType().toLowerCase().equals("ban")) {
                 if (punishment.isIp_ban()) {
+                    boolean found = false;
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         if (player.getAddress().getHostString().equals(punishment.getIp())) {
                             player.kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
@@ -334,17 +336,19 @@ public class PunishCommands {
                                             (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
                                             + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
                                             + ChatColor.GRAY + "ID: " + punishment.getId().toString());
+                            found = true;
                         }
                     }
-                } else {
-                    if (Bukkit.getPlayer(name) != null)
-                        Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
-                                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
-                                    + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
-                                    (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
-                                    + ChatColor.GRAY + "ID: " + punishment.getId().toString());
+                    if (found) return;
                 }
+                Player player;
+                if ((player = Bukkit.getPlayer(name)) != null)
+                    player.kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
+                                + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
+                                + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
+                                (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
+                                + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                                + ChatColor.GRAY + "ID: " + punishment.getId().toString());
             } else {
                 Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been kicked from the server. Reason:\n" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()));
             }
@@ -381,7 +385,7 @@ public class PunishCommands {
                 s.equalsIgnoreCase("forever") ||
                 s.equalsIgnoreCase("f") ||
                 s.equalsIgnoreCase("-1")) return new TimeUnitPair(1, ChronoUnit.FOREVER);
-        ChronoUnit timeUnit = ChronoUnit.SECONDS;
+        ChronoUnit timeUnit;
 
         String time = "";
         String unit = "";
@@ -397,6 +401,7 @@ public class PunishCommands {
             }
         }
         timeUnit = getTimeUnit(unit);
+        if (timeUnit == null) return null;
         return new TimeUnitPair(Integer.valueOf(time), timeUnit);
     }
 
@@ -407,7 +412,7 @@ public class PunishCommands {
                 return timeUnit;
             }
         }
-         return ChronoUnit.SECONDS;
+         return null;
     }
 
     @AllArgsConstructor @Getter

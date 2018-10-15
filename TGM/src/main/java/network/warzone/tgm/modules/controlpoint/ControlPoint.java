@@ -22,7 +22,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -99,11 +98,6 @@ public class ControlPoint implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        this.playersOnPoint.remove(event.getPlayer());
-    }
-
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
         this.playersOnPoint.remove(event.getPlayer());
     }
 
