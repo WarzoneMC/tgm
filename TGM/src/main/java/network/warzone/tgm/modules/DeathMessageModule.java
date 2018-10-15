@@ -69,10 +69,10 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 int distance = ((Double) module.getKillerLocation().distance(module.getPlayerLocation())).intValue();
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was shot by " +
                         killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " from " + distance + " blocks";
-                
+
             } else if (cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK)) {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
-                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was burned to death thanks too " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was burned to death by " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " burned to death";
                 }
@@ -86,7 +86,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
 
             } else {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
-                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was slain by " +
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was killed by " +
                             killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
                             (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the environment");
                 } else {
