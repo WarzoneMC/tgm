@@ -79,9 +79,9 @@ public class DeathMessageModule extends MatchModule implements Listener {
 
             } else if (cause.equals(DamageCause.BLOCK_EXPLOSION)) {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
-                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " blow up in pieces thanks too " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was blown to pieces by " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
                 } else {
-                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " blow up in pieces";
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " spontaneously combusted";
                 }
 
             } else {
@@ -105,7 +105,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
             } else if (cause.equals(DamageCause.DROWNING)) {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot to breath";
             } else if (cause.equals(DamageCause.BLOCK_EXPLOSION) || cause.equals(DamageCause.ENTITY_EXPLOSION)) {
-                message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " blow up in pieces";
+                message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " spontaneously combusted";
             } else {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
             }
