@@ -50,29 +50,45 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 if (weapon != null && weapon.getType().equals(Material.BOW))
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was shot into the void by " +
                             killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
-                else
-                    if (!module.getPlayerName().equals(module.getKillerName())) {
-                        message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was thrown into the void by " +
-                                killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
-                                itemToString(weapon);
-                    } else {
-                        message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " fell into the void";
-                    }
+                else if (!module.getPlayerName().equals(module.getKillerName())) {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was thrown into the void by " +
+                            killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
+                            itemToString(weapon);
+                } else {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " fell into the void";
+                }
+
+            } else if (cause.equals(DamageCause.DROWNING)) {
+                if (!module.getPlayerName().equals(module.getKillerName())) {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " drowned thanks too " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
+                } else {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot how to breathe";
+                }
+
             } else if (cause.equals(DamageCause.PROJECTILE)) {
                 int distance = ((Double) module.getKillerLocation().distance(module.getPlayerLocation())).intValue();
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was shot by " +
                         killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " from " + distance + " blocks";
+
             } else if (cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK)) {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
-                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was burned to death by " + killerTeam.getColor() + module.getKillerName() +ChatColor.GRAY;
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was burned to death by " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " burned to death";
                 }
+
+            } else if (cause.equals(DamageCause.BLOCK_EXPLOSION)) {
+                if (!module.getPlayerName().equals(module.getKillerName())) {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was blown to pieces by " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
+                } else {
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " spontaneously combusted";
+                }
+
             } else {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was killed by " +
                             killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
-                            (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the the environment");
+                            (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the environment");
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
                 }
@@ -86,6 +102,10 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " fell into the void";
             } else if (cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK)) {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " burned to death";
+            } else if (cause.equals(DamageCause.DROWNING)) {
+                message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot how to breathe";
+            } else if (cause.equals(DamageCause.BLOCK_EXPLOSION) || cause.equals(DamageCause.ENTITY_EXPLOSION)) {
+                message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " spontaneously combusted";
             } else {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
             }
@@ -120,19 +140,17 @@ public class DeathMessageModule extends MatchModule implements Listener {
     private void broadcastDeathMessage(Player dead, Player killer, String message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
 
-            /* TODO make look better and also fix
-            //bold messages when the player is involved
+
             if (dead == player || (killer != null && killer == player)) {
-                message = message.replaceAll(dead.getName() + ChatColor.GRAY, ChatColor.BOLD + dead.getName() + ChatColor.GRAY + ChatColor.BOLD);
+                message = message.replace(dead.getName() + ChatColor.GRAY, ChatColor.BOLD + dead.getName() + ChatColor.GRAY + ChatColor.BOLD);
                 if (killer != null) {
                     if (message.contains(killer.getName() + ChatColor.GRAY)) {
-                        message = message.replaceAll(killer.getName() + ChatColor.GRAY, ChatColor.BOLD + killer.getName() + ChatColor.GRAY + ChatColor.BOLD);
+                        message = message.replace(killer.getName() + ChatColor.GRAY, ChatColor.BOLD + killer.getName() + ChatColor.GRAY + ChatColor.BOLD);
                     } else {
-                        message = message.replaceAll(killer.getName(), ChatColor.BOLD + killer.getName());
+                        message = message.replace(killer.getName(), ChatColor.BOLD + killer.getName());
                     }
                 }
             }
-            */
 
             player.getPlayer().sendMessage(message);
         }
