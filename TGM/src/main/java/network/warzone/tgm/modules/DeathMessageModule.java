@@ -62,7 +62,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " drowned thanks too " + killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY;
                 } else {
-                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot to breath";
+                    message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot how to breathe";
                 }
 
             } else if (cause.equals(DamageCause.PROJECTILE)) {
