@@ -103,7 +103,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
             } else if (cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK)) {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " burned to death";
             } else if (cause.equals(DamageCause.DROWNING)) {
-                message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot to breath";
+                message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " forgot how to breathe";
             } else if (cause.equals(DamageCause.BLOCK_EXPLOSION) || cause.equals(DamageCause.ENTITY_EXPLOSION)) {
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " spontaneously combusted";
             } else {
