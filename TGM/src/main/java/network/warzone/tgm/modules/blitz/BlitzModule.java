@@ -156,8 +156,8 @@ public class BlitzModule extends MatchModule implements Listener {
 
     private void showLives(Player player) {
         player.sendTitle(
-                ChatColor.translateAlternateColorCodes('&', title.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())),
-                ChatColor.translateAlternateColorCodes('&', subtitle.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())),
+                ChatColor.translateAlternateColorCodes('&', title.replace("%lives%", "" + getLives(player)).replace("%player%", player.getName())),
+                ChatColor.translateAlternateColorCodes('&', subtitle.replace("%lives%", "" + getLives(player)).replace("%player%", player.getName())),
                 10, 20, 10
         );
     }
@@ -175,13 +175,16 @@ public class BlitzModule extends MatchModule implements Listener {
         createDeath((Player) event.getEntity());
         removeLife(player);
 
-        TGM.get().getModule(SpawnPointHandlerModule.class).spawnPlayer(TGM.get().getPlayerManager().getPlayerContext(player), teamManagerModule.getTeam(player), false);
+        TGM.get().getModule(SpawnPointHandlerModule.class).spawnPlayer(TGM.get().getPlayerManager().getPlayerContext(player), teamManagerModule.getTeam(player), true);
 
         if (getLives(player) <= 0) {
             player.setGameMode(GameMode.SPECTATOR);
             player.setAllowFlight(true);
             player.setFlying(true);
             player.getInventory().clear();
+            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+
+
 
             if (player.getLocation().getY() < 0) {
                 player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
