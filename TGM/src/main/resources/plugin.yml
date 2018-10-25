@@ -1,3 +1,5 @@
 name: TGM
+description: Team Game Manager
 main: network.warzone.tgm.TGM
 version: ${project.version}
+website: https://github.com/WarzoneMC/Warzone
