@@ -64,7 +64,7 @@ public class RankCommands {
                             TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().removeRank(response.getRank());
                             TGM.get().getPlayerManager().getPlayerContext(target).updateRank(response.getRank(), true);
                         }
-                        sender.sendMessage(ChatColor.GRAY + "Removed rank " + ChatColor.RESET + response.getRank().getName() + ChatColor.GRAY + " to " + ChatColor.RESET + (target != null ? target.getName() : cmd.getString(1)));
+                        sender.sendMessage(ChatColor.GRAY + "Removed rank " + ChatColor.RESET + response.getRank().getName() + ChatColor.GRAY + " from " + ChatColor.RESET + (target != null ? target.getName() : cmd.getString(1)));
                         break;
                 }
             });
