@@ -626,7 +626,7 @@ public class CycleCommands {
 
         if (!autoJoin) {
             if (!player.hasPermission("tgm.pickteam")) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at http://warzone.store/");
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at https://tgmwarzone.tebex.io/");
                 return;
             }
         }
