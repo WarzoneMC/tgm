@@ -72,7 +72,7 @@ public class CycleCommands {
             TextComponent message = new TextComponent(mapName);
             message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
             message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
-                    .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
+                    .append(ChatColor.GRAY + "Authors: ").append(ChatColor.YELLOW + Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
                     .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
                     .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
 
@@ -114,7 +114,7 @@ public class CycleCommands {
                 TextComponent message = new TextComponent(mapName);
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rotation.get(position).getMapInfo().getName()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + rotation.get(position).getMapInfo().getName()).append("\n\n")
-                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(",").join(rotation.get(position).getMapInfo().getAuthors())).append("\n")
+                        .append(ChatColor.GRAY + "Authors: ").append(ChatColor.YELLOW + Joiner.on(", ").join(rotation.get(position).getMapInfo().getAuthors())).append("\n")
                         .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
                         .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + rotation.get(position).getMapInfo().getVersion()).create()));
 
@@ -226,7 +226,7 @@ public class CycleCommands {
             TGM.get().getMatchManager().setForcedNextMap(found);
             sender.sendMessage(ChatColor.GREEN + "Set the next map to " + ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
         } else {
-            sender.sendMessage(ChatColor.RED + "/sn <map_name>");
+            sender.sendMessage(ChatColor.RED + "/sn (map name)");
         }
     }
     
@@ -348,7 +348,7 @@ public class CycleCommands {
                     player.playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
                     return;
                 }
-                player.sendMessage(ChatColor.RED + "Usage: /tp <name>");
+                player.sendMessage(ChatColor.RED + "Usage: /tp (name)");
             } else {
                 player.sendMessage(ChatColor.RED + "You can only execute this command as a spectator!");
             }
@@ -432,36 +432,36 @@ public class CycleCommands {
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage("Error: Only players can use this command.");
+            sender.sendMessage("Only players can use this command.");
             return;
         }
         Player player = (Player) sender;
         if (cmd.argsLength() == 0) {
-          player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
+          player.sendMessage(ChatColor.RED + "Usage: /channel (name)");
           return;
         }
 
         String channelName = cmd.getString(0).toUpperCase();
         ChatModule.Channel channel = ChatModule.Channel.byName(channelName);
         if (channel == null) {
-          player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
+          player.sendMessage(ChatColor.RED + "Invalid channel: " + channelName);
           player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatModule.Channel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
           return;
         }
 
         if (!channel.hasPermission(player)) {
-          player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
+          player.sendMessage(ChatColor.RED + "Insufficient permissions.");
           return;
         }
 
         ChatModule.getChannels().put(player.getUniqueId().toString(), channel);
-        player.sendMessage(ColorConverter.filterString("&7You've been added to the channel &c&l" + channel.name() + "&7."));
+        player.sendMessage(ChatColor.GRAY + "You are now talking in " + ChatColor.BOLD.toString() + ChatColor.RED + channel.name());
     }
 
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            sender.sendMessage("Only players can use this command.");
             return;
         }
         if (cmd.argsLength() > 0) {
@@ -521,10 +521,10 @@ public class CycleCommands {
                 timeModule.setTimeLimited(true);
                 sender.sendMessage(ChatColor.AQUA + "Set time limit to: " + ChatColor.GREEN + timeModule.getTimeLimit() + " seconds");
             } catch (CommandNumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
+                sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit (seconds)");
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
+            sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit (seconds)");
         }
     }
 
@@ -556,7 +556,7 @@ public class CycleCommands {
     public static void stats(final CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() == 0) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "Consoles don't have stats.");
+                sender.sendMessage("Only players can use this command.");
                 return;
             }
             viewStats(sender, sender.getName());

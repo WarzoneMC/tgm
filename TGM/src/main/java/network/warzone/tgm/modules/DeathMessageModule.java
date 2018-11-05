@@ -72,7 +72,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was killed by " +
                             killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
-                            (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the the environment");
+                            (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the environment");
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
                 }
@@ -119,21 +119,6 @@ public class DeathMessageModule extends MatchModule implements Listener {
 
     private void broadcastDeathMessage(Player dead, Player killer, String message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-
-            /* TODO make look better and also fix
-            //bold messages when the player is involved
-            if (dead == player || (killer != null && killer == player)) {
-                message = message.replaceAll(dead.getName() + ChatColor.GRAY, ChatColor.BOLD + dead.getName() + ChatColor.GRAY + ChatColor.BOLD);
-                if (killer != null) {
-                    if (message.contains(killer.getName() + ChatColor.GRAY)) {
-                        message = message.replaceAll(killer.getName() + ChatColor.GRAY, ChatColor.BOLD + killer.getName() + ChatColor.GRAY + ChatColor.BOLD);
-                    } else {
-                        message = message.replaceAll(killer.getName(), ChatColor.BOLD + killer.getName());
-                    }
-                }
-            }
-            */
-
             player.getPlayer().sendMessage(message);
         }
     }

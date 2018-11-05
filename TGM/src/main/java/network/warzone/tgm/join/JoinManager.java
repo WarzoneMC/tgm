@@ -68,7 +68,6 @@ public class JoinManager implements Listener {
             event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
             return;
         }
-        //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
 
         queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
     }
@@ -104,6 +103,8 @@ public class JoinManager implements Listener {
         if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty()){
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
             joinMsg = ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.";
+            playerContext.getPlayer().performCommand("map");
+            playerContext.getPlayer().sendMessage(ChatColor.GRAY + "You are currently spectating, Type " + ChatColor.LIGHT_PURPLE + "/join " + ChatColor.GRAY + "to join a team!");
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
         }
         else joinMsg = ChatColor.GRAY + event.getPlayer().getName() + " joined.";

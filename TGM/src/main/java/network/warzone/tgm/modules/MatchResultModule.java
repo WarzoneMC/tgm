@@ -24,7 +24,7 @@ public class MatchResultModule extends MatchModule implements Listener {
             int killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(player.getUniqueId().toString());
 
             if (killstreak >= 5) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYour killstreak of &4" + killstreak + "&c ended."));
+                player.sendMessage(ChatColor.RED + "Your killstreak of " + ChatColor.DARK_RED + killstreak + ChatColor.RED + " has ended.");
             }
 
             Location location = player.getLocation().clone().add(0.0, 100.0, 0.0);
