@@ -18,9 +18,9 @@ import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class PunishCommands {
 
@@ -155,8 +155,7 @@ public class PunishCommands {
                                             "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
                                             "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
                                             "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
-                                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
-                                            "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1)
+                                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString()
                                 ).create())).event(
                                         new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lookup " + profile.getName())
                         ).create());
@@ -168,14 +167,38 @@ public class PunishCommands {
                             "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
                             "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
                             "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
-                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
-                            "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1) +
-                            "\n" + ChatColor.GRAY + "IPs: [" + ChatColor.RESET + String.join(ChatColor.GRAY + ", " + ChatColor.RESET, profile.getIps()) + ChatColor.GRAY + "]");
+                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString()
+                    );
                 }
             }
         });
     }
 
+    @Command(aliases = "alts", desc = "Lookup alts of a user", min = 1, max = 1, usage = "(name)")
+    @CommandPermissions("tgm.lookup")
+    public static void alts(CommandContext cmd, CommandSender sender) {
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            PlayerAltsResponse response = TGM.get().getTeamClient().getAlts(cmd.getString(0));
+            if (response == null) {
+                sender.sendMessage(ChatColor.RED + "Something went wrong");
+            } else if (response.isError()) {
+                sender.sendMessage(ChatColor.RED + response.getMessage());
+            } else {
+                if (response.getUsers().isEmpty()) {
+                    sender.sendMessage(ChatColor.GREEN + response.getLookupUser().getName() + " has no known alts.");
+                    return;
+                }
+                String name = response.getLookupUser().getName();
+                List<String> alts = new ArrayList<>(Arrays.asList(
+                        "",
+                        ChatColor.AQUA + name + (name.endsWith("s") ? "'" : "'s") + " known alts:"
+                ));
+                alts.addAll(response.getUsers().stream().map(user -> ChatColor.GRAY + " - " + ChatColor.WHITE + user.getName()).collect(Collectors.toList()));
+                alts.add(" ");
+                sender.sendMessage(alts.toArray(new String[0]));
+            }
+        });
+    }
 
     @Command(aliases = "revert", desc = "Revert a punishment", min = 1, max = 1, usage = "(id)")
     @CommandPermissions({"tgm.punish.revert"})

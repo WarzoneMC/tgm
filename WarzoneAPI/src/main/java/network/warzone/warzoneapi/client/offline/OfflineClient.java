@@ -99,4 +99,9 @@ public class OfflineClient implements TeamClient {
     public PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest) {
         return null;
     }
+
+    @Override
+    public PlayerAltsResponse getAlts(String name) {
+        return null;
+    }
 }

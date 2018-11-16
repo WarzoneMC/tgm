@@ -54,4 +54,6 @@ public interface TeamClient {
 
     PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest);
 
+    PlayerAltsResponse getAlts(String name);
+
 }

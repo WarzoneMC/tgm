@@ -316,4 +316,18 @@ public class HttpClient implements TeamClient {
             return null;
         }
     }
+
+    @Override
+    public PlayerAltsResponse getAlts(String name) {
+        try {
+            HttpResponse<PlayerAltsResponse> response = Unirest.get(config.getBaseUrl() + "/mc/player/alts/" + name)
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(PlayerAltsResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
