@@ -327,35 +327,6 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
-    public static void teleport(CommandContext cmd, CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
-            return;
-        }
-        Player player = (Player) sender;
-        MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
-        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        if (matchTeam != null) {
-            if (matchTeam.isSpectator() || matchStatus == MatchStatus.POST || player.hasPermission("tgm.teleport")) { // allow staff to tp outside of spectator
-                if (cmd.argsLength() == 1) {
-                    Player tpTo = Bukkit.getPlayer(cmd.getString(0));
-                    if (tpTo == null) {
-                        player.sendMessage(ChatColor.RED + "Player not found");
-                        return;
-                    }
-                    player.teleport(tpTo.getLocation());
-                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
-                    return;
-                }
-                player.sendMessage(ChatColor.RED + "Usage: /tp <name>");
-            } else {
-                player.sendMessage(ChatColor.RED + "You can only execute this command as a spectator!");
-            }
-        } else {
-            player.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
-        }
-    }
 
     @Command(aliases = {"team"}, desc = "Manage teams.")
     @CommandPermissions({"tgm.team"})
