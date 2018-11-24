@@ -62,7 +62,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
             
             playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-            if (!matchTeam.isSpectator() || gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
+            if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
