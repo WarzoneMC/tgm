@@ -2,6 +2,7 @@ package network.warzone.tgm.modules;
 
 import lombok.Getter;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.SpawnPoint;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -57,8 +58,11 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         Players.reset(playerContext.getPlayer(), true);
 
         if (teleport) {
+            MatchManager matchManager = TGM.get().getMatchManager();
+            GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
+            
             playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-            if (!matchTeam.isSpectator()) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
+            if (!matchTeam.isSpectator() || gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
