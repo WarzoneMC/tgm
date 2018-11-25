@@ -359,9 +359,9 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
     
     @EventHandler
-    public void itemFrameItemRemoval(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof ItemFrame) {
-            e.setCancelled(true);
+    public void itemFrameItemRemoval(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof ItemFrame) {
+            event.setCancelled(true);
         }
     }
 
