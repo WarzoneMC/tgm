@@ -360,7 +360,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     
     @EventHandler
     public void itemFrameItemRemoval(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof ItemFrame) {
+        if (event.getEntity() instanceof ItemFrame && isSpectating(event.getPlayer())) {
             event.setCancelled(true);
         }
     }
