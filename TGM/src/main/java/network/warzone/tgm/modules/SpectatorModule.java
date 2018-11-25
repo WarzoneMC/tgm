@@ -357,6 +357,13 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         lastMovement.remove(event.getPlayer().getUniqueId());
     }
+    
+    @EventHandler
+    public void itemFrameItemRemoval(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof ItemFrame) {
+            e.setCancelled(true);
+        }
+    }
 
     @Override
     public void unload() {
