@@ -13,6 +13,8 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +54,7 @@ public class MatchManager {
                     playerContext.getPlayer().setAllowFlight(true);
                     playerContext.getPlayer().setVelocity(playerContext.getPlayer().getVelocity().setY(1.0)); // Weeee!
                     playerContext.getPlayer().setFlying(true);
+                    playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 5, true, false), true);
                 });
 
                 if (matchTeam != winningTeam) {
