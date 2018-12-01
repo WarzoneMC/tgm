@@ -17,6 +17,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
@@ -260,9 +261,9 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getItem() == null) return;
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
+            if (event.getItem() == null) return;
             if (event.getItem().isSimilar(teamSelectionItem)) {
                 teamSelectionMenu.open(event.getPlayer());
             } else if (event.getItem().isSimilar(teleportMenuItem)) {
@@ -297,6 +298,12 @@ public class SpectatorModule extends MatchModule implements Listener {
               teleportMenu.open(event.getPlayer());
             }
         }
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        Player player = (Player) event.getDamager();
+        if (isSpectating(player)) event.setCancelled(true);
     }
 
     @EventHandler
