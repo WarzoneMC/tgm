@@ -20,10 +20,10 @@ public class MiscCommands {
     public static void ping(CommandContext cmd, CommandSender sender) {
         Player player = (Player) sender;
         if (cmd.argsLength() > 0) {
-            try {
-                player = Bukkit.getPlayer(cmd.getString(0));
-            } catch(Error err) {
-                sender.sendMessage(ChatColor.RED + "Invalid player!");
+            player = Bukkit.getPlayer(cmd.getString(0));
+            if (player == null) {
+                sender.sendMessage(ChatColor.RED + "Invalid player");
+                return;
             }
         }
         sender.sendMessage(ChatColor.AQUA + player.getName() + ChatColor.GRAY + "'s ping is " + ChatColor.AQUA + player.spigot().getPing() + "ms");
