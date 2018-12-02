@@ -11,10 +11,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.broadcast.BroadcastManager;
-import network.warzone.tgm.command.BroadcastCommands;
-import network.warzone.tgm.command.CycleCommands;
-import network.warzone.tgm.command.PunishCommands;
-import network.warzone.tgm.command.RankCommands;
+import network.warzone.tgm.command.*;
 import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.MapInfoDeserializer;
@@ -103,6 +100,7 @@ public class TGM extends JavaPlugin {
 
         commandManager.register(CycleCommands.class);
         commandManager.register(BroadcastCommands.class);
+        commandManager.register(MiscCommands.class);
         if (apiConfig.getBoolean("enabled", false)) {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
