@@ -34,6 +34,7 @@ import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,7 +43,15 @@ public class CycleCommands {
 
     @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.", usage = "[page]")
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
-        int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+        int index;
+
+        try {
+             index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+        } catch (NumberFormatException e) {
+            sender.sendMessage(ChatColor.RED + "Number expected.");
+            return;
+        }
+
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
 
         int pageSize = 9;
@@ -51,33 +60,94 @@ public class CycleCommands {
         int pagesDivisible = mapLibrary.size() / pageSize;
         int pages = pagesDivisible;
 
-        if(pagesRemainder >= 1) {
+        if (pagesRemainder >= 1) {
             pages = pagesDivisible + 1;
         }
 
         if ((index > pages) || (index <= 0)) {
             index = 1;
         }
+
         sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
-        for (int i = 0; i < pageSize; i++) {
-            int position = pageSize * (index - 1) + i;
-            MapContainer map = mapLibrary.get(position);
-            String mapName = ChatColor.GOLD + map.getMapInfo().getName();
+        try {
+            for (int i = 0; i < pageSize; i++) {
+                int position = pageSize * (index - 1) + i;
+                MapContainer map = mapLibrary.get(position);
+                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
 
-            if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
-            } else {
-                mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
+                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
+                } else {
+                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
+                }
+                TextComponent message = new TextComponent(mapName);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
+                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
+                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
+                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
+
+                sender.spigot().sendMessage(message);
             }
-            TextComponent message = new TextComponent(mapName);
-            message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
-            message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
-                    .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
-                    .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
-                    .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
+        } catch (IndexOutOfBoundsException ignored) {}
+    }
 
-            sender.spigot().sendMessage(message);
+    @Command(aliases = {"findmaps"}, desc = "Find the maps that are on Warzone, although not necessarily in the rotation.", min = 1, usage = "<map name> [page]")
+    public static void findmaps(CommandContext cmd, CommandSender sender) throws CommandException {
+        List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
+        List<Integer> foundMaps = new ArrayList<>();
+
+        for (int i = 0; i < mapLibrary.size(); i++) {
+            if (cmd.getString(0).equalsIgnoreCase(mapLibrary.get(i).getMapInfo().getName())) { // Map with the exact same as input should always be listed first
+                foundMaps.add(0, i);
+            } else if (mapLibrary.get(i).getMapInfo().getName().toLowerCase().startsWith(cmd.getString(0).toLowerCase())) {
+                foundMaps.add(i);
+            }
         }
+
+        if (foundMaps.size() == 0) {
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cNo maps with the name &4" + cmd.getString(0) + "&c were found."));
+            return;
+        }
+
+        int index = cmd.argsLength() == 1 ? 1 : cmd.getInteger(1);
+
+        int pageSize = 9;
+
+        int pagesRemainder = foundMaps.size() % pageSize;
+        int pagesDivisible = foundMaps.size() / pageSize;
+        int pages = pagesDivisible;
+
+        if (pagesRemainder >= 1) {
+            pages = pagesDivisible + 1;
+        }
+
+        if ((index > pages) || (index <= 0)) {
+            index = 1;
+        }
+
+        sender.sendMessage(ChatColor.YELLOW + "Found Maps (" + index + "/" + pages + "): ");
+        try {
+            for (int i = 0; i < pageSize; i++) {
+                int position = pageSize * (index - 1) + i;
+                MapContainer map = mapLibrary.get(foundMaps.get(position));
+                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
+
+                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
+                } else {
+                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
+                }
+                TextComponent message = new TextComponent(mapName);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + map.getMapInfo().getName()));
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + map.getMapInfo().getName()).append("\n\n")
+                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(map.getMapInfo().getAuthors())).append("\n")
+                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
+                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + map.getMapInfo().getVersion()).create()));
+
+                sender.spigot().sendMessage(message);
+            }
+        } catch (IndexOutOfBoundsException ignored) {}
     }
 
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
@@ -91,15 +161,15 @@ public class CycleCommands {
         int pagesDivisible = rotation.size() / pageSize;
         int pages = pagesDivisible;
 
-        if(pagesRemainder >= 1) {
+        if (pagesRemainder >= 1) {
             pages = pagesDivisible + 1;
         }
 
         if ((index > pages) || (index <= 0)) {
             index = 1;
         }
-        sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
 
+        sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
         try {
             for (int i = 0; i < pageSize; i++) {
                 int position = 9 * (index - 1) + i;
@@ -122,7 +192,6 @@ public class CycleCommands {
             }
         } catch (IndexOutOfBoundsException ignored) { }
     }
-
 
     @Command(aliases = {"cycle"}, desc = "Cycle to a new map.")
     @CommandPermissions({"tgm.cycle"})
@@ -316,14 +385,11 @@ public class CycleCommands {
         if (matchTeam != null) {
             if (killstreak == 0 || matchTeam.isSpectator()) {
                 sender.sendMessage(ChatColor.RED + "You aren't on a killstreak.");
-                return;
             } else {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou're on a kill streak of &2" + killstreak + "&a kill" + (killstreak == 1 ? "" : "s") + "."));
-                return;
             }
         } else {
             player.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
-            return;
         }
     }
 
@@ -626,7 +692,7 @@ public class CycleCommands {
 
         if (!autoJoin) {
             if (!player.hasPermission("tgm.pickteam")) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at http://warzone.store/");
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at https://tgmwarzone.tebex.io/");
                 return;
             }
         }
