@@ -25,7 +25,7 @@ public class MiscCommands {
                 sender.sendMessage(ChatColor.RED + "Player not found: " + cmd.getString(0));
                 return;
             }
-        } else if (sender instance Player) {
+        } else if (sender instanceof Player) {
             player = (Player) sender;   
         } else {
             sender.sendMessage(ChatColor.RED + "As console, you can use /ping <player> to check someone's ping.");
