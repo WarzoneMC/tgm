@@ -8,6 +8,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
@@ -272,6 +273,45 @@ public class PunishCommands {
                 Bukkit.broadcastMessage("\n");
             }
             Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
+        }
+    }
+
+    @Command(aliases = {"report"}, desc = "Report a player", min = 2, usage = "(name) (reason...)")
+    public static void report(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            return;
+        }
+
+        Player reporter = (Player) sender;
+        Player reported = Bukkit.getPlayer(cmd.getString(0));
+
+        if (reported == null) {
+            reporter.sendMessage(ChatColor.RED + "Player not found!");
+            return;
+        }
+
+        if (ReportsModule.cooldown(reporter.getUniqueId().toString())) {
+            reporter.sendMessage(ChatColor.RED + "Please wait until reporting again!");
+            return;
+        }
+
+        boolean staffOnline = false;
+        int amount = ReportsModule.getAmount(reported.getUniqueId().toString());
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.hasPermission("tgm.reports")) {
+                staffOnline = true;
+
+                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4[REPORT]&8 [" + amount + "] &5" + reporter.getName() + "&7 reported &d" + reported.getName() + "&7 for &r" + cmd.getJoinedStrings(1)));
+            }
+        }
+
+        if (staffOnline) {
+            reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff.");
+            ReportsModule.setCooldown(reporter.getUniqueId().toString());
+        } else {
+            reporter.sendMessage(ChatColor.RED + "No online staff.");
         }
     }
 
