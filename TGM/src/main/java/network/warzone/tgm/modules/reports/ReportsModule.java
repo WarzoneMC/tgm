@@ -24,12 +24,9 @@ public class ReportsModule extends MatchModule implements Listener {
 
     public static boolean cooldown(String uuid) {
         if (cooldown.containsKey(uuid)) {
-            if (System.currentTimeMillis() - cooldown.get(uuid) > 30 * 1000) { // 30 seconds cooldown
-                return false;
-            } else {
-                return true;
-            }
+            return System.currentTimeMillis() - cooldown.get(uuid) <= 30 * 1000; // 30 seconds cooldown
         }
+
         return false;
     }
 
