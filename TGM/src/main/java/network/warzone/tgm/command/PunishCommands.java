@@ -2,12 +2,14 @@ package network.warzone.tgm.command;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
@@ -291,28 +293,86 @@ public class PunishCommands {
             return;
         }
 
+        if (reported.getName().equals(reporter.getName())) {
+            reporter.sendMessage(ChatColor.RED + "You can't report yourself!");
+            return;
+        }
+
         if (ReportsModule.cooldown(reporter.getUniqueId().toString())) {
             reporter.sendMessage(ChatColor.RED + "Please wait until reporting again!");
             return;
         }
 
-        boolean staffOnline = false;
-        int amount = ReportsModule.getAmount(reported.getUniqueId().toString());
+        int amount = ReportsModule.getAmount(reported.getUniqueId().toString()) + 1;
+
+        Report report = new Report()
+                .setReporter(reporter.getName())
+                .setReported(reported.getName())
+                .setReason(cmd.getJoinedStrings(1))
+                .setTimestamp(System.currentTimeMillis())
+                .setAmount(amount);
+
+        ReportsModule.addReport(report);
+        ReportsModule.setAmount(reported.getUniqueId().toString(), amount);
+        ReportsModule.setCooldown(reporter.getUniqueId().toString(), report.getTimestamp());
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("tgm.reports")) {
-                staffOnline = true;
-
                 player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4[REPORT]&8 [" + amount + "] &5" + reporter.getName() + "&7 reported &d" + reported.getName() + "&7 for &r" + cmd.getJoinedStrings(1)));
             }
         }
 
-        if (staffOnline) {
-            reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff.");
-            ReportsModule.setCooldown(reporter.getUniqueId().toString());
-        } else {
-            reporter.sendMessage(ChatColor.RED + "No online staff.");
+        reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff.");
+    }
+
+    @Command(aliases = {"reports"}, desc = "View reports", max = 1, usage = "[page]")
+    @CommandPermissions({"tgm.reports"})
+    public static void reports(CommandContext cmd, CommandSender sender) throws CommandException {
+        List<Report> reports = ReportsModule.getReports();
+
+        if (reports.size() == 0) {
+            sender.sendMessage(ChatColor.RED + "No reports found.");
+            return;
         }
+
+        int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+
+        int pageSize = 9;
+
+        int pagesRemainder = reports.size() % pageSize;
+        int pagesDivisible = reports.size() / pageSize;
+        int pages = pagesDivisible;
+
+        if (pagesRemainder >= 1) {
+            pages = pagesDivisible + 1;
+        }
+
+        if ((index > pages) || (index <= 0)) {
+            index = 1;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+        sender.sendMessage(ChatColor.YELLOW + "Reports (" + index + "/" + pages + "): ");
+        try {
+            for (int i = 0; i < pageSize; i++) {
+                int position = pageSize * (index - 1) + i;
+                Report report = reports.get(reports.size() - position - 1); // List new reports first
+
+                String reported = ChatColor.translateAlternateColorCodes('&', "&8[" + report.getAmount() + "] &5" + report.getReported() + "&7 - &f" + report.getReason() + "&7 (" + report.getAgo() + " ago)");
+
+                Date date = new Date();
+                date.setTime(report.getTimestamp());
+
+                TextComponent message = new TextComponent(reported);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp " + report.getReported()));
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + reported).append("\n\n")
+                        .append(org.bukkit.ChatColor.GRAY + "Date/Time: ").append(dateFormat.format(date)).append("\n")
+                        .append(org.bukkit.ChatColor.GRAY + "Reporter: ").append(report.getReporter()).create()));
+
+                sender.spigot().sendMessage(message);
+            }
+        } catch (IndexOutOfBoundsException ignored) {}
     }
 
     private static void issuePunishment(String type, String name, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
