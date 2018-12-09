@@ -53,7 +53,8 @@ public class Report {
     }
 
     public String getAgo() {
-        Double time = (System.currentTimeMillis() - this.getTimestamp()) / 1000D;
+        double time = (System.currentTimeMillis() - this.getTimestamp()) / 1000D;
+        String ago;
 
         int hours = (int) Math.floor(time / 3600);
         time -= hours * 3600;
@@ -62,17 +63,15 @@ public class Report {
         int seconds = (int) Math.floor(time);
 
         if (hours > 0) {
-            return (hours == 1) ? "1 hour" : hours + " hours";
+            ago = (hours == 1) ? "1 hour" : hours + " hours";
+        } else if (minutes > 0) {
+            ago = (minutes == 1) ? "1 minute" : minutes + " minutes";
+        } else if (seconds > 0) {
+            ago = (seconds == 1) ? "1 second" : seconds + " seconds";
+        } else {
+            ago = "moments";
         }
 
-        if (minutes > 0) {
-            return (minutes == 1) ? "1 minute" : minutes + " minutes";
-        }
-
-        if (seconds > 0) {
-            return (seconds == 1) ? "1 second" : seconds + " seconds";
-        }
-
-        return "moments";
+        return ago;
     }
 }

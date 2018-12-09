@@ -43,6 +43,12 @@ public class ReportsModule extends MatchModule implements Listener {
         return reports;
     }
 
+    public static void clear() {
+        amounts.clear();
+        cooldown.clear();
+        reports.clear();
+    }
+
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         amounts.remove(event.getPlayer().getUniqueId().toString());

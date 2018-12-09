@@ -328,14 +328,27 @@ public class PunishCommands {
     @Command(aliases = {"reports"}, desc = "View reports", max = 1, usage = "[page]")
     @CommandPermissions({"tgm.reports"})
     public static void reports(CommandContext cmd, CommandSender sender) throws CommandException {
+        if (cmd.argsLength() == 1 && cmd.getString(0).equalsIgnoreCase("clear")) {
+            ReportsModule.clear();
+            sender.sendMessage(ChatColor.GREEN + "Cleared all reports.");
+            return;
+        }
+
+        int index;
+
+        try {
+            index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+        } catch (NumberFormatException e) {
+            sender.sendMessage(org.bukkit.ChatColor.RED + "Number expected.");
+            return;
+        }
+
         List<Report> reports = ReportsModule.getReports();
 
         if (reports.size() == 0) {
             sender.sendMessage(ChatColor.RED + "No reports found.");
             return;
         }
-
-        int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
 
         int pageSize = 9;
 
