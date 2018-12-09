@@ -301,6 +301,10 @@ public class CycleCommands {
     
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
         MatchManager matchManager = TGM.get().getMatchManager();
         GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
