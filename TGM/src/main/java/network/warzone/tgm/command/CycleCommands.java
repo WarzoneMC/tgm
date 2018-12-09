@@ -625,16 +625,14 @@ public class CycleCommands {
         } else {
             if (!cmd.getString(0).equalsIgnoreCase("kills"))  {
                 sender.sendMessage(ChatColor.RED + "Invalid stat: " + cmd.getString(0));
-            } else {
-                if (cmd.getString(0).equalsIgnoreCase("kills")) {
-                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                        int place = 0;
-                        sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
-                        for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
-                            sender.sendMessage(profileToTextComponent(player, ++place));
-                        }
-                    });
-                }
+            } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    int place = 0;
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
+                    for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
+                        sender.sendMessage(profileToTextComponent(player, ++place));
+                    }
+                });
             }
         }
     }
