@@ -174,6 +174,21 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
+    public KillsLeaderboardResponse getKillsLeaderboard() {
+        try {
+            HttpResponse<KillsLeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/kills?limit=10")
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(KillsLeaderboardResponse.class);
+            System.out.println(response.getBody());
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return new KillsLeaderboardResponse();
+        }
+    }
+
+    @Override
     public RankList retrieveRanks() {
         try {
             HttpResponse<RankList> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")

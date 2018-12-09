@@ -56,4 +56,6 @@ public interface TeamClient {
 
     PlayerAltsResponse getAlts(String name);
 
+    KillsLeaderboardResponse getKillsLeaderboard();
+
 }
