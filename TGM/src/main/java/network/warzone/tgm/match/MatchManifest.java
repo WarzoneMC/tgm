@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.kit.KitLoaderModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.portal.PortalLoaderModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
+import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -69,6 +70,7 @@ public abstract class MatchManifest {
         modules.add(new ItemRemoveModule());
         modules.add(new RegenModule());
         modules.add(new KillstreakModule());
+        modules.add(new ReportsModule());
         modules.add(new StatsModule());
         modules.add(new PortalLoaderModule());
         modules.add(new WorldBorderModule());
