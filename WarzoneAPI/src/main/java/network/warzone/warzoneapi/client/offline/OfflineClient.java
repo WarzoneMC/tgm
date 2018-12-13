@@ -91,6 +91,9 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
+    public KillsLeaderboardResponse getKillsLeaderboard() { return new KillsLeaderboardResponse(); }
+
+    @Override
     public RevertPunishmentResponse revertPunishment(String id) {
         return null;
     }

@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
@@ -29,7 +30,6 @@ import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -618,6 +618,25 @@ public class CycleCommands {
         }
     }
 
+    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage="(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
+    public static void leaderboard(CommandContext cmd, CommandSender sender) {
+        if (!TGM.get().getConfig().getBoolean("api.stats.enabled") || !TGM.get().getConfig().getBoolean("api.enabled")) {
+            sender.sendMessage(ChatColor.RED + "Stat tracking is disabled");
+        } else {
+            if (!cmd.getString(0).equalsIgnoreCase("kills"))  {
+                sender.sendMessage(ChatColor.RED + "Invalid stat: " + cmd.getString(0));
+            } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    int place = 0;
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
+                    for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
+                        sender.sendMessage(profileToTextComponent(player, ++place));
+                    }
+                });
+            }
+        }
+    }
+
     @Command(aliases = {"stats", "stat"}, desc = "View your stats.")
     public static void stats(final CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() == 0) {
@@ -701,4 +720,21 @@ public class CycleCommands {
         TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
     }
 
+    private static TextComponent profileToTextComponent(UserProfile profile, int place) {
+        TextComponent main = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&7" + place + "." + " &b" + profile.getName() + " &7(&9" + profile.getKills() + " kills&7)"));
+        main.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
+                new TextComponent(ChatColor.AQUA + "Level: " + ChatColor.RESET + profile.getLevel()),
+                new TextComponent("\n"),
+                new TextComponent("\n" + ChatColor.AQUA + "XP: " + ChatColor.RESET + profile.getXP()),
+                new TextComponent("\n" + ChatColor.AQUA + "Kills: " + ChatColor.RESET + profile.getKills()),
+                new TextComponent("\n" + ChatColor.AQUA + "Deaths: " + ChatColor.RESET + profile.getDeaths()),
+                new TextComponent("\n" + ChatColor.AQUA + "K/D: " + ChatColor.RESET + profile.getKDR()),
+                new TextComponent("\n"),
+                new TextComponent("\n" + ChatColor.AQUA + "Wins: " + ChatColor.RESET + profile.getWins()),
+                new TextComponent("\n" + ChatColor.AQUA + "Losses: " + ChatColor.RESET + profile.getLosses()),
+                new TextComponent("\n" + ChatColor.AQUA + "W/L: " + ChatColor.RESET + profile.getWLR())
+        }));
+        main.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/stats " + profile.getName()));
+        return main;
+    }
 }
