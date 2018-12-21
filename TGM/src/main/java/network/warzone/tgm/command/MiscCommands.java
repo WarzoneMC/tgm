@@ -2,7 +2,6 @@ package network.warzone.tgm.command;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -16,7 +15,6 @@ be enabled WHETHER THE API IS ENABLED OR NOT.
 public class MiscCommands {
 
     @Command(aliases= {"ping"}, desc = "Check player ping", max = 1, usage = "(name)")
-    @CommandPermissions({"tgm.ping"})
     public static void ping(CommandContext cmd, CommandSender sender) {
         Player player;
         if (cmd.argsLength() > 0) {
