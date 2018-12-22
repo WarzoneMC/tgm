@@ -49,7 +49,7 @@ As an example, a map should be able to provide different spawn points as the mat
  
 4. (Optional) Install WorldEdit to enable the Teleport Tool. 
  
-5. Start the server.
+5. Start the server. If you want stats to save, you need to setup the API [here](https://github.com/WarzoneMC/api).
  
 ## Developer Tips
 

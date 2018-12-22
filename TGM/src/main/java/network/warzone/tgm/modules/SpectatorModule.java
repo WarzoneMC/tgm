@@ -301,8 +301,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        Player player = (Player) event.getDamager();
-        if (isSpectating(player)) event.setCancelled(true);
+        if (event.getDamager() instanceof Player && isSpectating((Player) event.getDamager()))
+            event.setCancelled(true);
     }
 
     @EventHandler
