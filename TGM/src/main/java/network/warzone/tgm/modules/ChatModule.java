@@ -65,7 +65,7 @@ public class ChatModule extends MatchModule implements Listener {
         return channels;
     }
 
-    private final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
+    private final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "report ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
