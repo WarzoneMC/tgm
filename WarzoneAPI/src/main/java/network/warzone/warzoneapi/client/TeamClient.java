@@ -23,6 +23,11 @@ public interface TeamClient {
     UserProfile login(PlayerLogin playerLogin);
 
     /**
+     * Called when a player logs out.
+     */
+    void logout(PlayerLogout playerLogout);
+
+    /**
      * Called whenever a map is loaded.
      * Returns the map id.
      */
@@ -35,6 +40,10 @@ public interface TeamClient {
     void finishMatch(MatchFinishPacket matchFinishPacket);
 
     void destroyWool(DestroyWoolRequest destroyWoolRequest);
+
+    void pickupWool(WoolPickupRequest woolPickupRequest);
+
+    void placeWool(WoolPlacementRequest woolPlacementRequest);
     
     RankList retrieveRanks();
 

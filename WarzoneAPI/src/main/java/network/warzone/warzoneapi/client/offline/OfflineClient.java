@@ -26,8 +26,13 @@ public class OfflineClient implements TeamClient {
     @Override
     public UserProfile login(PlayerLogin playerLogin) {
         return new UserProfile(new ObjectId(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
-                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), new ArrayList<>(), new ArrayList<>(),
-                0, 0, 0, 0, 0, new ArrayList<>(), new ArrayList<>(), false);
+                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), 0, Collections.singletonList(playerLogin.getIp()), new ArrayList<>(), new ArrayList<>(),
+                0, 0, 0, 0, 0, 0, 0, new ArrayList<>(), new ArrayList<>(), false);
+    }
+
+    @Override
+    public void logout(PlayerLogout playerLogout) {
+
     }
 
     @Override
@@ -52,6 +57,16 @@ public class OfflineClient implements TeamClient {
 
     @Override
     public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
+
+    }
+
+    @Override
+    public void pickupWool(WoolPickupRequest woolPickupRequest) {
+
+    }
+
+    @Override
+    public void placeWool(WoolPlacementRequest woolPlacementRequest) {
 
     }
 
