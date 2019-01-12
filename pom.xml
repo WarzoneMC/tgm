@@ -79,8 +79,8 @@
     </build>
 
     <repositories>
-        <repository>
-            <id>papermc-repo</id> <!-- paper-api repo -->
+        <repository> <!-- paper-api repo -->
+            <id>papermc-repo</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
