@@ -24,7 +24,7 @@ import org.bukkit.projectiles.ProjectileSource;
 public class EntityDamageModule extends MatchModule implements Listener {
 
     @EventHandler
-    public void onProjectileHitt(ProjectileHitEvent event) {
+    public void onProjectileHit(ProjectileHitEvent event) {
         ProjectileSource shooter = event.getEntity().getShooter();
         if (!(shooter instanceof Player)) return;
         if (event.getEntityType() != EntityType.FISHING_HOOK &&

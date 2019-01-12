@@ -80,7 +80,7 @@
 
     <repositories>
         <repository>
-            <id>papermc-repo</id>
+            <id>papermc-repo</id> <!-- paper-api repo -->
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
