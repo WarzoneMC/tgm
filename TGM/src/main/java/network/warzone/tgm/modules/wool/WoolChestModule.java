@@ -4,28 +4,31 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Getter
 public class WoolChestModule extends MatchModule implements Listener {
 
     private final HashMap<InventoryHolder, DyeColor> woolChests = new HashMap<>();
+    private final List<Location> disqualifiedChests = new ArrayList<>();
 
     private int runnableId = -1;
 
@@ -41,6 +44,18 @@ public class WoolChestModule extends MatchModule implements Listener {
     public void unload() {
         Bukkit.getScheduler().cancelTask(runnableId);
         woolChests.clear();
+        disqualifiedChests.clear();
+    }
+
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        Location place = event.getBlock().getLocation();
+        if(disqualifiedChests.contains(place)) disqualifiedChests.remove(place);
+        BlockState state = event.getBlock().getState();
+        if(state instanceof Chest) {
+            Inventory inventory = ((Chest) state).getBlockInventory();
+            registerInventory(inventory);
+        }
     }
 
     @EventHandler
@@ -56,7 +71,6 @@ public class WoolChestModule extends MatchModule implements Listener {
             }
         } else if (state instanceof DoubleChest) {
             DoubleChest chest = (DoubleChest) event.getInventory().getLocation().getBlock().getState();
-
             if (!isWoolChest(chest.getRightSide())) {
                 registerInventory(chest.getRightSide().getInventory());
             }
@@ -103,6 +117,14 @@ public class WoolChestModule extends MatchModule implements Listener {
     }
 
     private void registerInventory(Inventory inventory) {
+        boolean checkedDouble = false;
+        DoubleChestInventory both = null;
+        if(disqualifiedChests.contains(inventory.getLocation())) return;
+        else if(inventory instanceof DoubleChestInventory) {
+            checkedDouble = true;
+            both = (DoubleChestInventory) inventory;
+            if(disqualifiedChests.contains(both.getLeftSide().getLocation()) || disqualifiedChests.contains(both.getRightSide().getLocation())) return;
+        }
         for (ItemStack itemStack : inventory.getContents()) {
             if (itemStack != null && itemStack.getType() != null &&
                     itemStack.getType() == Material.WOOL) {
@@ -112,5 +134,9 @@ public class WoolChestModule extends MatchModule implements Listener {
                 return;
             }
         }
+        if(checkedDouble) {
+            disqualifiedChests.add(both.getLeftSide().getLocation());
+            disqualifiedChests.add(both.getRightSide().getLocation());
+        } else disqualifiedChests.add(inventory.getLocation());
     }
 }
