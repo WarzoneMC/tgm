@@ -23,7 +23,7 @@ public class Match {
     private final World world;
     private final MapContainer mapContainer;
     @Setter private MatchStatus matchStatus = MatchStatus.PRE;
-
+    @Setter private UUID firstBlood;
     private long startedTime;
     private long finishedTime;
 

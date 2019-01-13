@@ -10,9 +10,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -100,7 +98,16 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         DeathModule module = getPlayer(event.getEntity());
-
+        Match currentMatch = TGM.get().getMatchManager().getMatch();
+        if(currentMatch.getFirstBlood().toString().length() > 0 && module.getKiller() != null) {
+            String message = killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " dealt" + ChatColor.GOLD + ChatColor.BOLD + " FIRST BLOOD!";
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                Location location = player.getLocation().clone().add(0.0, 100.0, 0.0);
+                player.getPlayer().sendMessage(message);
+                player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 1000, 2);
+            }
+            currentMatch.setFirstBlood(module.getKiller().getUniqueId());
+        }
         new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()).callEvent();
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);
