@@ -30,7 +30,7 @@ public class BuildFilterType implements FilterType, Listener {
     private final FilterEvaluator evaluator;
     private final String message;
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         for (Region region : regions) {
             if (region.contains(event.getBlockPlaced().getLocation())) {

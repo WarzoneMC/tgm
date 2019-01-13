@@ -58,22 +58,12 @@ public class WoolObjective implements Listener {
         this.chatColor = ColorConverter.convertDyeColorToChatColor(color);
     }
 
-    @EventHandler
-    public void onPlace(BlockPlaceEvent event) {
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPlacePre(BlockPlaceEvent event) {
+        if(!podium.contains(event.getBlockPlaced().getLocation()) || !owner.containsPlayer(event.getPlayer())) return;
         if (event.getBlockPlaced().getType() == Material.WOOL && event.getBlockPlaced().getState().getData().getData() == color) {
             if (!completed) {
-
-                if (!podium.contains(event.getBlockPlaced().getLocation())) {
-                    return;
-                }
-
-                if (!owner.containsPlayer(event.getPlayer())) {
-                    return;
-                }
-
-                event.setCancelled(false); //override filter
                 setCompleted(true);
-
                 TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
                 MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
 
@@ -81,11 +71,19 @@ public class WoolObjective implements Listener {
                     woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
                 }
             }
-        } else {
-            if (podium.contains(event.getBlockPlaced().getLocation())) {
-                event.setCancelled(true);
-            }
         }
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlacePost(BlockPlaceEvent event) {
+        if(!podium.contains(event.getBlockPlaced().getLocation()) || !(owner.containsPlayer(event.getPlayer()))) return;
+        if (event.getBlockPlaced().getType() == Material.WOOL && event.getBlockPlaced().getState().getData().getData() == color) {
+            event.setCancelled(false); // allow
+        } else {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.RED + "Wrong block!");
+        } // Special Case
     }
 
     @EventHandler
