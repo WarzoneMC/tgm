@@ -7,6 +7,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.MapContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -23,7 +24,7 @@ public class Match {
     private final World world;
     private final MapContainer mapContainer;
     @Setter private MatchStatus matchStatus = MatchStatus.PRE;
-    @Setter private UUID firstBlood;
+    @Setter private Player firstBlood;
     private long startedTime;
     private long finishedTime;
 
@@ -32,6 +33,7 @@ public class Match {
         this.matchManifest = matchManifest;
         this.world = world;
         this.mapContainer = mapContainer;
+        this.firstBlood = null;
     }
 
     /**

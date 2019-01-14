@@ -139,7 +139,7 @@ public class InfectionModule extends MatchModule implements Listener {
 
         ApiManager api = TGM.get().getApiManager();
         Death death = new Death(playerContext.getUserProfile().getId().toString(), killerId, playerItem, killerItem,
-                api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
+                false, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
 
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }

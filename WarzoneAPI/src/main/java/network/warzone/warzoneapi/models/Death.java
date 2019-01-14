@@ -10,6 +10,7 @@ public class Death {
 
     @Getter private String playerItem;
     @Getter private String killerItem;
+    @Getter private boolean firstBlood;
 
     @Getter private String map; //id
     @Getter private String match; //id

@@ -670,6 +670,8 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + up.getDeaths());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + up.getKDR());
                 sender.sendMessage("");
+                sender.sendMessage(ChatColor.DARK_AQUA + "   First Bloods: " + ChatColor.GREEN + up.getFirstBloods());
+                sender.sendMessage("");
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + up.getWins());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + up.getLosses());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + up.getWLR());
@@ -687,6 +689,8 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
         sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
         sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + targetUser.getUserProfile().getKDR());
+        sender.sendMessage("");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   First Bloods: " + ChatColor.GREEN + targetUser.getUserProfile().getFirstBloods());
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
         sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());

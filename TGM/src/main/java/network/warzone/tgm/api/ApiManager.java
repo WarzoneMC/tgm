@@ -4,6 +4,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.ParsedTeam;
+import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.ChatModule;
@@ -18,6 +19,7 @@ import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -150,9 +152,16 @@ public class ApiManager implements Listener {
     public void onKill(TGMPlayerDeathEvent event) {
         if (isStatsDisabled()) return;
         DeathModule module = deathModule.getPlayer(event.getVictim());
-
+        Match currentMatch = TGM.get().getMatchManager().getMatch();
+        Player firstBlooder = null;
+        boolean firstBlood = false;
+        if(currentMatch != null) {
+            firstBlooder = currentMatch.getFirstBlood();
+            if(firstBlooder == null || firstBlooder.equals(module.getKiller())) {
+                firstBlood = true;
+            }
+        }
         PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(module.getPlayer());
-
         killed.getUserProfile().addDeath();
 
         String playerItem = module.getPlayer().getInventory().getItemInMainHand() == null ? "" : module.getPlayer().getInventory().getItemInMainHand().getType().toString();
@@ -163,13 +172,14 @@ public class ApiManager implements Listener {
             PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(module.getKiller());
             if (context == null) return;
             context.getUserProfile().addKill();
+            if(firstBlood) context.getUserProfile().addFirstBlood();
             Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, UserProfile.XP_PER_KILL, context.getUserProfile().getXP() - UserProfile.XP_PER_KILL, context.getUserProfile().getXP()));
 
             killerId = context.getUserProfile().getId().toString();
         }
 
         Death death = new Death(killed.getUserProfile().getId().toString(), killerId, playerItem,
-                killerItem, matchInProgress.getMap(), matchInProgress.getId());
+                killerItem, firstBlood, matchInProgress.getMap(), matchInProgress.getId());
 
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }
