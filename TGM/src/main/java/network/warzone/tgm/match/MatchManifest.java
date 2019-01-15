@@ -74,6 +74,7 @@ public abstract class MatchManifest {
         modules.add(new StatsModule());
         modules.add(new PortalLoaderModule());
         modules.add(new WorldBorderModule());
+        modules.add(new FirstBloodModule());
         return modules;
     }
 }

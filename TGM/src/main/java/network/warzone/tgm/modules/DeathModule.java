@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -39,6 +40,7 @@ public class DeathModule extends MatchModule implements Listener {
     @Getter @Setter private String playerName, killerName;
     @Getter @Setter private MatchTeam playerTeam, killerTeam;
     @Getter @Setter private Location playerLocation, killerLocation;
+    @Getter private GameType gameSelection;
 
     public DeathModule(Player player) {
         this.player = player;
@@ -46,6 +48,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     public void load(Match match) {
         teamManagerModule = match.getModule(TeamManagerModule.class);
+        gameSelection = match.getMapContainer().getMapInfo().getGametype();
     }
 
     public void unload() {
@@ -101,22 +104,9 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
+        if(gameSelection == GameType.Infected) return;
         DeathModule module = getPlayer(event.getEntity());
-        Match currentMatch = TGM.get().getMatchManager().getMatch();
-        if(currentMatch != null) {
-            if(currentMatch.getFirstBlood() == null && module.getKiller() != null) {
-                currentMatch.setFirstBlood(module.getKiller());
-                String msg = "";
-                if (!module.getPlayerTeam().isSpectator() && module.getKiller() != null && module.getKillerTeam() != null) {
-                    msg = module.getKillerTeam().getColor() + module.getKillerName() + ChatColor.GRAY + " has drawn" + ChatColor.GOLD + ChatColor.BOLD + " FIRST BLOOD!";
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        Location location = player.getLocation().clone().add(0.0, 100.0, 0.0);
-                        player.getPlayer().sendMessage(msg);
-                        player.playSound(location, Sound.ENTITY_PLAYER_LEVELUP, 1000, 2);
-                    }
-                }
-            }
-        }
+
         new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()).callEvent();
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);

@@ -7,10 +7,14 @@ import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.DeathMessageModule;
+import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.modules.FirstBloodModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import network.warzone.warzoneapi.models.Death;
@@ -19,6 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -39,6 +44,8 @@ public class InfectionModule extends MatchModule implements Listener {
 
     private Match match;
     private TeamManagerModule teamManager;
+    private DeathModule deathModuleController;
+    private FirstBloodModule firstBloodController;
 
     private int length;
 
@@ -49,6 +56,8 @@ public class InfectionModule extends MatchModule implements Listener {
         length = json.get("length").getAsInt();
         teamManager = match.getModule(TeamManagerModule.class);
         this.match = match;
+        this.deathModuleController = match.getModule(DeathModule.class);
+        this.firstBloodController = match.getModule(FirstBloodModule.class);
 
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getWinningTeam);
     }
@@ -93,7 +102,9 @@ public class InfectionModule extends MatchModule implements Listener {
 
         MatchTeam humans = teamManager.getTeamById("humans");
         MatchTeam infected = teamManager.getTeamById("infected");
-
+        DeathModule deadModule = null;
+        deadModule = deathModuleController.getPlayer((Player) event.getEntity());
+        firstBloodController.onKill(new TGMPlayerDeathEvent(deadModule.getPlayer(), deadModule.getKiller(), deadModule.getCause(), deadModule.getItem()));
         if (humans.containsPlayer(player)) {
             if (event.getDamager() instanceof Player) {
                 broadcastMessage(String.format("%s%s &7has been infected by %s%s",
