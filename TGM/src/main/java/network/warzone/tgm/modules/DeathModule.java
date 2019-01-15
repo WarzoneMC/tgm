@@ -13,8 +13,6 @@ import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;

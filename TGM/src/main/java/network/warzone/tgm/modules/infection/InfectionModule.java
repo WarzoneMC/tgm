@@ -7,7 +7,6 @@ import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.DeathMessageModule;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.FirstBloodModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -23,7 +22,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -150,7 +148,7 @@ public class InfectionModule extends MatchModule implements Listener {
 
         ApiManager api = TGM.get().getApiManager();
         Death death = new Death(playerContext.getUserProfile().getId().toString(), killerId, playerItem, killerItem,
-                false, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
+                firstBloodController.isEnabled(), api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
 
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }

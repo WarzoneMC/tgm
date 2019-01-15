@@ -9,6 +9,7 @@ import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.modules.FirstBloodModule;
 import network.warzone.tgm.modules.StatsModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -157,7 +158,8 @@ public class ApiManager implements Listener {
         boolean firstBlood = false;
         if(currentMatch != null) {
             firstBlooder = currentMatch.getFirstBlood();
-            if(firstBlooder == null || firstBlooder.equals(module.getKiller())) {
+            Bukkit.broadcastMessage("" + currentMatch.getModule(FirstBloodModule.class).isEnabled());
+            if(currentMatch.getModule(FirstBloodModule.class).isEnabled() && (firstBlooder == null || firstBlooder.equals(module.getKiller()))) {
                 firstBlood = true;
             }
         }
