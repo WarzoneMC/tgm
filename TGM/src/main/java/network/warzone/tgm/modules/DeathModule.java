@@ -37,6 +37,7 @@ public class DeathModule extends MatchModule implements Listener {
     @Getter @Setter private String playerName, killerName;
     @Getter @Setter private MatchTeam playerTeam, killerTeam;
     @Getter @Setter private Location playerLocation, killerLocation;
+    @Getter @Setter private long stampKill;
 
     public DeathModule(Player player) {
         this.player = player;
@@ -84,6 +85,7 @@ public class DeathModule extends MatchModule implements Listener {
             module.setItem(event.getDamager() instanceof Arrow ? ItemFactory.createItem(Material.BOW) : damager == null ? ItemFactory.createItem(Material.AIR) : damager.getInventory().getItemInMainHand());
 
             module.setKillerName(damager == null ? null : damager.getName());
+            module.setStampKill(damager == null ? -1 : System.currentTimeMillis());
             module.setKillerTeam(damager == null ? null : teamManagerModule.getTeam(damager));
             module.setKillerLocation(damager == null ? null : damager.getLocation());
         }
@@ -100,7 +102,7 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         DeathModule module = getPlayer(event.getEntity());
-
+        if(module.getStampKill() > 0 && System.currentTimeMillis() - module.getStampKill() >= 1000 * 30) module.setKiller(null);
         new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()).callEvent();
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);
