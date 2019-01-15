@@ -101,8 +101,13 @@ public class InfectionModule extends MatchModule implements Listener {
         MatchTeam humans = teamManager.getTeamById("humans");
         MatchTeam infected = teamManager.getTeamById("infected");
         DeathModule deadModule = null;
-        deadModule = deathModuleController.getPlayer((Player) event.getEntity());
-        firstBloodController.onKill(new TGMPlayerDeathEvent(deadModule.getPlayer(), deadModule.getKiller(), deadModule.getCause(), deadModule.getItem()));
+        boolean wasFirstBlood = false;
+        if(firstBloodController.isRelevant()) {
+            deadModule = deathModuleController.getPlayer((Player) event.getEntity());
+            wasFirstBlood = true;
+            firstBloodController.onKill(new TGMPlayerDeathEvent(deadModule.getPlayer(), deadModule.getKiller(), deadModule.getCause(), deadModule.getItem()));
+            firstBloodController.setRelevant(false);
+        }
         if (humans.containsPlayer(player)) {
             if (event.getDamager() instanceof Player) {
                 broadcastMessage(String.format("%s%s &7has been infected by %s%s",
@@ -148,7 +153,7 @@ public class InfectionModule extends MatchModule implements Listener {
 
         ApiManager api = TGM.get().getApiManager();
         Death death = new Death(playerContext.getUserProfile().getId().toString(), killerId, playerItem, killerItem,
-                firstBloodController.isEnabled(), api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
+                wasFirstBlood, api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
 
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }

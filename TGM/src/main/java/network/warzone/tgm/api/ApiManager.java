@@ -158,8 +158,10 @@ public class ApiManager implements Listener {
         boolean firstBlood = false;
         if(currentMatch != null) {
             firstBlooder = currentMatch.getFirstBlood();
-            if(currentMatch.getModule(FirstBloodModule.class).isEnabled() && (firstBlooder == null || firstBlooder.equals(module.getKiller()))) {
+            FirstBloodModule firstBloodController = currentMatch.getModule(FirstBloodModule.class);
+            if(firstBloodController.isEnabled() && (firstBlooder == null || firstBlooder.equals(module.getKiller())) && firstBloodController.isRelevant()) {
                 firstBlood = true;
+                firstBloodController.setRelevant(false);
             }
         }
         PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(module.getPlayer());
