@@ -66,7 +66,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
         TimeModule time = TGM.get().getModule(TimeModule.class);
         time.setTimeLimitService(this::getWinningTeam);
         time.getDependents().add(this);
-        this.timeScoreboardValue = "0:00";
+        this.timeScoreboardValue = length + ":00";
         this.scoreboardManagerController = TGM.get().getModule(ScoreboardManagerModule.class);
     }
 
@@ -94,7 +94,9 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     }
 
     public void processSecond(int elapsed) {
-        timeScoreboardValue = ChatColor.WHITE + "Time left: " + ChatColor.AQUA + Strings.formatTime((length * 60) - elapsed);
+        int diff = (length * 60) - elapsed;
+        if(diff < 0) diff = 0;
+        timeScoreboardValue = ChatColor.WHITE + "Time left: " + ChatColor.AQUA + Strings.formatTime(diff);
         for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
     }
 
