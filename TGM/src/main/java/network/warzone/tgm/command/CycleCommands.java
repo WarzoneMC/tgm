@@ -197,7 +197,7 @@ public class CycleCommands {
     @CommandPermissions({"tgm.cycle"})
     public static void cycle(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        if (matchStatus != MatchStatus.MID) {
+        if (!(matchStatus == MatchStatus.MID || matchStatus == MatchStatus.OVERTIME)) {
             int time = CycleCountdown.START_TIME;
             if (cmd.argsLength() > 0) {
                 try {
@@ -237,7 +237,7 @@ public class CycleCommands {
     @CommandPermissions({"tgm.end"})
     public static void end(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        if (matchStatus == MatchStatus.MID) {
+        if (matchStatus == MatchStatus.MID || matchStatus == MatchStatus.OVERTIME) {
             if (cmd.argsLength() > 0) {
                 MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeamFromInput(cmd.getJoinedStrings(0));
                 if (matchTeam == null) {
@@ -310,8 +310,11 @@ public class CycleCommands {
         GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
         MatchStatus matchStatus = matchManager.getMatch().getMatchStatus();
         if (cmd.argsLength() == 0) {
-            if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
-                if (!matchStatus.equals(MatchStatus.PRE)) {
+            if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode() || matchStatus == MatchStatus.OVERTIME) {
+                if(matchStatus == MatchStatus.OVERTIME) {
+                    sender.sendMessage(ChatColor.RED + "You can't pick a team after the match goes to overtime.");
+                    return;
+                } else if (!matchStatus.equals(MatchStatus.PRE)) {
                     sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
                     return;
                 }
@@ -350,7 +353,7 @@ public class CycleCommands {
                         attemptJoinTeam((Player) sender, matchTeam, false);
                         return;
                     }
-                } else if (matchStatus.equals(MatchStatus.MID)) {
+                } else if (matchStatus.equals(MatchStatus.MID) || matchStatus.equals(MatchStatus.OVERTIME)) {
                     if (!matchTeam.isSpectator()) {
                         sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
                         return;

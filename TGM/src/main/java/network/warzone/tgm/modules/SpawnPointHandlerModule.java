@@ -33,7 +33,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID || TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.OVERTIME) {
             spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
         }
         //player is joining the server

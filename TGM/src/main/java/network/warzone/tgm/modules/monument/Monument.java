@@ -39,7 +39,8 @@ public class Monument implements Listener {
         if (region.contains(event.getBlock().getLocation())) {
             if (materials == null || materials.contains(event.getBlock().getType())) {
                 if (canDamage(event.getPlayer())) {
-                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)
+                            || TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.OVERTIME)) {
                         event.setCancelled(false); //override filters
                         event.getBlock().getDrops().clear();
 

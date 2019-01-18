@@ -91,7 +91,7 @@ public class TimeModule extends MatchModule {
 
     public double getTimeElapsed() {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        if (matchStatus == MatchStatus.MID) {
+        if (matchStatus == MatchStatus.MID || matchStatus == MatchStatus.OVERTIME) {
             return (double) ((System.currentTimeMillis() - startedTimeStamp) / 1000);
         } else if (matchStatus == MatchStatus.POST) {
             return (double) ((endedTimeStamp - startedTimeStamp) / 1000);

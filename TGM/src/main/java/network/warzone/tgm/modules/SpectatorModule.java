@@ -174,7 +174,7 @@ public class SpectatorModule extends MatchModule implements Listener {
      */
     public boolean isSpectating(Player player) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player);
+        return !(matchStatus == MatchStatus.MID || matchStatus == MatchStatus.OVERTIME) || spectators.containsPlayer(player);
     }
 
     @EventHandler
