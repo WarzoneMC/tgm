@@ -18,10 +18,12 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
-import network.warzone.tgm.player.PlayerManager;
 import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
-import network.warzone.tgm.util.*;
+import network.warzone.tgm.util.ColorConverter;
+import network.warzone.tgm.util.FireworkUtil;
+import network.warzone.tgm.util.Parser;
+import network.warzone.tgm.util.TitleAPI;
 import network.warzone.warzoneapi.models.DestroyWoolRequest;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang3.StringUtils;
@@ -34,10 +36,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -162,7 +165,7 @@ public class DTMModule extends MatchModule implements Listener {
     }
 
     private void checkOvertimeOver() {
-        if(!(TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.OVERTIME)) return;
+        if(TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.OVERTIME) return;
         int winnerCount = 0;
         MatchTeam winner = null;
         for(MatchTeam team : teamManager.getTeams()) {
@@ -192,8 +195,8 @@ public class DTMModule extends MatchModule implements Listener {
         if (!(event.getEntity() instanceof Player)) return;
         Player player = (Player) event.getEntity();
 
-        if (!(TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.OVERTIME)
-                || teamManager.getTeam(player).isSpectator() || player.getHealth() - event.getFinalDamage() >= 0.5) return;
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.OVERTIME ||
+                teamManager.getTeam(player).isSpectator() || player.getHealth() - event.getFinalDamage() >= 0.5) return;
 
 
         for(String id : overtime.getNoRespawn()) {
