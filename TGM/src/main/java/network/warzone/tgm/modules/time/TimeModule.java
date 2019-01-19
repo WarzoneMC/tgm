@@ -19,6 +19,7 @@ public class TimeModule extends MatchModule {
     private long endedTimeStamp = 0;
 
     private List<Broadcast> broadcasts = new ArrayList<>();
+    private List<TimeUpdate> dependents = new ArrayList<>();
 
     @Setter private boolean timeLimited = false;
     @Setter private int timeLimit = 20*60; // Default
@@ -61,6 +62,9 @@ public class TimeModule extends MatchModule {
         startedTimeStamp = System.currentTimeMillis();
         taskID = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             int time = (int) getTimeElapsed();
+            for(TimeUpdate module : dependents) {
+                module.processSecond(time);
+            }
             for (Broadcast broadcast : broadcasts) {
                 broadcast.run(time);
             }

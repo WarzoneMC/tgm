@@ -9,14 +9,20 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.FirstBloodModule;
+import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
+import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
+import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.modules.time.TimeUpdate;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
+import network.warzone.tgm.util.Strings;
 import network.warzone.warzoneapi.models.Death;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -32,18 +38,25 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
  * Created by Draem on 7/31/2017.
  */
 @Getter
-public class InfectionModule extends MatchModule implements Listener {
+public class InfectionModule extends MatchModule implements Listener, TimeUpdate {
 
     private Match match;
     private TeamManagerModule teamManager;
     private DeathModule deathModuleController;
     private FirstBloodModule firstBloodController;
+    private HashMap<Integer, String> teamScoreboardLines = new HashMap<>();
+    private HashMap<MatchTeam, Integer> teamAliveScoreboardLines = new HashMap<>();
+    private ScoreboardManagerModule scoreboardManagerController;
+    private int timeScoreboardLine;
+    private String timeScoreboardValue;
+    private boolean defaultScoreboardLoaded = false;
 
     private int length;
 
@@ -57,8 +70,13 @@ public class InfectionModule extends MatchModule implements Listener {
         this.deathModuleController = match.getModule(DeathModule.class);
         this.firstBloodController = match.getModule(FirstBloodModule.class);
 
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getWinningTeam);
+        TimeModule time = TGM.get().getModule(TimeModule.class);
+        time.setTimeLimitService(this::getWinningTeam);
+        time.getDependents().add(this);
+        this.timeScoreboardValue = length + ":00";
+        this.scoreboardManagerController = TGM.get().getModule(ScoreboardManagerModule.class);
     }
+
 
     @Override
     public void enable() {
@@ -82,8 +100,63 @@ public class InfectionModule extends MatchModule implements Listener {
         match.getModule(InfectedTimeLimit.class).startCountdown(length);
     }
 
+    public void processSecond(int elapsed) {
+        int diff = (length * 60) - elapsed;
+        if(diff < 0) diff = 0;
+        timeScoreboardValue = ChatColor.WHITE + "Time left: " + ChatColor.AQUA + Strings.formatTime(diff);
+        for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
+    }
+
+    @Override
+    public void unload() {
+        teamScoreboardLines.clear();
+        teamAliveScoreboardLines.clear();
+    }
+
     private MatchTeam getWinningTeam() {
         return teamManager.getTeamByAlias("humans");
+    }
+
+
+    private void refreshScoreboard(SimpleScoreboard board) {
+        if(board == null) return;
+        teamScoreboardLines.forEach((i, s) -> board.add(s, (Integer) i));
+        refreshOnlyDynamicScoreboard(board);
+    }
+
+    private void refreshOnlyDynamicScoreboard(SimpleScoreboard board) {
+        if(board == null) return;
+        teamAliveScoreboardLines.forEach((mt, i) -> board.add(
+                "  " + ChatColor.YELLOW + mt.getMembers().size() + ChatColor.WHITE + " alive", i));
+        board.add(timeScoreboardValue, timeScoreboardLine);
+        board.update();
+    }
+
+    @EventHandler
+    public void onScoreboardInit(ScoreboardInitEvent event) {
+        if(!defaultScoreboardLoaded) defaultScoreboard();
+        refreshScoreboard(event.getSimpleScoreboard());
+    }
+
+    private void defaultScoreboard() {
+        teamScoreboardLines.clear();
+        teamAliveScoreboardLines.clear();
+        int positionOnScoreboard = 0;
+        int spaceCount = 1;
+        for(MatchTeam team : teamManager.getTeams()) {
+            if(team.isSpectator()) continue;
+            teamScoreboardLines.put(positionOnScoreboard, StringUtils.repeat(" ", spaceCount++));
+            positionOnScoreboard++;
+            teamAliveScoreboardLines.put(team, positionOnScoreboard);
+            positionOnScoreboard++;
+            teamScoreboardLines.put(positionOnScoreboard, team.getColor() + team.getAlias());
+            positionOnScoreboard++;
+        }
+        teamScoreboardLines.put(positionOnScoreboard++, StringUtils.repeat(" ", spaceCount++));
+        timeScoreboardLine = positionOnScoreboard++;
+        timeScoreboardValue = ChatColor.WHITE + "Time: " + ChatColor.AQUA + "0:00";
+        teamScoreboardLines.put(positionOnScoreboard, StringUtils.repeat(" ", spaceCount));
+        defaultScoreboardLoaded = true;
     }
 
     @EventHandler
@@ -189,6 +262,9 @@ public class InfectionModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if(defaultScoreboardLoaded) {
+            for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
+        }
         if (teamManager.getTeamById("humans").getMembers().size() == 0 && match.getMatchStatus().equals(MatchStatus.MID)) {
             TGM.get().getMatchManager().endMatch(teamManager.getTeamById("infected"));
         }
