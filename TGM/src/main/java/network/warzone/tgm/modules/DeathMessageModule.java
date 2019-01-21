@@ -61,7 +61,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
             } else if (cause.equals(DamageCause.PROJECTILE)) {
                 int distance = ((Double) module.getKillerLocation().distance(module.getPlayerLocation())).intValue();
                 message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was shot by " +
-                        killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " from " + distance + " blocks";
+                        killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " from " + distance + (distance == 1 ? " block" : " blocks");
             } else if (cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK)) {
                 if (!module.getPlayerName().equals(module.getKillerName())) {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was burned to death by " + killerTeam.getColor() + module.getKillerName() +ChatColor.GRAY;
