@@ -435,6 +435,7 @@ public class CycleCommands {
                         sender.sendMessage(ChatColor.RED + "Unknown team \"" + cmd.getString(1) + "\"");
                         return;
                     }
+                    sender.sendMessage(ChatColor.GREEN + "Renamed " + matchTeam.getColor() + matchTeam.getAlias() + ChatColor.GREEN + " to " + matchTeam.getColor() + cmd.getString(2));
                     matchTeam.setAlias(cmd.getString(2));
                     Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(matchTeam));
                 } else {
