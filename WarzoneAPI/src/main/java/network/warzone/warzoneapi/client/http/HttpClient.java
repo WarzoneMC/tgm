@@ -100,20 +100,6 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void logout(PlayerLogout playerLogout) {
-        try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/player/logout")
-                    .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .body(playerLogout)
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public MapLoadResponse loadmap(Map map) {
         try {
             HttpResponse<MapLoadResponse> mapLoadResponse = Unirest.post(config.getBaseUrl() + "/mc/map/load")
@@ -181,34 +167,6 @@ public class HttpClient implements TeamClient {
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .body(destroyWoolRequest)
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void pickupWool(WoolPickupRequest woolPickupRequest) {
-        try {
-            Unirest.post(config.getBaseUrl() + "/mc/match/pickup_wool")
-                    .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .body(woolPickupRequest)
-                    .asJson();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void placeWool(WoolPlacementRequest woolPlacementRequest) {
-        try {
-            Unirest.post(config.getBaseUrl() + "/mc/match/place_wool")
-                    .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .body(woolPlacementRequest)
                     .asJson();
         } catch (UnirestException e) {
             e.printStackTrace();

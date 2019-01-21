@@ -9,7 +9,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
-import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.MatchManager;
@@ -667,7 +666,6 @@ public class CycleCommands {
                 sender.sendMessage("");
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + up.getLevel());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + up.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(up.getLevel() + 1) + " (approx.)");
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Online time: " + ChatColor.AQUA + getFormattedPlaytime(up.getUuid(), up.getTotalPlaytime(), false));
                 sender.sendMessage("");
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + up.getKills());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + up.getDeaths());
@@ -686,7 +684,6 @@ public class CycleCommands {
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
         sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + targetUser.getUserProfile().getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(targetUser.getUserProfile().getLevel() + 1) + " (approx.)");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Online time: " + ChatColor.AQUA + getFormattedPlaytime(targetPlayer.getUniqueId().toString(), targetUser.getUserProfile().getTotalPlaytime(), true));
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
         sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
@@ -698,42 +695,6 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
     }
 
-    public static String getFormattedPlaytime(String uuid, long totalPlaytime, boolean online) {
-        double time = totalPlaytime / 1000D;
-        String playtime;
-
-        if (online) time += (System.currentTimeMillis() - JoinManager.getJoinDates().get(uuid)) / 1000D;
-
-        int months = (int) Math.floor(time / 2592000); // 1 month is 30 days here
-        time -= months * 2592000;
-        int weeks = (int) Math.floor(time / 604800);
-        time -= weeks * 604800;
-        int days = (int) Math.floor(time / 86400);
-        time -= days * 86400;
-        int hours = (int) Math.floor(time / 3600);
-        time -= hours * 3600;
-        int minutes = (int) Math.floor(time / 60);
-        time -= minutes * 60;
-        int seconds = (int) Math.floor(time);
-
-        if (months > 0) {
-            playtime = months == 1 ? "1 month" : months + " months";
-        } else if (weeks > 0) {
-            playtime = weeks == 1 ? "1 week" : weeks + " weeks";
-        } else if (days > 0) {
-            playtime = days == 1 ? " 1 day" : days + " days";
-        } else if (hours > 0) {
-            playtime = (hours == 1) ? "1 hour" : hours + " hours";
-        } else if (minutes > 0) {
-            playtime = (minutes == 1) ? "1 minute" : minutes + " minutes";
-        } else if (seconds > 0) {
-            playtime = (seconds == 1) ? "1 second" : seconds + " seconds";
-        } else {
-            playtime = "moments";
-        }
-
-        return playtime;
-    }
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin) {
         attemptJoinTeam(player, matchTeam, autoJoin, false);
@@ -764,8 +725,8 @@ public class CycleCommands {
         TextComponent main = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&7" + place + "." + " &b" + profile.getName() + " &7(&9" + profile.getKills() + " kills&7)"));
         main.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
                 new TextComponent(ChatColor.AQUA + "Level: " + ChatColor.RESET + profile.getLevel()),
-                new TextComponent("\n" + ChatColor.AQUA + "XP: " + ChatColor.RESET + profile.getXP()),
                 new TextComponent("\n"),
+                new TextComponent("\n" + ChatColor.AQUA + "XP: " + ChatColor.RESET + profile.getXP()),
                 new TextComponent("\n" + ChatColor.AQUA + "Kills: " + ChatColor.RESET + profile.getKills()),
                 new TextComponent("\n" + ChatColor.AQUA + "Deaths: " + ChatColor.RESET + profile.getDeaths()),
                 new TextComponent("\n" + ChatColor.AQUA + "K/D: " + ChatColor.RESET + profile.getKDR()),

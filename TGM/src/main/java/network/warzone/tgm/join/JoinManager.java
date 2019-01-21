@@ -8,7 +8,6 @@ import network.warzone.tgm.match.MatchPostLoadEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.PlayerLogin;
-import network.warzone.warzoneapi.models.PlayerLogout;
 import network.warzone.warzoneapi.models.Punishment;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
@@ -33,11 +32,6 @@ public class JoinManager implements Listener {
 
     private Collection<QueuedJoin> queuedJoins = new ConcurrentLinkedQueue<>();
     private Set<LoginService> loginServices = new HashSet<>();
-    private static HashMap<String, Long> joinDates = new HashMap<>();
-
-    public static HashMap<String, Long> getJoinDates() {
-        return joinDates;
-    }
  
     public JoinManager() {
         TGM.registerEvents(this);
@@ -104,8 +98,6 @@ public class JoinManager implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        joinDates.put(event.getPlayer().getUniqueId().toString(), System.currentTimeMillis());
-
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
         String joinMsg;
@@ -130,10 +122,6 @@ public class JoinManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        joinDates.remove(event.getPlayer().getUniqueId().toString());
-
-        TGM.get().getTeamClient().logout(new PlayerLogout(event.getPlayer().getName(), event.getPlayer().getUniqueId().toString()));
-
         event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " left.");
         handleQuit(event.getPlayer());
     }
