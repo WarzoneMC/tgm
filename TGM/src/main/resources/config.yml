@@ -1,6 +1,6 @@
 api:
   enabled: false
-  url: api.warz.one
+  url: https://api.warz.one
   auth: secret
   stats:
     enabled: true
