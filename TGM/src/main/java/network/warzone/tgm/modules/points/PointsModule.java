@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
+@ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class PointsModule extends MatchModule {
     private final HashMap<MatchTeam, Integer> points = new HashMap<>();
 
