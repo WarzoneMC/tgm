@@ -2,7 +2,6 @@ package network.warzone.tgm.modules.visibility;
 
 import lombok.Getter;
 import network.warzone.tgm.modules.SpectatorModule;
-import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

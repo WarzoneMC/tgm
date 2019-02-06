@@ -11,7 +11,6 @@ import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
-import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
 import network.warzone.tgm.modules.visibility.VisibilityModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
