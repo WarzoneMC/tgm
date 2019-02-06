@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
+import network.warzone.tgm.modules.visibility.VisibilityModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.PlayerLogin;
@@ -109,7 +110,11 @@ public class JoinManager implements Listener {
         else joinMsg = ChatColor.GRAY + event.getPlayer().getName() + " joined.";
 
         if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
-        event.setJoinMessage(joinMsg);
+        if(playerContext.getUserProfile().isStaff()) {
+            event.setJoinMessage("");
+            if(!playerContext.getUserProfile().isVanished()) event.getPlayer().sendMessage(ChatColor.YELLOW + "Vanish " + ChatColor.GRAY + "was enabled.");
+            TGM.get().getModule(VisibilityModule.class).addPlayerToVanish(event.getPlayer());
+        } else event.setJoinMessage(joinMsg);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -122,7 +127,7 @@ public class JoinManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " left.");
+        if(!TGM.get().getPlayerManager().getPlayerContext(event.getPlayer()).getUserProfile().isVanished()) event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " left.");
         handleQuit(event.getPlayer());
     }
 

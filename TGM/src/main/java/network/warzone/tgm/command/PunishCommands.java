@@ -11,6 +11,8 @@ import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
+import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
+import network.warzone.tgm.modules.visibility.VisibilityModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
@@ -276,6 +278,25 @@ public class PunishCommands {
             }
             Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
         }
+    }
+
+    @Command(aliases= {"vanish"}, desc = "Vanish", usage = "(on/off)")
+    @CommandPermissions({"tgm.vanish"})
+    public static void vanish(CommandContext cmd, CommandSender sender) {
+        if(!(sender instanceof Player)) return;
+        boolean shouldVanish = TGM.get().getPlayerManager().getPlayerContext((Player) sender).getUserProfile().isVanished();
+        if(cmd.argsLength() > 0) {
+            String selection = cmd.getString(0);
+            if(!(selection.equalsIgnoreCase("on") || selection.equalsIgnoreCase("off"))) {
+                sender.sendMessage(ChatColor.RED + "/vanish (on/off)");
+                return;
+            }
+            shouldVanish = selection.equalsIgnoreCase("on");
+        } else shouldVanish = !shouldVanish;
+        sender.sendMessage(ChatColor.YELLOW + "Vanish " + ChatColor.GRAY + "turned " + (shouldVanish ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF"));
+        Player vanisher = (Player) sender;
+        if(shouldVanish) TGM.get().getModule(VisibilityModule.class).addPlayerToVanish(vanisher);
+        else TGM.get().getModule(VisibilityModule.class).removePlayerFromVanish(vanisher);
     }
 
     @Command(aliases = {"report"}, desc = "Report a player", min = 2, usage = "(name) (reason...)")

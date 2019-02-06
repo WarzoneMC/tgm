@@ -1,8 +1,11 @@
 package network.warzone.tgm.modules.visibility;
 
+import lombok.Getter;
 import network.warzone.tgm.modules.SpectatorModule;
 import lombok.AllArgsConstructor;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
 
 /**
  * A better implementation should be made once
@@ -11,12 +14,22 @@ import org.bukkit.entity.Player;
  * /toggle obs
  */
 
-@AllArgsConstructor
 public class VisibilityControllerImpl implements VisibilityController {
     private final SpectatorModule spectatorModule;
+    @Getter private final ArrayList<Player> vanished = new ArrayList<>();
+    public VisibilityControllerImpl(SpectatorModule spectatorModule) {
+        this.spectatorModule = spectatorModule;
+    }
+    public void addVanishedPlayer(Player vanisher) {
+        vanished.add(vanisher);
+    }
+    public void removeVanishedPlayer(Player unvanisher) {
+        vanished.remove(unvanisher);
+    }
 
     @Override
     public boolean canSee(Player eyes, Player target) {
+        if(vanished.contains(target)) return false;
 
         if (spectatorModule.getSpectators().containsPlayer(target)) {
 

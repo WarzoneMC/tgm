@@ -3,6 +3,7 @@ package network.warzone.warzoneapi.models;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.text.NumberFormat;
@@ -43,6 +44,8 @@ public class UserProfile {
 
     @SerializedName("new")
     private boolean isNew;
+
+    @Setter private boolean vanished = false;
 
     public void addPunishment(Punishment punishment) {
         if (punishments == null) punishments = new ArrayList<>();

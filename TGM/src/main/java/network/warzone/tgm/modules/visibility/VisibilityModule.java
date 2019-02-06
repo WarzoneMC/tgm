@@ -8,6 +8,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.player.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +27,19 @@ public class VisibilityModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         visibilityController = new VisibilityControllerImpl(match.getModule(SpectatorModule.class));
+        PlayerManager playerManager = TGM.get().getPlayerManager();
+        for(Player candidate : Bukkit.getOnlinePlayers()) if(playerManager.getPlayerContext(candidate).getUserProfile().isVanished()) visibilityController.addVanishedPlayer(candidate);
+    }
+
+    public void addPlayerToVanish(Player candidate) {
+        TGM.get().getPlayerManager().getPlayerContext(candidate).getUserProfile().setVanished(true);
+        if(!visibilityController.getVanished().contains(candidate)) visibilityController.addVanishedPlayer(candidate);
+        refreshPlayer(candidate);
+    }
+    public void removePlayerFromVanish(Player candidate) {
+        TGM.get().getPlayerManager().getPlayerContext(candidate).getUserProfile().setVanished(false);
+        if(visibilityController.getVanished().contains(candidate)) visibilityController.removeVanishedPlayer(candidate);
+        refreshPlayer(candidate);
     }
 
     @EventHandler
