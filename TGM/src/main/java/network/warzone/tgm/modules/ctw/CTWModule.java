@@ -18,11 +18,13 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.wool.WoolObjective;
 import network.warzone.tgm.modules.wool.WoolObjectiveService;
 import network.warzone.tgm.modules.wool.WoolStatus;
+import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.FireworkUtil;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -32,6 +34,9 @@ import org.bukkit.event.Listener;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static network.warzone.warzoneapi.models.UserProfile.XP_PER_WOOL_PLACE;
+import static network.warzone.warzoneapi.models.UserProfile.XP_PER_WOOL_TOUCH;
 
 @Getter
 public class CTWModule extends MatchModule implements Listener {
@@ -72,28 +77,26 @@ public class CTWModule extends MatchModule implements Listener {
                 public void pickup(Player player, MatchTeam matchTeam, boolean firstTouch) {
                     if (firstTouch) {
                         updateOnScoreboard(woolObjective);
-
+                        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
                         Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
                                 " picked up " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
-                        for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
-                            for (PlayerContext playerContext : otherTeam.getMembers()) {
-                                if (otherTeam.isSpectator() || otherTeam == matchTeam) {
-                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
-                                } else {
-                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
-                                }
-                            }
-                        }
+                        Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, XP_PER_WOOL_TOUCH, playerContext.getUserProfile().getXP() - XP_PER_WOOL_TOUCH, playerContext.getUserProfile().getXP()));
+                        player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_TOUCH + ChatColor.DARK_AQUA + " " + ChatColor.BOLD + "XP" + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + "You picked up " + woolObjective.getChatColor() + woolObjective.getName() + ChatColor.GRAY + ".");
+                        player.getPlayer().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
                     }
                 }
 
                 @Override
                 public void place(Player player, MatchTeam matchTeam, Block block) {
                     updateOnScoreboard(woolObjective);
-
+                    PlayerContext playerContext2 = TGM.get().getPlayerManager().getPlayerContext(player);
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
                             " placed " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext2, UserProfile.XP_PER_WOOL_PLACE, playerContext2.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_PLACE, playerContext2.getUserProfile().getXP()));
+                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_PLACE + ChatColor.DARK_AQUA + " " + ChatColor.BOLD + "XP" + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + "You placed " + woolObjective.getChatColor() + woolObjective.getName() + ChatColor.GRAY + ".");
+                    player.getPlayer().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
 
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
@@ -105,6 +108,7 @@ public class CTWModule extends MatchModule implements Listener {
                         }
                     }
 
+
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
                     if (getIncompleteWools(matchTeam).isEmpty()) {
@@ -112,13 +116,13 @@ public class CTWModule extends MatchModule implements Listener {
                     }
                 }
 
-                 @Override
-                 public void drop(Player player, MatchTeam matchTeam, boolean broadcast) {
+                @Override
+                public void drop(Player player, MatchTeam matchTeam, boolean broadcast) {
                     updateOnScoreboard(woolObjective);
 
-                     if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                             " dropped " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
-                 }
+                    if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                            " dropped " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                }
 
             });
         }

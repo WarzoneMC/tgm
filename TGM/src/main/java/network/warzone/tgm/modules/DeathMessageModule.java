@@ -33,7 +33,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
         String message;
         ItemStack weapon = module.getItem();
         DamageCause cause = module.getCause();
-
+//
         MatchTeam playerTeam = module.getPlayerTeam();
         MatchTeam killerTeam = module.getKillerTeam();
 

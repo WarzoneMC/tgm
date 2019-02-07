@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static network.warzone.warzoneapi.models.UserProfile.XP_PER_WOOL_BREAK;
+
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
@@ -73,14 +75,11 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
+                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_BREAK + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "XP" + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + "You damaged " + monument.getOwners().get(0).getColor() + "wool" + ChatColor.RESET + ".");
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
 
-                    //TODO
-                    //for (PlayerContext playerContext : matchTeam.getMembers()) {
-                    //    playerContext.getPlayer().playSound(monument.getRegion().getCenter(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
-                    //}
 
                     for (PlayerContext playerContext : monument.getOwners().get(0).getMembers()) {
                         playerContext.getPlayer().playSound(monument.getRegion().getCenter(), Sound.ENTITY_IRONGOLEM_ATTACK, SoundCategory.MASTER, 1000, 1);
@@ -90,7 +89,7 @@ public class DTMModule extends MatchModule implements Listener {
 
                     PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
                     playerContext.getUserProfile().addWoolDestroy();
-                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
                     Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
 
                 }
@@ -101,6 +100,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
+                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_BREAK + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "XP" + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + "You destroyed " + monument.getOwners().get(0).getColor() + "wool" + ChatColor.RESET + ".");
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
@@ -114,7 +114,7 @@ public class DTMModule extends MatchModule implements Listener {
                     if (TGM.get().getApiManager().isStatsDisabled()) return;
                     PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
                     playerContext.getUserProfile().addWoolDestroy();
-                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
                     Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
                 }
             });
@@ -134,13 +134,6 @@ public class DTMModule extends MatchModule implements Listener {
                 .withColor(ColorConverter.getColor(color))
                 .build(), 0);
 
-        // Play the sound for the player if they are too far to render the firework.
-        //for (Player listener : Bukkit.getOnlinePlayers()) {
-        //    if (listener.getLocation().distance(location) > 64) {
-        //        listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_BLAST, 0.75f, 1f);
-        //        listener.playSound(listener.getLocation(), Sound.ENTITY_FIREWORK_TWINKLE, 0.75f, 1f);
-        //    }
-        //}
     }
 
     @EventHandler

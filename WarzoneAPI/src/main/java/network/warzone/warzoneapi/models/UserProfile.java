@@ -18,7 +18,10 @@ public class UserProfile {
     public static final int XP_PER_KILL = 2,
                             XP_PER_WIN = 10,
                             XP_PER_LOSS = 5,
-                            XP_PER_WOOL_BREAK = 3;
+                            XP_PER_WOOL_BREAK = 3,
+                            XP_PER_WOOL_TOUCH = 2,
+                            XP_PER_WOOL_PLACE = 3,
+                            XP_PER_TIE = 3;
 
     @SerializedName("_id")
     private ObjectId id;
@@ -34,9 +37,12 @@ public class UserProfile {
     private List<Rank> ranksLoaded;
     private int wins = 0;
     private int losses = 0;
+    private int ties = 0;
     private int kills = 0;
     private int deaths = 0;
     private int wool_destroys = 0;
+    private int touches = 0;
+    private int wool_placed = 0;
     private List<String> matches;
 
     private List<Punishment> punishments;
@@ -92,12 +98,22 @@ public class UserProfile {
         losses++;
     }
 
+    public void addTies() { ties++; }
+
     public void addWoolDestroy() {
         wool_destroys++;
     }
 
+    public void addWoolPlaced() { wool_placed++; }
+
     public int getXP() {
-        return (getWins() * XP_PER_WIN) + (getLosses() * XP_PER_LOSS) + (getWool_destroys() * XP_PER_WOOL_BREAK) + (getKills() * XP_PER_KILL);
+        return (getWins() * XP_PER_WIN) +
+                (getLosses() * XP_PER_LOSS) +
+                (getWool_destroys() * XP_PER_WOOL_BREAK) +
+                (getKills() * XP_PER_KILL) +
+                (getTouches() * XP_PER_WOOL_TOUCH) +
+                (getWool_placed() * XP_PER_WOOL_PLACE) +
+                (getTies() * XP_PER_TIE);
     }
 
     public int getLevel() {

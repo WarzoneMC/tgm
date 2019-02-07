@@ -154,7 +154,6 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {
-        playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().setAllowFlight(true);
         playerContext.getPlayer().setFlying(true);
@@ -255,7 +254,7 @@ public class SpectatorModule extends MatchModule implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (isSpectating(event.getPlayer())) {
@@ -289,17 +288,17 @@ public class SpectatorModule extends MatchModule implements Listener {
                 }
                 Menu teleportMenu = new PlayerMenu(ChatColor.UNDERLINE + "Teleport", size, event.getPlayer());
                 int i = 0;
-              for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
-                Player player = entry.getKey();
-                ChatColor teamColor = entry.getValue();
-                teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
-                        clicker -> {
-                          if (player.isOnline()) clicker.teleport(player);
-                        });
-                i++;
-                if (i >= size) break;
-              }
-              teleportMenu.open(event.getPlayer());
+                for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
+                    Player player = entry.getKey();
+                    ChatColor teamColor = entry.getValue();
+                    teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
+                            clicker -> {
+                                if (player.isOnline()) clicker.teleport(player);
+                            });
+                    i++;
+                    if (i >= size) break;
+                }
+                teleportMenu.open(event.getPlayer());
             }
         }
     }
