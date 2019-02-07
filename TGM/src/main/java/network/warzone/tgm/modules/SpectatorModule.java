@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.*;
@@ -313,9 +314,26 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onHangingDestroy(HangingBreakByEntityEvent event) { // Item Frames and Paintings
-        if (event.getRemover() != null && event.getRemover() instanceof Player) {
+    public void onHangingBreak(HangingBreakByEntityEvent event) {//item frames and paintings
+        if (event.getRemover() instanceof Player) {
             if (isSpectating((Player) event.getRemover())) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHangingPlace(HangingPlaceEvent event) {//item frames and paintings
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {//disables spectators damaging players / Mobs
+        if (event.getEntity() instanceof Player) {
+            if (isSpectating((Player) event.getEntity())) {
                 event.setCancelled(true);
             }
         }
