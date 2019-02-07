@@ -697,6 +697,7 @@ public class CycleCommands {
                 sender.sendMessage("");
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + up.getLevel());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + up.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(up.getLevel() + 1) + " (approx.)");
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Wools: " + ChatColor.AQUA + up.getWool_placed());
                 sender.sendMessage("");
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + up.getKills());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + up.getDeaths());
@@ -715,6 +716,7 @@ public class CycleCommands {
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
         sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + targetUser.getUserProfile().getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(targetUser.getUserProfile().getLevel() + 1) + " (approx.)");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Wools: " + ChatColor.AQUA + targetUser.getUserProfile().getWool_placed());
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
         sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());

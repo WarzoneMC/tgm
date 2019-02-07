@@ -18,6 +18,10 @@ import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -25,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static network.warzone.warzoneapi.models.UserProfile.XP_PER_KILL;
 
 @Getter
 public class ApiManager implements Listener {
@@ -86,6 +92,8 @@ public class ApiManager implements Listener {
                 winners.add(playerContext.getUserProfile().getId().toString());
                 playerContext.getUserProfile().addWin();
                 Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP()));
+                player.sendMessage(ChatColor.GREEN + "" ChatColor.BOLD + "+10 " + ChatColor.DARK_AQUA + "" ChatColor.BOLD + "XP" + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + "Your team won!");
+                player.getPlayer().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
             }
         }
 
@@ -95,6 +103,8 @@ public class ApiManager implements Listener {
                 losers.add(playerContext.getUserProfile().getId().toString());
                 playerContext.getUserProfile().addLoss();
                 Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP()));
+                player.sendMessage(ChatColor.GREEN + "" ChatColor.BOLD + "+5 " + ChatColor.DARK_AQUA + "" ChatColor.BOLD + "XP" + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + "Your team lost :c");
+                player.getPlayer().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
             }
         }
 
@@ -147,11 +157,12 @@ public class ApiManager implements Listener {
     }
 
     @EventHandler
-    public void onKill(TGMPlayerDeathEvent event) {
+    public void onKill(TGMPlayerDeathEvent event, Player player) {
         if (isStatsDisabled()) return;
         DeathModule module = deathModule.getPlayer(event.getVictim());
 
         PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(module.getPlayer());
+        MatchTeam playerTeam = module.getPlayerTeam();
 
         killed.getUserProfile().addDeath();
 
@@ -163,7 +174,9 @@ public class ApiManager implements Listener {
             PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(module.getKiller());
             if (context == null) return;
             context.getUserProfile().addKill();
-            Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, UserProfile.XP_PER_KILL, context.getUserProfile().getXP() - UserProfile.XP_PER_KILL, context.getUserProfile().getXP()));
+            Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, XP_PER_KILL, context.getUserProfile().getXP() - XP_PER_KILL, context.getUserProfile().getXP()));
+            player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_KILL + ChatColor.DARK_AQUA + "" +  ChatColor.BOLD + "XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " killed " + playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + ".");
+            player.getPlayer().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
 
             killerId = context.getUserProfile().getId().toString();
         }
