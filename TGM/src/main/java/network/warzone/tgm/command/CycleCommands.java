@@ -600,7 +600,7 @@ public class CycleCommands {
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
             if (cmd.argsLength() != 2) {
-                sender.sendMessage(ChatColor.WHITE + "Stat uploading is set to \"" + TGM.get().getConfig().getBoolean("api.stats.enabled") + "\"");
+                sender.sendMessage(ChatColor.GREEN + "Stat uploading is set to \"" + TGM.get().getConfig().getBoolean("api.stats.enabled") + "\"");
                 return;
             }
             if (cmd.getString(1).equalsIgnoreCase("off")) {
