@@ -595,7 +595,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats | links | website)", min = 1)
+    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats | links | website | appeal)", min = 1)
     @CommandPermissions({"tgm.config"})
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
