@@ -733,7 +733,7 @@ public class CycleCommands {
 
         if (!autoJoin) {
             if (!player.hasPermission("tgm.pickteam")) {
-                player.sendMessage(ChatColor.GREEN + "Store link has been set to \"" + TGM.get().getConfig().getString("links.store") + "\"");
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at " + TGM.get().getConfig().getString("links.store"));
                 return;
             }
         }
