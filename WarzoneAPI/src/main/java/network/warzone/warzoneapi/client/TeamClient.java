@@ -23,6 +23,12 @@ public interface TeamClient {
     UserProfile login(PlayerLogin playerLogin);
 
     /**
+     * Called when a player logs out.
+     */
+
+    void logout(PlayerLogout playerLogout);
+
+    /**
      * Called whenever a map is loaded.
      * Returns the map id.
      */

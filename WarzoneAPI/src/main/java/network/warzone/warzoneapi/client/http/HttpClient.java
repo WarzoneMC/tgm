@@ -100,6 +100,20 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
+    public void logout(PlayerLogout playerLogout) {
+        try {
+            Unirest.post(config.getBaseUrl() + "/mc/player/logout")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(playerLogout)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public MapLoadResponse loadmap(Map map) {
         try {
             HttpResponse<MapLoadResponse> mapLoadResponse = Unirest.post(config.getBaseUrl() + "/mc/map/load")

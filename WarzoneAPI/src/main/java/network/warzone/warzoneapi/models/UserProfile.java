@@ -28,6 +28,7 @@ public class UserProfile {
     private String uuid;
     private long initialJoinDate;
     private long lastOnlineDate;
+    private long totalPlaytime;
 
     private List<String> ips;
     private List<String> ranks;
