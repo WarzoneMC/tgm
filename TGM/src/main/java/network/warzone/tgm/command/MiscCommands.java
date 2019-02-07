@@ -48,7 +48,7 @@ public class MiscCommands {
             sender.sendMessage(ChatColor.RED + "As console, you can use /playtime <player> to check someone's playtime on the server.");
             return;
         }
-        sender.sendMessage(ChatColor.AQUA + player.getName() + ChatColor.GRAY + "'" + (player.getName().endsWith("s") ? "" : "s") + " playtime is " + ChatColor.AQUA + player.getStatistic(Statistic.PLAY_ONE_TICK));
+        sender.sendMessage(ChatColor.AQUA + player.getName() + ChatColor.GRAY + "'" + (player.getName().endsWith("s") ? "" : "s") + " playtime is " + ChatColor.AQUA + player.getStatistic(Statistic.RECORD_PLAYED));
     }
 
 }
