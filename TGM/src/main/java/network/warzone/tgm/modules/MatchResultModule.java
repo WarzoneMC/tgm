@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import static network.warzone.warzoneapi.models.UserProfile.*;
+
 public class MatchResultModule extends MatchModule implements Listener {
 
     @EventHandler
@@ -35,12 +37,15 @@ public class MatchResultModule extends MatchModule implements Listener {
                 if (event.getWinningTeam() == null) {
                     player.sendTitle("", ChatColor.YELLOW + "The result was a tie!", 10, 40, 10);
                     player.playSound(location, Sound.ENTITY_WITHER_SPAWN, 1000, 1);
+                    player.sendMessage(ChatColor.GREEN + "" +  ChatColor.BOLD + "+" + XP_PER_TIE + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " The result was a tie!");
                 } else if (event.getWinningTeam().containsPlayer(player)) {
                     player.sendTitle("", ChatColor.GREEN + "Your team won!", 10, 40, 10);
                     player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
+                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WIN + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " Your team won!");
                 } else {
                     player.sendTitle("", ChatColor.RED + "Your team lost!", 10, 40, 10);
                     player.playSound(location, Sound.ENTITY_WITHER_SPAWN, 1000, 1);
+                    player.sendMessage(ChatColor.GREEN + "" +  ChatColor.BOLD + "+" + XP_PER_LOSS + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " Your team lost :c");
                 }
             }
 

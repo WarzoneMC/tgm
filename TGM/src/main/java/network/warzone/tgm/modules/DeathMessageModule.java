@@ -14,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import static network.warzone.warzoneapi.models.UserProfile.XP_PER_KILL;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class DeathMessageModule extends MatchModule implements Listener {
@@ -73,6 +74,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " was killed by " +
                             killerTeam.getColor() + module.getKillerName() + ChatColor.GRAY + " using " +
                             (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the environment");
+                    module.getKiller().sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_KILL + ChatColor.DARK_AQUA + "" +  ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " killed " + playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + ".");
                 } else {
                     message = playerTeam.getColor() + module.getPlayerName() + ChatColor.GRAY + " died to the environment";
                 }

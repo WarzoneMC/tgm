@@ -75,7 +75,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_BREAK + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " You damaged " + monument.getOwners().get(0).getColor() + "wool" + ChatColor.RESET + ".");
+                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_BREAK + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " You damaged " + monument.getOwners().get(0).getColor() + "wool" + ChatColor.RESET + ".");
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
@@ -100,7 +100,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_BREAK + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + "XP" + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + "You destroyed " + monument.getOwners().get(0).getColor() + "wool" + ChatColor.RESET + ".");
+                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_BREAK + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " You destroyed " + monument.getOwners().get(0).getColor() + "wool" + ChatColor.RESET + ".");
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 

@@ -82,7 +82,7 @@ public class CTWModule extends MatchModule implements Listener {
                                 " picked up " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                         Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, XP_PER_WOOL_TOUCH, playerContext.getUserProfile().getXP() - XP_PER_WOOL_TOUCH, playerContext.getUserProfile().getXP()));
-                        player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_TOUCH + ChatColor.DARK_AQUA + " " + ChatColor.BOLD + "XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " You picked up " + woolObjective.getChatColor() + woolObjective.getName() + ChatColor.GRAY + ".");
+                        player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_TOUCH + ChatColor.DARK_AQUA + " " + ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " You picked up " + woolObjective.getChatColor() + woolObjective.getName() + ChatColor.GRAY + ".");
                         player.getPlayer().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
                     }
                 }
@@ -95,7 +95,7 @@ public class CTWModule extends MatchModule implements Listener {
                             " placed " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                     Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext2, UserProfile.XP_PER_WOOL_PLACE, playerContext2.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_PLACE, playerContext2.getUserProfile().getXP()));
-                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_PLACE + ChatColor.DARK_AQUA + " " + ChatColor.BOLD + "XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " You placed " + woolObjective.getChatColor() + woolObjective.getName() + ChatColor.GRAY + ".");
+                    player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "+" + XP_PER_WOOL_PLACE + ChatColor.DARK_AQUA + " " + ChatColor.BOLD + " XP " + ChatColor.DARK_PURPLE + "|" + ChatColor.GRAY + " You placed " + woolObjective.getChatColor() + woolObjective.getName() + ChatColor.GRAY + ".");
                     player.getPlayer().playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 1000, 2);
 
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
