@@ -15,4 +15,8 @@ map:
 server:
   name: "Warzone"
   id: "warzone"
+
+links:
+  store:
+  website:
   
