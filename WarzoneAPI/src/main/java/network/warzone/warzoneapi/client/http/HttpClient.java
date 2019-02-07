@@ -174,6 +174,20 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
+    public void placeWool(WoolPlacementRequest woolPlacementRequest) {
+        try {
+            Unirest.post(config.getBaseUrl() + "/mc/match/place_wool")
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(woolPlacementRequest)
+                    .asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public KillsLeaderboardResponse getKillsLeaderboard() {
         try {
             HttpResponse<KillsLeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/kills?limit=10")
