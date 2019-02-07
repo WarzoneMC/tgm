@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules;
 
+import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.join.MatchJoinEvent;
@@ -16,16 +17,20 @@ import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -149,7 +154,6 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {
-        playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100000, 255, false, false));
         playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
         playerContext.getPlayer().setAllowFlight(true);
         playerContext.getPlayer().setFlying(true);
@@ -250,7 +254,7 @@ public class SpectatorModule extends MatchModule implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (isSpectating(event.getPlayer())) {
@@ -284,17 +288,17 @@ public class SpectatorModule extends MatchModule implements Listener {
                 }
                 Menu teleportMenu = new PlayerMenu(ChatColor.UNDERLINE + "Teleport", size, event.getPlayer());
                 int i = 0;
-              for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
-                Player player = entry.getKey();
-                ChatColor teamColor = entry.getValue();
-                teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
-                        clicker -> {
-                          if (player.isOnline()) clicker.teleport(player);
-                        });
-                i++;
-                if (i >= size) break;
-              }
-              teleportMenu.open(event.getPlayer());
+                for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
+                    Player player = entry.getKey();
+                    ChatColor teamColor = entry.getValue();
+                    teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
+                            clicker -> {
+                                if (player.isOnline()) clicker.teleport(player);
+                            });
+                    i++;
+                    if (i >= size) break;
+                }
+                teleportMenu.open(event.getPlayer());
             }
         }
     }
@@ -305,16 +309,40 @@ public class SpectatorModule extends MatchModule implements Listener {
             event.setCancelled(true);
     }
 
+
     @EventHandler
-    public void onDrop(PlayerDropItemEvent event) {
+    public void onPlayerPickupExperience(PlayerPickupExperienceEvent event) {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onHangingDestroy(HangingBreakByEntityEvent event) { // Item Frames and Paintings
-        if (event.getRemover() != null && event.getRemover() instanceof Player) {
+    public void PlayerInteractAtEntityEvent(PlayerInteractAtEntityEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.getItemDrop().remove();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void NoExplo(EntityExplodeEvent event) {
+        if (event.getEntity() instanceof Player) {
+            if (isSpectating((Player) event.getEntity())) {
+                event.blockList().clear();
+            }
+        }
+    }
+
+    @EventHandler
+    public void onHangingBreak(HangingBreakByEntityEvent event) {//item frames and paintings
+        if (event.getRemover() instanceof Player) {
             if (isSpectating((Player) event.getRemover())) {
                 event.setCancelled(true);
             }
@@ -322,20 +350,52 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onVehicleDamage(VehicleDamageEvent event) {
-        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
-            if (isSpectating((Player) event.getAttacker())) {
+    public void onHangingPlace(HangingPlaceEvent event) {//item frames and paintings
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {//disables spectators damaging players / Mobs
+        if (event.getEntity() instanceof Player) {
+            if (isSpectating((Player) event.getEntity())) {
                 event.setCancelled(true);
             }
         }
     }
 
+
+    @EventHandler
+
+    public void onVehicleEnter(VehicleEnterEvent event) {
+        if (event.getEntered() instanceof Player && isSpectating((Player) event.getEntered())) {
+            event.setCancelled(true);
+        }
+    }
+
+
+    @EventHandler
+    public void onVehicleExit(VehicleExitEvent event) {
+        if (event.getExited() instanceof Player && isSpectating((Player) event.getExited())) {
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {
-        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
-            if (isSpectating((Player) event.getAttacker())) {
-                event.setCancelled(true);
-            }
+        if (isSpectating((Player) event.getAttacker())) {
+            event.setCancelled(true);
+        }
+    }
+
+
+
+    @EventHandler
+    public void onVehicleDamage(VehicleDamageEvent event) {
+        if (event.getAttacker() instanceof Player && isSpectating((Player) event.getAttacker())) {
+            event.setCancelled(true);
         }
     }
 
