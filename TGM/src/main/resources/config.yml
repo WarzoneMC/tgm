@@ -1,6 +1,6 @@
 api:
   enabled: false
-  url: api.warz.one
+  url: https://api.warz.one
   auth: secret
   stats:
     enabled: true
@@ -11,8 +11,14 @@ chat:
     muted: "&cChat is currently disabled. If you believe this is an error, please contact a staff member on our Discord."
 map:
   sources:
-  - Maps
+    - Maps
 server:
   name: "Warzone"
   id: "warzone"
+  ip: "play.warz.one"
+
+links:
+  store: https://tgmwarzone.tebex.io/
+  website: https://warz.one/
+  appeal: https://discord.io/WarzoneMC
   

@@ -53,7 +53,7 @@ public class TabListModule extends MatchModule implements Listener {
 
         String header = ChatColor.WHITE + ChatColor.BOLD.toString() + TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().toString() +
                         ChatColor.DARK_GRAY + " - " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed()) +
-                        ChatColor.DARK_GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + "WARZONE";
+                        ChatColor.DARK_GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + TGM.get().getConfig().getString("server.name");
 
         String footer = "";
         for (MatchTeam matchTeam : teamManagerModule.getTeams()) {

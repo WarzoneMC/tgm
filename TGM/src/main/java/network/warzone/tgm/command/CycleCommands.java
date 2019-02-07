@@ -46,7 +46,7 @@ public class CycleCommands {
         int index;
 
         try {
-             index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+            index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.RED + "Number expected.");
             return;
@@ -247,7 +247,7 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
-              sender.sendMessage(ChatColor.GREEN + "Ending match...");
+                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 if (cmd.hasFlag('f')) {
                     TGM.get().getMatchManager().endMatch(null);
                 } else {
@@ -278,7 +278,7 @@ public class CycleCommands {
                     found = mapContainer;
                 }
             }
-            
+
             if (found == null) {
                 for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
                     if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
@@ -298,7 +298,7 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "/sn <map_name>");
         }
     }
-    
+
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
@@ -504,21 +504,21 @@ public class CycleCommands {
         }
         Player player = (Player) sender;
         if (cmd.argsLength() == 0) {
-          player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
-          return;
+            player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
+            return;
         }
 
         String channelName = cmd.getString(0).toUpperCase();
         ChatModule.Channel channel = ChatModule.Channel.byName(channelName);
         if (channel == null) {
-          player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
-          player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatModule.Channel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
-          return;
+            player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
+            player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatModule.Channel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
+            return;
         }
 
         if (!channel.hasPermission(player)) {
-          player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
-          return;
+            player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
+            return;
         }
 
         ChatModule.getChannels().put(player.getUniqueId().toString(), channel);
@@ -542,7 +542,7 @@ public class CycleCommands {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
         sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors()));
     }
-    
+
     @Command(aliases = {"map"}, desc = "View the map info for the current map")
     public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
@@ -571,7 +571,7 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
                 return;
             }
-            
+
             TimeModule timeModule = TGM.get().getModule(TimeModule.class);
             if (cmd.getString(1).equalsIgnoreCase("on") || cmd.getString(1).equalsIgnoreCase("true")) {
                 timeModule.setTimeLimited(true);
@@ -595,12 +595,12 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
+    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats | links | website | appeal)", min = 1)
     @CommandPermissions({"tgm.config"})
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
             if (cmd.argsLength() != 2) {
-                sender.sendMessage(ChatColor.WHITE + "Stat uploading is set to \"" + TGM.get().getConfig().getBoolean("api.stats.enabled") + "\"");
+                sender.sendMessage(ChatColor.GREEN + "Stat uploading is set to \"" + TGM.get().getConfig().getBoolean("api.stats.enabled") + "\"");
                 return;
             }
             if (cmd.getString(1).equalsIgnoreCase("off")) {
@@ -616,6 +616,37 @@ public class CycleCommands {
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
             }
+        }
+
+
+        if (cmd.getString(0).equalsIgnoreCase("store")) {
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.GREEN + "Store link was already set to: " + ChatColor.YELLOW +  TGM.get().getConfig().getString("links.store"));
+                return;
+            }
+            TGM.get().getConfig().set("links.store", cmd.getString(1));
+            TGM.get().saveConfig();
+            sender.sendMessage(ChatColor.GREEN + "Store link was successfully set to: " + ChatColor.YELLOW +  cmd.getString(1));
+        }
+
+        if (cmd.getString(0).equalsIgnoreCase("website")) {
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.GREEN + "Website link was already set to: " + ChatColor.YELLOW +  TGM.get().getConfig().getString("links.website"));
+                return;
+            }
+            TGM.get().getConfig().set("links.website", cmd.getString(1));
+            TGM.get().saveConfig();
+            sender.sendMessage(ChatColor.GREEN + "Website link was successfully set to: " + ChatColor.YELLOW +  cmd.getString(1));
+        }
+
+        if (cmd.getString(0).equalsIgnoreCase("appeal")) {
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.GREEN + "Appeal link was already set to: " + ChatColor.YELLOW + TGM.get().getConfig().getString("links.appeal"));
+                return;
+            }
+            TGM.get().getConfig().set("links.appeal", cmd.getString(1));
+            TGM.get().saveConfig();
+            sender.sendMessage(ChatColor.GREEN + "Appeal link was successfully set to: " + ChatColor.YELLOW +  cmd.getString(1));
         }
     }
 
@@ -712,7 +743,7 @@ public class CycleCommands {
 
         if (!autoJoin) {
             if (!player.hasPermission("tgm.pickteam")) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at https://tgmwarzone.tebex.io/");
+                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at " + TGM.get().getConfig().getString("links.store"));
                 return;
             }
         }
