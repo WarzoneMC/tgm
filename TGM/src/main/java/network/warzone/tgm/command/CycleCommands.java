@@ -621,22 +621,32 @@ public class CycleCommands {
 
         if (cmd.getString(0).equalsIgnoreCase("store")) {
             if (cmd.argsLength() != 2) {
-                sender.sendMessage(ChatColor.GREEN + "Store link was already set to: " + TGM.get().getConfig().getString("links.store"));
+                sender.sendMessage(ChatColor.GREEN + "Store link was already set to: " + ChatColor.YELLOW +  TGM.get().getConfig().getString("links.store"));
                 return;
             }
             TGM.get().getConfig().set("links.store", cmd.getString(1));
             TGM.get().saveConfig();
-            sender.sendMessage(ChatColor.GREEN + "Store was successfully set to: " + cmd.getString(1));
+            sender.sendMessage(ChatColor.GREEN + "Store was successfully set to: " + ChatColor.YELLOW +  cmd.getString(1));
         }
 
         if (cmd.getString(0).equalsIgnoreCase("website")) {
             if (cmd.argsLength() != 2) {
-                sender.sendMessage(ChatColor.GREEN + "Website link was already set to: " + TGM.get().getConfig().getString("links.website"));
+                sender.sendMessage(ChatColor.GREEN + "Website link was already set to: " + ChatColor.YELLOW +  TGM.get().getConfig().getString("links.website"));
                 return;
             }
             TGM.get().getConfig().set("links.website", cmd.getString(1));
             TGM.get().saveConfig();
-            sender.sendMessage(ChatColor.GREEN + "Website was successfully set to: " + cmd.getString(1));
+            sender.sendMessage(ChatColor.GREEN + "Website was successfully set to: " + ChatColor.YELLOW +  cmd.getString(1));
+        }
+
+        if (cmd.getString(0).equalsIgnoreCase("appeal")) {
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.GREEN + "Appeal link was already set to: " + ChatColor.YELLOW + TGM.get().getConfig().getString("links.appeal"));
+                return;
+            }
+            TGM.get().getConfig().set("links.appeal", cmd.getString(1));
+            TGM.get().saveConfig();
+            sender.sendMessage(ChatColor.GREEN + "Appeal link was successfully set to: " + ChatColor.YELLOW +  cmd.getString(1));
         }
     }
 

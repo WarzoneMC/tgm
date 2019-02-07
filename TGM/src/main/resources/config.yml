@@ -1,6 +1,6 @@
 api:
   enabled: false
-  url: api.warz.one
+  url: https://api.warz.one
   auth: secret
   stats:
     enabled: true
@@ -17,6 +17,7 @@ server:
   id: "warzone"
 
 links:
-  store:
-  website:
+  store: https://tgmwarzone.tebex.io/
+  website: https://warz.one/
+  appeal: https://discord.io/WarzoneMC
   
