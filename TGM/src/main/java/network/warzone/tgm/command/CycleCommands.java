@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 
 public class CycleCommands {
 
-    @SuppressWarnings("MagicConstant")
     @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.", usage = "[page]")
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
         int index;
