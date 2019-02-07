@@ -18,7 +18,8 @@ public class UserProfile {
     public static final int XP_PER_KILL = 2,
                             XP_PER_WIN = 10,
                             XP_PER_LOSS = 5,
-                            XP_PER_WOOL_BREAK = 3;
+                            XP_PER_WOOL_BREAK = 3,
+                            XP_PER_WOOL_PICKUP = 3;
 
     @SerializedName("_id")
     private ObjectId id;
@@ -37,6 +38,7 @@ public class UserProfile {
     private int kills = 0;
     private int deaths = 0;
     private int wool_destroys = 0;
+    private int wool_pickups = 0;
     private List<String> matches;
 
     private List<Punishment> punishments;
@@ -96,8 +98,12 @@ public class UserProfile {
         wool_destroys++;
     }
 
+    public void addWoolPickup() {
+        wool_pickups++;
+    }
+
     public int getXP() {
-        return (getWins() * XP_PER_WIN) + (getLosses() * XP_PER_LOSS) + (getWool_destroys() * XP_PER_WOOL_BREAK) + (getKills() * XP_PER_KILL);
+        return (getWins() * XP_PER_WIN) + (getLosses() * XP_PER_LOSS) + (getWool_destroys() * XP_PER_WOOL_BREAK) + (getWool_pickups() * XP_PER_WOOL_PICKUP) + (getKills() * XP_PER_KILL);
     }
 
     public int getLevel() {

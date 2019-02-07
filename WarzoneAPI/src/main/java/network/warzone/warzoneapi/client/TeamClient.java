@@ -35,6 +35,8 @@ public interface TeamClient {
     void finishMatch(MatchFinishPacket matchFinishPacket);
 
     void destroyWool(DestroyWoolRequest destroyWoolRequest);
+
+    void pickupWool(WoolPickupRequest woolPickupRequest);
     
     RankList retrieveRanks();
 

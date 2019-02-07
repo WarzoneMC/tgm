@@ -18,11 +18,14 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.wool.WoolObjective;
 import network.warzone.tgm.modules.wool.WoolObjectiveService;
 import network.warzone.tgm.modules.wool.WoolStatus;
+import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.FireworkUtil;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
+import network.warzone.warzoneapi.models.UserProfile;
+import network.warzone.warzoneapi.models.WoolPickupRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -85,6 +88,13 @@ public class CTWModule extends MatchModule implements Listener {
                                 }
                             }
                         }
+
+                        if (TGM.get().getApiManager().isStatsDisabled()) return;
+
+                        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+                        playerContext.getUserProfile().addWoolPickup();
+                        Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_PICKUP, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_PICKUP, playerContext.getUserProfile().getXP()));
+                        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().pickupWool(new WoolPickupRequest(player.getUniqueId())));
                     }
                 }
 
