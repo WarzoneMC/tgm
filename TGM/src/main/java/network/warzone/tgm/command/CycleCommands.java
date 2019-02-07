@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 public class CycleCommands {
 
+    @SuppressWarnings("MagicConstant")
     @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.", usage = "[page]")
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
         int index;
@@ -595,7 +596,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
+    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats | links | website)", min = 1)
     @CommandPermissions({"tgm.config"})
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
@@ -616,6 +617,27 @@ public class CycleCommands {
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
             }
+        }
+
+
+        if (cmd.getString(0).equalsIgnoreCase("store")) {
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.GREEN + "Store link was already set to: " + TGM.get().getConfig().getString("links.store"));
+                return;
+            }
+            TGM.get().getConfig().set("links.store", cmd.getString(1));
+            TGM.get().saveConfig();
+            sender.sendMessage(ChatColor.GREEN + "Store was successfully set to: " + cmd.getString(1));
+        }
+
+        if (cmd.getString(0).equalsIgnoreCase("website")) {
+            if (cmd.argsLength() != 2) {
+                sender.sendMessage(ChatColor.GREEN + "Website link was already set to: " + TGM.get().getConfig().getString("links.website"));
+                return;
+            }
+            TGM.get().getConfig().set("links.website", cmd.getString(1));
+            TGM.get().saveConfig();
+            sender.sendMessage(ChatColor.GREEN + "Website was successfully set to: " + cmd.getString(1));
         }
     }
 
@@ -712,7 +734,7 @@ public class CycleCommands {
 
         if (!autoJoin) {
             if (!player.hasPermission("tgm.pickteam")) {
-                player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team! Purchase a rank at https://tgmwarzone.tebex.io/");
+                player.sendMessage(ChatColor.GREEN + "Store link has been set to \"" + TGM.get().getConfig().getString("links.store") + "\"");
                 return;
             }
         }
