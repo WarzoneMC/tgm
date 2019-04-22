@@ -37,7 +37,6 @@ public class UserProfile {
     private int kills = 0;
     private int deaths = 0;
     private int wool_destroys = 0;
-    private List<String> matches;
 
     private List<Punishment> punishments;
 
