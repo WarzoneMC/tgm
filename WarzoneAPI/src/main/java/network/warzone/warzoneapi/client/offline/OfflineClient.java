@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by luke on 4/27/17.
@@ -25,9 +26,10 @@ public class OfflineClient implements TeamClient {
 
     @Override
     public UserProfile login(PlayerLogin playerLogin) {
+        List<String> ranks = new ArrayList<String>();
         return new UserProfile(new ObjectId(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
-                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), new ArrayList<>(), new ArrayList<>(),
-                0, 0, 0, 0, 0, new ArrayList<>(), false);
+                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), ranks, new ArrayList<Rank>(),
+                0, 0, 0, 0, 0, new ArrayList<Punishment>(), false);
     }
 
     @Override
