@@ -58,7 +58,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.NETHER_STAR, ChatColor.YELLOW + "Team Selection");
-        teleportMenuItem = ItemFactory.createItem(Material.WATCH, ChatColor.YELLOW + "Player Teleport");
+        teleportMenuItem = ItemFactory.createItem(Material.CLOCK, ChatColor.YELLOW + "Player Teleport");
 
         leatherHelmet = new ItemStack(Material.LEATHER_HELMET);
         LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
@@ -289,7 +289,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 ChatColor teamColor = entry.getValue();
                 teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
                         clicker -> {
-                          if (player.isOnline()) clicker.teleport(player);
+                          if (player.isOnline()) clicker.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                         });
                 i++;
                 if (i >= size) break;

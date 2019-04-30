@@ -44,8 +44,8 @@ public class PortalModule extends MatchModule implements Listener {
 
             event.getPlayer().teleport(to);
             if (sound) {
-                event.getFrom().getWorld().playSound(event.getFrom(), Sound.ENTITY_ENDERMEN_TELEPORT, 0.2f, 1);
-                event.getTo().getWorld().playSound(event.getFrom(), Sound.ENTITY_ENDERMEN_TELEPORT, 0.2f, 1);
+                event.getFrom().getWorld().playSound(event.getFrom(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.2f, 1);
+                event.getTo().getWorld().playSound(event.getFrom(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.2f, 1);
             }
         }
     }

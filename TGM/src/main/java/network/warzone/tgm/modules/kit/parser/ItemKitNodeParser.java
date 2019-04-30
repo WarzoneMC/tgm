@@ -2,12 +2,12 @@ package network.warzone.tgm.modules.kit.parser;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import network.warzone.tgm.modules.kit.KitNode;
 import network.warzone.tgm.modules.kit.types.ItemKitNode;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.itemstack.ItemFactory;
-import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -111,7 +111,7 @@ public class ItemKitNodeParser implements KitNodeParser {
             itemStack.setDurability(jsonObject.get("durability").getAsShort());
         }
 
-        if (material.equals(Material.SKULL_ITEM) && jsonObject.has("skullOwner")) {
+        if (material.equals(Material.PLAYER_HEAD) && jsonObject.has("skullOwner")) {
             SkullMeta skullMeta = (SkullMeta) itemMeta;
             skullMeta.setOwner(jsonObject.get("skullOwner").getAsString());
             itemStack.setItemMeta(skullMeta);
@@ -174,7 +174,7 @@ public class ItemKitNodeParser implements KitNodeParser {
 
             if (jsonObject.has("pages")) { // Json pages
                 try {
-                    Field pagesField = Class.forName("org.bukkit.craftbukkit.v1_12_R1.inventory.CraftMetaBook").getDeclaredField("pages");
+                    Field pagesField = Class.forName("org.bukkit.craftbukkit.v1_13_R2.inventory.CraftMetaBook").getDeclaredField("pages");
                     pagesField.setAccessible(true);
 
                     List<IChatBaseComponent> pages = (List<IChatBaseComponent>) pagesField.get(bookMeta);

@@ -3,3 +3,4 @@ description: Team Game Manager
 main: network.warzone.tgm.TGM
 version: ${project.version}
 website: https://github.com/WarzoneMC/Warzone
+api-version: 1.13

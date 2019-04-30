@@ -61,7 +61,7 @@ public class StartCountdown extends BossBarCountdown {
 
             if (getTimeLeftSeconds() <= 3) {
                 Bukkit.getOnlinePlayers().forEach(player -> {
-                    player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_PLING, 1000, 1);
+                    player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_BLOCK_PLING, 1000, 1);
                     if (!TGM.get().getModule(TeamManagerModule.class).getSpectators().containsPlayer(player)) {
                         player.sendTitle(ChatColor.YELLOW.toString() + getTimeLeftSeconds(), "", 0, 5, 15);
                     }
@@ -76,7 +76,7 @@ public class StartCountdown extends BossBarCountdown {
         TGM.get().getMatchManager().startMatch();
 
         Bukkit.getOnlinePlayers().forEach(player -> {
-            player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_PLING, 1000f, 2f);
+            player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_BLOCK_PLING, 1000f, 2f);
             if (!TGM.get().getModule(TeamManagerModule.class).getSpectators().containsPlayer(player)) {
                 player.sendTitle(ChatColor.GREEN + "GO!", "", 0, 5, 15);
             }

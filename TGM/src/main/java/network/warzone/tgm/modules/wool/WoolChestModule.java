@@ -4,6 +4,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -25,7 +26,7 @@ import java.util.HashMap;
 @Getter
 public class WoolChestModule extends MatchModule implements Listener {
 
-    private final HashMap<InventoryHolder, DyeColor> woolChests = new HashMap<>();
+    private final HashMap<InventoryHolder, ItemStack> woolChests = new HashMap<>();
 
     private int runnableId = -1;
 
@@ -94,21 +95,18 @@ public class WoolChestModule extends MatchModule implements Listener {
         return woolChests.getOrDefault(holder, null) != null;
     }
 
-    private void fillInventoryWithWool(Inventory inventory, DyeColor dyeColor) {
-        Wool wool = new Wool(dyeColor);
-
+    private void fillInventoryWithWool(Inventory inventory, ItemStack woolFiller) {
         for (int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i, new ItemStack(wool.getItemType(), 1, (short) 0, wool.getData()));
+            inventory.setItem(i, woolFiller);
         }
     }
 
     private void registerInventory(Inventory inventory) {
         for (ItemStack itemStack : inventory.getContents()) {
-            if (itemStack != null && itemStack.getType() != null &&
-                    itemStack.getType() == Material.WOOL) {
-                DyeColor dyeColor = ((Wool) itemStack.getData()).getColor();
-                woolChests.put(inventory.getHolder(), dyeColor);
-                fillInventoryWithWool(inventory, dyeColor);
+            if (itemStack != null && itemStack.getType() != null && itemStack.getData() != null &&
+                    itemStack.getType().name().contains("WOOL")) {
+                woolChests.put(inventory.getHolder(), itemStack);
+                fillInventoryWithWool(inventory, itemStack);
                 return;
             }
         }

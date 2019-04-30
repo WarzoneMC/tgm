@@ -18,7 +18,7 @@ public class FireworkUtil {
         Preconditions.checkNotNull(effect, "firework effect");
         Preconditions.checkArgument(power >= 0, "power must be positive");
 
-        FireworkMeta meta = (FireworkMeta) Bukkit.getItemFactory().getItemMeta(Material.FIREWORK);
+        FireworkMeta meta = (FireworkMeta) Bukkit.getItemFactory().getItemMeta(Material.FIREWORK_ROCKET);
         meta.setPower(power > 0 ? (power - 1) : power);
         meta.addEffect(effect);
 

@@ -91,7 +91,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
             }
         }
 
-        module.getPlayer().getWorld().playSound(module.getPlayerLocation(), Sound.ENTITY_IRONGOLEM_DEATH, 2, 2);
+        module.getPlayer().getWorld().playSound(module.getPlayerLocation(), Sound.ENTITY_IRON_GOLEM_DEATH, 2, 2);
 
         if (message.length() > 0) {
             broadcastDeathMessage(module.getPlayer(), module.getKiller(), message);
