@@ -109,7 +109,7 @@ public class ColorConverter {
                 return ChatColor.RED;
             case GRAY:
                 return ChatColor.DARK_GRAY;
-            case SILVER:
+            case LIGHT_GRAY:
                 return ChatColor.GRAY;
             case CYAN:
                 return ChatColor.DARK_AQUA;
@@ -147,7 +147,7 @@ public class ColorConverter {
             case RED:
                 return DyeColor.RED;
             case GRAY:
-                return DyeColor.SILVER;
+                return DyeColor.LIGHT_GRAY;
             case DARK_GRAY:
                 return DyeColor.GRAY;
             case DARK_AQUA:

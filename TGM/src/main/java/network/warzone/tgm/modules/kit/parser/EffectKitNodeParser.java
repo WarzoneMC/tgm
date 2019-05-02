@@ -44,6 +44,6 @@ public class EffectKitNodeParser implements KitNodeParser {
 
         //if (jsonObject.has("color")) color = Color.jsonObject.get("color")
 
-        return new PotionEffect(type, duration, amplifier, ambient, particles, null);
+        return new PotionEffect(type, duration, amplifier, ambient, particles, false);
     }
 }

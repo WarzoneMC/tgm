@@ -26,6 +26,22 @@ public class ItemRemoveModule extends MatchModule implements Listener {
         if (match.getMapContainer().getMapInfo().getJsonObject().has("itemremove")) {
             for (JsonElement itemElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("itemremove")) {
                 try {
+                    // 1.13 temp fix
+                    if(Strings.getTechnicalName(itemElement.getAsString()).equalsIgnoreCase("WOOL")) {
+                        removed.add(Material.WHITE_WOOL);
+                        removed.add(Material.BLACK_WOOL);
+                        removed.add(Material.BLUE_WOOL);
+                        removed.add(Material.BROWN_WOOL);
+                        removed.add(Material.CYAN_WOOL);
+                        removed.add(Material.GRAY_WOOL);
+                        removed.add(Material.GREEN_WOOL);
+                        removed.add(Material.LIGHT_BLUE_WOOL);
+                        removed.add(Material.LIGHT_GRAY_WOOL);
+                        removed.add(Material.LIME_WOOL);
+                        removed.add(Material.MAGENTA_WOOL);
+                        removed.add(Material.ORANGE_WOOL);
+                        return;
+                    }
                     removed.add(Material.valueOf(Strings.getTechnicalName(itemElement.getAsString())));
                 } catch (Exception e) {
                     TGM.get().getPlayerManager().broadcastToAdmins(ChatColor.RED + "[JSON] Unknown material in itemremove module: \"" + itemElement.getAsString() + "\"");

@@ -9,14 +9,10 @@ import network.warzone.tgm.modules.region.RegionSave;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.Blocks;
-import network.warzone.tgm.util.ColorConverter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -188,30 +184,19 @@ public class ControlPoint implements Listener {
         return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
-    private void renderBlocks(MatchTeam matchTeam) {
-        byte color1 = progressingTowardsTeam != null ? ColorConverter.convertChatColorToDyeColor(progressingTowardsTeam.getColor()).getWoolData() : -1;
-        byte color2 = controller != null && matchTeam == controller ? ColorConverter.convertChatColorToDyeColor(controller.getColor()).getWoolData() : -1;
+    private void renderBlocks(MatchTeam matchTeam) { //TODO Test for 1.13
         Location center = region.getCenter();
-        double x = center.getX();
-        double z = center.getZ();
+
         double percent = Math.toRadians(getPercent() * 3.6);
+
         for (Block block : region.getBlocks()) {
             if (!Blocks.isVisualMaterial(block.getType())) continue;
-            double dx = block.getX() - x;
-            double dz = block.getZ() - z;
-            double angle = Math.atan2(dz, dx);
+
+            double angle = Math.atan2(block.getZ() - center.getZ(), block.getX() - center.getX());
+
             if (angle < 0) angle += 2 * Math.PI;
-            byte color = angle < percent ? color1 : color2;
-            if (color == -1) {
-                Pair<Material,Byte> oldBlock = regionSave.getBlockAt(new BlockVector(block.getLocation().toVector()));
-                if (oldBlock.getLeft().equals(block.getType())) color = oldBlock.getRight();
-            }
-            if (color != -1) {
-                block.setData(color);
-//                Bukkit.broadcastMessage("set to " + color);
-            } else {
-//                Bukkit.broadcastMessage("color = -1");
-            }
+
+            block.setType(regionSave.getBlockAt(new BlockVector(block.getLocation().toVector())));
         }
     }
 
@@ -220,5 +205,6 @@ public class ControlPoint implements Listener {
         HandlerList.unregisterAll(this);
 
         playersOnPoint.clear();
+        regionSave.clear();
     }
 }

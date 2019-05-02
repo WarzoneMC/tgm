@@ -1,17 +1,15 @@
 package network.warzone.tgm.modules.wool;
 
+import lombok.Getter;
+import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.util.ColorConverter;
-import lombok.Getter;
-import lombok.Setter;
+import network.warzone.tgm.modules.time.TimeModule;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,32 +33,32 @@ import java.util.UUID;
  *
  * Should be used as the actual objective.
  */
-
+@Getter
 public class WoolObjective implements Listener {
-    @Getter private final String name;
-    @Getter private final byte color;
-    @Getter private final MatchTeam owner;
-    @Getter private final Region podium; //where players place wool to complete objective.
-    @Getter private final ChatColor chatColor;
 
-    @Getter
+    private final String name;
+
+    private final Material block;
+    private final MatchTeam owner;
+    private final Region podium; //where players place wool to complete objective.
+    private final ChatColor color;
+
     private final HashMap<UUID, Double> touches = new HashMap<>(); //saves match time
+    private final List<WoolObjectiveService> services = new ArrayList<>();
 
-    @Getter @Setter private boolean completed = false;
+    @Setter private boolean completed = false;
 
-    @Getter private final List<WoolObjectiveService> services = new ArrayList<>();
-
-    public WoolObjective(String name, DyeColor color, MatchTeam owner, Region podium) {
+    public WoolObjective(String name, Material block, MatchTeam owner, Region podium, ChatColor color) {
         this.name = name;
-        this.color = color.getWoolData();
+        this.block = block;
         this.owner = owner;
         this.podium = podium;
-        this.chatColor = ColorConverter.convertDyeColorToChatColor(color);
+        this.color = color;
     }
 
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
-        if (event.getBlockPlaced().getType() == Material.WOOL && event.getBlockPlaced().getState().getData().getData() == color) {
+        if (event.getBlockPlaced().getType() == block) { //TODO 1.13 Temp fix
             if (!completed) {
 
                 if (!podium.contains(event.getBlockPlaced().getLocation())) {
@@ -90,7 +88,7 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onWoolCraft(CraftItemEvent event) {
-        if (event.getRecipe().getResult().getType() == Material.WOOL) {
+        if (event.getRecipe().getResult().getType().name().contains("WOOL")) { //TODO 1.13 Temp fix
             event.setCancelled(true);
             event.getWhoClicked().sendMessage(ChatColor.RED + "You are not allowed to craft wool.");
         }
@@ -128,8 +126,8 @@ public class WoolObjective implements Listener {
     @EventHandler
     public void onPickup(EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player) {
-            if (event.getItem() != null && event.getItem().getItemStack().getType() == Material.WOOL) {
-                if (event.getItem().getItemStack().getData().getData() == color) {
+            if (event.getItem() != null && event.getItem().getItemStack().getType().name().contains("WOOL")) { //TODO 1.13 Temp fix
+                if (event.getItem().getItemStack().getType() == block) {
                     handleWoolPickup(((Player) event.getEntity()).getPlayer());
                 }
             }
@@ -138,8 +136,8 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onCollect(InventoryClickEvent event) {
-        if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.WOOL) {
-            if (event.getCurrentItem().getData().getData() == color) {
+        if (event.getCurrentItem() != null && event.getCurrentItem().getType().name().contains("WOOL")) { //TODO 1.13 Temp fix
+            if (event.getCurrentItem().getType() == block) {
                 handleWoolPickup((Player) event.getWhoClicked());
             }
         }

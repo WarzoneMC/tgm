@@ -64,7 +64,7 @@ public class TabListModule extends MatchModule implements Listener {
         footer += ChatColor.AQUA + "Spectators: " + ChatColor.WHITE + TGM.get().getModule(TeamManagerModule.class).getSpectators().getMembers().size();
 
 
-        TitleAPI.sendTabTitle(player, header, footer);
+        player.setPlayerListHeaderFooter(header, footer);
     }
     private void refreshAllTabs() {
         for (Player player : Bukkit.getOnlinePlayers()) {
