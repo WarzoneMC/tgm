@@ -6,6 +6,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public class Players {
@@ -49,5 +50,15 @@ public class Players {
         player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 24.000D, AttributeModifier.Operation.ADD_SCALAR));
 
         player.updateInventory();
+    }
+    public static int getPing(Player player) {
+        int ping = -1;
+        try {
+            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+            ping = (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return ping;
     }
 }

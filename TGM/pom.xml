@@ -20,10 +20,9 @@
             <artifactId>warzone-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
             <version>1.13.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
@@ -33,13 +32,6 @@
             <version>1.13.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>io.papermc</groupId>
-            <artifactId>paperlib</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-
         <dependency>
             <groupId>com.github.OvercastNetwork.sk89q-command-framework</groupId>
             <artifactId>command-framework-bukkit</artifactId>

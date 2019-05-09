@@ -4,10 +4,8 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -19,7 +17,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Wool;
 
 import java.util.HashMap;
 

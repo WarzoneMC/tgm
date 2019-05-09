@@ -631,7 +631,7 @@ public class CycleCommands {
                     int place = 0;
                     sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
                     for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
-                        sender.sendMessage(profileToTextComponent(player, ++place));
+                        sender.sendMessage(profileToTextComponent(player, ++place).getText());
                     }
                 });
             }

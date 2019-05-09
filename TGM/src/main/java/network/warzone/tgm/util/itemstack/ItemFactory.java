@@ -128,8 +128,8 @@ public class ItemFactory {
         } else {
             meta.setOwner(name);
         }
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         skull.setItemMeta(meta);
-        skull.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         return skull;
     }
 
@@ -146,8 +146,8 @@ public class ItemFactory {
         if (lore != null && lore.length > 0) {
             meta.setLore(Arrays.stream(lore).map(str -> ChatColor.translateAlternateColorCodes('&', str)).collect(Collectors.toList()));
         }
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         skull.setItemMeta(meta);
-        skull.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         return skull;
     }
 
