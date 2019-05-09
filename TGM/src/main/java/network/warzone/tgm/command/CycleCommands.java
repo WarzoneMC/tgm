@@ -411,7 +411,7 @@ public class CycleCommands {
                         return;
                     }
                     player.teleport(tpTo.getLocation());
-                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 1, 1);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
                     return;
                 }
                 player.sendMessage(ChatColor.RED + "Usage: /tp <name>");

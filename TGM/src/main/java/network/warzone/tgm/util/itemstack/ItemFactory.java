@@ -120,7 +120,7 @@ public class ItemFactory {
     }
 
     public static ItemStack getPlayerSkull(String name) {
-        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
         if (offlinePlayer != null) {
@@ -134,7 +134,7 @@ public class ItemFactory {
     }
 
     public static ItemStack getPlayerSkull(String name, String displayName, String... lore) {
-        ItemStack skull = new ItemStack(Material.SKULL_ITEM, 1, (short) SkullType.PLAYER.ordinal());
+        ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) skull.getItemMeta();
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
         if (offlinePlayer != null) {

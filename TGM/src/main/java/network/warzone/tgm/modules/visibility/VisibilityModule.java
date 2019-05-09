@@ -2,26 +2,22 @@ package network.warzone.tgm.modules.visibility;
 
 import lombok.Getter;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+@Getter
 public class VisibilityModule extends MatchModule implements Listener {
-    @Getter private VisibilityController visibilityController;
 
-    public VisibilityModule() {
-
-    }
+    private VisibilityController visibilityController;
 
     @Override
     public void load(Match match) {
@@ -35,45 +31,36 @@ public class VisibilityModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        refreshPlayer(event.getPlayerContext().getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onMatchJoin(MatchJoinEvent event) {
-        if (!TGM.get().getModule(ChatModule.class).getTeamManagerModule().getTeam(event.getPlayerContext().getPlayer()).isSpectator()) refreshPlayer(event.getPlayerContext().getPlayer());
+        if (event.getOldTeam() != null) refreshPlayer(event.getPlayerContext().getPlayer());
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> refreshPlayer(event.getPlayer()), 20L);
+        refreshPlayer(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onWorldSwitch(PlayerChangedWorldEvent event) {
+        refreshPlayer(event.getPlayer());
     }
 
     public void refreshPlayer(Player player) {
         if (player == null) return;
 
-        //update who can see the player.
-        for (Player eyes : Bukkit.getOnlinePlayers()) {
-            if (player == eyes) continue;
-
-            boolean canSee = visibilityController.canSee(eyes, player);
-            if (canSee) {
-                eyes.showPlayer(TGM.get(), player);
+        // Update who can see who
+        Bukkit.getOnlinePlayers().stream().filter(looker -> !looker.equals(player)).forEach(looker -> {
+            if (visibilityController.canSee(looker, player)) {
+                looker.showPlayer(TGM.get(), player);
             } else {
-                eyes.hidePlayer(TGM.get(), player);
+                looker.hidePlayer(TGM.get(), player);
             }
-        }
 
-        //update who the player can see.
-        for (Player target : Bukkit.getOnlinePlayers()) {
-            if (player == target) continue;
-
-            boolean canSee = visibilityController.canSee(player, target);
-            if (canSee) {
-                player.showPlayer(TGM.get(), target);
+            if (visibilityController.canSee(player, looker)) {
+                player.showPlayer(TGM.get(), looker);
             } else {
-                player.hidePlayer(TGM.get(), target);
+                player.hidePlayer(TGM.get(), looker);
             }
-        }
+        });
     }
 
     public void refreshAllPlayers() {

@@ -54,10 +54,10 @@ public class CTWModule extends MatchModule implements Listener {
             String name = monumentJson.get("name").getAsString();
             Region region = match.getModule(RegionManagerModule.class).getRegion(match, monumentJson.get("region"));
             List<MatchTeam> teams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), monumentJson.get("teams"));
-            DyeColor color = DyeColor.valueOf(Strings.getTechnicalName(monumentJson.get("color").getAsString()));
-
+            String woolColor = Strings.getTechnicalName(monumentJson.get("woolcolor").getAsString()); //TODO 1.13 Temp fix
+            ChatColor color = ChatColor.valueOf(Strings.getTechnicalName(monumentJson.get("color").getAsString()));
             for (MatchTeam matchTeam : teams) {
-                wools.add(new WoolObjective(name, color, matchTeam, region));
+                wools.add(new WoolObjective(name, Material.valueOf(woolColor.toUpperCase() + "_WOOL"), matchTeam, region, color));
             }
 
             teams.clear();
@@ -74,7 +74,7 @@ public class CTWModule extends MatchModule implements Listener {
                         updateOnScoreboard(woolObjective);
 
                         Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                                " picked up " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                                " picked up " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                             for (PlayerContext playerContext : otherTeam.getMembers()) {
@@ -93,7 +93,7 @@ public class CTWModule extends MatchModule implements Listener {
                     updateOnScoreboard(woolObjective);
 
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                            " placed " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                            " placed " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
@@ -117,7 +117,7 @@ public class CTWModule extends MatchModule implements Listener {
                     updateOnScoreboard(woolObjective);
 
                      if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                             " dropped " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                             " dropped " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
                  }
 
             });
@@ -242,11 +242,11 @@ public class CTWModule extends MatchModule implements Listener {
     private String getScoreboardString(WoolObjective woolObjective) {
         WoolStatus woolStatus = woolObjective.getStatus();
         if (woolStatus == WoolStatus.COMPLETED) {
-            return "  " + woolObjective.getChatColor() + SYMBOL_WOOL_COMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
+            return "  " + woolObjective.getColor() + SYMBOL_WOOL_COMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
         } else if (woolStatus == WoolStatus.TOUCHED) {
-            return "  " + woolObjective.getChatColor() + SYMBOL_WOOL_TOUCHED + ChatColor.WHITE + " " + woolObjective.getName();
+            return "  " + woolObjective.getColor() + SYMBOL_WOOL_TOUCHED + ChatColor.WHITE + " " + woolObjective.getName();
         } else {
-            return "  " + woolObjective.getChatColor() + SYMBOL_WOOL_INCOMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
+            return "  " + woolObjective.getColor() + SYMBOL_WOOL_INCOMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
         }
     }
 

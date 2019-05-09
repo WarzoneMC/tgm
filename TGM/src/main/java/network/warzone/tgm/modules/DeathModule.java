@@ -103,7 +103,7 @@ public class DeathModule extends MatchModule implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         DeathModule module = getPlayer(event.getEntity());
         if(module.getStampKill() > 0 && System.currentTimeMillis() - module.getStampKill() >= 1000 * 30) module.setKiller(null);
-        new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()).callEvent();
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()));
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);
     }

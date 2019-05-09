@@ -11,8 +11,8 @@ public class EnchantGlow extends EnchantmentWrapper {
 
     private static Enchantment glow;
 
-    public EnchantGlow(int id) {
-        super(id);
+    public EnchantGlow(String namespaceKey) {
+        super(namespaceKey);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class EnchantGlow extends EnchantmentWrapper {
             e.printStackTrace();
         }
 
-        glow = new EnchantGlow(255);
+        glow = new EnchantGlow("TGM");
         Enchantment.registerEnchantment(glow);
         return glow;
     }
