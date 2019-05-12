@@ -3,6 +3,7 @@ package network.warzone.tgm.command;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.util.Players;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,7 +30,9 @@ public class MiscCommands {
             sender.sendMessage(ChatColor.RED + "As console, you can use /ping <player> to check someone's ping.");
             return;
         }
-        sender.sendMessage(ChatColor.AQUA + player.getName() + ChatColor.GRAY + "'" + (player.getName().endsWith("s") ? "" : "s") + " ping is " + ChatColor.AQUA + player.spigot().getPing() + "ms");
+        int playerPing = Players.getPing(player);
+        String pingMsg = ((playerPing >= 0) ? (ChatColor.AQUA + player.getName() + ChatColor.GRAY + "'" + (player.getName().endsWith("s") ? "" : "s") + " ping is " + ChatColor.AQUA + playerPing + "ms") : ChatColor.RED + "Could not get ping.");
+        sender.sendMessage(pingMsg);
     }
 
 }

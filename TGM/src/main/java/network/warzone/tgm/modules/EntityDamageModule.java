@@ -1,5 +1,7 @@
 package network.warzone.tgm.modules;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -45,7 +47,7 @@ public class EntityDamageModule extends MatchModule implements Listener {
             Player playerShooter = (Player) shooter;
             MatchTeam damagedTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(damaged);
             if(damagedTeam == null || damagedTeam.containsPlayer(playerShooter)) return;
-            if(!damagedTeam.isSpectator() && (damaged.getHealth() - event.getFinalDamage() >= 0)) playerShooter.sendActionBar(damagedTeam.getColor() + damaged.getName() + ChatColor.DARK_GRAY + " [" + ChatColor.WHITE + ((int)damaged.getHealth() - (int) event.getFinalDamage()) + ChatColor.GRAY + "/" + damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() + ChatColor.DARK_GRAY + "]");
+            if(!damagedTeam.isSpectator() && (damaged.getHealth() - event.getFinalDamage() >= 0)) playerShooter.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(damagedTeam.getColor() + damaged.getName() + ChatColor.DARK_GRAY + " [" + ChatColor.WHITE + ((int)damaged.getHealth() - (int) event.getFinalDamage()) + ChatColor.GRAY + "/" + damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() + ChatColor.DARK_GRAY + "]"));
         }
     }
 
