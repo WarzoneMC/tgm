@@ -16,3 +16,4 @@ server:
   name: "Warzone"
   id: "warzone"
   store: "https://tgmwarzone.tebex.io/"
+  tablist-name: "&f&lWARZONE"
