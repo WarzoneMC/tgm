@@ -83,7 +83,7 @@ public class DTMModule extends MatchModule implements Listener {
                     //}
 
                     for (PlayerContext playerContext : monument.getOwners().get(0).getMembers()) {
-                        playerContext.getPlayer().playSound(monument.getRegion().getCenter(), Sound.ENTITY_IRON_GOLEM_DEATH, SoundCategory.MASTER, 1000, 1);
+                        playerContext.getPlayer().playSound(monument.getRegion().getCenter(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.MASTER, 1000, 1);
                     }
 
                     if (TGM.get().getApiManager().isStatsDisabled()) return;
