@@ -21,7 +21,7 @@ public class EnterFilterType implements FilterType, Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID)
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
             for (Region region : regions) {
                 if (region.contains(event.getTo())) {
                     for (MatchTeam matchTeam : teams) {
