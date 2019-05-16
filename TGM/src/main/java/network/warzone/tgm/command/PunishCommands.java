@@ -249,7 +249,7 @@ public class PunishCommands {
         } else {
             prefix = "";
         }
-        String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + sender.getName() + ": " + ChatColor.RESET + cmd.getRemainingString(0);
+        String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + sender.getName() + ": " + ChatColor.LIGHT_PURPLE + cmd.getRemainingString(0);
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
         }
