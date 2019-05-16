@@ -24,9 +24,16 @@ import java.util.List;
 public class FilterManagerModule extends MatchModule {
 
     private List<FilterType> filterTypes = new ArrayList<>();
-
+    
+    private Match match;
+    
     @Override
     public void load(Match match) {
+        this.match = match;
+    }
+
+    @Override
+    public void enable() {
         if (match.getMapContainer().getMapInfo().getJsonObject().has("filters")) {
             for (JsonElement filterElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("filters")) {
                 JsonObject filterJson = filterElement.getAsJsonObject();
@@ -41,7 +48,7 @@ public class FilterManagerModule extends MatchModule {
     }
 
     @Override
-    public void unload() {
+    public void disable() {
         for (FilterType filterType : filterTypes) {
             if (filterType instanceof Listener) {
                 HandlerList.unregisterAll((Listener) filterType);
