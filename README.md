@@ -1,3 +1,4 @@
+![Minecraft Version](https://img.shields.io/badge/supports%20minecraft%20versions-1.13.2-brightgreen.svg)
 [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://discord.io/WarzoneMC)
 
