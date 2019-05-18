@@ -174,7 +174,7 @@ public class ItemKitNodeParser implements KitNodeParser {
 
             if (jsonObject.has("pages")) { // Json pages
                 try {
-                    Field pagesField = Class.forName("org.bukkit.craftbukkit.v1_13_R2.inventory.CraftMetaBook").getDeclaredField("pages");
+                    Field pagesField = Class.forName("org.bukkit.craftbukkit.v1_14_R1.inventory.CraftMetaBook").getDeclaredField("pages");
                     pagesField.setAccessible(true);
 
                     List<IChatBaseComponent> pages = (List<IChatBaseComponent>) pagesField.get(bookMeta);
