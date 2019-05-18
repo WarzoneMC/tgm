@@ -2,7 +2,7 @@ package network.warzone.tgm.modules.kit.parser;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.server.v1_14_R2.IChatBaseComponent;
+import net.minecraft.server.v1_14_R1.IChatBaseComponent;
 import network.warzone.tgm.modules.kit.KitNode;
 import network.warzone.tgm.modules.kit.types.ItemKitNode;
 import network.warzone.tgm.util.ColorConverter;
