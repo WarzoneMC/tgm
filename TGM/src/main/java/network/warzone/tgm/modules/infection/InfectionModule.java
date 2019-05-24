@@ -19,7 +19,7 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.Strings;
 import network.warzone.warzoneapi.models.Death;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;

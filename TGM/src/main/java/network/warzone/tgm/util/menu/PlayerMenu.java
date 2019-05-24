@@ -35,7 +35,7 @@ public class PlayerMenu extends Menu {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getName().equals(event.getInventory().getName())) {
+        if (event.getView().getTitle().equals(event.getView().getTitle())) {
             if (event.getPlayer().getUniqueId().equals(playerUuid)) {
                 super.disable();
             }
