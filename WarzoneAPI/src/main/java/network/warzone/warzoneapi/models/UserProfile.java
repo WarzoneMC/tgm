@@ -18,7 +18,7 @@ public class UserProfile {
     public static final int XP_PER_KILL = 2,
                             XP_PER_WIN = 20,
                             XP_PER_LOSS = 8,
-                            XP_PER_WOOL_BREAK = 4;
+                            XP_PER_WOOL_BREAK = 3;
 
     @SerializedName("_id")
     private ObjectId id;
