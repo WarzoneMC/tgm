@@ -42,7 +42,7 @@ public class CTWModule extends MatchModule implements Listener {
 
     private final List<WoolObjective> wools = new ArrayList<>();
     private final HashMap<WoolObjective, List<Integer>> woolScoreboardLines = new HashMap<>();
-    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private final HashMap<String, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -191,7 +191,7 @@ public class CTWModule extends MatchModule implements Listener {
                 }
             }
             event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i++);
+            teamScoreboardLines.put(matchTeam.getId(), i++);
 
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
                 event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
@@ -213,9 +213,12 @@ public class CTWModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamUpdate(TeamUpdateEvent event) {
-        for (MatchTeam matchTeam : teamScoreboardLines.keySet()) {
+        Set<String> teamIds = teamScoreboardLines.keySet();
+        Set<MatchTeam> teams = teamIds.stream().map(id -> TGM.get().getModule(TeamManagerModule.class).getTeamById(id)).collect(Collectors.toSet());
+
+        for (MatchTeam matchTeam : teams) {
             if (event.getMatchTeam() == matchTeam) {
-                int i = teamScoreboardLines.get(matchTeam);
+                int i = teamScoreboardLines.get(matchTeam.getId());
                 for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
                     simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                     simpleScoreboard.update();

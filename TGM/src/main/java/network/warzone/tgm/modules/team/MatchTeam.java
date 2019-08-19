@@ -56,11 +56,4 @@ public class MatchTeam {
         this.spawnPoints.add(spawnPoint);
     }
 
-    public boolean equals(MatchTeam other) {
-        return other.id.equals(this.id);
-    }
-
-    public int hashCode() {
-        return Integer.parseInt(this.id, 26);
-    }
 }
