@@ -1,6 +1,5 @@
 package network.warzone.tgm.modules.wool;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
