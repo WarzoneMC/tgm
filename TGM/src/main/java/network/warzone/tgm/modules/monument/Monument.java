@@ -1,7 +1,6 @@
 package network.warzone.tgm.modules.monument;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
@@ -19,7 +18,7 @@ import org.bukkit.event.block.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor @Getter @EqualsAndHashCode
+@AllArgsConstructor @Getter
 public class Monument implements Listener {
 
     private String name;
