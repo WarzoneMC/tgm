@@ -55,4 +55,5 @@ public class MatchTeam {
     public void addSpawnPoint(SpawnPoint spawnPoint) {
         this.spawnPoints.add(spawnPoint);
     }
+
 }

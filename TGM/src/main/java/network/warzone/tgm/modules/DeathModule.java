@@ -24,11 +24,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 @NoArgsConstructor
 public class DeathModule extends MatchModule implements Listener {
 
-    private HashMap<Player, DeathModule> players = new HashMap<>();
+    private HashMap<UUID, DeathModule> players = new HashMap<>();
     private TeamManagerModule teamManagerModule;
 
     @Getter @Setter private Player player, killer;
@@ -53,7 +54,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        players.remove(event.getPlayer());
+        players.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -92,11 +93,12 @@ public class DeathModule extends MatchModule implements Listener {
     }
 
     public DeathModule getPlayer(Player player) {
-        if (!players.containsKey(player)) {
-            players.put(player, new DeathModule(player));
+        UUID playerUUID = player.getUniqueId();
+        if (!players.containsKey(playerUUID)) {
+            players.put(playerUUID, new DeathModule(player));
         }
 
-        return players.get(player);
+        return players.get(playerUUID);
     }
 
     @EventHandler
