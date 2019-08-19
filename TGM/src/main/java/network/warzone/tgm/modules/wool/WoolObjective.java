@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules.wool;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
@@ -33,7 +34,7 @@ import java.util.UUID;
  *
  * Should be used as the actual objective.
  */
-@Getter
+@Getter @EqualsAndHashCode
 public class WoolObjective implements Listener {
 
     private final String name;

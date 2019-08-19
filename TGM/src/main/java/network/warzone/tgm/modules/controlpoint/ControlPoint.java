@@ -24,7 +24,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.BlockVector;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Not a module! Other modules should initialize these and keep track of them.
@@ -46,7 +48,7 @@ public class ControlPoint implements Listener {
     private final RegionSave regionSave;
     private final ControlPointService controlPointService;
 
-    private final Set<Player> playersOnPoint = Sets.newHashSet();
+    private final Set<UUID> playersOnPoint = new HashSet<>();
 
     private MatchTeam controller = null;
 
@@ -71,9 +73,9 @@ public class ControlPoint implements Listener {
         if(TGM.get().getModule(SpectatorModule.class).isSpectating(player)) return;
 
         if (!player.isDead() && region.contains(to)) {
-            playersOnPoint.add(player);
+            playersOnPoint.add(player.getUniqueId());
         } else {
-            playersOnPoint.remove(player);
+            playersOnPoint.remove(player.getUniqueId());
         }
     }
 
@@ -89,12 +91,12 @@ public class ControlPoint implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        this.playersOnPoint.remove(event.getPlayerContext().getPlayer());
+        this.playersOnPoint.remove(event.getPlayerContext().getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        this.playersOnPoint.remove(event.getPlayer());
+        this.playersOnPoint.remove(event.getPlayer().getUniqueId());
     }
 
     public void enable() {
@@ -106,8 +108,8 @@ public class ControlPoint implements Listener {
             for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
                 if (matchTeam.isSpectator()) continue;
 
-                for (Player player : playersOnPoint) {
-                    if (matchTeam.containsPlayer(player)) {
+                for (UUID uuid : playersOnPoint) {
+                    if (matchTeam.containsPlayer(Bukkit.getPlayer(uuid))) {
                         holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                     }
                 }

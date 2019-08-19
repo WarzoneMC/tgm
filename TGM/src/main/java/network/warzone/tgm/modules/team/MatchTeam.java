@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules.team;
 
+import lombok.EqualsAndHashCode;
 import network.warzone.tgm.map.SpawnPoint;
 import network.warzone.tgm.modules.kit.Kit;
 import network.warzone.tgm.user.PlayerContext;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * Created by luke on 4/28/17.
  */
-@AllArgsConstructor @Getter
+@AllArgsConstructor @Getter @EqualsAndHashCode
 public class MatchTeam {
 
     private final String id;
