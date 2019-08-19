@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules.controlpoint;
 
+import com.google.common.collect.Sets;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
@@ -23,9 +24,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.BlockVector;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Not a module! Other modules should initialize these and keep track of them.
@@ -47,7 +46,7 @@ public class ControlPoint implements Listener {
     private final RegionSave regionSave;
     private final ControlPointService controlPointService;
 
-    private final Set<UUID> playersOnPoint = new HashSet<>();
+    private final Set<Player> playersOnPoint = Sets.newHashSet();
 
     private MatchTeam controller = null;
 
@@ -72,9 +71,9 @@ public class ControlPoint implements Listener {
         if(TGM.get().getModule(SpectatorModule.class).isSpectating(player)) return;
 
         if (!player.isDead() && region.contains(to)) {
-            playersOnPoint.add(player.getUniqueId());
+            playersOnPoint.add(player);
         } else {
-            playersOnPoint.remove(player.getUniqueId());
+            playersOnPoint.remove(player);
         }
     }
 
@@ -90,12 +89,12 @@ public class ControlPoint implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        this.playersOnPoint.remove(event.getPlayerContext().getPlayer().getUniqueId());
+        this.playersOnPoint.remove(event.getPlayerContext().getPlayer());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        this.playersOnPoint.remove(event.getPlayer().getUniqueId());
+        this.playersOnPoint.remove(event.getPlayer());
     }
 
     public void enable() {
@@ -107,8 +106,8 @@ public class ControlPoint implements Listener {
             for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
                 if (matchTeam.isSpectator()) continue;
 
-                for (UUID uuid : playersOnPoint) {
-                    if (matchTeam.containsPlayer(Bukkit.getPlayer(uuid))) {
+                for (Player player : playersOnPoint) {
+                    if (matchTeam.containsPlayer(player)) {
                         holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                     }
                 }

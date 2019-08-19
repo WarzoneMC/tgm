@@ -23,7 +23,8 @@ public class MapLoaderImpl implements MapLoader {
             if (child.isDirectory()) {
                 if (isMapFolder(child)) {
                     File mapJsonFile = new File(child, "map.json");
-                    try (JsonReader reader = new JsonReader(new FileReader(mapJsonFile))) {
+                    try {
+                        JsonReader reader = new JsonReader(new FileReader(mapJsonFile));
                         MapInfo mapInfo = TGM.get().getGson().fromJson(reader, MapInfo.class);
                         maps.add(new MapContainer(child, mapInfo));
                     } catch (Exception e) {
@@ -31,8 +32,10 @@ public class MapLoaderImpl implements MapLoader {
                         e.printStackTrace();
                     }
                 } else {
-                    // Bulk add all the maps.
-                    maps.addAll(loadMaps(child));
+                    //recursively loop through directories
+                    for (MapContainer mapContainer : loadMaps(child)) {
+                        maps.add(mapContainer);
+                    }
                 }
             }
         }

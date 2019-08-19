@@ -31,7 +31,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +43,7 @@ import java.util.stream.Collectors;
 public class BlitzModule extends MatchModule implements Listener {
 
     private Map<MatchTeam, Integer> teamLives = new HashMap<>();
-    private Map<UUID, Integer> playerLives = new HashMap<>();
+    private Map<Player, Integer> playerLives = new HashMap<>();
 
     @Getter private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
 
@@ -96,7 +99,7 @@ public class BlitzModule extends MatchModule implements Listener {
         }
         if (highest != null) {
             final MatchTeam team = highest;
-            int amount = (int) teamManagerModule.getTeams().stream().filter(t -> getAlivePlayers(team) == getAlivePlayers(t) && !t.isSpectator()).count();
+            int amount = teamManagerModule.getTeams().stream().filter(t -> getAlivePlayers(team) == getAlivePlayers(t) && !t.isSpectator()).collect(Collectors.toList()).size();
             if (amount > 1) return null;
             else return team;
         }
@@ -108,7 +111,7 @@ public class BlitzModule extends MatchModule implements Listener {
         for (MatchTeam team : teamManagerModule.getTeams()) {
             if (team.isSpectator()) continue;
             for (PlayerContext player : team.getMembers()) {
-                playerLives.put(player.getPlayer().getUniqueId(), teamLives.getOrDefault(team, 1));
+                playerLives.put(player.getPlayer(), teamLives.getOrDefault(team, 1));
                 showLives(player.getPlayer());
             }
         }
@@ -230,7 +233,7 @@ public class BlitzModule extends MatchModule implements Listener {
         if (event.getOldTeam() != null && !event.getOldTeam().isSpectator()) updateScoreboardTeamLine(event.getOldTeam(), getAlivePlayers(event.getOldTeam()).size());
         if (!event.getTeam().isSpectator()) updateScoreboardTeamLine(event.getTeam(), getAlivePlayers(event.getTeam()).size());
 
-        playerLives.put(event.getPlayerContext().getPlayer().getUniqueId(), teamLives.getOrDefault(event.getTeam(), 1));
+        playerLives.put(event.getPlayerContext().getPlayer(), teamLives.getOrDefault(event.getTeam(), 1));
     }
 
     @Override
@@ -243,11 +246,11 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     private void removeLife(Player player) {
-        playerLives.put(player.getUniqueId(), (playerLives.getOrDefault(player.getUniqueId(), 0) > 0 ? playerLives.get(player.getUniqueId()) - 1 : 0));
+        playerLives.put(player, (playerLives.getOrDefault(player, 0) > 0 ? playerLives.get(player) - 1 : 0));
     }
 
     private int getLives(Player player) {
-        return playerLives.getOrDefault(player.getUniqueId(), 0);
+        return playerLives.getOrDefault(player, 0);
     }
 
     private boolean lastTeamAlive() {

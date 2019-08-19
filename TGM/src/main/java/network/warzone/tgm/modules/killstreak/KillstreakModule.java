@@ -26,7 +26,7 @@ public class KillstreakModule extends MatchModule implements Listener {
     private DeathModule deathModule;
 
     private final Map<String, Integer> players = new HashMap<>(); // String is player's uuid
-    private final List<Killstreak> killstreaks = new ArrayList<>();
+    private final Set<Killstreak> killstreaks = new HashSet<>();
 
     @Override
     public void load(Match match) {
