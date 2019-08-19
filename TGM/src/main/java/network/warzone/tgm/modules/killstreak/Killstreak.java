@@ -1,6 +1,5 @@
 package network.warzone.tgm.modules.killstreak;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,7 @@ import java.util.List;
 /**
  * Created by MatrixTunnel on 10/3/2017.
  */
-@NoArgsConstructor @Getter @EqualsAndHashCode
+@NoArgsConstructor @Getter
 public class Killstreak {
 
     private int count = 0;

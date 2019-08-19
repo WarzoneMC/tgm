@@ -1,10 +1,9 @@
 package network.warzone.tgm.modules.controlpoint;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@AllArgsConstructor @Getter @EqualsAndHashCode
+@AllArgsConstructor @Getter
 public class ControlPointDefinition {
 
     private final String name;

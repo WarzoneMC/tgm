@@ -19,7 +19,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 /**
  * Initializes and keeps track of player scoreboards.
@@ -31,7 +30,7 @@ import java.util.UUID;
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
 public class ScoreboardManagerModule extends MatchModule implements Listener {
 
-    private HashMap<UUID, SimpleScoreboard> scoreboards = new HashMap<>();
+    private HashMap<Player, SimpleScoreboard> scoreboards = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
@@ -75,7 +74,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         Bukkit.getPluginManager().callEvent(new ScoreboardInitEvent(playerContext.getPlayer(), simpleScoreboard));
 
         simpleScoreboard.send(playerContext.getPlayer());
-        scoreboards.put(playerContext.getPlayer().getUniqueId(), simpleScoreboard);
+        scoreboards.put(playerContext.getPlayer(), simpleScoreboard);
 
         simpleScoreboard.update();
 
@@ -98,11 +97,11 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        this.scoreboards.remove(event.getPlayer().getUniqueId());
+        this.scoreboards.remove(event.getPlayer());
     }
 
     public SimpleScoreboard getScoreboard(Player player) {
-        return scoreboards.get(player.getUniqueId());
+        return scoreboards.get(player);
     }
 
     @Override
