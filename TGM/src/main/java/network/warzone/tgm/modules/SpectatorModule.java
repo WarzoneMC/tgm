@@ -5,6 +5,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.team.MatchTeam;
+import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
@@ -12,7 +13,6 @@ import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.Menu;
 import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.PublicMenu;
-import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,10 +34,11 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class SpectatorModule extends MatchModule implements Listener {
+
+    private TeamManagerModule teamManagerModule;
 
     private MatchTeam spectators;
     private PublicMenu teamSelectionMenu;
@@ -48,7 +49,6 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     private final ItemStack leatherHelmet;
 
-    private int teamSelectionRunnable;
     private int afkTimerRunnable;
 
     private final Map<UUID, Long> lastMovement = new HashMap<>();
@@ -68,7 +68,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
+        teamManagerModule = match.getModule(TeamManagerModule.class);
 
         this.spectators = teamManagerModule.getSpectators();
 
@@ -91,61 +91,19 @@ public class SpectatorModule extends MatchModule implements Listener {
         /**
          * Update the item values every second to keep player counts accurate.
          */
-        teamSelectionRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-            int totalMatchSize = 0;
-            int totalMatchMaxSize = 0;
+        updateMenu();
 
-            int i = 2;
-            for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
-                if (matchTeam.isSpectator()) {
-                    ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
-                    LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
-                    leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
-//                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match.", "", ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString() + " spectating."));
-                    itemStack.setItemMeta(leatherArmorMeta);
-                    teamSelectionMenu.setItem(8, itemStack);
-                } else {
-                    totalMatchSize += matchTeam.getMembers().size();
-                    totalMatchMaxSize += matchTeam.getMax();
-
-                    ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
-                    LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
-                    leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
-                    leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
-                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-                    leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    leatherArmorMeta.setLore(Collections.singletonList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
-                            + "/" + matchTeam.getMax() + " playing."));
-                    itemStack.setItemMeta(leatherArmorMeta);
-                    teamSelectionMenu.setItem(i, itemStack);
-
-                    i++;
+        afkTimerRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (isSpectating(player) || !lastMovement.containsKey(player.getUniqueId())) continue;
+                long moved = lastMovement.get(player.getUniqueId());
+                if (moved == 0) continue;
+                if (System.currentTimeMillis() > moved + (5 * 60 * 1000)) {
+                    teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators);
+                    lastMovement.remove(player.getUniqueId());
                 }
             }
-
-            afkTimerRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (isSpectating(player) || !lastMovement.containsKey(player.getUniqueId())) continue;
-                    long moved = lastMovement.get(player.getUniqueId());
-                    if (moved == 0) continue;
-                    if (System.currentTimeMillis() > moved + (5 * 60 * 1000)) {
-                        teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators);
-                        lastMovement.remove(player.getUniqueId());
-                    }
-                }
-            }, 10 * 20, 10 * 20).getTaskId();
-
-            ItemStack autoJoinHelmet = ItemFactory.createItem(Material.CHAINMAIL_HELMET, ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
-                    Arrays.asList("", ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."));
-            ItemMeta autoJoinHelmetMeta = autoJoinHelmet.getItemMeta();
-            autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            autoJoinHelmet.setItemMeta(autoJoinHelmetMeta);
-            teamSelectionMenu.setItem(0, autoJoinHelmet);
-        }, 1L, 20L).getTaskId();
+        }, 10 * 20, 10 * 20).getTaskId();
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {
@@ -164,6 +122,59 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
     }
 
+    void updateTeamMenuItem(MatchTeam matchTeam, int i) {
+        ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
+        LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+        leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
+        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
+        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        leatherArmorMeta.setLore(Collections.singletonList(ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString()
+                + "/" + matchTeam.getMax() + " playing."));
+        itemStack.setItemMeta(leatherArmorMeta);
+        teamSelectionMenu.setItem(i, itemStack);
+    }
+
+    void updateSpectatorMenuItem(MatchTeam matchTeam) {
+        ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
+        LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
+        leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
+//                        leatherArmorMeta.setColor(ColorConverter.getColor(matchTeam.getColor()));
+        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        leatherArmorMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        leatherArmorMeta.setLore(Arrays.asList(ChatColor.WHITE + "Spectate the match.", "", ChatColor.WHITE.toString() + matchTeam.getMembers().size() + ChatColor.GRAY.toString() + " spectating."));
+        itemStack.setItemMeta(leatherArmorMeta);
+        teamSelectionMenu.setItem(8, itemStack);
+    }
+
+    void updateMenu() {
+        int totalMatchSize = 0;
+        int totalMatchMaxSize = 0;
+        int i = 2;
+        for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
+            if (!matchTeam.isSpectator()) {
+                totalMatchSize += matchTeam.getMembers().size();
+                totalMatchMaxSize += matchTeam.getMax();
+                updateTeamMenuItem(matchTeam, i++);
+            } else {
+                updateSpectatorMenuItem(matchTeam);
+            }
+        }
+        ItemStack autoJoinHelmet = ItemFactory.createItem(
+                Material.CHAINMAIL_HELMET,
+                ChatColor.WHITE + ChatColor.BOLD.toString() + "Auto Join",
+                Arrays.asList(
+                        "",
+                        ChatColor.WHITE.toString() + totalMatchSize + ChatColor.GRAY.toString() + "/" + totalMatchMaxSize + " playing."
+                )
+        );
+        ItemMeta autoJoinHelmetMeta = autoJoinHelmet.getItemMeta();
+        autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        autoJoinHelmetMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        autoJoinHelmet.setItemMeta(autoJoinHelmetMeta);
+        teamSelectionMenu.setItem(0, autoJoinHelmet);
+    }
+
     /**
      * Players who are on an actual team during pre/post
      * should still be counted as spectating.
@@ -175,6 +186,11 @@ public class SpectatorModule extends MatchModule implements Listener {
     public boolean isSpectating(Player player) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         return matchStatus != MatchStatus.MID || spectators.containsPlayer(player);
+    }
+
+    @EventHandler
+    public void onTeamJoin(TeamChangeEvent event) {
+        updateMenu();
     }
 
     @EventHandler
@@ -266,12 +282,11 @@ public class SpectatorModule extends MatchModule implements Listener {
             if (event.getItem().isSimilar(teamSelectionItem)) {
                 teamSelectionMenu.open(event.getPlayer());
             } else if (event.getItem().isSimilar(teleportMenuItem)) {
-                MatchTeam spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
+                MatchTeam spectators = teamManagerModule.getSpectators();
                 Map<Player, ChatColor> players = new HashMap<>();
-                TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
                 for (MatchTeam team : teamManagerModule.getTeams()) {
                     if (team.equals(spectators)) continue;
-                    players.putAll(team.getMembers().stream().collect(Collectors.toMap(PlayerContext::getPlayer, pc -> teamManagerModule.getTeam(pc.getPlayer()).getColor())));
+                    for (PlayerContext context : team.getMembers()) players.put(context.getPlayer(), team.getColor());
                 }
                 if (players.size() <= 0) {
                     event.getPlayer().sendMessage(ChatColor.RED + "There are no players to teleport to!");
@@ -284,17 +299,18 @@ public class SpectatorModule extends MatchModule implements Listener {
                 }
                 Menu teleportMenu = new PlayerMenu(ChatColor.UNDERLINE + "Teleport", size, event.getPlayer());
                 int i = 0;
-              for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
-                Player player = entry.getKey();
-                ChatColor teamColor = entry.getValue();
-                teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
+                for (Map.Entry<Player, ChatColor> entry : players.entrySet()) {
+                    Player player = entry.getKey();
+                    ChatColor teamColor = entry.getValue();
+                    teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
                         clicker -> {
-                          if (player.isOnline()) clicker.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        });
-                i++;
-                if (i >= size) break;
-              }
-              teleportMenu.open(event.getPlayer());
+                        if (player.isOnline()) clicker.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    });
+                    i++;
+                    if (i >= size) break;
+                }
+                teleportMenu.open(event.getPlayer());
+                players.clear();
             }
         }
     }
@@ -362,11 +378,11 @@ public class SpectatorModule extends MatchModule implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         lastMovement.remove(event.getPlayer().getUniqueId());
+        updateMenu();
     }
 
     @Override
     public void unload() {
-        Bukkit.getScheduler().cancelTask(teamSelectionRunnable);
         Bukkit.getScheduler().cancelTask(afkTimerRunnable);
         lastMovement.clear();
         teamSelectionMenu.disable();
