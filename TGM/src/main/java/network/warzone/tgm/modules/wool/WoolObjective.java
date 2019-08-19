@@ -34,7 +34,7 @@ import java.util.UUID;
  *
  * Should be used as the actual objective.
  */
-@Getter @EqualsAndHashCode
+@Getter
 public class WoolObjective implements Listener {
 
     private final String name;
