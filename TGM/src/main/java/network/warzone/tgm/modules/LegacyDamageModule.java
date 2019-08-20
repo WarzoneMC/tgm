@@ -40,7 +40,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
         }
         if (event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
-            p.setVelocity(event.getDamager().getLocation().getDirection().setY(0).normalize().multiply(0.75f));
+            p.setVelocity(event.getDamager().getLocation().getDirection().setY(0).normalize().multiply(0.55f));
         }
     }
 }

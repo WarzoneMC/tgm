@@ -7,6 +7,7 @@ import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -15,6 +16,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.time.TimeUpdate;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.Strings;
@@ -27,6 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -47,21 +50,24 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     private Match match;
     private TeamManagerModule teamManager;
     private HashMap<Integer, String> teamScoreboardLines = new HashMap<>();
-    private HashMap<MatchTeam, Integer> teamAliveScoreboardLines = new HashMap<>();
+    private HashMap<String, Integer> teamAliveScoreboardLines = new HashMap<>();
     private ScoreboardManagerModule scoreboardManagerController;
     private int timeScoreboardLine;
     private String timeScoreboardValue;
     private boolean defaultScoreboardLoaded = false;
 
+    private DeathModule deathModule;
+
     private int length;
 
     @Override
     public void load(Match match) {
-        TGM.registerEvents(this);
         JsonObject json = match.getMapContainer().getMapInfo().getJsonObject().get("infection").getAsJsonObject();
         length = json.get("length").getAsInt();
         teamManager = match.getModule(TeamManagerModule.class);
+        deathModule = match.getModule(DeathModule.class);
         this.match = match;
+
 
         TimeModule time = TGM.get().getModule(TimeModule.class);
         time.setTimeLimitService(this::getWinningTeam);
@@ -79,7 +85,6 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
             for (int i = 0; i < zombies; i++) {
                 PlayerContext player = teamManager.getTeamById("humans").getMembers().get(new Random().nextInt(teamManager.getTeamById("humans").getMembers().size()));
                 broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
-                player.getPlayer().setGameMode(GameMode.ADVENTURE);
 
                 infect(player.getPlayer());
                 freeze(player.getPlayer());
@@ -89,8 +94,6 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
         for (MatchTeam team : teamManager.getTeams()) {
             team.getMembers().forEach(playerContext -> playerContext.getPlayer().setGameMode(GameMode.ADVENTURE));
         }
-
-        match.getModule(InfectedTimeLimit.class).startCountdown(length);
     }
 
     public void processSecond(int elapsed) {
@@ -113,14 +116,14 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
 
     private void refreshScoreboard(SimpleScoreboard board) {
         if(board == null) return;
-        teamScoreboardLines.forEach((i, s) -> board.add(s, (Integer) i));
+        teamScoreboardLines.forEach((i, s) -> board.add(s, i));
         refreshOnlyDynamicScoreboard(board);
     }
 
     private void refreshOnlyDynamicScoreboard(SimpleScoreboard board) {
         if(board == null) return;
-        teamAliveScoreboardLines.forEach((mt, i) -> board.add(
-                "  " + ChatColor.YELLOW + mt.getMembers().size() + ChatColor.WHITE + " alive", i));
+        teamAliveScoreboardLines.forEach((id, i) -> board.add(
+                "  " + ChatColor.YELLOW + teamManager.getTeamById(id).getMembers().size() + ChatColor.WHITE + " alive", i));
         board.add(timeScoreboardValue, timeScoreboardLine);
         board.update();
     }
@@ -140,7 +143,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
             if(team.isSpectator()) continue;
             teamScoreboardLines.put(positionOnScoreboard, StringUtils.repeat(" ", spaceCount++));
             positionOnScoreboard++;
-            teamAliveScoreboardLines.put(team, positionOnScoreboard);
+            teamAliveScoreboardLines.put(team.getId(), positionOnScoreboard);
             positionOnScoreboard++;
             teamScoreboardLines.put(positionOnScoreboard, team.getColor() + team.getAlias());
             positionOnScoreboard++;
@@ -153,80 +156,60 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     }
 
     @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
-        Player player = (Player) event.getEntity();
-        if (!(event.getDamager() instanceof Player)) return; // Can't assume the damager is a player
-        Player killer = (Player) event.getDamager();
+    public void onDeath(TGMPlayerDeathEvent event) {
+        DeathModule module = deathModule.getPlayer(event.getVictim());
 
-        if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManager.getTeam(player).isSpectator() ||
-                player.getHealth() - event.getFinalDamage() >= 0.5) return;
-
-        event.setDamage(0);
+        Player victim = module.getPlayer();
 
         MatchTeam humans = teamManager.getTeamById("humans");
-        MatchTeam infected = teamManager.getTeamById("infected");
+        MatchTeam killerTeam = module.getKillerTeam();
+        MatchTeam playerTeam = module.getPlayerTeam();
 
-        if (humans.containsPlayer(player)) {
-            if (event.getDamager() instanceof Player) {
+        // Check if the player who died is a human.
+        if (playerTeam.equals(humans)) {
+            // Check if a player killed them.
+            if (module.getKiller() != null) {
+                // Get the killer.
+                Player killer = module.getKiller();
+
                 broadcastMessage(String.format("%s%s &7has been infected by %s%s",
-                        teamManager.getTeam(player).getColor(),
-                        event.getEntity().getName(),
-                        teamManager.getTeam(killer).getColor(),
+                        playerTeam.getColor(),
+                        victim.getName(),
+                        killerTeam.getColor(),
                         killer.getName()));
             } else {
-                broadcastMessage(String.format("%s%s &7has been taken by the environment",
-                        teamManager.getTeam(player).getColor(),
-                        event.getEntity().getName()));
-            }
-
-            infect(player);
-        } else if (infected.containsPlayer(player)) {
-            if (event.getDamager() instanceof Player) {
-                broadcastMessage(String.format("%s%s &7has been slain by %s%s",
-                        teamManager.getTeam(player).getColor(),
-                        event.getEntity().getName(),
-                        teamManager.getTeam(killer).getColor(),
-                        killer.getName()
+                broadcastMessage(String.format(
+                        "%s%s &7has been taken by the environment",
+                        playerTeam.getColor(),
+                        victim.getName()
                 ));
             }
-            refresh(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeam(player));
+
+            // Infect the player
+            infect(module.getPlayer());
+        } else {
+            // Assume an infected died.
+
+            // Check if a player killed them
+            if (module.getKiller() != null) {
+                // Get the killer.
+                Player killer = module.getKiller();
+
+                broadcastMessage(String.format(
+                        "%s%s has been slain by %s%s",
+                        playerTeam.getColor(),
+                        victim.getName(),
+                        killerTeam.getColor(),
+                        killer.getName()
+                ));
+            } else {
+                broadcastMessage(String.format(
+                        "%s%s wasted away to the environment",
+                        playerTeam.getColor(),
+                        victim.getName()
+                ));
+            }
         }
-
-
-        if (TGM.get().getApiManager().isStatsDisabled())
-            return;
-
-        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-
-        String playerItem = "";
-        if (player.getInventory().getItemInMainHand() != null) {
-            playerItem = player.getInventory().getItemInMainHand().getType().toString();
-        }
-
-        String killerItem = "";
-        String killerId = TGM.get().getPlayerManager().getPlayerContext(killer).getUserProfile().getId().toString();
-        if (killer.getInventory().getItemInMainHand() != null) {
-            killerItem = killer.getInventory().getItemInMainHand().getType().toString();
-        }
-
-        ApiManager api = TGM.get().getApiManager();
-        Death death = new Death(playerContext.getUserProfile().getId().toString(), killerId, playerItem, killerItem,
-                api.getMatchInProgress().getMap(), api.getMatchInProgress().getId());
-
-        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
-    }
-
-    private void refresh(PlayerContext playerContext, MatchTeam matchTeam) {
-        Players.reset(playerContext.getPlayer(), true);
-
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-            matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-            playerContext.getPlayer().updateInventory();
-            playerContext.getPlayer().teleport(matchTeam.getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-            playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
-            playerContext.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
-        }, 1L);
     }
 
     @EventHandler
@@ -274,7 +257,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     }
 
     //TODO Remove effects and replace with new kit module
-    public void infect(Player player) {
+    private void infect(Player player) {
         player.getWorld().strikeLightningEffect(player.getLocation());
 
         teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"));
@@ -284,7 +267,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
         player.setGameMode(GameMode.ADVENTURE);
     }
 
-    public void freeze(Player player) {
+    private void freeze(Player player) {
         player.addPotionEffects(Arrays.asList(
                 new PotionEffect(PotionEffectType.SLOW, 10 * 20, 255, true, false),
                 new PotionEffect(PotionEffectType.JUMP, 10 * 20, 128, true, false),
@@ -294,7 +277,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> unfreeze(player), 10 * 20);
     }
 
-    public void unfreeze(Player player) {
+    private void unfreeze(Player player) {
         player.removePotionEffect(PotionEffectType.JUMP);
         player.removePotionEffect(PotionEffectType.SLOW);
         player.removePotionEffect(PotionEffectType.BLINDNESS);
