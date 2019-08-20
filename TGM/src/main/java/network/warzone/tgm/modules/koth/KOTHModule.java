@@ -72,8 +72,8 @@ public class KOTHModule extends MatchModule implements Listener {
     }
 
     private MatchTeam getHighestPointsTeam() {
-        Map.Entry<MatchTeam, Integer> highest = null;
-        for (Map.Entry<MatchTeam, Integer> entry : pointsModule.getPoints().entrySet()) {
+        Map.Entry<String, Integer> highest = null;
+        for (Map.Entry<String, Integer> entry : pointsModule.getPoints().entrySet()) {
             if (highest == null) {
                 highest = entry;
                 continue;
@@ -83,10 +83,10 @@ public class KOTHModule extends MatchModule implements Listener {
             }
         }
         if (highest != null) {
-            final Map.Entry<MatchTeam, Integer> entry = highest;
+            final Map.Entry<String, Integer> entry = highest;
             int amount = pointsModule.getPoints().entrySet().stream().filter(en -> entry.getValue() == en.getValue()).collect(Collectors.toList()).size();
             if (amount > 1) return null;
-            else return entry.getKey();
+            else return TGM.get().getModule(TeamManagerModule.class).getTeamById(entry.getKey());
         }
         return null;
     }
