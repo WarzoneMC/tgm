@@ -48,8 +48,8 @@ public class CycleCommands {
 
         try {
              if (cmd.argsLength() == 1) {
-                 if (cmd.getOriginalArgs()[1].matches("[0-9]+")) {
-                    index = cmd.getInteger(0);
+                 if (cmd.getString(0).matches("[0-9]+")) {
+                     index = cmd.getInteger(0);
                  } else {
                      typeString = cmd.getString(0);
                  }
