@@ -2,10 +2,13 @@ package network.warzone.tgm.modules;
 
 import network.warzone.tgm.match.MatchModule;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 /**
  * Reverts 1.9's damage values to those of 1.8
@@ -38,9 +41,15 @@ public class LegacyDamageModule extends MatchModule implements Listener {
                     break;
             }
         }
-        if (event.getEntity() instanceof Player) {
-            Player p = (Player) event.getEntity();
-            p.setVelocity(event.getDamager().getLocation().getDirection().setY(0).normalize().multiply(0.55f));
+        if (event.getDamager() instanceof Arrow) {
+            Entity e = event.getEntity();
+            event.setDamage(2.5);
+            e.setVelocity(event.getDamager().getLocation().getDirection().setY(0).normalize().multiply(0.75f));
+        }
+
+        if (event.getDamager() instanceof Player) {
+            Entity e = event.getEntity();
+            e.setVelocity(event.getDamager().getLocation().getDirection().setY(0).normalize().multiply(0.55f));
         }
     }
 }

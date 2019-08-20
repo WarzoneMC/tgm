@@ -215,7 +215,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
-            event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 2, true, false)));
+            event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 1, true, false)));
         }
         event.getPlayer().setGameMode(GameMode.ADVENTURE);
     }
