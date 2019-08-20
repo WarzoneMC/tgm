@@ -196,7 +196,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
                 Player killer = module.getKiller();
 
                 broadcastMessage(String.format(
-                        "%s%s has been slain by %s%s",
+                        "%s%s &7has been slain by %s%s",
                         playerTeam.getColor(),
                         victim.getName(),
                         killerTeam.getColor(),
@@ -204,7 +204,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
                 ));
             } else {
                 broadcastMessage(String.format(
-                        "%s%s wasted away to the environment",
+                        "%s%s &7wasted away to the environment",
                         playerTeam.getColor(),
                         victim.getName()
                 ));

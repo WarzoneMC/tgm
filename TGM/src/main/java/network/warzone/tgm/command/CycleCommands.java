@@ -47,24 +47,25 @@ public class CycleCommands {
         String typeString = "";
 
         try {
-            if (cmd.argsLength() == 1) index = cmd.getInteger(0);
+             if (cmd.argsLength() == 1) {
+                 if (cmd.getOriginalArgs()[1].matches("[0-9]+")) {
+                    index = cmd.getInteger(0);
+                 } else {
+                     typeString = cmd.getString(0);
+                 }
+             }
              else if (cmd.argsLength() == 2) {
                  typeString = cmd.getString(0);
                  index = cmd.getInteger(1);
              }
         } catch (NumberFormatException e) {
-            if (cmd.argsLength() == 1) {
-                index = 1;
-                typeString = cmd.getString(0);
-            } else {
-                sender.sendMessage(ChatColor.RED + "Number expected.");
-                return;
-            }
+            sender.sendMessage(ChatColor.RED + "Number expected.");
+            return;
         }
 
         GameType type = null;
         for (GameType gameType : GameType.values()) {
-            if (gameType.getName().toLowerCase().equals(typeString.toLowerCase())) {
+            if (gameType.name().toLowerCase().equals(typeString.toLowerCase())) {
                 type = gameType;
             }
         }
