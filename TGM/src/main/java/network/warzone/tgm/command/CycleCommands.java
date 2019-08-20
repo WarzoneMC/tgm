@@ -41,18 +41,40 @@ import java.util.stream.Collectors;
 
 public class CycleCommands {
 
-    @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.", usage = "[page]")
+    @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.", usage = "[type]? [page]")
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
-        int index;
+        int index = 1;
+        String typeString = "";
 
         try {
-             index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+            if (cmd.argsLength() == 1) index = cmd.getInteger(0);
+             else if (cmd.argsLength() == 2) {
+                 typeString = cmd.getString(0);
+                 index = cmd.getInteger(1);
+             }
         } catch (NumberFormatException e) {
-            sender.sendMessage(ChatColor.RED + "Number expected.");
-            return;
+            if (cmd.argsLength() == 1) {
+                index = 1;
+                typeString = cmd.getString(0);
+            } else {
+                sender.sendMessage(ChatColor.RED + "Number expected.");
+                return;
+            }
+        }
+
+        GameType type = null;
+        for (GameType gameType : GameType.values()) {
+            if (gameType.getName().toLowerCase().equals(typeString.toLowerCase())) {
+                type = gameType;
+            }
         }
 
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
+
+        if (type != null) {
+            final GameType finalType = type;
+            mapLibrary = mapLibrary.stream().filter(map -> map.getMapInfo().getGametype().equals(finalType)).collect(Collectors.toList());
+        }
 
         int pageSize = 9;
 
