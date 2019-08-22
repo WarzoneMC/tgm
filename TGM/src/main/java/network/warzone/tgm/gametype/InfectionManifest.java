@@ -39,40 +39,8 @@ public class InfectionManifest extends MatchManifest {
 
     @Override
     public List<MatchModule> allocateCoreModules() {
-        List<MatchModule> modules = new ArrayList<>();
-
-        modules.add(new TeamJoinNotificationsModule());
-        modules.add(new SpectatorModule());
-        modules.add(new SpawnPointHandlerModule());
-        modules.add(new SpawnPointLoaderModule());
-        modules.add(new VisibilityModule());
-        modules.add(new TimeModule());
-        modules.add(new TabListModule());
-        modules.add(new MatchProgressNotifications());
-        modules.add(new MatchResultModule());
-        modules.add(new TeamManagerModule());
-        modules.add(new ScoreboardManagerModule());
-        modules.add(new RegionManagerModule());
-        modules.add(new TaskedModuleManager());
-        modules.add(new StartCountdown());
-        modules.add(new CycleCountdown());
-        modules.add(new KitLoaderModule());
-        modules.add(new DeathModule());
-        modules.add(new FilterManagerModule());
-        modules.add(new ChatModule());
-        modules.add(new DisabledCommandsModule());
-        modules.add(new PointsModule());
-        modules.add(new LegacyDamageModule());
-        modules.add(new EntityDamageModule());
-        modules.add(new FireworkDamageModule());
-        modules.add(new GameRuleModule());
-        modules.add(new ItemRemoveModule());
-        modules.add(new RegenModule());
-        modules.add(new KillstreakModule());
-        modules.add(new ReportsModule());
-        modules.add(new StatsModule());
-        modules.add(new PortalLoaderModule());
-        modules.add(new WorldBorderModule());
+        List<MatchModule> modules = super.allocateCoreModules();
+        modules.remove(new DeathMessageModule());
         return modules;
     }
 
