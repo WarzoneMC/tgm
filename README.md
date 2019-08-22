@@ -1,6 +1,6 @@
 ![Minecraft Version](https://img.shields.io/badge/supports%20MC%20versions-1.13%20--%201.14.4-brightgreen.svg)
 [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM)
-[![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://discord.io/WarzoneMC)
+[![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://warz.one/discord)
 
 # Warzone
 Team Oriented Minecraft PVP Suite
@@ -39,18 +39,19 @@ As an example, a map should be able to provide different spawn points as the mat
 ]
   ```
   
-
+  
 ## Local Server Setup
  
-1. Start with the latest stable [Paper (PaperSpigot)](https://papermc.io/ci/job/Paper/) build. 
+1. Start with the latest stable [Paper (PaperSpigot)](https://papermc.io/downloads) build. 
 
 2. Compile the latest version of TGM or download it from our [Jenkins](https://jenkins.bennydoesstuff.me/job/TGM/).
  
-3. Create a `Maps` folder inside of the server and insert a supported TGM map. You can also just clone our `Maps` repository as a folder. 
+3. Create a `Maps` folder in the root folder and insert a supported TGM map. Make sure you also include a rotation.txt with the maps you would like to be present in the rotation.
+    - You can download our Maps folder as a reference on the Maps repo located [here](https://github.com/WarzoneMC/Maps).
  
 4. (Optional) Install WorldEdit to enable the Teleport Tool. 
  
-5. Start the server. If you want stats to save, you need to setup the API [here](https://github.com/WarzoneMC/api).
+5. Start the server. If you would like stats to be saved, you need to setup the API [here](https://github.com/WarzoneMC/api).
  
 ## Developer Tips
 
