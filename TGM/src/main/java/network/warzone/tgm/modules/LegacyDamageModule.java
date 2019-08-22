@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules;
 
 import network.warzone.tgm.match.MatchModule;
+import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -46,7 +47,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
             Entity e = event.getEntity();
             Arrow arrow = (Arrow) event.getDamager();
             event.setDamage(5);
-            e.setVelocity(arrow.getVelocity().normalize().multiply(1f));
+            e.setVelocity(arrow.getVelocity().normalize().multiply(0.85f));
 
         }
 
@@ -56,27 +57,6 @@ public class LegacyDamageModule extends MatchModule implements Listener {
     }
 
     private void applyKnockback(LivingEntity attacker, Player victim) {
-        Vector normal = victim.getLocation().subtract(attacker.getLocation()).toVector();
-        normal = normal.normalize();
-
-        Vector victimNormal = magicKnockbackFunction(normal);
-
-        final boolean ground = attacker.isOnGround();
-        final double attackSpeed = Math.max(0, attacker.getVelocity().dot(normal));
-        final boolean sprint = ground && attackSpeed > 9;
-
-        victim.setVelocity(victimNormal.multiply(sprint ? 1 : 0.85));
-    }
-
-    private Vector magicKnockbackFunction(Vector delta) {
-        delta = delta.clone();
-        delta.setY(0);
-        delta.normalize();
-        final double theta = Math.toRadians(0);
-        final double cos = Math.cos(theta);
-        delta.setX(cos * delta.getX());
-        delta.setY(Math.sin(theta));
-        delta.setZ(cos * delta.getZ());
-        return delta;
+        victim.setVelocity(attacker.getLocation().getDirection().setY(0).normalize().multiply(0.65f));
     }
 }
