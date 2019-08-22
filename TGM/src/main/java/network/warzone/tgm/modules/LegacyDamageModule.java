@@ -46,7 +46,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
         if (event.getDamager() instanceof Arrow) {
             Entity e = event.getEntity();
             Arrow arrow = (Arrow) event.getDamager();
-            event.setDamage(5);
+            event.setDamage(event.getDamage());
             addVelocity(e, arrow.getVelocity().normalize().multiply(0.85f));
         }
 
@@ -57,10 +57,22 @@ public class LegacyDamageModule extends MatchModule implements Listener {
 
     private void applyKnockback(LivingEntity attacker, Player victim) {
         Vector kb = attacker.getLocation().getDirection().setY(0).normalize().multiply(0.65f);
-        addVelocity(victim, kb);
+        victim.setVelocity(magicKnockbackFunction(kb));
     }
 
     private void addVelocity(Entity e, Vector vel) {
         e.setVelocity(e.getVelocity().add(vel));
+    }
+
+    private Vector magicKnockbackFunction(Vector delta) {
+        delta = delta.clone();
+        delta.setY(0);
+        delta.normalize();
+        final double theta = Math.toRadians(0.5);
+        final double cos = Math.cos(theta);
+        delta.setX(cos * delta.getX());
+        delta.setY(Math.sin(theta));
+        delta.setZ(cos * delta.getZ());
+        return delta;
     }
 }
