@@ -17,8 +17,8 @@ public class KnockbackModule extends MatchModule implements Listener {
         if (event.getDamager() instanceof Arrow) {
             Entity e = event.getEntity();
             Arrow arrow = (Arrow) event.getDamager();
-            event.setDamage(event.getDamage() / 3.11);
-            addVelocity(e, arrow.getVelocity().normalize().multiply(0.25f));
+            event.setDamage(event.getDamage() / 2.5);
+            addVelocity(e, arrow.getVelocity().normalize().multiply(0.45f));
         }
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getDamager() instanceof LivingEntity && event.getEntity() instanceof Player) {
