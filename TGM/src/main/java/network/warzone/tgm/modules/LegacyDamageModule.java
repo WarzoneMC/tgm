@@ -42,7 +42,5 @@ public class LegacyDamageModule extends MatchModule implements Listener {
                     break;
             }
         }
-
     }
-
 }
