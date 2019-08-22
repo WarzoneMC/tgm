@@ -39,8 +39,8 @@ public class KnockbackModule extends MatchModule implements Listener {
     }
 
     private void applyKnockback(LivingEntity attacker, Player victim) {
-        Vector kb = attacker.getLocation().getDirection().normalize().multiply(0.65f);
-        victim.setVelocity(kb.setY(kb.getY()));
+        Vector kb = attacker.getLocation().getDirection().setY(0).normalize().multiply(0.65f);
+        victim.setVelocity(kb);
     }
 
     private void addVelocity(Entity e, Vector v) {
