@@ -76,6 +76,9 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
         simpleScoreboard.send(playerContext.getPlayer());
         scoreboards.put(playerContext.getPlayer().getUniqueId(), simpleScoreboard);
+        
+        scoreboards.blankLine();
+        scoreboards.add(ChatColor.AQUA + "play.warz.one");
 
         simpleScoreboard.update();
 
