@@ -72,6 +72,8 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
         TimeModule time = TGM.get().getModule(TimeModule.class);
         time.setTimeLimitService(this::getWinningTeam);
         time.getDependents().add(this);
+        time.setTimeLimit(length * 60);
+        time.setTimeLimited(true);
         this.timeScoreboardValue = length + ":00";
         this.scoreboardManagerController = TGM.get().getModule(ScoreboardManagerModule.class);
     }
