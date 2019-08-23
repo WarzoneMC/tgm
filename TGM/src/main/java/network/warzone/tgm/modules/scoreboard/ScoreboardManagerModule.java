@@ -84,8 +84,8 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     public Team registerScoreboardTeam(SimpleScoreboard simpleScoreboard, MatchTeam matchTeam, PlayerContext playerContext) {
         Team team = simpleScoreboard.getScoreboard().registerNewTeam(matchTeam.getId());
-        team.setPrefix(matchTeam.getColor().toString());
-        //team.setColor(matchTeam.getColor());
+        //team.setPrefix(matchTeam.getColor().toString());
+        team.setColor(matchTeam.getColor());
         team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
         team.setAllowFriendlyFire(false);
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
