@@ -31,10 +31,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -42,7 +39,7 @@ public class DTMModule extends MatchModule implements Listener {
 
     @Getter private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
-    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private final HashMap<String, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -166,7 +163,7 @@ public class DTMModule extends MatchModule implements Listener {
                 }
             }
             event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i++);
+            teamScoreboardLines.put(matchTeam.getId(), i++);
 
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
                 event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
@@ -176,9 +173,14 @@ public class DTMModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamUpdate(TeamUpdateEvent event) {
-        for (MatchTeam matchTeam : teamScoreboardLines.keySet()) {
+        TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
+
+        Set<String> teamIds = teamScoreboardLines.keySet();
+        Set<MatchTeam> matchTeams = teamIds.stream().map(teamManager::getTeamById).collect(Collectors.toSet());
+
+        for (MatchTeam matchTeam : matchTeams) {
             if (event.getMatchTeam() == matchTeam) {
-                int i = teamScoreboardLines.get(matchTeam);
+                int i = teamScoreboardLines.get(matchTeam.getId());
 
                 for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
                     simpleScoreboard.remove(i);
@@ -222,7 +224,7 @@ public class DTMModule extends MatchModule implements Listener {
 
         if (highest != null) {
             final MatchTeam team = highest;
-            int amount = teams.entrySet().stream().filter(entry -> teams.get(team) == entry.getValue()).collect(Collectors.toList()).size();
+            long amount = teams.entrySet().stream().filter(entry -> teams.get(team).equals( entry.getValue())).count();
             if (amount > 1) return null;
             else return team;
         }
@@ -249,7 +251,7 @@ public class DTMModule extends MatchModule implements Listener {
         }
     }
 
-    public List<Monument> getAliveMonuments(MatchTeam matchTeam) {
+    private List<Monument> getAliveMonuments(MatchTeam matchTeam) {
         List<Monument> alive = new ArrayList<>();
         for (Monument monument : monuments) {
             if (monument.isAlive() && monument.getOwners().contains(matchTeam)) {
