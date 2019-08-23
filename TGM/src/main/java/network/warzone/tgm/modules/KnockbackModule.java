@@ -17,29 +17,35 @@ public class KnockbackModule extends MatchModule implements Listener {
         if (event.getDamager() instanceof Arrow) {
             Entity e = event.getEntity();
             Arrow arrow = (Arrow) event.getDamager();
-            event.setDamage(event.getDamage() / 2.5);
+            event.setDamage(event.getDamage() / 1.75);
+            applyBowKnockback(arrow, e);
         }
 
         if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getDamager() instanceof LivingEntity && event.getEntity() instanceof Player) {
-            applyKnockback((LivingEntity) event.getDamager(), (Player) event.getEntity());
+            applyMeleeKnockback((LivingEntity) event.getDamager(), (Player) event.getEntity());
         }
     }
 
     @EventHandler
     public void onArrowsShoot(ProjectileLaunchEvent e) {
-        Projectile projectile = e.getEntity(); //Getting the projectile
-        ProjectileSource shooter = projectile.getShooter(); //Getting the shooter
-        if (shooter instanceof Player) { //If the shooter was a player
+        Projectile projectile = e.getEntity();
+        ProjectileSource shooter = projectile.getShooter();
+        if (shooter instanceof Player) {
             Player player = (Player) shooter;
-            //Here we get a unit vector of the direction the player is looking in and multiply it by the projectile's vector's magnitude
-            //We then assign this to the projectile as its new velocity
             projectile.setVelocity(player.getLocation().getDirection().normalize().multiply(projectile.getVelocity().length()));
         }
     }
 
-    private void applyKnockback(LivingEntity attacker, Player victim) {
-        Vector kb = attacker.getLocation().getDirection().setY(0).normalize().multiply(0.65f);
-        victim.setVelocity(kb);
+    private void applyBowKnockback(Arrow a, Entity e) {
+        Vector normalVelocity = a.getVelocity().normalize();
+        normalVelocity.setY(normalVelocity.getY() / 3);
+        e.setVelocity(normalVelocity.normalize().multiply(0.15f));
+    }
+
+    private void applyMeleeKnockback(LivingEntity attacker, Player victim) {
+        Vector normalVelocity = attacker.getLocation().getDirection().normalize();
+        normalVelocity.setY(normalVelocity.getY() / 3);
+        victim.setVelocity(normalVelocity.normalize().multiply(0.65f));
     }
 
     private void addVelocity(Entity e, Vector v) {
