@@ -43,9 +43,10 @@ public class KnockbackModule extends MatchModule implements Listener {
     }
 
     private void applyMeleeKnockback(LivingEntity attacker, Player victim) {
-        Vector normalVelocity = attacker.getLocation().getDirection().normalize();
-        normalVelocity.setY(normalVelocity.getY() / 3);
-        victim.setVelocity(normalVelocity.normalize().multiply(0.65f));
+        Vector kb = attacker.getLocation().getDirection().setY(0).normalize().multiply(0.65f);
+//        Vector normalVelocity = attacker.getLocation().getDirection().normalize();
+//        normalVelocity.setY(normalVelocity.getY() / 3);
+        victim.setVelocity(kb);
     }
 
     private void addVelocity(Entity e, Vector v) {
