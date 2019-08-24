@@ -49,7 +49,7 @@ public class PointsModule extends MatchModule {
     }
 
     public void incrementPoints(MatchTeam matchTeam, int amount) {
-        int updated = points.getOrDefault(matchTeam, 0) + amount;
+        int updated = points.getOrDefault(matchTeam.getId(), 0) + amount;
         this.points.put(matchTeam.getId(), updated);
 
         if (updated >= targets.get(matchTeam.getId())) {
