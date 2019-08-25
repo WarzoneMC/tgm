@@ -52,7 +52,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                         .setCount(25)
                         .setMessage("%killercolor%%killername% &7is on a kill streak of &c&l%count%&r&7!")
                         .setCommands(Arrays.asList(
-                                "execute %killername% ~ ~ ~ playsound entity.enderdragon.growl master @a ~ ~ ~ 1000",
+                                "execute %killername% ~ ~ ~ playsound entity.ender_dragon.growl master @a ~ ~ ~ 1000",
                                 "execute %killername% ~ ~ ~ summon fireworks_rocket ~ ~ ~ {LifeTime:0,FireworksItem:{id:fireworks,Count:1,tag:{Fireworks:{Explosions:[{Type:0,Colors:[I;16711680],FadeColors:[I;9371648]}]}}}}"
                         )),
 
