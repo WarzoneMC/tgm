@@ -26,6 +26,9 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import network.warzone.warzoneapi.client.TeamClient;
+import network.warzone.warzoneapi.client.http.HttpClient;
+import network.warzone.warzoneapi.client.http.HttpClientConfig;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
@@ -618,7 +621,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
+    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats|reload)", min = 1)
     @CommandPermissions({"tgm.config"})
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
@@ -639,6 +642,9 @@ public class CycleCommands {
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
             }
+        } else if (cmd.getString(0).equalsIgnoreCase("reload")) {
+            TGM.get().reloadConfig();
+            sender.sendMessage(ChatColor.GREEN + "The config has been reloaded");
         }
     }
 
