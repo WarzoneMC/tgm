@@ -31,17 +31,17 @@ public class BuildFilterType implements FilterType, Listener {
     private final String message;
 
     @EventHandler
-    public void onBlockPlace(BlockCanBuildEvent event) {
+    public void onBlockPlace(BlockPlaceEvent event) {
         for (Region region : regions) {
-            if (region.contains(event.getBlock().getLocation())) {
+            if (region.contains(event.getBlockPlaced().getLocation())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
                         if (filterResult == FilterResult.DENY) {
-                            event.setBuildable(false);
+                            event.setCancelled(true);
                             event.getPlayer().sendMessage(message);
                         } else if (filterResult == FilterResult.ALLOW) {
-                            event.setBuildable(true);
+                            event.setCancelled(false);
                         }
                     }
                 }
