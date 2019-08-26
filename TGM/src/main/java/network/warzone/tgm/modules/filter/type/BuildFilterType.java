@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -114,7 +115,7 @@ public class BuildFilterType implements FilterType, Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onHangingDamage(EntityDamageByEntityEvent event) {
         if (!event.isCancelled() && event.getEntity() != null && event.getEntity() instanceof ItemFrame) {
             if (event.getDamager() instanceof Player) {

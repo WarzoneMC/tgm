@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.infection.InfectionModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
+import network.warzone.tgm.modules.knockback.KnockbackModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.portal.PortalLoaderModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
