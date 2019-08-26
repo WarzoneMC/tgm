@@ -13,9 +13,9 @@ import org.bukkit.util.Vector;
 
 public class KnockbackModule extends MatchModule implements Listener {
 
-    @EventHandler(priority= EventPriority.HIGH)
+    @EventHandler(priority= EventPriority.NORMAL)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player) {
+        if (event.getEntity() instanceof Player && !event.isCancelled()) {
             Player p = (Player) event.getEntity();
             p.damage(event.getFinalDamage());
             applyKnockback(event.getDamager(), p);
@@ -52,16 +52,26 @@ public class KnockbackModule extends MatchModule implements Listener {
             d0 = (Math.random() - Math.random()) * 0.01D;
         }
 
-        double f1 = Math.sqrt(d0 * d0 + d1*d1);
+        double f1 = Math.sqrt(d0 * d0 + d1 * d1);
         float f2 = 0.4F;
 
         Vector vel = victim.getVelocity();
 
-        victim.setVelocity(new Vector((vel.getX() / 2.0F) - d0 / f1 * f2, (vel.getY() / 2.0F) + f2, (vel.getZ() / 2.0F) - d1 / f1 * f2));
+        double motX = vel.getX();
+        double motY = vel.getY();
+        double motZ = vel.getZ();
+        motX /= 2;
+        motY /= 2;
+        motZ /= 2;
+        motX -= d0 / f1 * f2;
+        motY += f2;
+        motZ -= d1 / f1 * f2;
 
-        if (victim.getVelocity().getY() > 0.4000000059604645D) {
-            victim.setVelocity(victim.getVelocity().setY(0.4000000059604645D));
+        if (motY > 0.4000000059604645D) {
+            motY = 0.4000000059604645D;
         }
+
+        victim.setVelocity(new Vector(motX, motY, motZ));
     }
 
     private void applyBowKnockback(Arrow a, Entity e) {

@@ -39,7 +39,7 @@ public class EntityDamageModule extends MatchModule implements Listener {
 
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if(event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
             ProjectileSource shooter = ((Projectile) event.getDamager()).getShooter();

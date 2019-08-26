@@ -1,23 +1,18 @@
 package network.warzone.tgm.modules;
 
 import network.warzone.tgm.match.MatchModule;
-import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.util.Vector;
 
 /**
  * Reverts 1.9's damage values to those of 1.8
  */
 public class LegacyDamageModule extends MatchModule implements Listener {
 
-    @EventHandler(priority= EventPriority.HIGHEST) // Make sure this event is called before the knockback
+    @EventHandler(priority= EventPriority.HIGH) // Make sure this event is called before the knockback
     public void onDamage(EntityDamageByEntityEvent event) {
         if ((event.getDamager() instanceof Player)) {
             Player player = (Player) event.getDamager();
