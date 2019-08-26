@@ -75,18 +75,18 @@ public class SpectatorModule extends MatchModule implements Listener {
         /**
          * Only assign the menu actions once. No need to update these every second.
          */
-        teamSelectionMenu.setItem(0, null, player -> player.performCommand("join"));
+        teamSelectionMenu.setItem(0, null, (player, event) -> player.performCommand("join"));
 
         int slot = 2;
         for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
             if (matchTeam.isSpectator()) {
-                teamSelectionMenu.setItem(8, null, player -> player.performCommand("join spectators"));
+                teamSelectionMenu.setItem(8, null, (player, event) -> player.performCommand("join spectators"));
             } else {
-                teamSelectionMenu.setItem(slot++, null, player -> player.performCommand("join " + matchTeam.getId()));
+                teamSelectionMenu.setItem(slot++, null, (player, event) -> player.performCommand("join " + matchTeam.getId()));
             }
         }
 
-        teamSelectionMenu.setItem(0, null, player -> player.performCommand("join"));
+        teamSelectionMenu.setItem(0, null, (player, event) -> player.performCommand("join"));
 
         /**
          * Update the item values every second to keep player counts accurate.
@@ -303,7 +303,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                     Player player = entry.getKey();
                     ChatColor teamColor = entry.getValue();
                     teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
-                        clicker -> {
+                            (clicker, clickEvent) -> {
                         if (player.isOnline()) clicker.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                     });
                     i++;

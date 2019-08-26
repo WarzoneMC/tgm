@@ -26,4 +26,27 @@ public class Strings {
         return s.toUpperCase().replace(" ", "_");
     }
 
+    public static String getAgo(long timestamp) {
+        double time = (System.currentTimeMillis() - timestamp) / 1000D;
+
+        int t;
+        if ((t = (int) Math.floor(time / 31536000)) > 0) {
+            return (t == 1) ? "1 year" : t + " years";
+        } else if ((t = (int) Math.floor(time / 2592000)) > 0) {
+            return (t == 1) ? "1 month" : t + " months";
+        } else if ((t = (int) Math.floor(time / 604800)) > 0) {
+            return (t == 1) ? "1 week" : t + " weeks";
+        } else if ((t = (int) Math.floor(time / 86400)) > 0) {
+            return (t == 1) ? "1 day" : t + " days";
+        } else if ((t = (int) Math.floor(time / 3600)) > 0) {
+            return (t == 1) ? "1 hour" : t + " hours";
+        } else if ((t = (int) Math.floor(time / 60)) > 0) {
+            return (t == 1) ? "1 minute" : t + " minutes";
+        } else if ((t = (int) Math.floor(time)) > 0) {
+            return (t == 1) ? "1 second" : t + " seconds";
+        } else {
+            return "moments";
+        }
+    }
+
 }

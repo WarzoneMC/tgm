@@ -1,20 +1,17 @@
 package network.warzone.tgm.command;
 
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
+import com.sk89q.minecraft.util.commands.*;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.TimeUnitPair;
+import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -33,12 +30,29 @@ public class PunishCommands {
         return IP_PATTERN.matcher(ip).matches();
     }
 
+    @Command(aliases = {"punish", "pun", "pg", "pgui"}, desc = "Punishment interface")
+    public static void punish(CommandContext cmd, CommandSender sender) throws CommandPermissionsException {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!player.hasPermission("tgm.punish.ban-ip") &&
+                    !player.hasPermission("tgm.punish.ban"   ) &&
+                    !player.hasPermission("tgm.punish.kick"  ) &&
+                    !player.hasPermission("tgm.punish.mute"  ) &&
+                    !player.hasPermission("tgm.punish.warn"  )) {
+                throw new CommandPermissionsException();
+            }
+            PunishMenu.openNew(player);
+        } else {
+            throw new CommandPermissionsException();
+        }
+    }
+
     @Command(aliases = {"ban-ip", "banip"}, desc = "IP Ban a rulebreaker", min = 2, usage = "(name|ip) (length) (reason...)", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.punish.ban-ip"})
     public static void banIP(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
-        TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
+        TimeUnitPair timeUnitPair = TimeUnitPair.parse(cmd.getString(1));
         if (timeUnitPair == null) {
             sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
@@ -62,7 +76,7 @@ public class PunishCommands {
     public static void ban(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
-        TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
+        TimeUnitPair timeUnitPair = TimeUnitPair.parse(cmd.getString(1));
         if (timeUnitPair == null) {
             sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
@@ -88,7 +102,7 @@ public class PunishCommands {
     public static void mute(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
-        TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
+        TimeUnitPair timeUnitPair = TimeUnitPair.parse(cmd.getString(1));
         if (timeUnitPair == null) {
             sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
@@ -428,11 +442,11 @@ public class PunishCommands {
         if (name != null) {
             if (time) {
                 if (everyone) Bukkit.broadcastMessage(punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                        " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
+                        " for " + durationColor + timeUnitPair.toString() + ChatColor.GRAY  +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
                 else {
                     Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list") || player.getName().equalsIgnoreCase(name)).forEach(player -> player.sendMessage(ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                            " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
+                            " for " + durationColor + timeUnitPair.toString() + ChatColor.GRAY  +
                             " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason)));
                 }
             } else {
@@ -446,7 +460,7 @@ public class PunishCommands {
         } else {
             if (time) {
                 String result = ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + ip + ChatColor.GRAY +
-                        " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY +
+                        " for " + durationColor + timeUnitPair.toString() + ChatColor.GRAY +
                         " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason);
                 Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list")).forEach(player -> player.sendMessage(result));
                 Bukkit.getConsoleSender().sendMessage(result);
@@ -511,71 +525,6 @@ public class PunishCommands {
 
         if (revertOption && !punishment.isReverted()) textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/revert " + punishment.getId().toString()));
         return textComponent;
-    }
-
-    private static TimeUnitPair parseLength(String s) {
-        if (s.equalsIgnoreCase("permanent") ||
-                s.equalsIgnoreCase("perm") ||
-                s.equalsIgnoreCase("p") ||
-                s.equalsIgnoreCase("forever") ||
-                s.equalsIgnoreCase("f") ||
-                s.equalsIgnoreCase("-1")) return new TimeUnitPair(1, ChronoUnit.FOREVER);
-        ChronoUnit timeUnit;
-
-        String time = "";
-        String unit = "";
-        boolean digitsDone = false;
-        for (int i = 0; i < s.length(); i++) {
-            if (!digitsDone && Character.isDigit(s.charAt(i))) {
-                time += s.charAt(i);
-            } else if (!Character.isDigit(s.charAt(i))) {
-                digitsDone = true;
-                unit += s.charAt(i);
-            } else {
-                break;
-            }
-        }
-        timeUnit = getTimeUnit(unit);
-        if (timeUnit == null) return null;
-        return new TimeUnitPair(Integer.valueOf(time), timeUnit);
-    }
-
-    private static ChronoUnit getTimeUnit(String s) {
-        for (ChronoUnit timeUnit : ChronoUnit.values()) {
-            if (timeUnit == ChronoUnit.NANOS || timeUnit == ChronoUnit.MICROS || timeUnit == ChronoUnit.MILLIS) continue;
-            if (timeUnit.name().toLowerCase().startsWith(s.toLowerCase())) {
-                return timeUnit;
-            }
-        }
-         return null;
-    }
-
-    @AllArgsConstructor @Getter
-    public static class TimeUnitPair {
-
-        private int value;
-        private ChronoUnit timeUnit;
-
-        public String getTimeWord() {
-            if (timeUnit == ChronoUnit.FOREVER || toMilliseconds() == -1) return "permanent";
-            if (value == 1) {
-                if (timeUnit == ChronoUnit.MILLENNIA) return value + " millennium";
-                if (timeUnit == ChronoUnit.CENTURIES) return value + " century";
-                if (timeUnit.name().toLowerCase().endsWith("s")) {
-                    return value + " " + timeUnit.name().substring(0, timeUnit.name().length() - 1).toLowerCase().replace("_", " ");
-                }
-            }
-            return value + " " + timeUnit.name().toLowerCase().replace("_", " ");
-        }
-
-        public long toMilliseconds() {
-            if (timeUnit == ChronoUnit.FOREVER) {
-                return -1;
-            }
-            if (value <= 0) return -1;
-            return timeUnit.getDuration().getSeconds() * value * 1000;
-        }
-
     }
 
 }
