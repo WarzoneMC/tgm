@@ -70,6 +70,7 @@ public class DeathModule extends MatchModule implements Listener {
         }
     }
 
+    @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
             DeathModule module = getPlayer((Player) event.getEntity());
