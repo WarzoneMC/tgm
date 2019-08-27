@@ -122,7 +122,12 @@ public class PunishMenu extends Menu {
             updateMenu();
         });
         if (config.getType().isTimed())
-            setItem(47, ItemFactory.createItem(Material.CLOCK, ChatColor.DARK_AQUA + "Length", Arrays.asList("", ChatColor.GRAY + config.getTime().toString())), (p, event) -> {
+            setItem(47, ItemFactory.createItem(Material.CLOCK, ChatColor.DARK_AQUA + "Length", Arrays.asList(
+                    "",
+                    ChatColor.GRAY + config.getTime().toString(),
+                    "",
+                    ChatColor.YELLOW + "Click to edit")
+            ), (p, event) -> {
                 this.mode = Mode.SETTING_LENGTH;
                 clickSound();
                 p.closeInventory();
@@ -130,12 +135,22 @@ public class PunishMenu extends Menu {
             });
         else
             setItem(47, ItemFactory.createItem(Material.BLACK_STAINED_GLASS_PANE, ChatColor.DARK_GRAY + "Length"));
-        setItem(48, ItemFactory.createItem(Material.NOTE_BLOCK, ChatColor.DARK_AQUA + "Silent", Arrays.asList("", (config.isSilent() ? ChatColor.GREEN + "True" : ChatColor.RED + "False"))), (p, event) -> {
+        setItem(48, ItemFactory.createItem(Material.NOTE_BLOCK, ChatColor.DARK_AQUA + "Silent", Arrays.asList(
+                "",
+                (config.isSilent() ? ChatColor.GREEN + "True" : ChatColor.RED + "False"),
+                "",
+                ChatColor.YELLOW + "Click to toggle"
+        )), (p, event) -> {
             config.setSilent(!config.isSilent());
             clickSound();
             updateMenu();
         });
-        setItem(49, ItemFactory.createItem(Material.PAPER, ChatColor.DARK_AQUA + "Reason", Arrays.asList("", ChatColor.GRAY + config.getReason())), (p, event) -> {
+        setItem(49, ItemFactory.createItem(Material.PAPER, ChatColor.DARK_AQUA + "Reason", Arrays.asList(
+                "",
+                ChatColor.GRAY + config.getReason(),
+                "",
+                ChatColor.YELLOW + "Click to edit")
+        ), (p, event) -> {
             this.mode = Mode.SETTING_REASON;
             clickSound();
             p.closeInventory();
@@ -154,7 +169,9 @@ public class PunishMenu extends Menu {
                 "",
                 "If live update is off,",
                 "shift-click to skip",
-                "confirmation."
+                "confirmation.",
+                "",
+                ChatColor.YELLOW + "Click to toggle"
         ), (p, event) -> {
             clickSound();
             liveUpdate = !liveUpdate;
@@ -202,6 +219,8 @@ public class PunishMenu extends Menu {
             if (!getPlayer().hasPermission(type.getPermission())) typeString += ChatColor.STRIKETHROUGH;
             lore.add(typeString + type.name());
         }
+        lore.add("");
+        lore.add(ChatColor.YELLOW + "Click to cycle");
         ItemFactory.setLore(itemStack, lore);
         return itemStack;
     }
@@ -375,7 +394,9 @@ public class PunishMenu extends Menu {
             setItem(i, ItemFactory.createItem(Material.ENDER_CHEST, ChatColor.YELLOW + config.getReason(), ChatColor.GRAY,
                     "",
                     "Type: " + ChatColor.WHITE + config.getType().name() + (config.getType().isTimed() ? " " + ChatColor.GRAY + "Time: " + ChatColor.RESET + config.getTime().toString() : ""),
-                    "Silent: " + ChatColor.WHITE + config.isSilent()
+                    "Silent: " + ChatColor.WHITE + config.isSilent(),
+                    "",
+                    ChatColor.YELLOW + "Click to select"
             ), (p, event) -> {
                 configs.put(p.getUniqueId(), config.clone());
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
