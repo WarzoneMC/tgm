@@ -42,7 +42,9 @@ public class MiscCommands {
         if (cmd.argsLength() > 0) {
             try {
                 double kbMultiplier = cmd.getDouble(0);
+                sender.sendMessage(ChatColor.GREEN + "Knockback Modifier updated from " + ChatColor.YELLOW + KnockbackSettings.multiplier + ChatColor.GREEN + " to " + ChatColor.YELLOW + kbMultiplier);
                 KnockbackSettings.multiplier = (float) kbMultiplier;
+
             } catch (CommandNumberFormatException e) {
                 sender.sendMessage(ChatColor.RED + "Invalid number.");
             }
