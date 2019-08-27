@@ -30,15 +30,22 @@ public class PunishCommands {
         return IP_PATTERN.matcher(ip).matches();
     }
 
-    @Command(aliases = {"punish", "pun", "pg", "pgui"}, desc = "Punishment interface")
+    @Command(aliases = {"punish", "pun", "pg", "pgui"}, desc = "Punishment interface", max = 1)
     public static void punish(CommandContext cmd, CommandSender sender) throws CommandPermissionsException {
-        if (sender instanceof Player) {
+        if (cmd.argsLength() == 1) {
+            if (cmd.getString(0).equalsIgnoreCase("reload") && sender.hasPermission("tgm.punish.preset.reload")) {
+                PunishMenu.getPresetsMenu().load();
+                sender.sendMessage(ChatColor.YELLOW + "Reloaded punishment presets.");
+                return;
+            }
+            throw new CommandPermissionsException();
+        } else if (sender instanceof Player) {
             Player player = (Player) sender;
             if (!player.hasPermission("tgm.punish.ban-ip") &&
-                    !player.hasPermission("tgm.punish.ban"   ) &&
-                    !player.hasPermission("tgm.punish.kick"  ) &&
-                    !player.hasPermission("tgm.punish.mute"  ) &&
-                    !player.hasPermission("tgm.punish.warn"  )) {
+                    !player.hasPermission("tgm.punish.ban") &&
+                    !player.hasPermission("tgm.punish.kick") &&
+                    !player.hasPermission("tgm.punish.mute") &&
+                    !player.hasPermission("tgm.punish.warn")) {
                 throw new CommandPermissionsException();
             }
             PunishMenu.openNew(player);

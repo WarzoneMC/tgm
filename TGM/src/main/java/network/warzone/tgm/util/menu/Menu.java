@@ -57,6 +57,7 @@ public abstract class Menu implements Listener {
 
     public void clear() {
         this.inventory.clear();
+        this.actions.clear();
     }
 
     public void disable() {

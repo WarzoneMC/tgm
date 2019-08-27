@@ -24,6 +24,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.*;
 
 /**
@@ -32,7 +35,7 @@ import java.util.*;
 public class PunishMenu extends Menu {
 
     private static Map<UUID, PunishConfig> configs = new HashMap<>();
-    private static PresetsMenu presetsMenu = new PresetsMenu();
+    @Getter private static PresetsMenu presetsMenu = new PresetsMenu();
 
     @Getter Player player;
     @Getter UUID playerUuid;
@@ -51,11 +54,11 @@ public class PunishMenu extends Menu {
         });
     }
 
-    public PunishMenu(Player player) {
+    private PunishMenu(Player player) {
         this(player, 0);
     }
 
-    public PunishMenu(Player player, int page) {
+    private PunishMenu(Player player, int page) {
         super(ChatColor.UNDERLINE + "Punish Menu", 9*6);
         if (player == null) {
             this.disable();
@@ -87,14 +90,12 @@ public class PunishMenu extends Menu {
                     issuePunishment(playerName, player, config);
                     return;
                 }
-                new ConfirmMenu(player, getDisplayItem(playerName, config, false),
+                new ConfirmMenu(player, ChatColor.UNDERLINE + "Confirm", getDisplayItem(playerName, config, false),
                         (p, e) -> {
                             issuePunishment(playerName, player, config);
                             new PunishMenu(player).open(player);
                         },
-                        (p, e) -> {
-                            new PunishMenu(player).open(player);
-                        }
+                        (p, e) -> new PunishMenu(player).open(player)
                 ).open(player);
             });
             slot++;
@@ -167,12 +168,16 @@ public class PunishMenu extends Menu {
 
     private ItemStack getDisplayItem(String playerName, PunishConfig config, boolean clickMsg) {
         ItemStack itemStack = ItemFactory.getPlayerSkull(playerName, ChatColor.AQUA + playerName);
-        UserProfile userProfile = TGM.get().getPlayerManager().getPlayerContext(Bukkit.getPlayer(playerName)).getUserProfile();
+        Player player = Bukkit.getPlayer(playerName);
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.add(ChatColor.GRAY + "Level: " + ChatColor.RESET + userProfile.getLevel());
-        lore.add(ChatColor.GRAY + "First join: " + ChatColor.RESET + Strings.getAgo(userProfile.getInitialJoinDate()) + " ago");
-        lore.add(ChatColor.GRAY + "Last join: " + ChatColor.RESET + Strings.getAgo(userProfile.getLastOnlineDate()) + " ago");
+        if (player != null) {
+            UserProfile userProfile = TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile();
+            lore.add(ChatColor.GRAY + "Level: " + ChatColor.RESET + userProfile.getLevel());
+            lore.add(ChatColor.GRAY + "First join: " + ChatColor.RESET + Strings.getAgo(userProfile.getInitialJoinDate()) + " ago");
+            lore.add(ChatColor.GRAY + "Last join: " + ChatColor.RESET + Strings.getAgo(userProfile.getLastOnlineDate()) + " ago");
+        } else
+            lore.add(ChatColor.RED + "Player is offline.");
         lore.add("");
         lore.add(ChatColor.GRAY + "Type: " + ChatColor.RESET + config.getType().name() +
               (config.getType().isTimed() ? " " + ChatColor.GRAY + "Time: " + ChatColor.RESET + config.getTime().toString() : ""));
@@ -205,7 +210,7 @@ public class PunishMenu extends Menu {
         StringBuilder command = new StringBuilder(config.getType().name().toLowerCase() + " " + playerName + " ");
         if (config.getType().isTimed()) {
             command.append(config.getTime().getValue());
-            command.append(config.getTime().getTimeUnit().name());
+            command.append(config.getTime().getUnit().name());
             command.append(" ");
         }
         command.append(config.getReason());
@@ -242,7 +247,7 @@ public class PunishMenu extends Menu {
                     Bukkit.getScheduler().runTask(TGM.get(), () -> {
                         TimeUnitPair timeUnitPair = TimeUnitPair.parse(event.getMessage());
                         if (timeUnitPair == null) {
-                            getPlayer().sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");;
+                            getPlayer().sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
                             this.open(getPlayer());
                             return;
                         }
@@ -325,35 +330,45 @@ public class PunishMenu extends Menu {
     private enum Mode {
         NONE,
         SETTING_LENGTH,
-        SETTING_REASON;
+        SETTING_REASON
     }
 
-    // Temp.
     public static class PresetsMenu extends Menu {
+
+        private File presets = new File(TGM.get().getDataFolder().getAbsolutePath() + "/punishmentPresets.json");
 
         private PresetsMenu() {
             super(ChatColor.UNDERLINE + "Presets", 9*3);
-            registerPresets(
-                    PunishConfig.SPAM_BOT,
-                    PunishConfig.COMBAT_MOD,
-                    PunishConfig.MOVEMENT_MOD,
-                    PunishConfig.AUTO_CLICK,
-                    PunishConfig.BUG_EXPLOIT,
-                    PunishConfig.DISCRIMINATION,
-                    PunishConfig.MUTE_EVASION,
-                    PunishConfig.SUICIDE_ENCOURAGEMENT,
-                    PunishConfig.EXTREME_HARASSMENT
-            );
-            setItem(22, ItemFactory.createItem(Material.ARROW, ChatColor.RED + "Close"), (p, event) -> {
-                PunishMenu.openNew(p);
-            });
         }
 
         private void registerPresets(PunishConfig... configs) {
-            int i = 9;
+            int i = 0;
             for (PunishConfig config : configs) {
                 registerPreset(i++, config);
             }
+        }
+
+        public void load() {
+            clear();
+            if (!this.presets.exists()) TGM.get().saveResource("punishmentPresets.json", true);
+            try {
+                PunishConfig[] configs = TGM.get().getGson().fromJson(new FileReader(presets), PunishConfig[].class);
+                registerPresets(configs);
+            } catch (FileNotFoundException e) {
+                TGM.get().getLogger().warning("Punishment presets file not found. Using fallback presets.");
+                registerPresets(
+                        PunishConfig.SPAM_BOT,
+                        PunishConfig.COMBAT_MOD,
+                        PunishConfig.MOVEMENT_MOD,
+                        PunishConfig.AUTO_CLICK,
+                        PunishConfig.BUG_EXPLOIT,
+                        PunishConfig.DISCRIMINATION,
+                        PunishConfig.MUTE_EVASION,
+                        PunishConfig.SUICIDE_ENCOURAGEMENT,
+                        PunishConfig.EXTREME_HARASSMENT
+                );
+            }
+            setItem(22, ItemFactory.createItem(Material.ARROW, ChatColor.RED + "Close"), (p, event) -> PunishMenu.openNew(p));
         }
 
         private void registerPreset(int i, PunishConfig config) {

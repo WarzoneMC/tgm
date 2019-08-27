@@ -11,45 +11,47 @@ import java.time.temporal.ChronoUnit;
 public class TimeUnitPair {
 
     int value;
-    ChronoUnit timeUnit;
+    ChronoUnit unit;
 
-    private final String toString;
+    private String toString;
 
-    public TimeUnitPair(int value, ChronoUnit timeUnit) {
+    public TimeUnitPair(int value, ChronoUnit unit) {
         this.value = value;
-        this.timeUnit = timeUnit;
-        if (timeUnit == ChronoUnit.FOREVER || toMilliseconds() == -1) toString = "permanent";
-        else if (value == 1) {
-            if (timeUnit == ChronoUnit.MILLENNIA) toString = value + " millennium";
-            else if (timeUnit == ChronoUnit.CENTURIES) toString = value + " century";
-            else if (timeUnit.name().toLowerCase().endsWith("s")) {
-                toString = value + " " + timeUnit.name().substring(0, timeUnit.name().length() - 1).toLowerCase().replace("_", " ");
-            }
-            else toString = value + " " + timeUnit.name().toLowerCase().replace("_", " ");
-        } else toString = value + " " + timeUnit.name().toLowerCase().replace("_", " ");
+        this.unit = unit;
     }
 
     public String toString() {
+        if (toString == null) {
+            if (this.unit == ChronoUnit.FOREVER || toMilliseconds() == -1) toString = "permanent";
+            else if (value == 1) {
+                if (this.unit == ChronoUnit.MILLENNIA) toString = value + " millennium";
+                else if (this.unit == ChronoUnit.CENTURIES) toString = value + " century";
+                else if (this.unit.name().toLowerCase().endsWith("s")) {
+                    toString = value + " " + this.unit.name().substring(0, this.unit.name().length() - 1).toLowerCase().replace("_", " ");
+                }
+                else toString = value + " " + this.unit.name().toLowerCase().replace("_", " ");
+            } else toString = value + " " + this.unit.name().toLowerCase().replace("_", " ");
+        }
         return toString;
     }
 
     public long toMilliseconds() {
-        if (timeUnit == ChronoUnit.FOREVER) {
+        if (this.unit == ChronoUnit.FOREVER) {
             return -1;
         }
         if (value <= 0) return -1;
-        return timeUnit.getDuration().getSeconds() * value * 1000;
+        return this.unit.getDuration().getSeconds() * value * 1000;
     }
 
     public static TimeUnitPair permanent() {
         return new TimeUnitPair(1, ChronoUnit.FOREVER);
     }
 
-    public static ChronoUnit getChronoUnit(String s) {
-        for (ChronoUnit timeUnit : ChronoUnit.values()) {
-            if (timeUnit == ChronoUnit.NANOS || timeUnit == ChronoUnit.MICROS || timeUnit == ChronoUnit.MILLIS) continue;
-            if (timeUnit.name().toLowerCase().startsWith(s.toLowerCase())) {
-                return timeUnit;
+    private static ChronoUnit getChronoUnit(String s) {
+        for (ChronoUnit unit : ChronoUnit.values()) {
+            if (unit == ChronoUnit.NANOS || unit == ChronoUnit.MICROS || unit == ChronoUnit.MILLIS) continue;
+            if (unit.name().toLowerCase().startsWith(s.toLowerCase())) {
+                return unit;
             }
         }
         return null;
@@ -64,12 +66,12 @@ public class TimeUnitPair {
                 s.equalsIgnoreCase("-1")) return new TimeUnitPair(1, ChronoUnit.FOREVER);
         ChronoUnit timeUnit;
 
-        String time = "";
+        StringBuilder time = new StringBuilder();
         String unit = "";
         boolean digitsDone = false;
         for (int i = 0; i < s.length(); i++) {
             if (!digitsDone && Character.isDigit(s.charAt(i))) {
-                time += s.charAt(i);
+                time.append(s.charAt(i));
             } else if (!Character.isDigit(s.charAt(i))) {
                 digitsDone = true;
                 unit += s.charAt(i);
@@ -79,7 +81,7 @@ public class TimeUnitPair {
         }
         timeUnit = TimeUnitPair.getChronoUnit(unit);
         if (timeUnit == null) return null;
-        return new TimeUnitPair(Integer.valueOf(time), timeUnit);
+        return new TimeUnitPair(Integer.parseInt(time.toString()), timeUnit);
     }
 
 }
