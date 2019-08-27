@@ -19,7 +19,6 @@ public class KnockbackModule extends MatchModule implements Listener {
             Player p = (Player) event.getEntity();
             double health = p.getHealth();
             p.damage(event.getFinalDamage());
-            p.sendMessage(String.valueOf(p.getNoDamageTicks()));
             if (p.getNoDamageTicks() > 16) {
                 applyKnockback(event.getDamager(), p);
             }
@@ -71,8 +70,8 @@ public class KnockbackModule extends MatchModule implements Listener {
         motY += f2;
         motZ -= d1 / f1 * f2;
 
-        if (motY > 0.4) {
-            motY = 0.4;
+        if (motY > 0.3) {
+            motY = 0.3;
         }
 
         victim.setVelocity(new Vector(motX, motY, motZ));
