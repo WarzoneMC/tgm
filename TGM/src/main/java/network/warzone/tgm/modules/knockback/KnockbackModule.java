@@ -17,8 +17,11 @@ public class KnockbackModule extends MatchModule implements Listener {
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player && !event.isCancelled()) {
             Player p = (Player) event.getEntity();
+            double health = p.getHealth();
             p.damage(event.getFinalDamage());
-            applyKnockback(event.getDamager(), p);
+            if (p.getHealth() < health) {
+                applyKnockback(event.getDamager(), p);
+            }
             event.setCancelled(true);
         }
 //        if (event.getDamager() instanceof Arrow) {
