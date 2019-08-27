@@ -67,8 +67,8 @@ public class KnockbackModule extends MatchModule implements Listener {
         motY += f2;
         motZ -= d1 / f1 * f2;
 
-        if (motY > 0.4000000059604645D) {
-            motY = 0.4000000059604645D;
+        if (motY > 0.5) {
+            motY = 0.5;
         }
 
         victim.setVelocity(new Vector(motX, motY, motZ));
