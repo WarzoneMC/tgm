@@ -56,7 +56,7 @@ public class KnockbackModule extends MatchModule implements Listener {
         }
 
         double f1 = Math.sqrt(d0 * d0 + d1 * d1);
-        float f2 = 0.4F;
+        float f2 = KnockbackSettings.multiplier;
 
         Vector vel = victim.getVelocity();
 
