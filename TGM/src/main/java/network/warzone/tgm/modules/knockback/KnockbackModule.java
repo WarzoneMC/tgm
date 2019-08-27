@@ -20,7 +20,7 @@ public class KnockbackModule extends MatchModule implements Listener {
             double health = p.getHealth();
             p.damage(event.getFinalDamage());
             p.sendMessage(String.valueOf(p.getNoDamageTicks()));
-            if (p.getNoDamageTicks() == 0) {
+            if (p.getNoDamageTicks() > 16) {
                 applyKnockback(event.getDamager(), p);
             }
             event.setCancelled(true);
