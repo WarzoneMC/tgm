@@ -79,7 +79,7 @@ public class ItemFactory {
             lore.add(start + string);
         }
         meta.setLore(lore);
-
+        item.setItemMeta(meta);
         return item;
     }
 
@@ -105,6 +105,22 @@ public class ItemFactory {
             }
         }
         return itemStack;
+    }
+
+    public static void setLore(ItemStack item, String... strings) {
+        ItemMeta meta = item.getItemMeta();
+        List<String> lore = new ArrayList<>();
+        for (String string : strings) {
+            lore.add(string);
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+    }
+
+    public static void setLore(ItemStack item, List<String> lore) {
+        ItemMeta meta = item.getItemMeta();
+        meta.setLore(lore);
+        item.setItemMeta(meta);
     }
 
     public static ItemStack createPotion(PotionType potionType, int level, String name) {
