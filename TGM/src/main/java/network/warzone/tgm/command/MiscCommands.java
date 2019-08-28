@@ -44,12 +44,26 @@ public class MiscCommands {
                 double kbMultiplier = cmd.getDouble(0);
                 sender.sendMessage(ChatColor.GREEN + "Knockback Modifier updated from " + ChatColor.YELLOW + KnockbackSettings.multiplier + ChatColor.GREEN + " to " + ChatColor.YELLOW + kbMultiplier);
                 KnockbackSettings.multiplier = (float) kbMultiplier;
-
             } catch (CommandNumberFormatException e) {
                 sender.sendMessage(ChatColor.RED + "Invalid number.");
             }
         } else {
             sender.sendMessage(ChatColor.GREEN + "Current Knockback Modifier: " + ChatColor.WHITE + KnockbackSettings.multiplier);
+        }
+    }
+
+    @Command(aliases={"setkbheight"}, desc = "Change the knockback height", usage= "(amount)")
+    public static void setkbheight(CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() > 0) {
+            try {
+                double kbHeight = cmd.getDouble(0);
+                sender.sendMessage(ChatColor.GREEN + "Knockback Height updated from " + ChatColor.YELLOW + KnockbackSettings.height + ChatColor.GREEN + " to " + ChatColor.YELLOW + kbHeight);
+                KnockbackSettings.height = (float) kbHeight;
+            } catch (CommandNumberFormatException e) {
+                sender.sendMessage(ChatColor.RED + "Invalid number.");
+            }
+        } else {
+            sender.sendMessage(ChatColor.GREEN + "Current Knockback Height: " + ChatColor.WHITE + KnockbackSettings.height);
         }
     }
 
