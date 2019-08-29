@@ -86,6 +86,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         Team team = simpleScoreboard.getScoreboard().registerNewTeam(matchTeam.getId());
         //team.setPrefix(matchTeam.getColor().toString());
         team.setPrefix(matchTeam.getColor() + " "); // Hacky fix for team colors not showing up in older versions
+        team.setColor(matchTeam.getColor());
         team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
         team.setAllowFriendlyFire(false);
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
