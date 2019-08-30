@@ -56,7 +56,8 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         String prefix = event.getPlayerContext().getUserProfile().getPrefix();
         if (prefix != null) {
             String name = event.getPlayerContext().getPlayer().getName();
-            event.getPlayerContext().getPlayer().setPlayerListName(prefix.trim() + " " + event.getTeam().getColor() + name);
+            String colouredPrefix = ChatColor.translateAlternateColorCodes('&', prefix.trim());
+            event.getPlayerContext().getPlayer().setPlayerListName(colouredPrefix + " " + event.getTeam().getColor() + name);
         }
     }
 
