@@ -4,6 +4,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.knockback.KnockbackSettings;
 import network.warzone.tgm.util.Players;
 import org.bukkit.Bukkit;
@@ -64,6 +65,33 @@ public class MiscCommands {
             }
         } else {
             sender.sendMessage(ChatColor.GREEN + "Current Knockback Height: " + ChatColor.WHITE + KnockbackSettings.height);
+        }
+    }
+
+    @Command(aliases={"nick"}, desc= "Change nickname", usage ="(name)")
+    public static void nick(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Player only command.");
+            return;
+        }
+        Player p = (Player) sender;
+        if (cmd.argsLength() > 0) {
+            String newName = cmd.getString(0);
+//            if (newName.equals("reset")) {
+//                TGM.get().getNickManager().reset(p);
+//                return;
+//            }
+            if (newName.length() > 16) {
+                sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
+                return;
+            }
+            if (Bukkit.getOnlinePlayers().stream().anyMatch((Player p1) -> p1.getName().equals(newName))) {
+                sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
+                return;
+            }
+            TGM.get().getNickManager().setName(p, newName);
+            TGM.get().getNickManager().setSkin(p, newName);
+            sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
         }
     }
 

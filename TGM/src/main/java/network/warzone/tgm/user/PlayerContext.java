@@ -2,6 +2,7 @@ package network.warzone.tgm.user;
 
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
@@ -20,6 +21,14 @@ public class PlayerContext {
     public PlayerContext(Player player, UserProfile userProfile) {
         this.player = player;
         this.userProfile = userProfile;
+    }
+
+    public String getDisplayName() {
+        return TGM.get().getNickManager().nickNames.getOrDefault(player.getUniqueId(), player.getName());
+    }
+
+    public boolean isNicked() {
+        return TGM.get().getNickManager().nickNames.containsKey(player.getUniqueId());
     }
 
     public String getLevelString() {

@@ -18,6 +18,7 @@ import network.warzone.tgm.map.MapInfoDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
+import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.player.PlayerManager;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.client.http.HttpClient;
@@ -48,6 +49,7 @@ public class TGM extends JavaPlugin {
     private PlayerManager playerManager;
     private JoinManager joinManager;
     private ApiManager apiManager;
+    private NickManager nickManager;
 
     private BroadcastManager broadcastManager;
 
@@ -95,6 +97,7 @@ public class TGM extends JavaPlugin {
         joinManager = new JoinManager();
         apiManager = new ApiManager();
         broadcastManager = new BroadcastManager();
+        nickManager = new NickManager();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 
