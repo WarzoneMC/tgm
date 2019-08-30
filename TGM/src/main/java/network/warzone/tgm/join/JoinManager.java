@@ -20,6 +20,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.world.WorldInitEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -126,9 +127,8 @@ public class JoinManager implements Listener {
         }
     }
 
-    @EventHandler(priority=EventPriority.HIGHEST)
-    public void worldInit(org.bukkit.event.world.WorldInitEvent e)
-    {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onWorldInit(WorldInitEvent e) {
         e.getWorld().setKeepSpawnInMemory(false);
     }
 

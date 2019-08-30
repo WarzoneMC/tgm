@@ -170,6 +170,17 @@ public class UserProfile {
         else return null;
     }
 
+    public Rank getHighestRank() {
+        if (!ranksLoaded.isEmpty()) {
+            Rank highest = ranksLoaded.get(0);
+            for (Rank rank : ranksLoaded) {
+                if (highest.getPriority() < rank.getPriority()) highest = rank;
+            }
+            return highest;
+        }
+        else return null;
+    }
+
     public static int getRequiredXP(int level) {
         return (int) Math.round(Math.pow((level - 1)/0.6, 2) + 0.49);
     }

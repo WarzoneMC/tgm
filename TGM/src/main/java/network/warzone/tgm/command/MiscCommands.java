@@ -99,9 +99,13 @@ public class MiscCommands {
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("reset")) {
                 String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());
-                TGM.get().getNickManager().setName(p, original);
-                TGM.get().getNickManager().setSkin(p, original);
-                sender.sendMessage(ChatColor.GREEN + "Reset username");
+                if (original != null) {
+                    TGM.get().getNickManager().setName(p, original);
+                    TGM.get().getNickManager().setSkin(p, original);
+                    TGM.get().getNickManager().setLevel(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getLevel());
+                    TGM.get().getNickManager().setRank(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getHighestRank());
+                    sender.sendMessage(ChatColor.GREEN + "Reset username");
+                }
             } else if (option.equals("skin") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
                 if (newName.length() > 16) {
