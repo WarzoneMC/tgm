@@ -27,6 +27,12 @@
                     <include>**/*.xml</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
         </resources>
 
         <plugins>
@@ -52,16 +58,6 @@
                 </executions>
 
                 <configuration>
-                    <!--
-                        Default (optional):
-                        ${project.basedir}/.git
-
-                        Explanation:
-                        If you'd like to tell the plugin where your .git directory is, use this setting, otherwise we'll perform a search trying to figure out the right directory.
-                        The default value and will most probably be ok for single module projects, in other cases please use `../` to get higher up in the dir tree.
-                        An example would be: `${project.basedir}/../.git`
-                        It seems reasonable to always add this configuration to have this set explicitly.
-                    -->
                     <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
                     <prefix>git</prefix>
                     <dateFormat>yyyy-MM-dd'T'HH:mm:ssZ</dateFormat>
@@ -75,7 +71,7 @@
                     <failOnNoGitDirectory>true</failOnNoGitDirectory>
                     <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
                     <skip>false</skip>
-                    <offline>false</offline>
+<!--                    <offline>false</offline>-->
                     <runOnlyOnce>false</runOnlyOnce>
                     <excludeProperties>
                          <excludeProperty>git.user.*</excludeProperty>
@@ -85,7 +81,7 @@
                     <replacementProperties>
                     </replacementProperties>
                     <useNativeGit>false</useNativeGit>
-                    <nativeGitTimeoutInMs>30000</nativeGitTimeoutInMs>
+<!--                    <nativeGitTimeoutInMs>30000</nativeGitTimeoutInMs>-->
                     <abbrevLength>7</abbrevLength>
                     <commitIdGenerationMode>flat</commitIdGenerationMode>
                     <gitDescribe>
@@ -101,8 +97,8 @@
                     </validationProperties>
                     <validationShouldFailIfNoMatch>false</validationShouldFailIfNoMatch>
                     <evaluateOnCommit>HEAD</evaluateOnCommit>
-                    <useBranchNameFromBuildEnvironment>true</useBranchNameFromBuildEnvironment>
-                    <injectIntoSysProperties>true</injectIntoSysProperties>
+<!--                    <useBranchNameFromBuildEnvironment>true</useBranchNameFromBuildEnvironment>-->
+<!--                    <injectIntoSysProperties>true</injectIntoSysProperties>-->
                 </configuration>
             </plugin>
         </plugins>
