@@ -85,7 +85,6 @@ public class MiscCommands {
             String option = cmd.getString(0);
             if (option.equals("set") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
-
                 if (newName.length() > 16) {
                     sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
                     return;
@@ -106,6 +105,8 @@ public class MiscCommands {
                     TGM.get().getNickManager().setLevel(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getLevel());
                     TGM.get().getNickManager().setRank(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getHighestRank());
                     sender.sendMessage(ChatColor.GREEN + "Reset username");
+                } else {
+                    sender.sendMessage(ChatColor.RED + "You are not nicked!");
                 }
             } else if (option.equals("skin") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
@@ -143,11 +144,21 @@ public class MiscCommands {
                 for (Rank r : TGM.get().getTeamClient().retrieveRanks()) {
                     if (r.getName().equalsIgnoreCase(newRank)) rank = r;
                 }
+                if (newRank.equals("none")) {
+                    TGM.get().getNickManager().ranks.remove(p.getUniqueId());
+                    sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
+                }
                 if (rank != null) {
                     TGM.get().getNickManager().setRank(p, rank);
                     sender.sendMessage(ChatColor.GREEN + "Updated rank to " + ChatColor.YELLOW + rank.getName());
+                } else {
+                    sender.sendMessage(ChatColor.RED + "Invalid rank");
                 }
+            } else {
+                sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|level|rank> <option>");
             }
+        } else {
+            sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|level|rank> <option>");
         }
     }
 
