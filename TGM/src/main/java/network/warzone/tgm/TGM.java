@@ -35,12 +35,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 @Getter
 public class TGM extends JavaPlugin {
 
     public static TGM instance;
+
+    @Getter
+    private Properties gitInfo = new Properties();
 
     private Gson gson;
     private TeamClient teamClient;
@@ -98,6 +103,14 @@ public class TGM extends JavaPlugin {
         apiManager = new ApiManager();
         broadcastManager = new BroadcastManager();
         nickManager = new NickManager();
+
+        // Load git.properties
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try (InputStream resourceStream = loader.getResourceAsStream("git.properties")) {
+            gitInfo.load(resourceStream);
+        } catch (IOException err) {
+
+        }
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 

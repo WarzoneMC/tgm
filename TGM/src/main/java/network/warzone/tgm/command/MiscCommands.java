@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Properties;
+
 /*
 These commands MUST NOT use ANY API FUNCTIONALITY. This class will
 be enabled WHETHER THE API IS ENABLED OR NOT.
@@ -97,6 +99,7 @@ public class MiscCommands {
 
     @Command(aliases = {"tgm"}, desc = "General TGM command")
     public static void tgm(CommandContext cmd, CommandSender sender) {
-        sender.sendMessage(String.format(ChatColor.AQUA + "This server is running TGM version git-%s (latest commit: %s)", System.getProperty("git.commit.id.abbrev"), System.getProperty("git.commit.message.short")));
+        Properties gitInfo = TGM.get().getGitInfo();
+        sender.sendMessage(String.format(ChatColor.AQUA + "This server is running TGM version git-%s (latest commit: %s)", gitInfo.getProperty("git.commit.id.abbrev"), gitInfo.getProperty("git.commit.message.short")));
     }
 }
