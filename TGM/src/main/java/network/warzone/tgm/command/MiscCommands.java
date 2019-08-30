@@ -95,4 +95,8 @@ public class MiscCommands {
         }
     }
 
+    @Command(aliases = {"tgm"}, desc = "General TGM command")
+    public static void tgm(CommandContext cmd, CommandSender sender) {
+        sender.sendMessage(String.format(ChatColor.AQUA + "This server is running TGM version git-%s (latest commit: %s)", System.getProperty("git.commit.id.abbrev"), System.getProperty("git.commit.message.short")));
+    }
 }
