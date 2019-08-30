@@ -9,14 +9,12 @@ import com.mojang.util.UUIDTypeAdapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_14_R1.PacketPlayOutNamedEntitySpawn;
-import net.minecraft.server.v1_14_R1.PacketPlayOutPlayerInfo;
+import net.minecraft.server.v1_14_R1.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.warzoneapi.models.Rank;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -29,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -40,15 +39,23 @@ public class NickManager {
         public String signature;
     }
 
+    public HashMap<UUID, String> originalNames = new HashMap<>();
     public HashMap<UUID, String> nickNames = new HashMap<>();
     public HashMap<UUID, Skin> skins = new HashMap<>();
+    public HashMap<UUID, Rank> ranks = new HashMap<>();
+    public HashMap<UUID, Integer> levels = new HashMap<>();
 
-    public HashMap<String, UUID> uuidCache = new HashMap<>();
-    public HashMap<String, Skin> skinCache = new HashMap<>();
+    private HashMap<String, UUID> uuidCache = new HashMap<>();
+    private HashMap<String, Skin> skinCache = new HashMap<>();
 
     public void setName(Player player, String newName) {
         EntityPlayer entityPlayer = getEntityPlayer(player);
-
+        if (!originalNames.containsKey(player.getUniqueId())) {
+            originalNames.put(player.getUniqueId(), player.getName());
+        } else if (newName.equals(originalNames.get(player.getUniqueId()))) {
+            originalNames.remove(player.getUniqueId());
+            nickNames.remove(player.getUniqueId());
+        }
         PacketPlayOutPlayerInfo playerInfo1 = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
         entityPlayer.playerConnection.sendPacket(playerInfo1);
 
@@ -95,6 +102,14 @@ public class NickManager {
         TGM.get().getModule(TeamManagerModule.class).joinTeam(context, team);
     }
 
+    public void setLevel(Player player, Integer level) {
+        levels.put(player.getUniqueId(), level);
+    }
+
+    public void setRank(Player player, Rank rank) {
+        ranks.put(player.getUniqueId(), rank);
+    }
+
     public void setSkin(Player player, String nameOfPlayer) {
         EntityPlayer entityPlayer = getEntityPlayer(player);
 
@@ -104,6 +119,11 @@ public class NickManager {
 
         PacketPlayOutPlayerInfo playerInfo1 = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
         entityPlayer.playerConnection.sendPacket(playerInfo1);
+
+        Collection<Property> properties = entityPlayer.getProfile().getProperties().get("textures");
+        Property property = (Property) properties.toArray()[0];
+        skinCache.put(player.getUniqueId().toString(), new Skin(property.getValue(), property.getSignature()));
+        uuidCache.put(originalNames.get(player.getUniqueId()), player.getUniqueId());
 
         if (skin != null) {
             for (Player p : Bukkit.getOnlinePlayers()) {
@@ -128,6 +148,7 @@ public class NickManager {
 
             PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
             entityPlayer.playerConnection.sendPacket(playerAddBack);
+            player.spigot().respawn();
             skins.put(player.getUniqueId(), skin);
         }
     }
@@ -164,7 +185,7 @@ public class NickManager {
         return null;
     }
 
-    public static String insertDashUUID(String uuid) {
+    private static String insertDashUUID(String uuid) {
         StringBuilder sb = new StringBuilder(uuid);
         sb.insert(8, "-");
         sb = new StringBuilder(sb.toString());

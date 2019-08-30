@@ -115,7 +115,7 @@ public class ChatModule extends MatchModule implements Listener {
 
         if(channel == Channel.STAFF) {
             String prefix;
-            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            prefix = playerContext.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
 
             String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + event.getPlayer().getName() + ": " + ChatColor.RESET + event.getMessage();
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -128,7 +128,7 @@ public class ChatModule extends MatchModule implements Listener {
 
         if (channel == Channel.ALL) {
             MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            String prefix = playerContext.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
             event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
                     prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
         }

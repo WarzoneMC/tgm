@@ -101,9 +101,9 @@ public class JoinManager implements Listener {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
         String joinMsg;
-        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty() && !playerContext.isNicked()){
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && playerContext.getPrefix() != null){
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-            joinMsg = ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.";
+            joinMsg = ChatColor.GOLD + prefix + event.getPlayer().getDisplayName() + ChatColor.GOLD + " joined.";
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
         }
         else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";
@@ -124,6 +124,12 @@ public class JoinManager implements Listener {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
             Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
         }
+    }
+
+    @EventHandler(priority=EventPriority.HIGHEST)
+    public void worldInit(org.bukkit.event.world.WorldInitEvent e)
+    {
+        e.getWorld().setKeepSpawnInMemory(false);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

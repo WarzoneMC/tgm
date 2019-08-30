@@ -27,12 +27,35 @@ public class PlayerContext {
         return TGM.get().getNickManager().nickNames.getOrDefault(player.getUniqueId(), player.getName());
     }
 
+    public String getOriginalName() {
+        return TGM.get().getNickManager().originalNames.get(player.getUniqueId());
+    }
+
+    public String getPrefix() {
+        if (isNicked()) {
+            Rank r = TGM.get().getNickManager().ranks.get(player.getUniqueId());
+            if (r != null) {
+                return r.getPrefix();
+            } else {
+                return null;
+            }
+        }
+        return userProfile.getPrefix();
+    }
+
+    public int getLevel() {
+        if (isNicked()) {
+            return TGM.get().getNickManager().levels.getOrDefault(player.getUniqueId(), 1);
+        }
+        return userProfile.getLevel();
+    }
+
     public boolean isNicked() {
         return TGM.get().getNickManager().nickNames.containsKey(player.getUniqueId());
     }
 
     public String getLevelString() {
-        int level = userProfile.getLevel();
+        int level = getLevel();
 
         if (level < 10) {
             return ChatColor.GRAY + "[" + level + "]";
