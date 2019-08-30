@@ -114,8 +114,7 @@ public class JoinManager implements Listener {
 
         if (playerContext.isNicked()) {
             String nick = TGM.get().getNickManager().nickNames.get(event.getPlayer().getUniqueId());
-            TGM.get().getNickManager().setName(event.getPlayer(), nick);
-            TGM.get().getNickManager().setSkin(event.getPlayer(), nick);
+            TGM.get().getNickManager().setNick(event.getPlayer(), nick, false);
         }
     }
 
