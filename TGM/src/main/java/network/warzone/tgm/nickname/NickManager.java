@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,7 +49,13 @@ public class NickManager {
     private HashMap<String, UUID> uuidCache = new HashMap<>();
     private HashMap<String, Skin> skinCache = new HashMap<>();
 
-    public void setName(Player player, String newName) {
+    public void setNick(Player player, String newName, boolean uuidSpoof) {
+        UUID uuid = getUUID(newName);
+        setName(player, newName, uuidSpoof, uuid);
+        setSkin(player, newName, uuid);
+    }
+
+    public void setName(Player player, String newName, boolean uuidSpoof, UUID uuid) {
         EntityPlayer entityPlayer = getEntityPlayer(player);
         if (!originalNames.containsKey(player.getUniqueId())) {
             originalNames.put(player.getUniqueId(), player.getName());
@@ -73,7 +80,6 @@ public class NickManager {
                 PacketPlayOutPlayerInfo playerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
                 entityOther.playerConnection.sendPacket(playerInfo);
 
-
                 // Modify the player's game profile.
                 GameProfile profile = entityPlayer.getProfile();
                 try {
@@ -83,6 +89,17 @@ public class NickManager {
                     field.set(profile, newName);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     e.printStackTrace();
+                }
+
+                if (uuidSpoof) {
+                    try {
+                        Field field = GameProfile.class.getDeclaredField("id");
+                        field.setAccessible(true);
+
+                        field.set(profile, uuid);
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 // Add the player back.
@@ -110,12 +127,14 @@ public class NickManager {
         ranks.put(player.getUniqueId(), rank);
     }
 
-    public void setSkin(Player player, String nameOfPlayer) {
+    public void setSkin(Player player, String nameOfPlayer, @Nullable UUID uuid) {
         EntityPlayer entityPlayer = getEntityPlayer(player);
 
-        UUID uuid = getUUID(nameOfPlayer);
-        if (uuid == null) return;
-        Skin skin = getSkin(uuid);
+        UUID theUUID = uuid;
+        if (theUUID == null) {
+            theUUID = getUUID(nameOfPlayer);
+        }
+        Skin skin = getSkin(theUUID);
 
         PacketPlayOutPlayerInfo playerInfo1 = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
         entityPlayer.playerConnection.sendPacket(playerInfo1);

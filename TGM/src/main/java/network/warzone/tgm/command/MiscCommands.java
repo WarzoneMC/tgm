@@ -94,14 +94,18 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
-                TGM.get().getNickManager().setName(p, newName);
-                TGM.get().getNickManager().setSkin(p, newName);
+
+                boolean uuidSpoof = false;
+                if (cmd.argsLength() > 2) {
+                    uuidSpoof = cmd.getString(2).equals("true");
+                }
+                TGM.get().getNickManager().setNick(p, newName, uuidSpoof);
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("reset")) {
                 String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());
                 if (original != null) {
-                    TGM.get().getNickManager().setName(p, original);
-                    TGM.get().getNickManager().setSkin(p, original);
+                    TGM.get().getNickManager().setName(p, original, false, null);
+                    TGM.get().getNickManager().setSkin(p, original, null);
                     TGM.get().getNickManager().setLevel(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getLevel());
                     TGM.get().getNickManager().setRank(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getHighestRank());
                     sender.sendMessage(ChatColor.GREEN + "Reset username");
@@ -114,7 +118,7 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "New skin name must be shorter than 16 characters.");
                     return;
                 }
-                TGM.get().getNickManager().setSkin(p, newName);
+                TGM.get().getNickManager().setSkin(p, newName, null);
                 sender.sendMessage(ChatColor.GREEN + "Updated skin to " + ChatColor.YELLOW + newName);
             } else if (option.equals("name") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
@@ -128,7 +132,7 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
-                TGM.get().getNickManager().setName(p, newName);
+                TGM.get().getNickManager().setName(p, newName, false, null);
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("level") && cmd.argsLength() > 1) {
                 try {
