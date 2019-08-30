@@ -51,8 +51,13 @@ public class NickManager {
 
     public void setNick(Player player, String newName, boolean uuidSpoof) {
         UUID uuid = getUUID(newName);
-        setName(player, newName, uuidSpoof, uuid);
-        setSkin(player, newName, uuid);
+        if (uuid == null ){
+            setName(player, newName, false, null);
+            setSkin(player, newName, null);
+        } else {
+            setName(player, newName, uuidSpoof, uuid);
+            setSkin(player, newName, uuid);
+        }
     }
 
     public void setName(Player player, String newName, boolean uuidSpoof, UUID uuid) {
@@ -134,6 +139,7 @@ public class NickManager {
         if (theUUID == null) {
             theUUID = getUUID(nameOfPlayer);
         }
+        if (theUUID == null) return;
         Skin skin = getSkin(theUUID);
 
         PacketPlayOutPlayerInfo playerInfo1 = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
