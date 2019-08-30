@@ -642,9 +642,9 @@ public class CycleCommands {
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
             }
-        } else if (cmd.getString(0).equalsIgnoreCase("reload")) {
-            TGM.get().reloadConfig();
-            sender.sendMessage(ChatColor.GREEN + "The config has been reloaded");
+//        } else if (cmd.getString(0).equalsIgnoreCase("reload")) {
+//            TGM.get().reloadConfig();
+//            sender.sendMessage(ChatColor.GREEN + "The config has been reloaded");
         }
     }
 
