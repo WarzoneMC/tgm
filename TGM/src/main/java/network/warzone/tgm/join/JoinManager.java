@@ -101,15 +101,21 @@ public class JoinManager implements Listener {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
         String joinMsg;
-        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty()){
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty() && !playerContext.isNicked()){
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
             joinMsg = ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.";
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
         }
-        else joinMsg = ChatColor.GRAY + event.getPlayer().getName() + " joined.";
+        else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";
 
         if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
         event.setJoinMessage(joinMsg);
+
+        if (playerContext.isNicked()) {
+            String nick = TGM.get().getNickManager().nickNames.get(event.getPlayer().getUniqueId());
+            TGM.get().getNickManager().setName(event.getPlayer(), nick);
+            TGM.get().getNickManager().setSkin(event.getPlayer(), nick);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
