@@ -82,7 +82,11 @@ public class JoinManager implements Listener {
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
-        QueuedJoin queuedJoin = getQueuedUserProfile(event.getPlayer());
+        UUID uuid = event.getPlayer().getUniqueId();
+        if (TGM.get().getNickManager().spoof.containsKey(uuid)) {
+            uuid = TGM.get().getNickManager().spoof.get(uuid);
+        }
+        QueuedJoin queuedJoin = getQueuedUserProfile(uuid);
         if (queuedJoin == null) {
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             event.setKickMessage(ChatColor.RED + "Unable to load user profile. Please try again.");
@@ -99,8 +103,8 @@ public class JoinManager implements Listener {
         queuedJoins.remove(queuedJoin);
     }
 
-    private QueuedJoin getQueuedUserProfile(Player player) {
-        return queuedJoins.stream().filter(queuedJoin -> player.getUniqueId().equals(queuedJoin.getUuid())).findFirst().orElse(null);
+    private QueuedJoin getQueuedUserProfile(UUID uuid) {
+        return queuedJoins.stream().filter(queuedJoin -> uuid.equals(queuedJoin.getUuid())).findFirst().orElse(null);
     }
 
     @EventHandler
@@ -120,7 +124,12 @@ public class JoinManager implements Listener {
 
         if (playerContext.isNicked()) {
             String nick = TGM.get().getNickManager().nickNames.get(event.getPlayer().getUniqueId());
-            TGM.get().getNickManager().setNick(event.getPlayer(), nick, false);
+            if (TGM.get().getNickManager().spoof.containsKey(event.getPlayer().getUniqueId())) {
+                TGM.get().getNickManager().setNick(event.getPlayer(), nick, true, TGM.get().getNickManager().spoof.get(event.getPlayer().getUniqueId()));
+            }
+            else {
+                TGM.get().getNickManager().setNick(event.getPlayer(), nick, false, null);
+            }
         }
     }
 

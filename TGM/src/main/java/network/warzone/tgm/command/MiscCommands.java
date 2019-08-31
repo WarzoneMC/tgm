@@ -104,7 +104,7 @@ public class MiscCommands {
                     uuidSpoof = cmd.getString(2).equals("true");
                     sender.sendMessage(ChatColor.GOLD + "UUID Spoofing: " + uuidSpoof);
                 }
-                TGM.get().getNickManager().setNick(p, newName, uuidSpoof);
+                TGM.get().getNickManager().setNick(p, newName, uuidSpoof, null);
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("reset")) {
                 String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());

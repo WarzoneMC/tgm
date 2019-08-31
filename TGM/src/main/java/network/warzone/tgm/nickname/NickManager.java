@@ -54,14 +54,19 @@ public class NickManager {
 
     }
 
-    public void setNick(Player player, String newName, boolean uuidSpoof) {
-        UUID uuid = getUUID(newName);
+    public void setNick(Player player, String newName, boolean uuidSpoof, @Nullable UUID uuid) {
         if (uuid == null ){
             setName(player, newName, false, null);
             setSkin(player, newName, null);
         } else {
-            setName(player, newName, uuidSpoof, uuid);
-            setSkin(player, newName, uuid);
+            UUID uuid1 = getUUID(newName);
+            if (uuid1 == null) {
+                setName(player, newName, false, null);
+                setSkin(player, newName, null);
+            } else {
+                setName(player, newName, uuidSpoof, uuid1);
+                setSkin(player, newName, uuid1);
+            }
         }
     }
 
