@@ -53,13 +53,19 @@ public class JoinManager implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
+        UUID uuid = event.getUniqueId();
+        boolean spoofed = false;
+        if (TGM.get().getNickManager().spoof.containsKey(uuid)) {
+                uuid = TGM.get().getNickManager().spoof.get(uuid);
+                spoofed = true;
+        }
+        UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), uuid.toString(), event.getAddress().getHostAddress()));
 
         Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + userProfile.getRanks().size() + " (loaded/total)");
 
         //TODO Custom ban messages
         Punishment punishment = userProfile.getLatestBan();
-        if (punishment != null) {
+        if (punishment != null && !spoofed) {
             event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
@@ -71,7 +77,7 @@ public class JoinManager implements Listener {
         }
         //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
 
-        queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
+        queuedJoins.add(new QueuedJoin(uuid, userProfile, System.currentTimeMillis()));
     }
 
     @EventHandler

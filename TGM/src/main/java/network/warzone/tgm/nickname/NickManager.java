@@ -45,9 +45,14 @@ public class NickManager {
     public HashMap<UUID, Skin> skins = new HashMap<>();
     public HashMap<UUID, Rank> ranks = new HashMap<>();
     public HashMap<UUID, Integer> levels = new HashMap<>();
+    public HashMap<UUID, UUID> spoof = new HashMap<>();
 
     private HashMap<String, UUID> uuidCache = new HashMap<>();
     private HashMap<String, Skin> skinCache = new HashMap<>();
+
+    public void changeUUID(Player p, UUID uuid) {
+
+    }
 
     public void setNick(Player player, String newName, boolean uuidSpoof) {
         UUID uuid = getUUID(newName);
@@ -89,6 +94,7 @@ public class NickManager {
         }
 
         if (uuidSpoof) {
+            spoof.put(player.getUniqueId(), uuid);
             try {
                 Field field = GameProfile.class.getDeclaredField("id");
                 field.setAccessible(true);
@@ -122,6 +128,10 @@ public class NickManager {
         nickNames.put(player.getUniqueId(), newName);
 
         TGM.get().getModule(TeamManagerModule.class).joinTeam(context, team);
+
+        if (uuidSpoof) {
+            TGM.get().getPlayerManager().removePlayer(context);
+        }
     }
 
     public void setLevel(Player player, Integer level) {
