@@ -222,6 +222,15 @@ public class NickManager {
             entityPlayer.playerConnection.sendPacket(playerAddBack);
             PacketPlayOutRespawn respawn = new PacketPlayOutRespawn(DimensionManager.OVERWORLD, WorldType.getType(Objects.requireNonNull(player.getWorld().getWorldType()).getName()), EnumGamemode.getById(player.getGameMode().getValue()));
             entityPlayer.playerConnection.sendPacket(respawn);
+            PacketPlayOutEntityTeleport playerTP = new PacketPlayOutEntityTeleport(entityPlayer);
+            try {
+                Field field = PacketPlayOutEntityTeleport.class.getDeclaredField("a");
+                field.setAccessible(true);
+                field.set(playerTP, -1337);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            entityPlayer.playerConnection.sendPacket(playerTP);
 
             skins.put(player.getUniqueId(), skin);
         }
