@@ -89,7 +89,7 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
                     return;
                 }
-                if (!newName.matches("^[a-z_A-Z]+$")) {
+                if (!newName.matches("^[a-z_A-Z0-9]+$")) {
                     sender.sendMessage(ChatColor.RED + "Invalid name.");
                     return;
                 }
@@ -128,7 +128,7 @@ public class MiscCommands {
             } else if (option.equals("name") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
 
-                if (!newName.matches("^[a-z_A-Z]+$")) {
+                if (!newName.matches("^[a-z_A-Z0-9]+$")) {
                     sender.sendMessage(ChatColor.RED + "Invalid name.");
                     return;
                 }
