@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 public class NickManager {
@@ -147,6 +148,37 @@ public class NickManager {
         ranks.put(player.getUniqueId(), rank);
     }
 
+    public void setSkin(Player player, Skin skin) {
+        EntityPlayer entityPlayer = getEntityPlayer(player);
+
+        PacketPlayOutPlayerInfo playerInfo1 = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
+        entityPlayer.playerConnection.sendPacket(playerInfo1);
+        entityPlayer.getProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!p.equals(player) && p.canSee(player)) {
+                EntityPlayer entityOther = getEntityPlayer(p);
+
+                // Remove the old player.
+                PacketPlayOutPlayerInfo playerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
+                entityOther.playerConnection.sendPacket(playerInfo);
+
+                // Add the player back.
+                PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
+                PacketPlayOutEntityDestroy entityDestroy = new PacketPlayOutEntityDestroy(player.getEntityId());
+                PacketPlayOutNamedEntitySpawn namedEntitySpawn = new PacketPlayOutNamedEntitySpawn(entityPlayer);
+                entityOther.playerConnection.sendPacket(playerAddBack);
+                entityOther.playerConnection.sendPacket(entityDestroy);
+                entityOther.playerConnection.sendPacket(namedEntitySpawn);
+            }
+        }
+
+        PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
+        entityPlayer.playerConnection.sendPacket(playerAddBack);
+
+        skins.put(player.getUniqueId(), skin);
+    }
+
     public void setSkin(Player player, String nameOfPlayer, @Nullable UUID uuid) {
         EntityPlayer entityPlayer = getEntityPlayer(player);
 
@@ -188,7 +220,9 @@ public class NickManager {
 
             PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
             entityPlayer.playerConnection.sendPacket(playerAddBack);
-            player.spigot().respawn();
+            PacketPlayOutRespawn respawn = new PacketPlayOutRespawn(DimensionManager.OVERWORLD, WorldType.getType(Objects.requireNonNull(player.getWorld().getWorldType()).getName()), EnumGamemode.getById(player.getGameMode().getValue()));
+            entityPlayer.playerConnection.sendPacket(respawn);
+
             skins.put(player.getUniqueId(), skin);
         }
     }
