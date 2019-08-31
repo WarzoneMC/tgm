@@ -89,6 +89,10 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
                     return;
                 }
+                if (!newName.matches("^[a-z_A-Z]+$")) {
+                    sender.sendMessage(ChatColor.RED + "Invalid name.");
+                    return;
+                }
                 if (TGM.get().getNickManager().originalNames.values().stream().anyMatch((String s1) -> s1.equals(newName)) ||
                         Bukkit.getOnlinePlayers().stream().anyMatch((Player p1) -> p1.getName().equals(newName))) {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
@@ -98,6 +102,7 @@ public class MiscCommands {
                 boolean uuidSpoof = false;
                 if (cmd.argsLength() > 2) {
                     uuidSpoof = cmd.getString(2).equals("true");
+                    sender.sendMessage(ChatColor.GOLD + "UUID Spoofing: " + uuidSpoof);
                 }
                 TGM.get().getNickManager().setNick(p, newName, uuidSpoof);
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
@@ -123,6 +128,10 @@ public class MiscCommands {
             } else if (option.equals("name") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
 
+                if (!newName.matches("^[a-z_A-Z]+$")) {
+                    sender.sendMessage(ChatColor.RED + "Invalid name.");
+                    return;
+                }
                 if (newName.length() > 16) {
                     sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
                     return;
