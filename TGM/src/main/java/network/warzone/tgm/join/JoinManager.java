@@ -111,6 +111,11 @@ public class JoinManager implements Listener {
         if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
         event.setJoinMessage(joinMsg);
     }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onWorldInit(WorldInitEvent e) {
+        e.getWorld().setKeepSpawnInMemory(false);
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCycle(MatchPostLoadEvent event) {
