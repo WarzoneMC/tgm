@@ -77,6 +77,28 @@ public class NickManager {
         PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
         team.removePlayer(context);
 
+        // Modify the player's game profile.
+        GameProfile profile = entityPlayer.getProfile();
+        try {
+            Field field = GameProfile.class.getDeclaredField("name");
+            field.setAccessible(true);
+
+            field.set(profile, newName);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        if (uuidSpoof) {
+            try {
+                Field field = GameProfile.class.getDeclaredField("id");
+                field.setAccessible(true);
+
+                field.set(profile, uuid);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!p.equals(player) && p.canSee(player)) {
                 EntityPlayer entityOther = getEntityPlayer(p);
@@ -84,28 +106,6 @@ public class NickManager {
                 // Remove the old player.
                 PacketPlayOutPlayerInfo playerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
                 entityOther.playerConnection.sendPacket(playerInfo);
-
-                // Modify the player's game profile.
-                GameProfile profile = entityPlayer.getProfile();
-                try {
-                    Field field = GameProfile.class.getDeclaredField("name");
-                    field.setAccessible(true);
-
-                    field.set(profile, newName);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-                if (uuidSpoof) {
-                    try {
-                        Field field = GameProfile.class.getDeclaredField("id");
-                        field.setAccessible(true);
-
-                        field.set(profile, uuid);
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                }
 
                 // Add the player back.
                 PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
@@ -150,6 +150,8 @@ public class NickManager {
         skinCache.put(player.getUniqueId().toString(), new Skin(property.getValue(), property.getSignature()));
         uuidCache.put(originalNames.get(player.getUniqueId()), player.getUniqueId());
 
+        entityPlayer.getProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
+
         if (skin != null) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (!p.equals(player) && p.canSee(player)) {
@@ -158,8 +160,6 @@ public class NickManager {
                     // Remove the old player.
                     PacketPlayOutPlayerInfo playerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
                     entityOther.playerConnection.sendPacket(playerInfo);
-
-                    entityPlayer.getProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
 
                     // Add the player back.
                     PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);

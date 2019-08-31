@@ -160,6 +160,7 @@ public class MiscCommands {
                 if (newRank.equals("none")) {
                     TGM.get().getNickManager().ranks.remove(p.getUniqueId());
                     sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
+                    return;
                 }
                 if (rank != null) {
                     TGM.get().getNickManager().setRank(p, rank);
