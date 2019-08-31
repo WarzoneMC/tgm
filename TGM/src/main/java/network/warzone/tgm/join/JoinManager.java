@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
+import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.PlayerLogin;
@@ -128,7 +129,11 @@ public class JoinManager implements Listener {
                 TGM.get().getNickManager().setNick(event.getPlayer(), nick, true, TGM.get().getNickManager().spoof.get(event.getPlayer().getUniqueId()));
             }
             else {
-                TGM.get().getNickManager().setNick(event.getPlayer(), nick, false, null);
+                NickManager.Skin skin = TGM.get().getNickManager().skins.getOrDefault(event.getPlayer().getUniqueId(), null);
+                if (skin != null) {
+                    TGM.get().getNickManager().setSkin(event.getPlayer(), skin);
+                }
+                TGM.get().getNickManager().setName(event.getPlayer(), nick, false, null);
             }
         }
     }

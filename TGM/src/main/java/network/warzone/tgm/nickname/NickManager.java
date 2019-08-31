@@ -36,7 +36,7 @@ import java.util.UUID;
 public class NickManager {
 
     @Getter @Setter @AllArgsConstructor
-    private class Skin {
+    public class Skin {
         public String value;
         public String signature;
     }
