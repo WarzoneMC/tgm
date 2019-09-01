@@ -140,7 +140,8 @@ public class JoinManager implements Listener {
 
         if (playerContext.isNicked()) {
             String nick = TGM.get().getNickManager().nickNames.get(event.getPlayer().getUniqueId());
-            if (Bukkit.getOnlinePlayers().stream().map((Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()).anyMatch(name -> name.equals(nick))) {
+            if (Bukkit.getOnlinePlayers().stream().map((Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()).anyMatch(name -> name.equals(nick)) ||
+            Bukkit.getOnlinePlayers().stream().map((Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getDisplayName()).anyMatch(name -> name.equals(nick))) {
                 playerContext.getPlayer().sendMessage(ChatColor.YELLOW + nick + ChatColor.RED + " is already on, so your nickname must be reset.");
                 TGM.get().getNickManager().reset(playerContext.getPlayer());
                 return;

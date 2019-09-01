@@ -96,8 +96,10 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "Invalid name.");
                     return;
                 }
-                if (TGM.get().getNickManager().originalNames.values().stream().anyMatch((String s1) -> s1.equals(newName)) ||
-                        Bukkit.getOnlinePlayers().stream().anyMatch((Player p1) -> p1.getName().equals(newName))) {
+                if (
+                        Bukkit.getOnlinePlayers().stream().map(
+                                (Player player)->TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
+                        ).anyMatch((String name) -> name.equals(newName))) {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
@@ -136,8 +138,10 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
                     return;
                 }
-                if (TGM.get().getNickManager().originalNames.values().stream().anyMatch((String s1) -> s1.equals(newName)) ||
-                        Bukkit.getOnlinePlayers().stream().anyMatch((Player p1) -> p1.getName().equals(newName))) {
+                if (
+                        Bukkit.getOnlinePlayers().stream().map(
+                                (Player player)-> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
+                        ).anyMatch((String name) -> name.equals(newName))) {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
