@@ -8,18 +8,19 @@ import network.warzone.tgm.match.MatchModule;
 public class MapCommandsModule extends MatchModule {
     Match match;
 
+    String startCommand;
+
     @Override
     public void enable() {
-        TGM.get().getServer().broadcastMessage("test, the match started");
-        //match.getMapContainer().getMapInfo().getJsonObject()
+        if (this.startCommand != null)
+            TGM.get().getServer().dispatchCommand(TGM.get().getServer().getConsoleSender(), this.startCommand);
     }
 
     @Override
     public void load(Match match) {
         this.match = match;
-        if (match.getMapContainer().getMapInfo().getJsonObject().has("startCommand")) {
-            JsonElement command = match.getMapContainer().getMapInfo().getJsonObject().get("startCommand");
-            TGM.get().getServer().broadcastMessage(command.toString());
-        }
+
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("startCommand"))
+            this.startCommand = match.getMapContainer().getMapInfo().getJsonObject().get("startCommand").getAsString();
     }
 }
