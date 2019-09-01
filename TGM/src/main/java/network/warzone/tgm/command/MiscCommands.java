@@ -6,6 +6,7 @@ import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.knockback.KnockbackSettings;
+import network.warzone.tgm.nickname.NickedUserProfile;
 import network.warzone.tgm.util.Players;
 import network.warzone.warzoneapi.models.Rank;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /*
 These commands MUST NOT use ANY API FUNCTIONALITY. This class will
@@ -111,8 +113,6 @@ public class MiscCommands {
                 if (original != null) {
                     TGM.get().getNickManager().setName(p, original, false, null);
                     TGM.get().getNickManager().setSkin(p, original, null);
-                    TGM.get().getNickManager().setLevel(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getLevel());
-                    TGM.get().getNickManager().setRank(p, TGM.get().getPlayerManager().getPlayerContext(p).getUserProfile().getHighestRank());
                     sender.sendMessage(ChatColor.GREEN + "Reset username");
                 } else {
                     sender.sendMessage(ChatColor.RED + "You are not nicked!");
@@ -143,13 +143,44 @@ public class MiscCommands {
                 }
                 TGM.get().getNickManager().setName(p, newName, false, null);
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
-            } else if (option.equals("level") && cmd.argsLength() > 1) {
-                try {
-                    int newLevel = cmd.getInteger(1);
-                    TGM.get().getNickManager().setLevel(p, newLevel);
-                    sender.sendMessage(ChatColor.GREEN + "Updated level to " + ChatColor.YELLOW + newLevel);
-                } catch (CommandNumberFormatException e) {
-                    e.printStackTrace();
+            } else if (option.equals("stats") && cmd.argsLength() > 1) {
+                if (cmd.argsLength() > 2) {
+                    try {
+                        String statToChange = cmd.getString(1);
+                        int value = cmd.getInteger(2);
+
+                        switch (statToChange) {
+                            case "kills":
+                                TGM.get().getNickManager().setStats(p, value, null, null, null, null);
+                                break;
+                            case "deaths":
+                                TGM.get().getNickManager().setStats(p, null, value, null, null, null);
+                                break;
+                            case "wins":
+                                TGM.get().getNickManager().setStats(p, null, null, value, null, null);
+                                break;
+                            case "losses":
+                                TGM.get().getNickManager().setStats(p, null, null, null, value, null);
+                                break;
+                            case "objectives":
+                                TGM.get().getNickManager().setStats(p, null, null, null, null, value);
+                                break;
+                            default:
+                                sender.sendMessage(ChatColor.RED + "Invalid stat. /nick stats <kills|deaths|wins|losses|objectives> <value>");
+                                return;
+                        }
+                        sender.sendMessage(ChatColor.GREEN + "Updated nicked " + ChatColor.YELLOW + statToChange + ChatColor.GREEN + " to " + ChatColor.YELLOW + value + ChatColor.GREEN + ".");
+                    } catch (CommandNumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    String type = cmd.getString(1);
+                    if (type.equals("random")) {
+                        TGM.get().getNickManager().setStats(p, generateNumber(10, 90), generateNumber(45, 90), generateNumber(10, 30), generateNumber(10, 30), generateNumber(10, 20));
+                        sender.sendMessage(ChatColor.GREEN + "Set stats to random");
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "/nick stats <statName> <value>");
+                    }
                 }
             } else if (option.equals("rank") && cmd.argsLength() > 1) {
                 String newRank = cmd.getString(1);
@@ -158,7 +189,11 @@ public class MiscCommands {
                     if (r.getName().equalsIgnoreCase(newRank)) rank = r;
                 }
                 if (newRank.equals("none")) {
-                    TGM.get().getNickManager().ranks.remove(p.getUniqueId());
+                    NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
+                    if (profile.getHighestRank() != null) {
+                        profile.removeRank(profile.getHighestRank());
+                    }
+                    TGM.get().getNickManager().stats.put(p.getUniqueId(), profile);
                     sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
                     return;
                 }
@@ -199,5 +234,9 @@ public class MiscCommands {
     public static void tgm(CommandContext cmd, CommandSender sender) {
         Properties gitInfo = TGM.get().getGitInfo();
         sender.sendMessage(String.format(ChatColor.AQUA + "This server is running TGM version git-%s (latest commit: %s)", gitInfo.getProperty("git.commit.id.abbrev"), gitInfo.getProperty("git.commit.message.short")));
+    }
+
+    public static int generateNumber(int min, int max) {
+        return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
 }
