@@ -7,12 +7,14 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.PlayerLogin;
 import network.warzone.warzoneapi.models.Punishment;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,6 +27,7 @@ import org.bukkit.event.world.WorldInitEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
 
 /**
  * Created by luke on 4/27/17.
@@ -123,8 +126,25 @@ public class JoinManager implements Listener {
         if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
         event.setJoinMessage(joinMsg);
 
+        Player p = playerContext.getPlayer();
+        if (TGM.get().getNickManager().nickNames.containsValue(p.getName())) {
+            UUID uuid = HashMaps.reverseGetFirst(p.getName(), TGM.get().getNickManager().nickNames);
+            if (Bukkit.getOnlinePlayers().stream().map((Function<Player, UUID>) Entity::getUniqueId).anyMatch(uuid1 -> uuid1.equals(uuid))) {
+                Player onlinePlayer = Bukkit.getPlayer(uuid);
+                if (onlinePlayer != null) {
+                    onlinePlayer.sendMessage(ChatColor.YELLOW + p.getName() + ChatColor.RED + " has joined with the same name as you nick, so it must be reset.");
+                    TGM.get().getNickManager().reset(onlinePlayer);
+                }
+            }
+        }
+
         if (playerContext.isNicked()) {
             String nick = TGM.get().getNickManager().nickNames.get(event.getPlayer().getUniqueId());
+            if (Bukkit.getOnlinePlayers().stream().map((Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()).anyMatch(name -> name.equals(nick))) {
+                playerContext.getPlayer().sendMessage(ChatColor.YELLOW + nick + ChatColor.RED + " is already on, so your nickname must be reset.");
+                TGM.get().getNickManager().reset(playerContext.getPlayer());
+                return;
+            }
             if (TGM.get().getNickManager().spoof.containsKey(event.getPlayer().getUniqueId())) {
                 TGM.get().getNickManager().setNick(event.getPlayer(), nick, true, TGM.get().getNickManager().spoof.get(event.getPlayer().getUniqueId()));
             }

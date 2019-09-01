@@ -71,12 +71,17 @@ public class NickManager {
         }
     }
 
+    public void reset(Player player) {
+        String originalName = originalNames.get(player.getUniqueId());
+        setName(player, originalName, false, null);
+        setSkin(player, originalName, player.getUniqueId());
+    }
+
     public void setName(Player player, String newName, boolean uuidSpoof, UUID uuid) {
         EntityPlayer entityPlayer = getEntityPlayer(player);
         if (!originalNames.containsKey(player.getUniqueId())) {
             originalNames.put(player.getUniqueId(), player.getName());
         } else if (newName.equals(originalNames.get(player.getUniqueId()))) {
-            stats.remove(player.getUniqueId());
             originalNames.remove(player.getUniqueId());
             nickNames.remove(player.getUniqueId());
         }

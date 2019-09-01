@@ -112,8 +112,7 @@ public class MiscCommands {
             } else if (option.equals("reset")) {
                 String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());
                 if (original != null) {
-                    TGM.get().getNickManager().setName(p, original, false, null);
-                    TGM.get().getNickManager().setSkin(p, original, null);
+                    TGM.get().getNickManager().reset(p);
                     sender.sendMessage(ChatColor.GREEN + "Reset username");
                 } else {
                     sender.sendMessage(ChatColor.RED + "You are not nicked!");
@@ -191,7 +190,6 @@ public class MiscCommands {
                             return;
                     }
                     sender.sendMessage(ChatColor.GREEN + "Set stats to preset ranges " + ChatColor.YELLOW + type);
-
                 }
             } else if (option.equals("rank") && cmd.argsLength() > 1) {
                 String newRank = cmd.getString(1);
@@ -225,7 +223,7 @@ public class MiscCommands {
     @Command(aliases={"whois"}, desc ="Reveals a nicked player")
     public static void whois(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
-            String username = cmd.getString(0);
+            String username = cmd.getString(0).toLowerCase();
             if (TGM.get().getNickManager().nickNames.containsValue(username)) {
                 UUID uuid = HashMaps.reverseGetFirst(username, TGM.get().getNickManager().nickNames);
                 String originalName = TGM.get().getNickManager().originalNames.get(uuid);
