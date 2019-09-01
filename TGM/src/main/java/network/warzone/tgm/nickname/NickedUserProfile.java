@@ -14,10 +14,6 @@ public class NickedUserProfile extends UserProfile {
         super(id, name, nameLower, uuid, initialJoinDate, lastOnlineDate, ips, ranks, ranksLoaded, wins, losses, kills, deaths, wool_destroys, punishments, isNew);
     }
 
-    public void setKills(int kills) {
-
-    }
-
     public static NickedUserProfile createFromUserProfile(UserProfile profile) {
         return new NickedUserProfile(
                 profile.getId(),
