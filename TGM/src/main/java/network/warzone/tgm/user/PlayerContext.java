@@ -16,11 +16,19 @@ import java.util.List;
  */
 public class PlayerContext {
     @Getter private Player player;
-    @Getter private UserProfile userProfile;
+    private UserProfile userProfile;
 
     public PlayerContext(Player player, UserProfile userProfile) {
         this.player = player;
         this.userProfile = userProfile;
+    }
+
+    public UserProfile getUserProfile() {
+        if (hasNickedStats()) {
+            return TGM.get().getNickManager().stats.get(player.getUniqueId());
+        } else {
+            return userProfile;
+        }
     }
 
     public String getDisplayName() {
@@ -31,23 +39,8 @@ public class PlayerContext {
         return TGM.get().getNickManager().originalNames.get(player.getUniqueId());
     }
 
-    public String getPrefix() {
-        if (isNicked()) {
-            Rank r = TGM.get().getNickManager().ranks.get(player.getUniqueId());
-            if (r != null) {
-                return r.getPrefix();
-            } else {
-                return null;
-            }
-        }
-        return userProfile.getPrefix();
-    }
-
-    public int getLevel() {
-        if (isNicked()) {
-            return TGM.get().getNickManager().levels.getOrDefault(player.getUniqueId(), 1);
-        }
-        return userProfile.getLevel();
+    public boolean hasNickedStats() {
+        return TGM.get().getNickManager().stats.containsKey(player.getUniqueId());
     }
 
     public boolean isNicked() {
@@ -55,7 +48,7 @@ public class PlayerContext {
     }
 
     public String getLevelString() {
-        int level = getLevel();
+        int level = getUserProfile().getLevel();
 
         if (level < 10) {
             return ChatColor.GRAY + "[" + level + "]";

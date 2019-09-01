@@ -3,6 +3,7 @@ package network.warzone.warzoneapi.models;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.text.NumberFormat;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Created by luke on 4/27/17.
  */
-@AllArgsConstructor @Getter
+@AllArgsConstructor @Getter @Setter
 public class UserProfile {
 
     public static final int XP_PER_KILL = 2,
@@ -32,11 +33,11 @@ public class UserProfile {
     private List<String> ips;
     private List<String> ranks;
     private List<Rank> ranksLoaded;
-    private int wins = 0;
-    private int losses = 0;
-    private int kills = 0;
-    private int deaths = 0;
-    private int wool_destroys = 0;
+    private int wins;
+    private int losses;
+    private int kills;
+    private int deaths;
+    private int wool_destroys;
 
     private List<Punishment> punishments;
 

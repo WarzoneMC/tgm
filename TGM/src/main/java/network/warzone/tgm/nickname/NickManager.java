@@ -41,11 +41,11 @@ public class NickManager {
         public String signature;
     }
 
+
     public HashMap<UUID, String> originalNames = new HashMap<>();
     public HashMap<UUID, String> nickNames = new HashMap<>();
     public HashMap<UUID, Skin> skins = new HashMap<>();
-    public HashMap<UUID, Rank> ranks = new HashMap<>();
-    public HashMap<UUID, Integer> levels = new HashMap<>();
+    public HashMap<UUID, NickedUserProfile> stats = new HashMap<>();
     public HashMap<UUID, UUID> spoof = new HashMap<>();
 
     private HashMap<String, UUID> uuidCache = new HashMap<>();
@@ -76,6 +76,7 @@ public class NickManager {
         if (!originalNames.containsKey(player.getUniqueId())) {
             originalNames.put(player.getUniqueId(), player.getName());
         } else if (newName.equals(originalNames.get(player.getUniqueId()))) {
+            stats.remove(player.getUniqueId());
             originalNames.remove(player.getUniqueId());
             nickNames.remove(player.getUniqueId());
         }
@@ -140,12 +141,35 @@ public class NickManager {
         }
     }
 
-    public void setLevel(Player player, Integer level) {
-        levels.put(player.getUniqueId(), level);
+    public void setStats(Player player, Integer kills, Integer deaths, Integer wins, Integer losses, Integer woolDestroys) {
+        NickedUserProfile nickedStats = getUserProfile(player);
+        if (kills != null) {
+            nickedStats.setKills(kills);
+        }
+        if (deaths != null ){
+            nickedStats.setDeaths(deaths);
+        }
+        if (wins != null) {
+            nickedStats.setWins(wins);
+        }
+        if (losses != null) {
+            nickedStats.setLosses(losses);
+        }
+        if (woolDestroys != null) {
+            nickedStats.setWool_destroys(woolDestroys);
+        }
+        stats.put(player.getUniqueId(), nickedStats);
     }
 
     public void setRank(Player player, Rank rank) {
-        ranks.put(player.getUniqueId(), rank);
+        NickedUserProfile nickedStats = getUserProfile(player);
+        nickedStats.addRank(rank);
+        stats.put(player.getUniqueId(), nickedStats);
+    }
+
+    public NickedUserProfile getUserProfile(Player player) {
+        PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
+        return stats.getOrDefault(player.getUniqueId(), NickedUserProfile.createFromUserProfile(context.getUserProfile()));
     }
 
     public void setSkin(Player player, Skin skin) {
