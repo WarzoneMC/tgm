@@ -98,7 +98,7 @@ public class JoinManager implements Listener {
         TGM.get().getPlayerManager().addPlayer(playerContext);
 
         Ranks.createAttachment(event.getPlayer());
-        playerContext.getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
+        playerContext.getUserProfile(true).getRanksLoaded().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
 
         loginServices.forEach(loginService -> loginService.login(playerContext));
         queuedJoins.remove(queuedJoin);

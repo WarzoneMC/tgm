@@ -7,6 +7,7 @@ import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.knockback.KnockbackSettings;
 import network.warzone.tgm.nickname.NickedUserProfile;
+import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Players;
 import network.warzone.warzoneapi.models.Rank;
 import org.bukkit.Bukkit;
@@ -175,12 +176,22 @@ public class MiscCommands {
                     }
                 } else {
                     String type = cmd.getString(1);
-                    if (type.equals("random")) {
-                        TGM.get().getNickManager().setStats(p, generateNumber(10, 90), generateNumber(45, 90), generateNumber(10, 30), generateNumber(10, 30), generateNumber(10, 20));
-                        sender.sendMessage(ChatColor.GREEN + "Set stats to random");
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "/nick stats <statName> <value>");
+                    switch (type) {
+                        case "random":
+                            TGM.get().getNickManager().setStats(p, generateNumber(10, 100), generateNumber(45, 90), generateNumber(10, 30), generateNumber(10, 30), generateNumber(10, 20));
+                            break;
+                        case "good":
+                            TGM.get().getNickManager().setStats(p, generateNumber(100, 200), generateNumber(35, 75), generateNumber(50, 100), generateNumber(25, 50), generateNumber(50, 100));
+                            break;
+                        case "bad":
+                            TGM.get().getNickManager().setStats(p, generateNumber(10, 100), generateNumber(100, 150), generateNumber(20, 50), generateNumber(50, 150), generateNumber(1, 10));
+                            break;
+                        default:
+                            sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad> [value]");
+                            return;
                     }
+                    sender.sendMessage(ChatColor.GREEN + "Set stats to preset ranges " + ChatColor.YELLOW + type);
+
                 }
             } else if (option.equals("rank") && cmd.argsLength() > 1) {
                 String newRank = cmd.getString(1);
@@ -204,10 +215,10 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "Invalid rank");
                 }
             } else {
-                sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|level|rank> <option>");
+                sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|stats|rank> <option>");
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|level|rank> <option>");
+            sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|stats|rank> <option>");
         }
     }
 
@@ -216,12 +227,9 @@ public class MiscCommands {
         if (cmd.argsLength() > 0) {
             String username = cmd.getString(0);
             if (TGM.get().getNickManager().nickNames.containsValue(username)) {
-                Optional<Map.Entry<UUID, String>> first = TGM.get().getNickManager().nickNames.entrySet().stream().filter(uuidStringEntry -> uuidStringEntry.getValue().equals(username)).findFirst();
-                if (first.isPresent()) {
-                    UUID uuid = first.get().getKey();
-                    String originalName = TGM.get().getNickManager().originalNames.get(uuid);
-                    sender.sendMessage(ChatColor.YELLOW + username + ChatColor.GREEN + " is " + ChatColor.YELLOW + originalName);
-                }
+                UUID uuid = HashMaps.reverseGetFirst(username, TGM.get().getNickManager().nickNames);
+                String originalName = TGM.get().getNickManager().originalNames.get(uuid);
+                sender.sendMessage(ChatColor.YELLOW + username + ChatColor.GREEN + " is " + ChatColor.YELLOW + originalName);
             } else {
                 sender.sendMessage(ChatColor.RED + "That user isn't nicked!");
             }

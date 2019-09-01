@@ -24,7 +24,11 @@ public class PlayerContext {
     }
 
     public UserProfile getUserProfile() {
-        if (hasNickedStats()) {
+        return getUserProfile(false);
+    }
+
+    public UserProfile getUserProfile(boolean original) {
+        if (hasNickedStats() && isNicked() && !original) {
             return TGM.get().getNickManager().stats.get(player.getUniqueId());
         } else {
             return userProfile;
@@ -36,7 +40,7 @@ public class PlayerContext {
     }
 
     public String getOriginalName() {
-        return TGM.get().getNickManager().originalNames.get(player.getUniqueId());
+        return TGM.get().getNickManager().originalNames.getOrDefault(player.getUniqueId(), player.getName());
     }
 
     public boolean hasNickedStats() {
