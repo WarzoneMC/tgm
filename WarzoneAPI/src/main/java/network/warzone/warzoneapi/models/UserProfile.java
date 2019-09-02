@@ -76,9 +76,7 @@ public class UserProfile {
         return null;
     }
 
-    public void addWin() {
-        wins++;
-    }
+    public void addWin() { wins++; }
 
     public void addKill() {
         kills++;

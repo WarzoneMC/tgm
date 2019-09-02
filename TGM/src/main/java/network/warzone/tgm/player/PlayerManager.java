@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -27,6 +28,24 @@ public class PlayerManager {
         for (PlayerContext playerContext : players) {
             if (playerContext.getPlayer() == player) {
                 return playerContext;
+            }
+        }
+        return null;
+    }
+
+    public PlayerContext getPlayerContext(UUID uuid) {
+        for (PlayerContext context : players) {
+            if (context.getPlayer().getUniqueId().equals(uuid)) {
+                return context;
+            }
+        }
+        return null;
+    }
+
+    public PlayerContext getPlayerContext(String uuid) {
+        for (PlayerContext context : players) {
+            if (context.getPlayer().getUniqueId().toString().equals(uuid)) {
+                return context;
             }
         }
         return null;
