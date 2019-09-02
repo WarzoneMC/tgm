@@ -1,8 +1,10 @@
 package network.warzone.tgm.util;
 
+import net.minecraft.server.v1_14_R1.EntityPlayer;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -54,9 +56,9 @@ public class Players {
     public static int getPing(Player player) {
         int ping = -1;
         try {
-            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
-            ping = (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
+            EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+            ping = entityPlayer.ping;
+        } catch (IllegalArgumentException | SecurityException e) {
             e.printStackTrace();
         }
         return ping;
