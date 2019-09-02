@@ -14,6 +14,7 @@ public class Killstreak {
 
     private int count = 0;
     private String message = "";
+    private List<KillstreakAction> actions = new ArrayList<>();
     private List<String> commands = new ArrayList<>();
     private boolean repeat = false;
 
@@ -25,6 +26,11 @@ public class Killstreak {
 
     public Killstreak setMessage(String message) {
         this.message = message;
+        return this;
+    }
+
+    public Killstreak setActions(List<KillstreakAction> actions) {
+        this.actions = actions;
         return this;
     }
 
