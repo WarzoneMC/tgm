@@ -147,11 +147,6 @@ public class JoinManager implements Listener {
             }
         }
     }
-    
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onWorldInit(WorldInitEvent e) {
-        e.getWorld().setKeepSpawnInMemory(false);
-    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onCycle(MatchPostLoadEvent event) {
