@@ -5,7 +5,6 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.knockback.KnockbackSettings;
 import network.warzone.tgm.nickname.NickedUserProfile;
 import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Players;
@@ -14,8 +13,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -47,36 +44,6 @@ public class MiscCommands {
         sender.sendMessage(pingMsg);
     }
 
-    @Command(aliases={"setkb"}, desc = "Change the KB", usage = "(amount)")
-    public static void setkb(CommandContext cmd, CommandSender sender) {
-        if (cmd.argsLength() > 0) {
-            try {
-                double kbMultiplier = cmd.getDouble(0);
-                sender.sendMessage(ChatColor.GREEN + "Knockback Modifier updated from " + ChatColor.YELLOW + KnockbackSettings.multiplier + ChatColor.GREEN + " to " + ChatColor.YELLOW + kbMultiplier);
-                KnockbackSettings.multiplier = (float) kbMultiplier;
-            } catch (CommandNumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Invalid number.");
-            }
-        } else {
-            sender.sendMessage(ChatColor.GREEN + "Current Knockback Modifier: " + ChatColor.WHITE + KnockbackSettings.multiplier);
-        }
-    }
-
-    @Command(aliases={"setkbheight"}, desc = "Change the knockback height", usage= "(amount)")
-    public static void setkbheight(CommandContext cmd, CommandSender sender) {
-        if (cmd.argsLength() > 0) {
-            try {
-                double kbHeight = cmd.getDouble(0);
-                sender.sendMessage(ChatColor.GREEN + "Knockback Height updated from " + ChatColor.YELLOW + KnockbackSettings.height + ChatColor.GREEN + " to " + ChatColor.YELLOW + kbHeight);
-                KnockbackSettings.height = (float) kbHeight;
-            } catch (CommandNumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Invalid number.");
-            }
-        } else {
-            sender.sendMessage(ChatColor.GREEN + "Current Knockback Height: " + ChatColor.WHITE + KnockbackSettings.height);
-        }
-    }
-
     @Command(aliases={"nick"}, desc= "Change nickname", usage ="(name)")
     public static void nick(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
@@ -84,7 +51,7 @@ public class MiscCommands {
             return;
         }
         Player p = (Player) sender;
-        if (!p.hasPermission("tgm.nick") && !p.getUniqueId().toString().equalsIgnoreCase("4e55a4a3-9b70-4a0a-b4ed-b81415ae7b80")) {
+        if (!p.hasPermission("tgm.nick")) {
             sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
             return;
         }
