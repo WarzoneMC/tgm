@@ -85,10 +85,9 @@ public class NickManager {
         PacketPlayOutPlayerInfo playerInfo1 = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
         entityPlayer.playerConnection.sendPacket(playerInfo1);
 
-        // Get player's old team.
-        TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
-        MatchTeam team = teamManager.getTeam(player);
+        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
+        MatchTeam team = teamManagerModule.getTeam(player);
         team.removePlayer(context);
 
         // Modify the player's game profile.
@@ -123,7 +122,9 @@ public class NickManager {
         PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
         entityPlayer.playerConnection.sendPacket(playerAddBack);
 
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(context, team);
+        teamManagerModule.joinTeam(context, team);
+        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
+        scoreboardManagerModule.updatePlayerListName(context);
     }
 
     public void setStats(Player player, Integer kills, Integer deaths, Integer wins, Integer losses, Integer woolDestroys) {
@@ -190,6 +191,7 @@ public class NickManager {
         entityPlayer.playerConnection.sendPacket(playerAddBack);
 
         skins.put(player.getUniqueId(), skin);
+        player.updateInventory();
     }
 
     public void setSkin(Player player, String nameOfPlayer, @Nullable UUID uuid) {
@@ -246,6 +248,7 @@ public class NickManager {
             entityPlayer.playerConnection.sendPacket(playerTP);
 
             skins.put(player.getUniqueId(), skin);
+            player.updateInventory();
         }
     }
 
