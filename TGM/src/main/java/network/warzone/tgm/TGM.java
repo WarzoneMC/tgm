@@ -20,6 +20,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.player.PlayerManager;
+import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.client.http.HttpClientConfig;
@@ -124,6 +125,8 @@ public class TGM extends JavaPlugin {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
         }
+
+        PunishMenu.getPresetsMenu().load();
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 

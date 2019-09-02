@@ -1,6 +1,5 @@
 package network.warzone.tgm.modules;
 
-import com.google.gson.JsonElement;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;

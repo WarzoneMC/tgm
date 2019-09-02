@@ -1,0 +1,82 @@
+[{
+  "type": "BAN",
+  "time": {
+    "value": 1,
+    "unit": "FOREVER"
+  },
+  "reason": "Spam Bot",
+  "silent": true
+},
+  {
+    "type": "BAN",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Client Modification (Combat)",
+    "silent": false
+  },
+  {
+    "type": "BAN",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Client Modification (Movement)",
+    "silent": false
+  },
+  {
+    "type": "BAN",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Gameplay Modification (Auto-clicker)",
+    "silent": false
+  },
+  {
+    "type": "KICK",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Bug Exploiting",
+    "silent": true
+  },
+  {
+    "type": "MUTE",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Discrimination",
+    "silent": false
+  },
+  {
+    "type": "MUTE",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Mute Evasion",
+    "silent": false
+  },
+  {
+    "type": "MUTE",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Suicide Encouragement",
+    "silent": false
+  },
+  {
+    "type": "MUTE",
+    "time": {
+      "value": 1,
+      "unit": "FOREVER"
+    },
+    "reason": "Extreme Harassment",
+    "silent": false
+  }
+]

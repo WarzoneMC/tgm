@@ -53,7 +53,6 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
                 to.addEntry(event.getPlayerContext().getPlayer().getName());
             }
         }
-
         updatePlayerListName(event.getPlayerContext());
     }
 
