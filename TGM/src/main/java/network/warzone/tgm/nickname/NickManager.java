@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.server.v1_14_R1.*;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
@@ -46,26 +47,21 @@ public class NickManager {
     public HashMap<UUID, String> nickNames = new HashMap<>();
     public HashMap<UUID, Skin> skins = new HashMap<>();
     public HashMap<UUID, NickedUserProfile> stats = new HashMap<>();
-    public HashMap<UUID, UUID> spoof = new HashMap<>();
 
     private HashMap<String, UUID> uuidCache = new HashMap<>();
     private HashMap<String, Skin> skinCache = new HashMap<>();
 
-    public void changeUUID(Player p, UUID uuid) {
-
-    }
-
-    public void setNick(Player player, String newName, boolean uuidSpoof, @Nullable UUID uuid) {
+    public void setNick(Player player, String newName, @Nullable UUID uuid) {
         if (uuid == null ){
-            setName(player, newName, false, null);
+            setName(player, newName);
             setSkin(player, newName, null);
         } else {
             UUID uuid1 = getUUID(newName);
             if (uuid1 == null) {
-                setName(player, newName, false, null);
+                setName(player, newName);
                 setSkin(player, newName, null);
             } else {
-                setName(player, newName, uuidSpoof, uuid1);
+                setName(player, newName);
                 setSkin(player, newName, uuid1);
             }
         }
@@ -73,12 +69,13 @@ public class NickManager {
 
     public void reset(Player player) {
         String originalName = originalNames.get(player.getUniqueId());
-        setName(player, originalName, false, null);
+        setName(player, originalName);
         setSkin(player, originalName, player.getUniqueId());
     }
 
-    public void setName(Player player, String newName, boolean uuidSpoof, UUID uuid) {
+    public void setName(Player player, String newName) {
         EntityPlayer entityPlayer = getEntityPlayer(player);
+        nickNames.put(player.getUniqueId(), newName);
         if (!originalNames.containsKey(player.getUniqueId())) {
             originalNames.put(player.getUniqueId(), player.getName());
         } else if (newName.equals(originalNames.get(player.getUniqueId()))) {
@@ -105,18 +102,6 @@ public class NickManager {
             e.printStackTrace();
         }
 
-        if (uuidSpoof) {
-            spoof.put(player.getUniqueId(), uuid);
-            try {
-                Field field = GameProfile.class.getDeclaredField("id");
-                field.setAccessible(true);
-
-                field.set(profile, uuid);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!p.equals(player) && p.canSee(player)) {
                 EntityPlayer entityOther = getEntityPlayer(p);
@@ -137,13 +122,8 @@ public class NickManager {
 
         PacketPlayOutPlayerInfo playerAddBack = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
         entityPlayer.playerConnection.sendPacket(playerAddBack);
-        nickNames.put(player.getUniqueId(), newName);
 
         TGM.get().getModule(TeamManagerModule.class).joinTeam(context, team);
-
-        if (uuidSpoof) {
-            TGM.get().getPlayerManager().removePlayer(context);
-        }
     }
 
     public void setStats(Player player, Integer kills, Integer deaths, Integer wins, Integer losses, Integer woolDestroys) {
@@ -164,6 +144,10 @@ public class NickManager {
             nickedStats.setWool_destroys(woolDestroys);
         }
         stats.put(player.getUniqueId(), nickedStats);
+
+        PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
+        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
+        scoreboardManagerModule.updatePlayerListName(context);
     }
 
     public void setRank(Player player, Rank rank) {

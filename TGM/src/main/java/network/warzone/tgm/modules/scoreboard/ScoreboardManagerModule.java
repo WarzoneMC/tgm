@@ -7,6 +7,7 @@ import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -53,12 +54,22 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
             }
         }
 
-        String prefix = event.getPlayerContext().getLevelString();
+        updatePlayerListName(event.getPlayerContext());
+    }
+
+    @EventHandler
+    public void onPlayerXPEvent(PlayerXPEvent event) {
+        updatePlayerListName(event.getPlayerContext());
+    }
+
+    public void updatePlayerListName(PlayerContext player) {
+        MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeam(player.getPlayer());
+        String prefix = player.getLevelString();
         if (prefix != null) {
-            String name = event.getPlayerContext().getPlayer().getName();
+            String name = player.getPlayer().getName();
             String colouredPrefix = ChatColor.translateAlternateColorCodes('&', prefix.trim());
-            event.getPlayerContext().getPlayer().setPlayerListName(
-                    colouredPrefix + " " + event.getTeam().getColor() + name);
+            player.getPlayer().setPlayerListName(
+                    colouredPrefix + " " + team.getColor() + name);
         }
     }
 

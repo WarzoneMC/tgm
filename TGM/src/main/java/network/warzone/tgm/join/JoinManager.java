@@ -58,18 +58,13 @@ public class JoinManager implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
         UUID uuid = event.getUniqueId();
-        boolean spoofed = false;
-        if (TGM.get().getNickManager().spoof.containsKey(uuid)) {
-                uuid = TGM.get().getNickManager().spoof.get(uuid);
-                spoofed = true;
-        }
         UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), uuid.toString(), event.getAddress().getHostAddress()));
 
         Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + userProfile.getRanks().size() + " (loaded/total)");
 
         //TODO Custom ban messages
         Punishment punishment = userProfile.getLatestBan();
-        if (punishment != null && !spoofed) {
+        if (punishment != null) {
             event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
@@ -87,9 +82,6 @@ public class JoinManager implements Listener {
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
-        if (TGM.get().getNickManager().spoof.containsKey(uuid)) {
-            uuid = TGM.get().getNickManager().spoof.get(uuid);
-        }
         QueuedJoin queuedJoin = getQueuedUserProfile(uuid);
         if (queuedJoin == null) {
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
@@ -144,17 +136,13 @@ public class JoinManager implements Listener {
             Bukkit.getOnlinePlayers().stream().map((Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getDisplayName()).anyMatch(name -> name.equals(nick))) {
                 playerContext.getPlayer().sendMessage(ChatColor.YELLOW + nick + ChatColor.RED + " is already on, so your nickname must be reset.");
                 TGM.get().getNickManager().reset(playerContext.getPlayer());
-                return;
-            }
-            if (TGM.get().getNickManager().spoof.containsKey(event.getPlayer().getUniqueId())) {
-                TGM.get().getNickManager().setNick(event.getPlayer(), nick, true, TGM.get().getNickManager().spoof.get(event.getPlayer().getUniqueId()));
             }
             else {
                 NickManager.Skin skin = TGM.get().getNickManager().skins.getOrDefault(event.getPlayer().getUniqueId(), null);
                 if (skin != null) {
                     TGM.get().getNickManager().setSkin(event.getPlayer(), skin);
                 }
-                TGM.get().getNickManager().setName(event.getPlayer(), nick, false, null);
+                TGM.get().getNickManager().setName(event.getPlayer(), nick);
             }
         }
     }

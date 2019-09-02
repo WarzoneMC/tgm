@@ -74,13 +74,7 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
-
-                boolean uuidSpoof = false;
-                if (cmd.argsLength() > 2) {
-                    uuidSpoof = cmd.getString(2).equals("true");
-                    sender.sendMessage(ChatColor.GOLD + "UUID Spoofing: " + uuidSpoof);
-                }
-                TGM.get().getNickManager().setNick(p, newName, uuidSpoof, null);
+                TGM.get().getNickManager().setNick(p, newName, null);
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("reset")) {
                 String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());
@@ -116,7 +110,7 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
-                TGM.get().getNickManager().setName(p, newName, false, null);
+                TGM.get().getNickManager().setName(p, newName);
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("stats") && cmd.argsLength() > 1) {
                 if (cmd.argsLength() > 2) {
@@ -152,13 +146,17 @@ public class MiscCommands {
                     String type = cmd.getString(1);
                     switch (type) {
                         case "random":
-                            TGM.get().getNickManager().setStats(p, generateNumber(10, 100), generateNumber(45, 90), generateNumber(10, 30), generateNumber(10, 30), generateNumber(10, 20));
+                            TGM.get().getNickManager().setStats(p, generateInt(10, 100), generateInt(45, 90), generateInt(10, 30), generateInt(10, 30), generateInt(10, 20));
                             break;
                         case "good":
-                            TGM.get().getNickManager().setStats(p, generateNumber(100, 200), generateNumber(35, 75), generateNumber(50, 100), generateNumber(25, 50), generateNumber(50, 100));
+                            double goodKDR = generateDouble(1, 2);
+                            int goodDeaths = generateInt(35, 75);
+                            TGM.get().getNickManager().setStats(p, (int) (goodDeaths * goodKDR), goodDeaths, generateInt(50, 100), generateInt(25, 50), generateInt(50, 100));
                             break;
                         case "bad":
-                            TGM.get().getNickManager().setStats(p, generateNumber(10, 100), generateNumber(100, 150), generateNumber(20, 50), generateNumber(50, 150), generateNumber(1, 10));
+                            double badKDR = generateDouble(0.1, 1);
+                            int badDeaths = generateInt(100, 150);
+                            TGM.get().getNickManager().setStats(p, (int) (badDeaths * badKDR), badDeaths, generateInt(20, 50), generateInt(50, 150), generateInt(1, 10));
                             break;
                         default:
                             sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad> [value]");
@@ -198,7 +196,7 @@ public class MiscCommands {
     @Command(aliases={"whois"}, desc ="Reveals a nicked player")
     public static void whois(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
-            String username = cmd.getString(0).toLowerCase();
+            String username = cmd.getString(0);
             if (TGM.get().getNickManager().nickNames.containsValue(username)) {
                 UUID uuid = HashMaps.reverseGetFirst(username, TGM.get().getNickManager().nickNames);
                 String originalName = TGM.get().getNickManager().originalNames.get(uuid);
@@ -217,7 +215,8 @@ public class MiscCommands {
         sender.sendMessage(String.format(ChatColor.AQUA + "This server is running TGM version git-%s (latest commit: %s)", gitInfo.getProperty("git.commit.id.abbrev"), gitInfo.getProperty("git.commit.message.short")));
     }
 
-    public static int generateNumber(int min, int max) {
+    public static double generateDouble(double min, double max) { return ThreadLocalRandom.current().nextDouble(min, max+1); }
+    public static int generateInt(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
 }
