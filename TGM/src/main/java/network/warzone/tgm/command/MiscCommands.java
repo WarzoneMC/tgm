@@ -3,6 +3,7 @@ package network.warzone.tgm.command;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.nickname.NickedUserProfile;
@@ -45,16 +46,13 @@ public class MiscCommands {
     }
 
     @Command(aliases={"nick"}, desc= "Change nickname", usage ="(name)")
+    @CommandPermissions({"tgm.command.nick"})
     public static void nick(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("Player only command.");
             return;
         }
         Player p = (Player) sender;
-        if (!p.hasPermission("tgm.nick")) {
-            sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
-            return;
-        }
         if (cmd.argsLength() > 0) {
             String option = cmd.getString(0);
             if (option.equals("set") && cmd.argsLength() > 1) {
@@ -194,6 +192,7 @@ public class MiscCommands {
     }
 
     @Command(aliases={"whois"}, desc ="Reveals a nicked player")
+    @CommandPermissions({"tgm.command.whois"})
     public static void whois(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
             String username = cmd.getString(0);
