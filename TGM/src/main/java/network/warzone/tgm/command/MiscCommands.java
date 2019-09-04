@@ -72,8 +72,20 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
-                TGM.get().getNickManager().setNick(p, newName, null);
+                boolean force = false;
+                if (cmd.argsLength() > 2) {
+                    String arg2 = cmd.getString(2);
+                    force = arg2.equals("force");
+                }
+                if (force) {
+                    TGM.get().getNickManager().setNick(p, newName, null);
+                } else {
+                    TGM.get().getNickManager().setRelogNick(p, newName, null);
+                }
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
+                if (!force) {
+                    sender.sendMessage(ChatColor.AQUA + "Relog for effects to take place!");
+                }
             } else if (option.equals("reset")) {
                 String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());
                 if (original != null) {

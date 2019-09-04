@@ -51,6 +51,14 @@ public class NickManager {
     private HashMap<String, UUID> uuidCache = new HashMap<>();
     private HashMap<String, Skin> skinCache = new HashMap<>();
 
+    public void setRelogNick(Player player, String newName, @Nullable UUID uuid) {
+        nickNames.put(player.getUniqueId(), newName);
+        skins.put(player.getUniqueId(), getSkin(getUUID(newName)));
+        if (!originalNames.containsKey(player.getUniqueId())) {
+            originalNames.put(player.getUniqueId(), player.getName());
+        }
+    }
+
     public void setNick(Player player, String newName, @Nullable UUID uuid) {
         if (uuid == null ){
             setName(player, newName);
