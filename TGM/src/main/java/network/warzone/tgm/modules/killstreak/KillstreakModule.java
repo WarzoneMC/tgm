@@ -8,6 +8,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.kit.parser.EffectKitNodeParser;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
@@ -160,8 +161,8 @@ public class KillstreakModule extends MatchModule implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST) // DeathMessageModule sets killer to null so this has to be first
-    public void onKill(PlayerDeathEvent event) {
-        DeathModule module = deathModule.getPlayer(event.getEntity());
+    public void onKill(TGMPlayerDeathEvent event) {
+        DeathModule module = deathModule.getPlayer(event.getVictim());
 
         if (module.getKiller() == null) {
             if (players.getOrDefault(module.getPlayer().getUniqueId().toString(), 0) >= 5) {
