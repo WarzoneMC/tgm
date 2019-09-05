@@ -220,12 +220,6 @@ public class MiscCommands {
         }
     }
 
-    @Command(aliases = {"tgm"}, desc = "General TGM command")
-    public static void tgm(CommandContext cmd, CommandSender sender) {
-        Properties gitInfo = TGM.get().getGitInfo();
-        sender.sendMessage(String.format(ChatColor.AQUA + "This server is running TGM version git-%s (latest commit: %s)", gitInfo.getProperty("git.commit.id.abbrev"), gitInfo.getProperty("git.commit.message.short")));
-    }
-
     public static double generateDouble(double min, double max) { return ThreadLocalRandom.current().nextDouble(min, max+1); }
     public static int generateInt(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
