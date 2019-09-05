@@ -106,16 +106,6 @@ public class TGM extends JavaPlugin {
         broadcastManager = new BroadcastManager();
         nickManager = new NickManager();
 
-        // Load git.properties
-//        File propFile = new File("git.properties");
-//        System.out.println(propFile.getAbsolutePath());
-//        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-//        try (InputStream resourceStream = loader.getResourceAsStream("git.properties")) {
-//            gitInfo.load(resourceStream);
-//        } catch (IOException err) {
-//
-//        }
-
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 
         commandManager.register(CycleCommands.class);
