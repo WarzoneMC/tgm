@@ -7,6 +7,7 @@ import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -52,13 +53,22 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
                 to.addEntry(event.getPlayerContext().getPlayer().getName());
             }
         }
-        
-        String prefix = event.getPlayerContext().getLevelString();
+        updatePlayerListName(event.getPlayerContext());
+    }
+
+    @EventHandler
+    public void onPlayerXPEvent(PlayerXPEvent event) {
+        updatePlayerListName(event.getPlayerContext());
+    }
+
+    public void updatePlayerListName(PlayerContext player) {
+        MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeam(player.getPlayer());
+        String prefix = player.getLevelString();
         if (prefix != null) {
-            String name = event.getPlayerContext().getPlayer().getName();
+            String name = player.getPlayer().getName();
             String colouredPrefix = ChatColor.translateAlternateColorCodes('&', prefix.trim());
-            event.getPlayerContext().getPlayer().setPlayerListName(
-                colouredPrefix + " " + event.getTeam().getColor() + name);
+            player.getPlayer().setPlayerListName(
+                    colouredPrefix + " " + team.getColor() + name);
         }
     }
 
@@ -93,8 +103,8 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
     public Team registerScoreboardTeam(SimpleScoreboard simpleScoreboard, MatchTeam matchTeam, PlayerContext playerContext) {
         Team team = simpleScoreboard.getScoreboard().registerNewTeam(matchTeam.getId());
         //team.setPrefix(matchTeam.getColor().toString());
-        team.setPrefix(matchTeam.getColor() + " "); // Hacky fix for team colors not showing up in older versions
         team.setColor(matchTeam.getColor());
+        team.setPrefix(matchTeam.getColor() + " "); // Hacky fix for team colors not showing up in older versions
         team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
         team.setAllowFriendlyFire(false);
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);

@@ -18,6 +18,7 @@ import network.warzone.tgm.map.MapInfoDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
+import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.player.PlayerManager;
 import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.client.TeamClient;
@@ -34,13 +35,19 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 @Getter
 public class TGM extends JavaPlugin {
 
     public static TGM instance;
+
+    @Getter
+    private Properties gitInfo = new Properties();
 
     private Gson gson;
     private TeamClient teamClient;
@@ -49,6 +56,7 @@ public class TGM extends JavaPlugin {
     private PlayerManager playerManager;
     private JoinManager joinManager;
     private ApiManager apiManager;
+    private NickManager nickManager;
 
     private BroadcastManager broadcastManager;
 
@@ -96,6 +104,7 @@ public class TGM extends JavaPlugin {
         joinManager = new JoinManager();
         apiManager = new ApiManager();
         broadcastManager = new BroadcastManager();
+        nickManager = new NickManager();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 

@@ -2,6 +2,7 @@ package network.warzone.tgm.user;
 
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
@@ -15,15 +16,43 @@ import java.util.List;
  */
 public class PlayerContext {
     @Getter private Player player;
-    @Getter private UserProfile userProfile;
+    private UserProfile userProfile;
 
     public PlayerContext(Player player, UserProfile userProfile) {
         this.player = player;
         this.userProfile = userProfile;
     }
 
+    public UserProfile getUserProfile() {
+        return getUserProfile(false);
+    }
+
+    public UserProfile getUserProfile(boolean original) {
+        if (hasNickedStats() && isNicked() && !original) {
+            return TGM.get().getNickManager().stats.get(player.getUniqueId());
+        } else {
+            return userProfile;
+        }
+    }
+
+    public String getDisplayName() {
+        return TGM.get().getNickManager().nickNames.getOrDefault(player.getUniqueId(), player.getName());
+    }
+
+    public String getOriginalName() {
+        return TGM.get().getNickManager().originalNames.getOrDefault(player.getUniqueId(), player.getName());
+    }
+
+    public boolean hasNickedStats() {
+        return TGM.get().getNickManager().stats.containsKey(player.getUniqueId());
+    }
+
+    public boolean isNicked() {
+        return TGM.get().getNickManager().nickNames.containsKey(player.getUniqueId());
+    }
+
     public String getLevelString() {
-        int level = userProfile.getLevel();
+        int level = getUserProfile().getLevel();
 
         if (level < 10) {
             return ChatColor.GRAY + "[" + level + "]";
