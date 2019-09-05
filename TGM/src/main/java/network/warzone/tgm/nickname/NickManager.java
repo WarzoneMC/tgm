@@ -53,7 +53,13 @@ public class NickManager {
 
     public void setRelogNick(Player player, String newName, @Nullable UUID uuid) {
         nickNames.put(player.getUniqueId(), newName);
-        skins.put(player.getUniqueId(), getSkin(getUUID(newName)));
+        UUID nickedUUID = getUUID(newName);
+        if (nickedUUID != null) {
+            Skin skin = getSkin(nickedUUID);
+            if (skin != null) {
+                skins.put(player.getUniqueId(), skin);
+            }
+        }
         if (!originalNames.containsKey(player.getUniqueId())) {
             originalNames.put(player.getUniqueId(), player.getName());
         }
