@@ -37,8 +37,8 @@ public class PunishMenu extends Menu {
     private static Map<UUID, PunishConfig> configs = new HashMap<>();
     @Getter private static PresetsMenu presetsMenu = new PresetsMenu();
 
-    @Getter Player player;
-    @Getter UUID playerUuid;
+    @Getter private Player player;
+    @Getter private UUID playerUuid;
 
     private List<String> players = new ArrayList<>();
     private int page = 0;
@@ -88,11 +88,13 @@ public class PunishMenu extends Menu {
             setItem(slot, getDisplayItem(playerName, config, true), (player, clickEvent) -> {
                 if (clickEvent.isShiftClick() && !liveUpdate) {
                     issuePunishment(playerName, player, config);
+                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
                     return;
                 }
                 new ConfirmMenu(player, ChatColor.UNDERLINE + "Confirm", getDisplayItem(playerName, config, false),
                         (p, e) -> {
                             issuePunishment(playerName, player, config);
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
                             new PunishMenu(player).open(player);
                         },
                         (p, e) -> new PunishMenu(player).open(player)
@@ -225,7 +227,7 @@ public class PunishMenu extends Menu {
         return itemStack;
     }
 
-    private void issuePunishment(String playerName, Player sender, PunishConfig config) {
+    public static void issuePunishment(String playerName, Player sender, PunishConfig config) {
         StringBuilder command = new StringBuilder(config.getType().name().toLowerCase() + " " + playerName + " ");
         if (config.getType().isTimed()) {
             command.append(config.getTime().getValue());
@@ -235,15 +237,18 @@ public class PunishMenu extends Menu {
         command.append(config.getReason());
         if (config.isSilent()) command.append(" -s");
         TGM.get().getLogger().info("Punishment issued from menu for " + playerName + " by " + sender.getName() + ": /" + command.toString());
-        sender.playSound(sender.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
         sender.performCommand(command.toString());
     }
 
     private PunishConfig getConfig() {
-        if (!configs.containsKey(getPlayerUuid())) {
-            configs.put(getPlayerUuid(), PunishConfig.INAPPROPRIATE_BEHAVIOR.clone());
+        return getConfig(getPlayerUuid());
+    }
+
+    public static PunishConfig getConfig(UUID uuid) {
+        if (!configs.containsKey(uuid)) {
+            configs.put(uuid, PunishConfig.INAPPROPRIATE_BEHAVIOR.clone());
         }
-        return configs.get(getPlayerUuid());
+        return configs.get(uuid);
     }
 
     @EventHandler
@@ -321,7 +326,7 @@ public class PunishMenu extends Menu {
     }
 
     @AllArgsConstructor @Data
-    private static class PunishConfig {
+    public static class PunishConfig {
 
         public static final PunishConfig INAPPROPRIATE_BEHAVIOR = new PunishConfig(PunishmentType.WARN, TimeUnitPair.permanent(), "Inappropriate Behavior", false);
 
@@ -342,6 +347,14 @@ public class PunishMenu extends Menu {
 
         public PunishConfig clone() {
             return new PunishConfig(type, time, reason, silent);
+        }
+
+        public ItemStack toItem() {
+            return ItemFactory.createItem(Material.ENDER_CHEST, ChatColor.YELLOW + getReason(), ChatColor.GRAY,
+                    "",
+                    "Type: " + ChatColor.WHITE + getType().name() + (getType().isTimed() ? " " + ChatColor.GRAY + "Time: " + ChatColor.RESET + getTime().toString() : ""),
+                    "Silent: " + ChatColor.WHITE + isSilent()
+            );
         }
 
     }
@@ -391,13 +404,9 @@ public class PunishMenu extends Menu {
         }
 
         private void registerPreset(int i, PunishConfig config) {
-            setItem(i, ItemFactory.createItem(Material.ENDER_CHEST, ChatColor.YELLOW + config.getReason(), ChatColor.GRAY,
-                    "",
-                    "Type: " + ChatColor.WHITE + config.getType().name() + (config.getType().isTimed() ? " " + ChatColor.GRAY + "Time: " + ChatColor.RESET + config.getTime().toString() : ""),
-                    "Silent: " + ChatColor.WHITE + config.isSilent(),
-                    "",
-                    ChatColor.YELLOW + "Click to select"
-            ), (p, event) -> {
+            ItemStack item = config.toItem();
+            ItemFactory.appendLore(item, "", ChatColor.YELLOW + "Click to select");
+            setItem(i, item, (p, event) -> {
                 configs.put(p.getUniqueId(), config.clone());
                 p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
                 PunishMenu.openNew(p);

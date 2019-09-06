@@ -7,13 +7,17 @@ import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.TimeUnitPair;
+import network.warzone.tgm.util.itemstack.ItemFactory;
+import network.warzone.tgm.util.menu.ConfirmMenu;
 import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
@@ -30,16 +34,19 @@ public class PunishCommands {
         return IP_PATTERN.matcher(ip).matches();
     }
 
-    @Command(aliases = {"punish", "pun", "pg", "pgui"}, desc = "Punishment interface", max = 1)
+    @Command(aliases = {"punish", "pun", "pg", "pgui"}, desc = "Punishment interface", usage = "(reload | <players>)", flags = "s")
     public static void punish(CommandContext cmd, CommandSender sender) throws CommandPermissionsException {
         if (cmd.argsLength() == 1) {
-            if (cmd.getString(0).equalsIgnoreCase("reload") && sender.hasPermission("tgm.punish.preset.reload")) {
+            if (cmd.getString(0).equalsIgnoreCase("reload")) {
+                if (!sender.hasPermission("tgm.punish.preset.reload")) {
+                    throw new CommandPermissionsException();
+                }
                 PunishMenu.getPresetsMenu().load();
                 sender.sendMessage(ChatColor.YELLOW + "Reloaded punishment presets.");
                 return;
             }
-            throw new CommandPermissionsException();
-        } else if (sender instanceof Player) {
+        }
+        if (sender instanceof Player) {
             Player player = (Player) sender;
             if (!player.hasPermission("tgm.punish.ban-ip") &&
                     !player.hasPermission("tgm.punish.ban") &&
@@ -47,6 +54,31 @@ public class PunishCommands {
                     !player.hasPermission("tgm.punish.mute") &&
                     !player.hasPermission("tgm.punish.warn")) {
                 throw new CommandPermissionsException();
+            }
+            if (cmd.argsLength() >= 1) {
+                String[] players = cmd.getRemainingString(0).split(" ");
+                PunishMenu.PunishConfig config = PunishMenu.getConfig(player.getUniqueId());
+                if (!cmd.hasFlag('s') || !player.hasPermission("tgm.punish.confirm.skip")) {
+                    ItemStack configItem = config.toItem();
+                    String[] lore = new String[players.length + 2];
+                    lore[0] = "";
+                    lore[1] = ChatColor.GRAY + "Players:";
+                    for (int i = 0; i < players.length; i++) lore[i + 2] = ChatColor.GRAY + "- " + ChatColor.WHITE + players[i];
+                    ItemFactory.appendLore(configItem, lore);
+                    new ConfirmMenu(player, ChatColor.UNDERLINE + "Confirm bulk punish", configItem,
+                            (p, e) -> {
+                                Arrays.stream(players).forEach(username -> PunishMenu.issuePunishment(username, player, config));
+                                p.closeInventory();
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
+                            }, (p, e) -> {
+                                p.closeInventory();
+                                p.sendMessage(ChatColor.RED + "Bulk punish cancelled.");
+                    }).open(player);
+                    return;
+                }
+                Arrays.stream(players).forEach(username -> PunishMenu.issuePunishment(username, player, config));
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
+                return;
             }
             PunishMenu.openNew(player);
         } else {

@@ -107,6 +107,15 @@ public class ItemFactory {
         return itemStack;
     }
 
+    public static List<String> getLore(ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        List<String> lore;
+        if (meta != null && (lore = meta.getLore()) != null) {
+            return lore;
+        }
+        return new ArrayList<>();
+    }
+
     public static void setLore(ItemStack item, String... strings) {
         ItemMeta meta = item.getItemMeta();
         List<String> lore = new ArrayList<>();
@@ -121,6 +130,18 @@ public class ItemFactory {
         ItemMeta meta = item.getItemMeta();
         meta.setLore(lore);
         item.setItemMeta(meta);
+    }
+
+    public static void appendLore(ItemStack item, String... lore) {
+        List<String> finalLore = getLore(item);
+        finalLore.addAll(Arrays.asList(lore));
+        setLore(item, finalLore);
+    }
+
+    public static void appendLore(ItemStack item, List<String> lore) {
+        List<String> finalLore = getLore(item);
+        finalLore.addAll(lore);
+        setLore(item);
     }
 
     public static ItemStack createPotion(PotionType potionType, int level, String name) {
