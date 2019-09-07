@@ -11,9 +11,12 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.server.v1_14_R1.*;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.visibility.VisibilityController;
+import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.Rank;
 import org.bukkit.Bukkit;
@@ -42,6 +45,7 @@ public class NickManager {
         public String signature;
     }
 
+    private VisibilityController visiblityController;
 
     public HashMap<UUID, String> originalNames = new HashMap<>();
     public HashMap<UUID, String> nickNames = new HashMap<>();
@@ -50,6 +54,10 @@ public class NickManager {
 
     private HashMap<String, UUID> uuidCache = new HashMap<>();
     private HashMap<String, Skin> skinCache = new HashMap<>();
+
+    public NickManager() {
+        visiblityController = new VisibilityControllerImpl(TGM.get().getModule(SpectatorModule.class));
+    }
 
     public void setRelogNick(Player player, String newName, @Nullable UUID uuid) {
         nickNames.put(player.getUniqueId(), newName);
@@ -116,7 +124,7 @@ public class NickManager {
         }
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!p.equals(player) && p.canSee(player)) {
+            if (!p.equals(player) && visiblityController.canSee(p, player)) {
                 EntityPlayer entityOther = getEntityPlayer(p);
 
                 // Remove the old player.
@@ -184,7 +192,7 @@ public class NickManager {
         entityPlayer.getProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!p.equals(player) && p.canSee(player)) {
+            if (!p.equals(player) && visiblityController.canSee(p, player)) {
                 EntityPlayer entityOther = getEntityPlayer(p);
 
                 // Remove the old player.
@@ -230,7 +238,7 @@ public class NickManager {
 
         if (skin != null) {
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (!p.equals(player) && p.canSee(player)) {
+                if (!p.equals(player) && visiblityController.canSee(p, player)) {
                     EntityPlayer entityOther = getEntityPlayer(p);
 
                     // Remove the old player.

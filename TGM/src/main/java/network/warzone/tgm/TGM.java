@@ -104,7 +104,6 @@ public class TGM extends JavaPlugin {
         joinManager = new JoinManager();
         apiManager = new ApiManager();
         broadcastManager = new BroadcastManager();
-        nickManager = new NickManager();
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 
@@ -121,6 +120,7 @@ public class TGM extends JavaPlugin {
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
         matchManager.cycleNextMatch();
+        nickManager = new NickManager(); 
     }
 
     @Override
