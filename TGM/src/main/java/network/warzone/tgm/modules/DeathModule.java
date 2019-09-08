@@ -1,17 +1,13 @@
 package network.warzone.tgm.modules;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -21,7 +17,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -29,27 +24,15 @@ import java.util.UUID;
 @NoArgsConstructor
 public class DeathModule extends MatchModule implements Listener {
 
-    private HashMap<UUID, DeathModule> players = new HashMap<>();
+    private HashMap<UUID, DeathInfo> players = new HashMap<>();
     private TeamManagerModule teamManagerModule;
-
-    @Getter @Setter private Player player, killer;
-    @Getter @Setter private ItemStack item;
-    @Getter @Setter private EntityDamageEvent.DamageCause cause;
-    @Getter @Setter private String playerName, killerName;
-    @Getter @Setter private MatchTeam playerTeam, killerTeam;
-    @Getter @Setter private Location playerLocation, killerLocation;
-    @Getter @Setter private long stampKill;
-
-    public DeathModule(Player player) {
-        this.player = player;
-    }
 
     public void load(Match match) {
         teamManagerModule = match.getModule(TeamManagerModule.class);
     }
 
     public void unload() {
-        players.clear();
+        players = null;
     }
 
     @EventHandler
@@ -60,20 +43,19 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
-            DeathModule module = getPlayer(((Player) event.getEntity()).getPlayer());
+            DeathInfo deathInfo = getPlayer((Player) event.getEntity());
 
-            module.setPlayer(module.getPlayer());
-            module.setPlayerName(module.getPlayer().getName());
-            module.setPlayerTeam(teamManagerModule.getTeam(module.getPlayer()));
-            module.setPlayerLocation(module.getPlayer().getLocation());
-            module.setCause(event.getCause());
+            deathInfo.playerName = deathInfo.player.getName();
+            deathInfo.playerTeam = teamManagerModule.getTeam(deathInfo.player);
+            deathInfo.playerLocation = deathInfo.player.getLocation();
+            deathInfo.cause = event.getCause();
         }
     }
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
-            DeathModule module = getPlayer((Player) event.getEntity());
+            DeathInfo deathInfo = getPlayer((Player) event.getEntity());
 
             Player damager = null;
 
@@ -82,20 +64,20 @@ public class DeathModule extends MatchModule implements Listener {
 
             if (damager != null && teamManagerModule.getTeam(damager).isSpectator()) return;
 
-            module.setKiller(damager);
-            module.setItem(event.getDamager() instanceof Arrow ? ItemFactory.createItem(Material.BOW) : damager == null ? ItemFactory.createItem(Material.AIR) : damager.getInventory().getItemInMainHand());
+            deathInfo.killer = damager;
+            deathInfo.item = event.getDamager() instanceof Arrow ? ItemFactory.createItem(Material.BOW) : damager == null ? ItemFactory.createItem(Material.AIR) : damager.getInventory().getItemInMainHand();
 
-            module.setKillerName(damager == null ? null : damager.getName());
-            module.setStampKill(damager == null ? -1 : System.currentTimeMillis());
-            module.setKillerTeam(damager == null ? null : teamManagerModule.getTeam(damager));
-            module.setKillerLocation(damager == null ? null : damager.getLocation());
+            deathInfo.killerName = damager == null ? null : damager.getName();
+            deathInfo.stampKill = damager == null ? -1 : System.currentTimeMillis();
+            deathInfo.killerTeam = damager == null ? null : teamManagerModule.getTeam(damager);
+            deathInfo.killerLocation = damager == null ? null : damager.getLocation();
         }
     }
 
-    public DeathModule getPlayer(Player player) {
+    public DeathInfo getPlayer(Player player) {
         UUID playerUUID = player.getUniqueId();
         if (!players.containsKey(playerUUID)) {
-            players.put(playerUUID, new DeathModule(player));
+            players.put(playerUUID, new DeathInfo(player));
         }
 
         return players.get(playerUUID);
@@ -103,9 +85,9 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        DeathModule module = getPlayer(event.getEntity());
-        if(module.getStampKill() > 0 && System.currentTimeMillis() - module.getStampKill() >= 1000 * 30) module.setKiller(null);
-        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(module.getPlayer(), module.getKiller(), module.getCause(), module.getItem()));
+        DeathInfo deathInfo = getPlayer(event.getEntity());
+        if(deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.killer, deathInfo.cause, deathInfo.item));
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);
     }

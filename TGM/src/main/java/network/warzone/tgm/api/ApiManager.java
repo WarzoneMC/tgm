@@ -7,6 +7,7 @@ import network.warzone.tgm.map.ParsedTeam;
 import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.modules.DeathInfo;
 import network.warzone.tgm.modules.DeathModule;
 import network.warzone.tgm.modules.StatsModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -149,18 +150,18 @@ public class ApiManager implements Listener {
     @EventHandler
     public void onKill(TGMPlayerDeathEvent event) {
         if (isStatsDisabled()) return;
-        DeathModule module = deathModule.getPlayer(event.getVictim());
+        DeathInfo deathInfo = deathModule.getPlayer(event.getVictim());
 
-        PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(module.getPlayer());
+        PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(deathInfo.player);
 
         killed.getUserProfile().addDeath();
 
-        String playerItem = module.getPlayer().getInventory().getItemInMainHand() == null ? "" : module.getPlayer().getInventory().getItemInMainHand().getType().toString();
-        String killerItem = module.getItem() == null ? "" : module.getItem().getType().toString();
+        String playerItem = deathInfo.player.getInventory().getItemInMainHand().getType().toString();
+        String killerItem = deathInfo.item == null ? "" : deathInfo.item.getType().toString();
         String killerId = null;
 
-        if (module.getKiller() != null) {
-            PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(module.getKiller());
+        if (deathInfo.killer != null) {
+            PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(deathInfo.killer);
             if (context == null) return;
             context.getUserProfile().addKill();
             Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, UserProfile.XP_PER_KILL, context.getUserProfile().getXP() - UserProfile.XP_PER_KILL, context.getUserProfile().getXP()));
