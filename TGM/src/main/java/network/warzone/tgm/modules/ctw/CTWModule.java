@@ -6,6 +6,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.modules.ItemRemoveModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
@@ -123,9 +124,12 @@ public class CTWModule extends MatchModule implements Listener {
             });
         }
 
+        ItemRemoveModule module = TGM.get().getModule(ItemRemoveModule.class);
+
         //load wools
         for (WoolObjective woolObjective : wools) {
             woolObjective.load();
+            if (module != null) module.add(woolObjective.getBlock());
         }
 
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getWinningTeam);

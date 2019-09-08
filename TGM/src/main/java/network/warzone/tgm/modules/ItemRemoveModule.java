@@ -21,6 +21,14 @@ public class ItemRemoveModule extends MatchModule implements Listener {
 
     private final List<Material> removed = new ArrayList<>();
 
+    public void add(Material material) {
+        this.removed.add(material);
+    }
+
+    public void remove(Material material) {
+        this.removed.remove(material);
+    }
+
     @Override
     public void load(Match match) {
         if (match.getMapContainer().getMapInfo().getJsonObject().has("itemremove")) {
