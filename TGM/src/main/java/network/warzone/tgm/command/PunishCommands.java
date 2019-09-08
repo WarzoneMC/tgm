@@ -292,23 +292,6 @@ public class PunishCommands {
         });
     }
 
-    @Command(aliases = {"sc", "staffchat", "staffc"}, desc = "Staff chat", min = 1, usage = "(message)")
-    @CommandPermissions({"tgm.staffchat"})
-    public static void staffchat(CommandContext cmd, CommandSender sender) {
-        String prefix;
-        if (sender instanceof Player) {
-            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
-            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-        } else {
-            prefix = "";
-        }
-        String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.RESET + sender.getName() + ": " + ChatColor.GREEN + cmd.getRemainingString(0);
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
-        }
-        Bukkit.getConsoleSender().sendMessage(result);
-    }
-
     @Command(aliases = {"chat"}, desc = "Control chat settings", min = 1, usage = "(mute|clear)")
     @CommandPermissions({"tgm.chat.control"})
     public static void chat(CommandContext cmd, CommandSender sender) {

@@ -4,10 +4,13 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import joptsimple.internal.Strings;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.*;
 import org.bukkit.Bukkit;
@@ -24,6 +27,17 @@ import java.util.UUID;
  * Created by Jorge on 2/23/2018.
  */
 public class RankCommands {
+
+    @Command(aliases = {"sc", "staffchat", "staffc"}, desc = "Staff chat", min = 1, usage = "(message)")
+    @CommandPermissions({"tgm.staffchat"})
+    public static void staffchat(CommandContext cmd, CommandSender sender) {
+        String prefix = "";
+        if (sender instanceof Player) {
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
+            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+        }
+        ChatModule.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
+    }
 
     @Command(aliases = {"rank", "ranks"}, desc = "Rank management command.", min = 1, usage = "(player|list|info|create|delete|edit|permissions)")
     @CommandPermissions({"tgm.command.rank"})

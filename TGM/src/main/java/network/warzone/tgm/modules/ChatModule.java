@@ -3,7 +3,6 @@ package network.warzone.tgm.modules;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -17,6 +16,7 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.Chat;
 import network.warzone.warzoneapi.models.Punishment;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -117,11 +117,7 @@ public class ChatModule extends MatchModule implements Listener {
             String prefix;
             prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
 
-            String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + event.getPlayer().getName() + ": " + ChatColor.RESET + event.getMessage();
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
-            }
-            Bukkit.getConsoleSender().sendMessage(result);
+            sendStaffMessage(prefix, event.getPlayer().getName(), event.getMessage());
             event.setCancelled(true);
             return;
         }
@@ -132,6 +128,14 @@ public class ChatModule extends MatchModule implements Listener {
             event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
                     prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
         }
+    }
+
+    public static void sendStaffMessage(String prefix, String sender, String message) {
+        String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + sender + ": " + ChatColor.GREEN + message;
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
+        }
+        Bukkit.getConsoleSender().sendMessage(result);
     }
 
     @EventHandler
