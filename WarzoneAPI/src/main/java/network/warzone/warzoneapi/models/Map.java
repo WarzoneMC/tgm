@@ -9,7 +9,7 @@ import java.util.List;
 public class Map {
     @Getter private String name;
     @Getter private String version;
-    @Getter private List<String> authors;
+    @Getter private List<Author> authors;
     @Getter private String gametype;
     @Getter private List<Team> teams;
 }

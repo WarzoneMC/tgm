@@ -1,5 +1,7 @@
 package network.warzone.tgm.util;
 
+import network.warzone.warzoneapi.models.Author;
+
 public class Strings {
     public static String formatTime(double time) {
         boolean negative = false;
@@ -47,6 +49,10 @@ public class Strings {
         } else {
             return "moments";
         }
+    }
+
+    public static String getAuthorUsername(Author author) {
+        return author.getDisplayUsername() != null ? author.getDisplayUsername() : author.getUsername() != null ? author.getUsername() : "Unknown";
     }
 
 }
