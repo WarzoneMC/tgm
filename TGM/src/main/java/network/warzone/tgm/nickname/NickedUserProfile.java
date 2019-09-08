@@ -53,7 +53,6 @@ public class NickedUserProfile extends UserProfile {
     @Override
     public void removeRank(Rank r) {
         super.removeRank(r);
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).removeRank(r);
     }
 
     @Override
@@ -64,7 +63,6 @@ public class NickedUserProfile extends UserProfile {
     @Override
     public void addRank(Rank rank) {
         super.addRank(rank);
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addRank(rank);
     }
 
     static NickedUserProfile createFromUserProfile(UserProfile profile) {
