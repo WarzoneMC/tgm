@@ -7,6 +7,7 @@ api:
 rotation: Maps/rotation.txt
 chat:
   enabled: true
+  stats-hover: true
   messages:
     muted: "&cChat is currently disabled. If you believe this is an error, please contact a staff member on our Discord."
 map:

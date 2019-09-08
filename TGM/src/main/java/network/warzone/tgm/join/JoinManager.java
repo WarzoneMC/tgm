@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
+import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.HashMaps;
@@ -19,11 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.*;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldInitEvent;
 
 import java.util.*;
@@ -146,6 +144,14 @@ public class JoinManager implements Listener {
                 TGM.get().getNickManager().setName(event.getPlayer(), nick);
             }
         }
+    }
+
+    //TODO: Persistent modules
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChat(AsyncPlayerChatEvent event) {
+        event.setFormat("");
+        if (event.isCancelled()) return;
+        event.setCancelled(TGM.get().getModule(ChatModule.class) == null);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

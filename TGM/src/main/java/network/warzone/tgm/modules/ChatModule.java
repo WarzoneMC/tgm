@@ -126,7 +126,7 @@ public class ChatModule extends MatchModule implements Listener {
             MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
             event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
-                    prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
+                    prefix + matchTeam.getColor() + "%s" + ChatColor.WHITE + ": %s");
         }
     }
 
@@ -154,10 +154,11 @@ public class ChatModule extends MatchModule implements Listener {
     */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChatHighPriority(AsyncPlayerChatEvent event) {
+        if (!TGM.get().getConfig().getBoolean("chat.stats-hover")) return;
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         if (!event.isCancelled())  {
             Bukkit.getOnlinePlayers().forEach(player -> {
-                TextComponent message = new TextComponent(event.getFormat().replaceAll("%%", "%"));
+                TextComponent message = new TextComponent(String.format(event.getFormat(), playerContext.getPlayer().getName(), event.getMessage()) );
                 BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString().replace("[", "").replace("]", "")),
                         new TextComponent("\n"),
                         new TextComponent("\n" + ChatColor.AQUA + "XP: " + ChatColor.RESET + playerContext.getUserProfile().getXP()),
@@ -171,7 +172,7 @@ public class ChatModule extends MatchModule implements Listener {
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, stats));
                 player.spigot().sendMessage(message);
             });
-            Bukkit.getConsoleSender().sendMessage(event.getFormat().replace("%%", "%"));
+            Bukkit.getConsoleSender().sendMessage(String.format(event.getFormat(), playerContext.getPlayer().getName(), event.getMessage()));
         }
         event.setCancelled(true);
     }
