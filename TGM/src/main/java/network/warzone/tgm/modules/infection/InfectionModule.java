@@ -3,11 +3,11 @@ package network.warzone.tgm.modules.infection;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.modules.death.DeathInfo;
+import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -18,9 +18,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.time.TimeUpdate;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
-import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.Strings;
-import network.warzone.warzoneapi.models.Death;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,11 +26,8 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -159,20 +154,20 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
 
     @EventHandler
     public void onDeath(TGMPlayerDeathEvent event) {
-        DeathModule module = deathModule.getPlayer(event.getVictim());
+        DeathInfo deathInfo = deathModule.getPlayer(event.getVictim());
 
-        Player victim = module.getPlayer();
+        Player victim = deathInfo.player;
 
         MatchTeam humans = teamManager.getTeamById("humans");
-        MatchTeam killerTeam = module.getKillerTeam();
-        MatchTeam playerTeam = module.getPlayerTeam();
+        MatchTeam killerTeam = deathInfo.killerTeam;
+        MatchTeam playerTeam = deathInfo.playerTeam;
 
         // Check if the player who died is a human.
         if (playerTeam.equals(humans)) {
             // Check if a player killed them.
-            if (module.getKiller() != null) {
+            if (deathInfo.killer != null) {
                 // Get the killer.
-                Player killer = module.getKiller();
+                Player killer = deathInfo.killer;
 
                 broadcastMessage(String.format("%s%s &7has been infected by %s%s",
                         playerTeam.getColor(),
@@ -188,14 +183,14 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
             }
 
             // Infect the player
-            infect(module.getPlayer());
+            infect(deathInfo.player);
         } else {
             // Assume an infected died.
 
             // Check if a player killed them
-            if (module.getKiller() != null) {
+            if (deathInfo.killer != null) {
                 // Get the killer.
-                Player killer = module.getKiller();
+                Player killer = deathInfo.killer;
 
                 broadcastMessage(String.format(
                         "%s%s &7has been slain by %s%s",

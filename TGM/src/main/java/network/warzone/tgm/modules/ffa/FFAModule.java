@@ -6,7 +6,8 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.DeathModule;
+import network.warzone.tgm.modules.death.DeathInfo;
+import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -135,8 +136,8 @@ public class FFAModule extends MatchModule implements Listener {
     }
 
     public void createDeath(Player player) {
-        DeathModule deathModule = match.getModule(DeathModule.class).getPlayer(player);
-        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathModule.getKiller(), deathModule.getCause(), deathModule.getItem()));
+        DeathInfo deathInfo = match.getModule(DeathModule.class).getPlayer(player);
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathInfo.killer, deathInfo.cause, deathInfo.item));
     }
 
     @EventHandler
