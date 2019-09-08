@@ -1,17 +1,15 @@
 package network.warzone.tgm.command;
 
-import com.google.common.base.Joiner;
 import com.sk89q.minecraft.util.commands.*;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.map.MapInfo;
-import network.warzone.tgm.map.MapLibrary;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.ChatModule;
@@ -27,9 +25,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
-import network.warzone.warzoneapi.models.Author;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
-import network.warzone.warzoneapi.models.Map;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;

@@ -1,9 +1,7 @@
 package network.warzone.tgm.map;
 
 import com.google.gson.*;
-import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.warzoneapi.models.Author;
