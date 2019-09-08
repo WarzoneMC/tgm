@@ -1,9 +1,9 @@
-package network.warzone.tgm.modules;
+package network.warzone.tgm.modules.death;
 
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

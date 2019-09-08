@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules;
+package network.warzone.tgm.modules.death;
 
 import lombok.NoArgsConstructor;
 import network.warzone.tgm.TGM;

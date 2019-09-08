@@ -6,6 +6,7 @@ import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
+import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.infection.InfectionModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;

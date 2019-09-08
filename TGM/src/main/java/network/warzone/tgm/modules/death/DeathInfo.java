@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules;
+package network.warzone.tgm.modules.death;
 
 import network.warzone.tgm.modules.team.MatchTeam;
 import org.bukkit.Location;
