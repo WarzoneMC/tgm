@@ -57,14 +57,14 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
     }
 
     private static String getCurrentName(UUID uuid) throws Exception {
-        MojangProfile[] body = Unirest.get("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")
-                .asObject(MojangProfile[].class)
+        MojangProfile body = Unirest.get("https://api.ashcon.app/mojang/v2/user/" + uuid.toString())
+                .asObject(MojangProfile.class)
                 .getBody();
-        return body[body.length - 1].name;
+        return body.username;
     }
 
     private static class MojangProfile {
-        private String name;
+        private String username;
     }
 
 }
