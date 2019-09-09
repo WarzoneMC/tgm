@@ -115,6 +115,8 @@ public class Match {
 
             module.unload();
         }
+        
+        modules.clear();
     }
 
     @SuppressWarnings("unchecked")
