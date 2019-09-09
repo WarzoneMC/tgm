@@ -1,12 +1,17 @@
 package network.warzone.tgm.map;
 
 import com.google.gson.*;
+import com.mashape.unirest.http.Unirest;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
+import network.warzone.warzoneapi.models.Author;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by luke on 4/27/17.
@@ -17,9 +22,24 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
         JsonObject json = jsonElement.getAsJsonObject();
         String name = json.get("name").getAsString();
         String version = json.get("version").getAsString();
-        List<String> authors = new ArrayList<>();
+        List<Author> authors = new ArrayList<>();
         for (JsonElement authorJson : json.getAsJsonArray("authors")) {
-            authors.add(authorJson.getAsString());
+            if (authorJson.isJsonPrimitive()) {
+                authors.add(new Author(authorJson.getAsString()));
+            } else {
+                Author author = TGM.get().getGson().fromJson(authorJson, Author.class);
+                if (TGM.get().getConfig().getBoolean("map.get-names"))
+                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                        if (author != null && author.getUuid() != null) {
+                            try {
+                                author.setDisplayUsername(getCurrentName(author.getUuid()));
+                            } catch (Exception e) {
+                                TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);
+                            }
+                        }
+                    });
+                authors.add(author);
+            }
         }
         GameType gameType = GameType.valueOf(json.get("gametype").getAsString());
         List<ParsedTeam> parsedTeams = new ArrayList<>();
@@ -35,4 +55,16 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
 
         return new MapInfo(name, version, authors, gameType, parsedTeams, json);
     }
+
+    private static String getCurrentName(UUID uuid) throws Exception {
+        MojangProfile[] body = Unirest.get("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")
+                .asObject(MojangProfile[].class)
+                .getBody();
+        return body[body.length - 1].name;
+    }
+
+    private static class MojangProfile {
+        private String name;
+    }
+
 }

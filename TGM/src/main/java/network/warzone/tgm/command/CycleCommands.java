@@ -1,12 +1,11 @@
 package network.warzone.tgm.command;
 
-import com.google.common.base.Joiner;
 import com.sk89q.minecraft.util.commands.*;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
@@ -94,22 +93,9 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
         try {
             for (int i = 0; i < pageSize; i++) {
-                int position = pageSize * (index - 1) + i;
+                int position = 9 * (index - 1) + i;
                 MapContainer map = mapLibrary.get(position);
-                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
-
-                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
-                } else {
-                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
-                }
-                TextComponent message = new TextComponent(mapName);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapLibrary.get(position).getMapInfo().getName()));
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapLibrary.get(position).getMapInfo().getName()).append("\n\n")
-                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(mapLibrary.get(position).getMapInfo().getAuthors())).append("\n")
-                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
-                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapLibrary.get(position).getMapInfo().getVersion()).create()));
-
+                TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
         } catch (IndexOutOfBoundsException ignored) {}
@@ -154,20 +140,7 @@ public class CycleCommands {
             for (int i = 0; i < pageSize; i++) {
                 int position = pageSize * (index - 1) + i;
                 MapContainer map = mapLibrary.get(foundMaps.get(position));
-                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
-
-                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
-                } else {
-                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
-                }
-                TextComponent message = new TextComponent(mapName);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + map.getMapInfo().getName()));
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + map.getMapInfo().getName()).append("\n\n")
-                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(map.getMapInfo().getAuthors())).append("\n")
-                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
-                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + map.getMapInfo().getVersion()).create()));
-
+                TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
         } catch (IndexOutOfBoundsException ignored) {}
@@ -197,20 +170,7 @@ public class CycleCommands {
             for (int i = 0; i < pageSize; i++) {
                 int position = 9 * (index - 1) + i;
                 MapContainer map = rotation.get(position);
-                String mapName = ChatColor.GOLD + map.getMapInfo().getName();
-
-                if (map.getMapInfo().equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
-                    mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
-                } else {
-                    mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
-                }
-                TextComponent message = new TextComponent(mapName);
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rotation.get(position).getMapInfo().getName()));
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + rotation.get(position).getMapInfo().getName()).append("\n\n")
-                        .append(ChatColor.GRAY + "Authors: ").append(Joiner.on(", ").join(rotation.get(position).getMapInfo().getAuthors())).append("\n")
-                        .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + map.getMapInfo().getGametype().toString()).append("\n")
-                        .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + rotation.get(position).getMapInfo().getVersion()).create()));
-
+                TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
         } catch (IndexOutOfBoundsException ignored) { }
@@ -563,13 +523,13 @@ public class CycleCommands {
     @Command(aliases = {"next"}, desc = "View the next map in the rotation")
     public static void next(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
-        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors()));
+        sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors().stream().map(Strings::getAuthorUsername).collect(Collectors.joining(", "))));
     }
     
     @Command(aliases = {"map"}, desc = "View the map info for the current map")
     public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
-        sender.sendMessage(ChatColor.GRAY + "Currently playing " + ChatColor.YELLOW + info.getGametype() + ChatColor.GRAY + " on map " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().collect(Collectors.joining(", ")));
+        sender.sendMessage(ChatColor.GRAY + "Currently playing " + ChatColor.YELLOW + info.getGametype() + ChatColor.GRAY + " on map " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + info.getAuthors().stream().map(Strings::getAuthorUsername).collect(Collectors.joining(", ")));
     }
 
     @Command(aliases = {"time"}, desc = "Time options")
@@ -760,5 +720,22 @@ public class CycleCommands {
         }));
         main.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/stats " + profile.getName()));
         return main;
+    }
+
+    private static TextComponent mapToTextComponent(int position, MapInfo mapInfo) {
+        String mapName = ChatColor.GOLD + mapInfo.getName();
+
+        if (mapInfo.equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+            mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
+        } else {
+            mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
+        }
+        TextComponent message = new TextComponent(mapName);
+        message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapInfo.getName()));
+        message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapInfo.getName()).append("\n\n")
+                .append(ChatColor.GRAY + "Authors: ").append(ChatColor.YELLOW + mapInfo.getAuthors().stream().map(Strings::getAuthorUsername).collect(Collectors.joining(", "))).append("\n")
+                .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + mapInfo.getGametype().toString()).append("\n")
+                .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapInfo.getVersion()).create()));
+        return message;
     }
 }

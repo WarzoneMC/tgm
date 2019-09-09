@@ -1,9 +1,10 @@
 package network.warzone.tgm.map;
 
 import com.google.gson.JsonObject;
-import network.warzone.tgm.gametype.GameType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.gametype.GameType;
+import network.warzone.warzoneapi.models.Author;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public class MapInfo {
     private String name;
     private String version;
-    private List<String> authors;
+    private List<Author> authors;
     private GameType gametype;
     private List<ParsedTeam> teams;
     private JsonObject jsonObject;
