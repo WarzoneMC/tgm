@@ -28,15 +28,16 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
                 authors.add(new Author(authorJson.getAsString()));
             } else {
                 Author author = TGM.get().getGson().fromJson(authorJson, Author.class);
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                    if (author != null && author.getUuid() != null) {
-                        try {
-                            author.setDisplayUsername(getCurrentName(author.getUuid()));
-                        } catch (Exception e) {
-                            TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);
+                if (TGM.get().getConfig().getBoolean("map.get-names"))
+                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                        if (author != null && author.getUuid() != null) {
+                            try {
+                                author.setDisplayUsername(getCurrentName(author.getUuid()));
+                            } catch (Exception e) {
+                                TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);
+                            }
                         }
-                    }
-                });
+                    });
                 authors.add(author);
             }
         }

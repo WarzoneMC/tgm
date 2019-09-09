@@ -11,6 +11,7 @@ chat:
   messages:
     muted: "&cChat is currently disabled. If you believe this is an error, please contact a staff member on our Discord."
 map:
+  get-names: false
   sources:
   - Maps
 server:
