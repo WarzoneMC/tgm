@@ -93,7 +93,7 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.YELLOW + "Maps (" + index + "/" + pages + "): ");
         try {
             for (int i = 0; i < pageSize; i++) {
-                int position = 9 * (index - 1) + i;
+                int position = pageSize * (index - 1) + i;
                 MapContainer map = mapLibrary.get(position);
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
@@ -168,7 +168,7 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
         try {
             for (int i = 0; i < pageSize; i++) {
-                int position = 9 * (index - 1) + i;
+                int position = pageSize * (index - 1) + i;
                 MapContainer map = rotation.get(position);
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
