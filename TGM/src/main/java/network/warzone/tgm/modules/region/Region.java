@@ -11,4 +11,8 @@ public interface Region {
     Location getCenter();
 
     List<Block> getBlocks();
+
+    Location getMin();
+
+    Location getMax();
 }

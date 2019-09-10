@@ -1,6 +1,6 @@
 package network.warzone.tgm.modules.region;
 
-import network.warzone.tgm.TGM;
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -12,12 +12,15 @@ import java.util.List;
 
 
 public class CuboidRegion implements Region {
-    @Getter World world;
+    @Getter private final World world;
     @Getter double minX, minY, minZ, maxX, maxY, maxZ;
 
-    public CuboidRegion(World world, Location min, Location max) {
-        this.world = world;
+    private final Location min;
+    private final Location max;
 
+    public CuboidRegion(Location min, Location max) {
+        Preconditions.checkArgument(min.getWorld() == max.getWorld(), "region location worlds must match");
+        this.world = min.getWorld();
         minX = Math.min(min.getX(), max.getX());
         maxX = Math.max(min.getX(), max.getX());
 
@@ -26,14 +29,19 @@ public class CuboidRegion implements Region {
 
         minZ = Math.min(min.getZ(), max.getZ());
         maxZ = Math.max(min.getZ(), max.getZ());
+
+        this.min = new Location(world, minX, minY, minZ);
+        this.max = new Location(world, maxX, maxY, maxZ);
     }
 
+    @Override
     public Location getMin() {
-        return new Location(world, minX, minY, minZ);
+        return min;
     }
 
+    @Override
     public Location getMax() {
-        return new Location(world, maxX, maxY, maxZ);
+        return max;
     }
 
     @Override
@@ -53,7 +61,7 @@ public class CuboidRegion implements Region {
         for (int x = (int) getMinX(); x <= getMaxX(); x++) {
             for (int z = (int) getMinZ(); z <= getMaxZ(); z++) {
                 for (int y = (int) getMinY(); y <= getMaxY(); y++) {
-                    results.add((new Location(TGM.get().getMatchManager().getMatch().getWorld(), x, y, z).getBlock()));
+                    results.add((new Location(world, x, y, z).getBlock()));
                 }
             }
         }

@@ -4,37 +4,37 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.util.NumberConversions;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CylinderRegion implements Region {
-    @Getter private final Location base;
-    @Getter private final double radius, height;
+/**
+ * Created by Jorge on 09/09/2019
+ */
+public class SphereRegion implements Region {
+
+    @Getter private final Location center;
+    @Getter private final double radius;
 
     private final Location min;
     private final Location max;
 
-    public CylinderRegion(Location base, double radius, double height) {
-        this.base = base;
+    public SphereRegion(Location center, double radius) {
+        this.center = center;
         this.radius = radius;
-        this.height = height;
 
-        this.min = new Location(base.getWorld(), base.getX() - radius, base.getY(), base.getZ() - radius);
-        this.max = new Location(base.getWorld(), base.getX() + radius, base.getY() + height, base.getZ() + radius);
+        this.min = new Location(center.getWorld(), center.getX() - radius, center.getY() - radius, center.getZ() - radius);
+        this.max = new Location(center.getWorld(), center.getX() + radius, center.getY() + radius, center.getZ() + radius);
     }
 
     @Override
     public boolean contains(Location location) {
-        return Math.sqrt(NumberConversions.square(base.getX() - location.getX()) + NumberConversions.square(base.getZ() - location.getZ())) <= radius &&
-                location.getY() >= base.getY() &&
-                location.getY() <= base.getY() + height;
+        return center.distance(location) <= radius;
     }
 
     @Override
     public Location getCenter() {
-        return base;
+        return this.center;
     }
 
     @Override
