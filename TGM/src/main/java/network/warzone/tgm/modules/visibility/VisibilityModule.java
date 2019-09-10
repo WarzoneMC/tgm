@@ -22,6 +22,7 @@ public class VisibilityModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         visibilityController = new VisibilityControllerImpl(match.getModule(SpectatorModule.class));
+        refreshAllPlayers();
     }
 
     @EventHandler

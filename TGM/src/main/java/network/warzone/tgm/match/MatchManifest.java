@@ -48,12 +48,12 @@ public abstract class MatchManifest {
         modules.add(new SpectatorModule());
         modules.add(new SpawnPointHandlerModule());
         modules.add(new SpawnPointLoaderModule());
+        modules.add(new TeamManagerModule());
         modules.add(new VisibilityModule());
         modules.add(new TimeModule());
         modules.add(new TabListModule());
         modules.add(new MatchProgressNotifications());
         modules.add(new MatchResultModule());
-        modules.add(new TeamManagerModule());
         modules.add(new ScoreboardManagerModule());
         modules.add(new RegionManagerModule());
         modules.add(new TaskedModuleManager());
