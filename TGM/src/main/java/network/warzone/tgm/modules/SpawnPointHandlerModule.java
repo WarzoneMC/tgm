@@ -36,6 +36,11 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
             spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
         }
+        // infection hardcode moment
+        else if (TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype() == GameType.Infected
+                && event.getTeam().getId().equalsIgnoreCase("infected") && event.getOldTeam().getId().equalsIgnoreCase("humans")) {
+            spawnPlayer(event.getPlayerContext(), event.getTeam(), false);
+        }
         //player is joining the server
         else if (event.getOldTeam() == null) {
             spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
