@@ -283,7 +283,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 teamSelectionMenu.open(event.getPlayer());
             } else if (event.getItem().isSimilar(teleportMenuItem)) {
                 MatchTeam spectators = teamManagerModule.getSpectators();
-                Map<Player, ChatColor> players = new HashMap<>();
+                Map<Player, ChatColor> players = new LinkedHashMap<>();
                 for (MatchTeam team : teamManagerModule.getTeams()) {
                     if (team.equals(spectators)) continue;
                     for (PlayerContext context : team.getMembers()) players.put(context.getPlayer(), team.getColor());
