@@ -257,7 +257,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     private void infect(Player player) {
         player.getWorld().strikeLightningEffect(player.getLocation());
 
-        teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"));
+        teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"), !teamManager.getTeam(player).getId().equalsIgnoreCase("humans"));
         if (teamManager.getTeamById("humans").getMembers().size() > 0)
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
         player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));

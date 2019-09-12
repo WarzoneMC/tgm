@@ -14,14 +14,27 @@ import org.bukkit.event.HandlerList;
  * 2. The map cycles.
  */
 
-@AllArgsConstructor @Getter
+@Getter
 public class TeamChangeEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     private PlayerContext playerContext;
     private MatchTeam team;
     private MatchTeam oldTeam;
+    private boolean teleportEnabled;
 
+    public TeamChangeEvent(PlayerContext playerContext, MatchTeam team, MatchTeam oldTeam) {
+        this.playerContext = playerContext;
+        this.team = team;
+        this.oldTeam = oldTeam;
+        this.teleportEnabled = true;
+    }
+    public TeamChangeEvent(PlayerContext playerContext, MatchTeam team, MatchTeam oldTeam, boolean shouldTeleport) {
+        this.playerContext = playerContext;
+        this.team = team;
+        this.oldTeam = oldTeam;
+        this.teleportEnabled = shouldTeleport;
+    }
     @Override
     public HandlerList getHandlers() {
         return handlers;
