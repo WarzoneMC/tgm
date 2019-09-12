@@ -209,8 +209,9 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-            sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
-            TGM.get().getModule(StartCountdown.class).start(time);
+            boolean soloStart = Bukkit.getOnlinePlayers().size() <= 1;
+            if(!soloStart) sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
+            TGM.get().getModule(StartCountdown.class).start((soloStart) ? 0 : time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
