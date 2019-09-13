@@ -1,5 +1,6 @@
 package network.warzone.tgm.match;
 
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
@@ -19,6 +20,8 @@ import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.visibility.VisibilityModule;
+import network.warzone.tgm.modules.vote.VoteSkipModule;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +82,15 @@ public abstract class MatchManifest {
         modules.add(new WorldBorderModule());
         modules.add(new KnockbackModule());
         modules.add(new MapCommandsModule());
+        return modules;
+    }
+
+    public List<MatchModule> allocateConditionalModules() {
+        FileConfiguration fileConfiguration = TGM.get().getConfig();
+        List<MatchModule> modules = new ArrayList<>();
+        if (fileConfiguration.getBoolean("vote-skip", false)) {
+            modules.add(new VoteSkipModule());
+        }
         return modules;
     }
 }

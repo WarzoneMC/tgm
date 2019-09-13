@@ -5,6 +5,7 @@ api:
   stats:
     enabled: true
 rotation: Maps/rotation.txt
+vote-skip: true
 chat:
   enabled: true
   stats-hover: true
