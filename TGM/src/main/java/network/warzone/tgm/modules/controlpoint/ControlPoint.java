@@ -186,7 +186,7 @@ public class ControlPoint implements Listener {
         return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
-    private void renderBlocks(MatchTeam matchTeam) { //TODO Test for 1.13
+    private void renderBlocks(MatchTeam matchTeam) {
         ChatColor color1 = progressingTowardsTeam != null ? progressingTowardsTeam.getColor() : ChatColor.WHITE;
         ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : ChatColor.WHITE;
         Location center = region.getCenter();
