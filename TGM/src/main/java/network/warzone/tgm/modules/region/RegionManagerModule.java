@@ -69,6 +69,13 @@ public class RegionManagerModule extends MatchModule {
                             regionJson.get("radius").getAsDouble()
                     );
                     break;
+                case "hemisphere":
+                    region = new HemisphereRegion(
+                            Parser.convertLocation(match.getWorld(), regionJson.get("center")),
+                            regionJson.get("radius").getAsDouble(),
+                            regionJson.has("direction") ? HemisphereRegion.parseHemisphereDirection(regionJson.get("direction")) : HemisphereRegion.HemisphereFace.NEGATIVE_Z
+                    );
+                    break;
                 case "cuboid":
                 default:
                     region = new CuboidRegion(
