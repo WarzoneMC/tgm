@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules;
 
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -16,7 +17,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 public class AntiSpleefModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
 
-    public void load() {
+    @Override
+    public void load(Match match) {
         teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
     }
 
