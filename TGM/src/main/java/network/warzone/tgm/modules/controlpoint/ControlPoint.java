@@ -10,9 +10,11 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Blocks;
+import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -185,18 +187,20 @@ public class ControlPoint implements Listener {
     }
 
     private void renderBlocks(MatchTeam matchTeam) { //TODO Test for 1.13
+        ChatColor color1 = progressingTowardsTeam != null ? progressingTowardsTeam.getColor() : ChatColor.WHITE;
+        ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : ChatColor.WHITE;
         Location center = region.getCenter();
-
+        double x = center.getX();
+        double z = center.getZ();
         double percent = Math.toRadians(getPercent() * 3.6);
-
         for (Block block : region.getBlocks()) {
             if (!Blocks.isVisualMaterial(block.getType())) continue;
-
-            double angle = Math.atan2(block.getZ() - center.getZ(), block.getX() - center.getX());
-
+            double dx = block.getX() - x;
+            double dz = block.getZ() - z;
+            double angle = Math.atan2(dz, dx);
             if (angle < 0) angle += 2 * Math.PI;
-
-            block.setType(regionSave.getBlockAt(new BlockVector(block.getLocation().toVector())));
+            ChatColor color = angle < percent ? color1 : color2;
+            if (color != ChatColor.RESET) block.setType(ColorConverter.convertChatColorToColoredBlock(block.getType(), color));
         }
     }
 
