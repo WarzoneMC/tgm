@@ -22,6 +22,11 @@ public class VoteSkipModule extends MatchModule implements Listener {
         this.match = match;
     }
 
+    @Override
+    public void disable() {
+        skipVoters.clear();
+    }
+
     public boolean addVote(Player player) {
         if(skipVoters.contains(player)) return false;
         else {
@@ -36,7 +41,6 @@ public class VoteSkipModule extends MatchModule implements Listener {
     }
 
     private void checkVotes() {
-        if(match.getMatchStatus() != MatchStatus.MID)
         int stillNeeds = stillNeeds();
         if (stillNeeds == 0) {
             TGM.get().getMatchManager().endMatch(null);
