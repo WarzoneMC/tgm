@@ -54,11 +54,13 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     private DeathModule deathModule;
 
     private int length;
+    private boolean shouldTp;
 
     @Override
     public void load(Match match) {
         JsonObject json = match.getMapContainer().getMapInfo().getJsonObject().get("infection").getAsJsonObject();
         length = json.get("length").getAsInt();
+        shouldTp = !json.has("teleport") || json.get("teleport").getAsBoolean();
         teamManager = match.getModule(TeamManagerModule.class);
         deathModule = match.getModule(DeathModule.class);
         this.match = match;
@@ -257,7 +259,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     private void infect(Player player) {
         player.getWorld().strikeLightningEffect(player.getLocation());
 
-        teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"), !teamManager.getTeam(player).getId().equalsIgnoreCase("humans"));
+        teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"), shouldTp || !teamManager.getTeam(player).getId().equalsIgnoreCase("humans"));
         if (teamManager.getTeamById("humans").getMembers().size() > 0)
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
         player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
