@@ -27,16 +27,29 @@ public class AntiSpleefModule extends MatchModule implements Listener {
         MatchTeam playerTeam = teamManagerModule.getTeam(event.getPlayer());
         if(playerTeam.isSpectator()) return;
         String playerTeamID = playerTeam.getId();
-        Location locOfBreaker = event.getPlayer().getLocation().clone();
+        Location locOfBreaker = event.getBlock().getLocation().clone();
         locOfBreaker.setY(locOfBreaker.getY() + 1);
         World playerWorld = event.getPlayer().getWorld();
         for(Player p : Bukkit.getOnlinePlayers()) {
-            if(p.getWorld() != playerWorld) continue;
-            if(p.getLocation().equals(locOfBreaker) && teamManagerModule.getTeam(p).getId().equalsIgnoreCase(playerTeamID)) {
+            if(p.getWorld() != playerWorld || event.getPlayer() == p) continue;
+            if(getCenter(p.getLocation()).equals(getCenter(locOfBreaker)) && teamManagerModule.getTeam(p).getId().equalsIgnoreCase(playerTeamID)) {
                 event.getPlayer().sendMessage(ChatColor.RED + "You cannot break blocks under your teammates!");
                 event.setCancelled(true);
                 return;
             }
         }
+    }
+
+    private Location getCenter(Location loc) {
+        return new Location(loc.getWorld(),
+                getRelativeCoord(loc.getBlockX()),
+                getRelativeCoord(loc.getBlockY()),
+                getRelativeCoord(loc.getBlockZ()));
+    }
+
+    private double getRelativeCoord(int i) {
+        double d = i;
+        d = d < 0 ? d - .5 : d + .5;
+        return d;
     }
 }
