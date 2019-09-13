@@ -55,6 +55,8 @@ public class ControlPoint implements Listener {
     private int progress = 0;
     private MatchTeam progressingTowardsTeam = null;
 
+    private boolean initialCapture = true;
+
     private int runnableId = -1;
 
     public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
@@ -143,6 +145,7 @@ public class ControlPoint implements Listener {
     }
 
     private void handleCap(MatchTeam matchTeam) {
+        boolean isInitial = initialCapture;
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
             progress++;
@@ -169,6 +172,7 @@ public class ControlPoint implements Listener {
                 if (controller == null) {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
+                    if (initialCapture) initialCapture = false;
                 } else {
                     controlPointService.holding(matchTeam);
                 }
@@ -179,16 +183,16 @@ public class ControlPoint implements Listener {
             }
         }
 
-        renderBlocks(matchTeam);
+        renderBlocks(matchTeam, isInitial);
     }
 
     public int getPercent() {
         return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
-    private void renderBlocks(MatchTeam matchTeam) {
-        ChatColor color1 = progressingTowardsTeam != null ? progressingTowardsTeam.getColor() : ChatColor.WHITE;
-        ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : ChatColor.WHITE;
+    private void renderBlocks(MatchTeam matchTeam, boolean isInitial) {
+        ChatColor color1 = progressingTowardsTeam.getColor();
+        ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : (isInitial ? ChatColor.RESET : ChatColor.WHITE);
         Location center = region.getCenter();
         double x = center.getX();
         double z = center.getZ();
