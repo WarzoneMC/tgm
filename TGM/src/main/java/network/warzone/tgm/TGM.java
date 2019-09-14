@@ -114,7 +114,7 @@ public class TGM extends JavaPlugin {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
         }
-        if (apiConfig.getBoolean("vote-skip", false)) {
+        if (fileConfiguration.getBoolean("vote-skip", false)) {
             commandManager.register(SkipCommands.class);
         }
 

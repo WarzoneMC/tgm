@@ -31,7 +31,6 @@ public class VoteSkipModule extends MatchModule implements Listener {
         if(skipVoters.contains(player)) return false;
         else {
             skipVoters.add(player);
-            checkVotes();
             return true;
         }
     }
@@ -40,7 +39,7 @@ public class VoteSkipModule extends MatchModule implements Listener {
         return Math.max(0, ((int) Math.ceil(Bukkit.getOnlinePlayers().size() * 0.75)) - skipVoters.size());
     }
 
-    private void checkVotes() {
+    public void checkVotes() {
         int stillNeeds = stillNeeds();
         if (stillNeeds == 0) {
             TGM.get().getMatchManager().endMatch(null);

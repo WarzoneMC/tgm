@@ -25,6 +25,7 @@ public class SkipCommands {
         boolean success = voteSkipModule.addVote(player);
         player.sendMessage(success ? ChatColor.GREEN + "You have voted to skip the current match." : ChatColor.RED + "You have already voted!");
         int stillNeeds = voteSkipModule.stillNeeds();
-        if(stillNeeds > 0) player.sendMessage(ChatColor.GOLD.toString() + stillNeeds + ChatColor.YELLOW + " votes are needed to skip the current map.");
+        if(stillNeeds > 0) player.sendMessage(ChatColor.GOLD.toString() + stillNeeds + ChatColor.YELLOW + " vote" + ((stillNeeds == 1) ? " is" : "s are") + " needed to skip the current map.");
+        voteSkipModule.checkVotes();
     }
 }
