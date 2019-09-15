@@ -23,6 +23,16 @@ public class ItemPotionParser implements ItemMetaParser {
         if (!object.has("potion")) return;
         PotionMeta potionMeta = (PotionMeta) meta;
 
+        /*
+        Used to get potions that can be obtained from the Creative Inventory
+        https://hub.spigotmc.org/javadocs/spigot/org/bukkit/potion/PotionType.html
+        "potion": {
+             "type": "<type>",
+             "extend": <boolean>,    Only used if "type" exists
+             "upgrade": <boolean>    Only used if "type" exists
+        }
+        */
+
         if (object.getAsJsonObject("potion").has("type")) {
             PotionType type = PotionType.valueOf(Strings.getTechnicalName(object.getAsJsonObject("potion").get("type").getAsString()));
             boolean extended = false;
@@ -33,6 +43,19 @@ public class ItemPotionParser implements ItemMetaParser {
                 upgraded = object.getAsJsonObject("potion").get("upgrade").getAsBoolean();
             potionMeta.setBasePotionData(new PotionData(type, extended, upgraded));
         }
+
+        /*
+        "potion": {
+            "effects": [
+                {
+                    "type": "<effect ID>",
+                    "duration": <int>,
+                    "amplifier": <int>,
+                    "ambient": <boolean>,
+                    "particles": <boolean>,
+                }
+            ]}
+        */
 
         if (object.getAsJsonObject("potion").has("effects")) {
             for (JsonElement element : object.getAsJsonObject("potion").getAsJsonArray("effects")) {
