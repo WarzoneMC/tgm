@@ -9,6 +9,7 @@ import network.warzone.tgm.modules.death.DeathInfo;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.kit.parser.EffectKitNodeParser;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.parser.item.ItemParser;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Parser;
@@ -128,8 +129,9 @@ public class KillstreakModule extends MatchModule implements Listener {
                     if(actionObj.has("items")) {
                         Set<ItemStack> items = new HashSet<>();
                         for(JsonElement jsonElem : actionObj.getAsJsonArray("items")) {
+                            if (!jsonElem.isJsonObject()) continue;
                             JsonObject itemJson = jsonElem.getAsJsonObject();
-                            items.add(Parser.parseItemStack(itemJson));
+                            items.add(ItemParser.parseItemStack(itemJson));
                         }
                         killstreakActions.add(new ItemKillstreakAction(items));
                     }
