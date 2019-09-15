@@ -1,27 +1,11 @@
 package network.warzone.tgm.modules.kit.parser;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.server.v1_14_R1.IChatBaseComponent;
 import network.warzone.tgm.modules.kit.KitNode;
 import network.warzone.tgm.modules.kit.types.ItemKitNode;
 import network.warzone.tgm.parser.item.ItemParser;
-import network.warzone.tgm.util.ColorConverter;
-import network.warzone.tgm.util.Strings;
-import network.warzone.tgm.util.itemstack.ItemFactory;
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.*;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
