@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -25,7 +26,7 @@ be enabled WHETHER THE API IS ENABLED OR NOT.
 
 public class MiscCommands {
 
-    @Command(aliases= {"ping"}, desc = "Check player ping", max = 1, usage = "(name)")
+    @Command(aliases = {"ping"}, desc = "Check player ping", max = 1, usage = "(name)")
     public static void ping(CommandContext cmd, CommandSender sender) {
         Player player;
         if (cmd.argsLength() > 0) {
@@ -35,7 +36,7 @@ public class MiscCommands {
                 return;
             }
         } else if (sender instanceof Player) {
-            player = (Player) sender;   
+            player = (Player) sender;
         } else {
             sender.sendMessage(ChatColor.RED + "As console, you can use /ping <player> to check someone's ping.");
             return;
@@ -45,7 +46,33 @@ public class MiscCommands {
         sender.sendMessage(pingMsg);
     }
 
-    @Command(aliases={"nick"}, desc= "Change nickname", usage ="(name)")
+    @Command(aliases = {"nicks"}, desc = "View all nicked players")
+    @CommandPermissions({"tgm.command.nicks"})
+    public static void nicks(CommandContext cmd, CommandSender sender) {
+        HashMap<UUID, String> originalNames = TGM.get().getNickManager().originalNames;
+        HashMap<UUID, String> nickNames = TGM.get().getNickManager().nickNames;
+
+        if (originalNames.size() == 0) {
+            sender.sendMessage(ChatColor.RED + "No nicked players found.");
+            return;
+        }
+
+        StringBuilder message = new StringBuilder(ChatColor.YELLOW + "Nicked Players:");
+
+        originalNames.forEach((uuid, originalName) -> {
+            message.append("\n")
+                    .append(ChatColor.DARK_PURPLE)
+                    .append(originalName)
+                    .append(ChatColor.GRAY)
+                    .append(" is nicked as ")
+                    .append(ChatColor.LIGHT_PURPLE)
+                    .append(nickNames.get(uuid));
+        });
+
+        sender.sendMessage(message.toString());
+    }
+
+    @Command(aliases = {"nick"}, desc = "Change nickname", usage = "(name)")
     @CommandPermissions({"tgm.command.nick"})
     public static void nick(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
@@ -67,7 +94,7 @@ public class MiscCommands {
                 }
                 if (
                         Bukkit.getOnlinePlayers().stream().map(
-                                (Player player)->TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
+                                (Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
                         ).anyMatch((String name) -> name.equals(newName))) {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
@@ -115,7 +142,7 @@ public class MiscCommands {
                 }
                 if (
                         Bukkit.getOnlinePlayers().stream().map(
-                                (Player player)-> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
+                                (Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
                         ).anyMatch((String name) -> name.equals(newName))) {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
@@ -203,7 +230,7 @@ public class MiscCommands {
         }
     }
 
-    @Command(aliases={"whois"}, desc ="Reveals a nicked player")
+    @Command(aliases = {"whois"}, desc = "Reveals a nicked player")
     @CommandPermissions({"tgm.command.whois"})
     public static void whois(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
@@ -220,7 +247,10 @@ public class MiscCommands {
         }
     }
 
-    public static double generateDouble(double min, double max) { return ThreadLocalRandom.current().nextDouble(min, max+1); }
+    public static double generateDouble(double min, double max) {
+        return ThreadLocalRandom.current().nextDouble(min, max + 1);
+    }
+
     public static int generateInt(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
