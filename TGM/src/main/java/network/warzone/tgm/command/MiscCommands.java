@@ -1,11 +1,13 @@
 package network.warzone.tgm.command;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.NickedUserProfile;
 import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Players;
@@ -14,9 +16,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.UUID;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /*
@@ -49,8 +50,8 @@ public class MiscCommands {
     @Command(aliases = {"nicks"}, desc = "View all nicked players")
     @CommandPermissions({"tgm.command.nicks"})
     public static void nicks(CommandContext cmd, CommandSender sender) {
-        HashMap<UUID, String> originalNames = TGM.get().getNickManager().originalNames;
-        HashMap<UUID, String> nickNames = TGM.get().getNickManager().nickNames;
+        HashMap<UUID, String> originalNames = TGM.get().getNickManager().getOriginalNames();
+        HashMap<UUID, String> nickNames = TGM.get().getNickManager().getNickNames();
 
         if (originalNames.size() == 0) {
             sender.sendMessage(ChatColor.RED + "No nicked players found.");
@@ -74,7 +75,7 @@ public class MiscCommands {
 
     @Command(aliases = {"nick"}, desc = "Change nickname", usage = "(name)")
     @CommandPermissions({"tgm.command.nick"})
-    public static void nick(CommandContext cmd, CommandSender sender) {
+    public static void nick(CommandContext cmd, CommandSender sender) throws IllegalAccessException, NoSuchFieldException, UnirestException {
         if (!(sender instanceof Player)) {
             sender.sendMessage("Player only command.");
             return;
@@ -85,7 +86,7 @@ public class MiscCommands {
             if (option.equals("set") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
                 if (newName.length() > 16) {
-                    sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
+                    sender.sendMessage(ChatColor.RED + "Username must be shorter than 16 characters.");
                     return;
                 }
                 if (!newName.matches("^[a-z_A-Z0-9]+$")) {
@@ -104,30 +105,42 @@ public class MiscCommands {
                     String arg2 = cmd.getString(2);
                     force = arg2.equals("force");
                 }
-                if (force) {
-                    TGM.get().getNickManager().setNick(p, newName, null);
-                } else {
-                    TGM.get().getNickManager().setRelogNick(p, newName, null);
+                try {
+                    if (force) {
+                        try {
+                            TGM.get().getNickManager().setNick(p, newName, null);
+                        } catch (UnirestException | NoSuchFieldException | IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        TGM.get().getNickManager().addQueuedNick(p, newName);
+                    }
+                } catch (UnirestException e) {
+                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
                 }
+
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
                 if (!force) {
-                    sender.sendMessage(ChatColor.AQUA + "Relog for effects to take place!");
+                    sender.sendMessage(ChatColor.GOLD + "Reconnect for the changes to apply!");
                 }
             } else if (option.equals("reset")) {
-                String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());
+                String original = TGM.get().getNickManager().getOriginalNames().get(p.getUniqueId());
                 if (original != null) {
-                    TGM.get().getNickManager().reset(p);
-                    sender.sendMessage(ChatColor.GREEN + "Reset username");
+                    TGM.get().getNickManager().reset(p, true);
                 } else {
                     sender.sendMessage(ChatColor.RED + "You are not nicked!");
                 }
             } else if (option.equals("skin") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
                 if (newName.length() > 16) {
-                    sender.sendMessage(ChatColor.RED + "New skin name must be shorter than 16 characters.");
+                    sender.sendMessage(ChatColor.RED + "Username must be shorter than 16 characters.");
                     return;
                 }
-                TGM.get().getNickManager().setSkin(p, newName, null);
+                try {
+                    TGM.get().getNickManager().setSkin(p, newName, null);
+                } catch (UnirestException e) {
+                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
+                }
                 sender.sendMessage(ChatColor.GREEN + "Updated skin to " + ChatColor.YELLOW + newName);
             } else if (option.equals("name") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
@@ -147,7 +160,11 @@ public class MiscCommands {
                     sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
                     return;
                 }
-                TGM.get().getNickManager().setName(p, newName);
+                try {
+                    TGM.get().getNickManager().setName(p, newName);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
+                }
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("stats") && cmd.argsLength() > 1) {
                 if (cmd.argsLength() > 2) {
@@ -155,25 +172,10 @@ public class MiscCommands {
                         String statToChange = cmd.getString(1);
                         int value = cmd.getInteger(2);
 
-                        switch (statToChange) {
-                            case "kills":
-                                TGM.get().getNickManager().setStats(p, value, null, null, null, null);
-                                break;
-                            case "deaths":
-                                TGM.get().getNickManager().setStats(p, null, value, null, null, null);
-                                break;
-                            case "wins":
-                                TGM.get().getNickManager().setStats(p, null, null, value, null, null);
-                                break;
-                            case "losses":
-                                TGM.get().getNickManager().setStats(p, null, null, null, value, null);
-                                break;
-                            case "objectives":
-                                TGM.get().getNickManager().setStats(p, null, null, null, null, value);
-                                break;
-                            default:
-                                sender.sendMessage(ChatColor.RED + "Invalid stat. /nick stats <kills|deaths|wins|losses|objectives> <value>");
-                                return;
+                        try {
+                            TGM.get().getNickManager().setStats(p, statToChange, value);
+                        } catch (NoSuchFieldException e) {
+                            sender.sendMessage(ChatColor.RED + "Invalid stat. /nick stats <kills|deaths|wins|losses|objectives> <value>");
                         }
                         sender.sendMessage(ChatColor.GREEN + "Updated nicked " + ChatColor.YELLOW + statToChange + ChatColor.GREEN + " to " + ChatColor.YELLOW + value + ChatColor.GREEN + ".");
                     } catch (CommandNumberFormatException e) {
@@ -209,10 +211,8 @@ public class MiscCommands {
                 }
                 if (newRank.equals("none")) {
                     NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
-                    if (profile.getHighestRank() != null) {
-                        profile.removeRank(profile.getHighestRank());
-                    }
-                    TGM.get().getNickManager().stats.put(p.getUniqueId(), profile);
+                    profile.setRanks(Collections.emptyList());
+                    TGM.get().getNickManager().getStats().put(p.getUniqueId(), profile);
                     sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
                     return;
                 }
@@ -235,9 +235,9 @@ public class MiscCommands {
     public static void whois(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
             String username = cmd.getString(0);
-            if (TGM.get().getNickManager().nickNames.containsValue(username)) {
-                UUID uuid = HashMaps.reverseGetFirst(username, TGM.get().getNickManager().nickNames);
-                String originalName = TGM.get().getNickManager().originalNames.get(uuid);
+            if (TGM.get().getNickManager().getNickNames().containsValue(username)) {
+                UUID uuid = HashMaps.reverseGetFirst(username, TGM.get().getNickManager().getNickNames());
+                String originalName = TGM.get().getNickManager().getOriginalNames().get(uuid);
                 sender.sendMessage(ChatColor.YELLOW + username + ChatColor.GREEN + " is " + ChatColor.YELLOW + originalName);
             } else {
                 sender.sendMessage(ChatColor.RED + "That user isn't nicked!");

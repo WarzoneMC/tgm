@@ -1,5 +1,6 @@
 package network.warzone.tgm.join;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -7,6 +8,8 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.nickname.NickManager;
+import network.warzone.tgm.nickname.QueuedNick;
+import network.warzone.tgm.nickname.Skin;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Ranks;
@@ -36,7 +39,7 @@ public class JoinManager implements Listener {
 
     private Collection<QueuedJoin> queuedJoins = new ConcurrentLinkedQueue<>();
     private Set<LoginService> loginServices = new HashSet<>();
- 
+
     public JoinManager() {
         TGM.registerEvents(this);
 
@@ -106,44 +109,86 @@ public class JoinManager implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
+
+        Player p = playerContext.getPlayer();
+        NickManager nickManager = TGM.get().getNickManager();
+        // Check if a player is nicked as your name.
+        if (nickManager.getNickNames().containsValue(p.getName())) {
+            // Get UUID for player currently with the nickname.
+            UUID uuid = HashMaps.reverseGetFirst(p.getName(), nickManager.getNickNames());
+
+            // Get the player by the UUID.
+            Player player = Bukkit.getPlayer(uuid);
+
+            // Check if the user is online
+            if (player != null && player.isOnline()) {
+                player.sendMessage(ChatColor.RED + "Your name must be reset because the player has joined!");
+                try {
+                    nickManager.reset(player, false);
+                } catch (NoSuchFieldException | IllegalAccessException | UnirestException ignored) {
+                }
+            }
+        }
+
+        String name = nickManager.getNickNames().get(p.getUniqueId());
+        Skin skin = nickManager.getSkins().get(p.getUniqueId());
+
+        // Get the optional queued nick for the player.
+        Optional<QueuedNick> optionalQueuedNick = nickManager.getQueuedNick(p);
+
+        // Check if the the queued nick is present.
+        if (optionalQueuedNick.isPresent()) {
+            // Get the queued nick.
+            QueuedNick queuedNick = optionalQueuedNick.get();
+
+            name = queuedNick.getName();
+            skin = queuedNick.getSkin();
+
+            // Remove the queued nick.
+            nickManager.getQueuedNicks().remove(queuedNick);
+        }
+
+        // Check if a player is nicked as the queued nick.
+        if (nickManager.getNickNames().containsValue(name)) {
+            // Get UUID for player currently with the nickname.
+            UUID uuid = HashMaps.reverseGetFirst(name, nickManager.getNickNames());
+
+            // Get the player by the UUID.
+            Player player = Bukkit.getPlayer(uuid);
+
+            // Check if the player is online.
+            if (player != null && !uuid.equals(p.getUniqueId()) && player.isOnline()) {
+                p.sendMessage(ChatColor.RED + "Could not apply the queued nick. The player is already online!");
+                try {
+                    nickManager.reset(p, false);
+                } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
+                    e.printStackTrace();
+                }
+                // Invalidate the nick.
+                name = null;
+                skin = null;
+            }
+        }
+
+        if (name != null) {
+            try {
+                nickManager.setName(p, name);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
+        }
+        if(skin != null) {
+            nickManager.setSkin(p, skin);
+        }
+
         String joinMsg;
-        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && playerContext.getUserProfile().getPrefix() != null){
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && playerContext.getUserProfile().getPrefix() != null) {
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
             joinMsg = ChatColor.GOLD + prefix + playerContext.getDisplayName() + ChatColor.GOLD + " joined.";
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
-        }
-        else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";
+        } else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";
 
         if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
         event.setJoinMessage(joinMsg);
-
-        Player p = playerContext.getPlayer();
-        if (TGM.get().getNickManager().nickNames.containsValue(p.getName())) {
-            UUID uuid = HashMaps.reverseGetFirst(p.getName(), TGM.get().getNickManager().nickNames);
-            if (Bukkit.getOnlinePlayers().stream().map((Function<Player, UUID>) Entity::getUniqueId).anyMatch(uuid1 -> uuid1.equals(uuid))) {
-                Player onlinePlayer = Bukkit.getPlayer(uuid);
-                if (onlinePlayer != null) {
-                    onlinePlayer.sendMessage(ChatColor.YELLOW + p.getName() + ChatColor.RED + " has joined with the same name as you nick, so it must be reset.");
-                    TGM.get().getNickManager().reset(onlinePlayer);
-                }
-            }
-        }
-
-        if (playerContext.isNicked()) {
-            String nick = TGM.get().getNickManager().nickNames.get(event.getPlayer().getUniqueId());
-            if (Bukkit.getOnlinePlayers().stream().map((Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()).anyMatch(name -> name.equals(nick)) ||
-            Bukkit.getOnlinePlayers().stream().filter(player -> !player.getUniqueId().equals(playerContext.getPlayer().getUniqueId())).map((Player player) -> TGM.get().getPlayerManager().getPlayerContext(player).getDisplayName()).anyMatch(name -> name.equals(nick))) {
-                playerContext.getPlayer().sendMessage(ChatColor.YELLOW + nick + ChatColor.RED + " is already on, so your nickname must be reset.");
-                TGM.get().getNickManager().reset(playerContext.getPlayer());
-            }
-            else {
-                NickManager.Skin skin = TGM.get().getNickManager().skins.getOrDefault(event.getPlayer().getUniqueId(), null);
-                if (skin != null) {
-                    TGM.get().getNickManager().setSkin(event.getPlayer(), skin);
-                }
-                TGM.get().getNickManager().setName(event.getPlayer(), nick);
-            }
-        }
     }
 
     //TODO: Persistent modules

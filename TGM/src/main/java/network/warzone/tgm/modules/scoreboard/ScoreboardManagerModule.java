@@ -36,6 +36,16 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
+        updatePlayerTeam(event.getPlayerContext(), event.getOldTeam(), event.getTeam());
+        updatePlayerListName(event.getPlayerContext());
+    }
+
+    @EventHandler
+    public void onPlayerXPEvent(PlayerXPEvent event) {
+        updatePlayerListName(event.getPlayerContext());
+    }
+
+    public void updatePlayerTeam(PlayerContext player, MatchTeam oldTeam, MatchTeam newTeam) {
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             for (PlayerContext playerContext : matchTeam.getMembers()) {
                 SimpleScoreboard simpleScoreboard = getScoreboard(playerContext.getPlayer());
@@ -44,21 +54,15 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
                     simpleScoreboard = initScoreboard(playerContext);
                 }
 
-                if (event.getOldTeam() != null) {
-                    Team old = simpleScoreboard.getScoreboard().getTeam(event.getOldTeam().getId());
-                    old.removeEntry(event.getPlayerContext().getPlayer().getName());
+                if (oldTeam != null) {
+                    Team old = simpleScoreboard.getScoreboard().getTeam(oldTeam.getId());
+                    old.removeEntry(player.getPlayer().getName());
                 }
 
-                Team to = simpleScoreboard.getScoreboard().getTeam(event.getTeam().getId());
-                to.addEntry(event.getPlayerContext().getPlayer().getName());
+                Team to = simpleScoreboard.getScoreboard().getTeam(newTeam.getId());
+                to.addEntry(player.getPlayer().getName());
             }
         }
-        updatePlayerListName(event.getPlayerContext());
-    }
-
-    @EventHandler
-    public void onPlayerXPEvent(PlayerXPEvent event) {
-        updatePlayerListName(event.getPlayerContext());
     }
 
     public void updatePlayerListName(PlayerContext player) {

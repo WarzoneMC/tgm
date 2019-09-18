@@ -662,19 +662,22 @@ public class CycleCommands {
             return;
         }
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
+        boolean getNickedStats = !target.equalsIgnoreCase(targetUser.getOriginalName()) && targetUser.isNicked();
+        UserProfile profile = getNickedStats ? targetUser.getUserProfile() : targetUser.getUserProfile(true);
+        String levelString = getNickedStats ? targetUser.getLevelString() : targetUser.getLevelString(true);
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + (target.equalsIgnoreCase(targetUser.getOriginalName()) ? targetUser.getOriginalName() : targetUser.getDisplayName()));
         sender.sendMessage("");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
-        sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + targetUser.getUserProfile().getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(targetUser.getUserProfile().getLevel() + 1) + " (approx.)");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + levelString.replace("[", "").replace("]", ""));
+        sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + profile.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(profile.getLevel() + 1) + " (approx.)");
         sender.sendMessage("");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + targetUser.getUserProfile().getKDR());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + profile.getKills());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + profile.getDeaths());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + profile.getKDR());
         sender.sendMessage("");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + profile.getWins());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + profile.getLosses());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + profile.getWLR());
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
     }
 
