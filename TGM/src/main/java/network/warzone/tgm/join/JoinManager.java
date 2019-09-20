@@ -125,7 +125,8 @@ public class JoinManager implements Listener {
                 player.sendMessage(ChatColor.RED + "Your name must be reset because the player has joined!");
                 try {
                     nickManager.reset(player, false);
-                } catch (NoSuchFieldException | IllegalAccessException | UnirestException ignored) {
+                } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
+                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
                 }
             }
         }
