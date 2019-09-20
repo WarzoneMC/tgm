@@ -162,7 +162,7 @@ public class JoinManager implements Listener {
                 try {
                     nickManager.reset(p, false);
                 } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
-                    e.printStackTrace();
+                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
                 }
                 // Invalidate the nick.
                 name = null;
