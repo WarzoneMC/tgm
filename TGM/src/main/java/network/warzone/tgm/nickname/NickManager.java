@@ -1,6 +1,5 @@
 package network.warzone.tgm.nickname;
 
-import com.google.common.collect.Lists;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -17,25 +16,20 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.visibility.VisibilityController;
 import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
 import network.warzone.tgm.user.PlayerContext;
-import network.warzone.tgm.util.Strings;
 import network.warzone.warzoneapi.models.Rank;
-import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class NickManager {
 
-    public static String RATELIMITED_MESSAGE = net.md_5.bungee.api.ChatColor.GOLD.toString() + net.md_5.bungee.api.ChatColor.BOLD + "Slow Down! " + net.md_5.bungee.api.ChatColor.RESET.toString() + net.md_5.bungee.api.ChatColor.RED + "You're being ratelimited.";
+    public static String RATELIMITED_MESSAGE = ChatColor.GOLD.toString() + ChatColor.BOLD + "Slow Down! " + ChatColor.RESET.toString() + ChatColor.RED + "You're being ratelimited.";
 
     private VisibilityController visiblityController;
 
@@ -111,7 +105,6 @@ public class NickManager {
         // Modify the player's game profile.
         GameProfile profile = entityPlayer.getProfile();
         setGameProfileField(profile, "name", newName);
-
 
         updatePlayers(player);
         updatePlayerTeam(player, matchTeam);
@@ -289,7 +282,7 @@ public class NickManager {
         }
     }
 
-    private UUID fetchUUID(String name) throws UnirestException {
+    private  UUID fetchUUID(String name) throws UnirestException {
         HttpResponse<String> response = Unirest.get("https://api.mojang.com/users/profiles/minecraft/" + name).asString();
         if (response.getStatus() == 200) {
             return UUID.fromString(insertDashUUID(new JSONObject(response.getBody()).getString("id")));
