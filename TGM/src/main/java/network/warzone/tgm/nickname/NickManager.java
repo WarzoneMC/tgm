@@ -55,31 +55,28 @@ public class NickManager {
         visiblityController = new VisibilityControllerImpl(TGM.get().getModule(SpectatorModule.class));
     }
 
-    public void addQueuedNick(Player player, String newName) throws UnirestException {
-        UUID nickedUUID = getUUID(newName);
-        Skin skin = getSkin(nickedUUID);
+    public void addQueuedNick(Player player, String newName) {
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            Skin skin;
+            try {
+                UUID nickedUUID = getUUID(newName);
+                skin = getSkin(nickedUUID);
+            } catch (UnirestException exception) {
+                player.sendMessage(RATELIMITED_MESSAGE);
+                return;
+            }
 
-        queuedNicks.add(new QueuedNick(newName, skin, player));
+            queuedNicks.add(new QueuedNick(newName, skin, player));
+        });
     }
 
     public Optional<QueuedNick> getQueuedNick(Player player) {
         return queuedNicks.stream().filter(queuedNick -> queuedNick.getPlayer().getUniqueId().equals(player.getUniqueId())).findFirst();
     }
 
-    public void setNick(Player player, String newName, @Nullable UUID uuid) throws UnirestException, NoSuchFieldException, IllegalAccessException {
-        if (uuid == null ){
-            setName(player, newName);
-            setSkin(player, newName, null);
-        } else {
-            UUID uuid1 = getUUID(newName);
-            if (uuid1 == null) {
-                setName(player, newName);
-                setSkin(player, newName, null);
-            } else {
-                setName(player, newName);
-                setSkin(player, newName, uuid1);
-            }
-        }
+    public void setNick(Player player, String newName) throws NoSuchFieldException, IllegalAccessException {
+        setName(player, newName);
+        setSkin(player, newName, null);
     }
 
     public void reset(Player player, boolean kick) throws NoSuchFieldException, IllegalAccessException, UnirestException {
@@ -212,14 +209,22 @@ public class NickManager {
         skins.put(player.getUniqueId(), skin);
     }
 
-    public void setSkin(Player player, String nameOfPlayer, @Nullable UUID uuid) throws UnirestException {
-        UUID theUUID = uuid;
-        if (theUUID == null) {
-            theUUID = getUUID(nameOfPlayer);
-        }
-        Skin skin = getSkin(theUUID);
+    public void setSkin(Player player, String nameOfPlayer, @Nullable UUID uuid) {
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            Skin skin;
+            try {
+                UUID theUUID = uuid;
+                if (theUUID == null) {
+                    theUUID = getUUID(nameOfPlayer);
+                }
+                skin = getSkin(theUUID);
+            } catch (UnirestException exception) {
+                player.sendMessage(RATELIMITED_MESSAGE);
+                return;
+            }
 
-        setSkin(player, skin);
+            setSkin(player, skin);
+        });
     }
 
     private void updatePlayers(Player toExclude) {

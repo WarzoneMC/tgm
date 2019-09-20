@@ -80,18 +80,14 @@ public class NickCommands {
                     String arg2 = cmd.getString(2);
                     force = arg2.equals("force");
                 }
-                try {
-                    if (force) {
-                        try {
-                            TGM.get().getNickManager().setNick(p, newName, null);
-                        } catch (UnirestException | NoSuchFieldException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        TGM.get().getNickManager().addQueuedNick(p, newName);
+                if (force) {
+                    try {
+                        TGM.get().getNickManager().setNick(p, newName);
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        e.printStackTrace();
                     }
-                } catch (UnirestException e) {
-                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
+                } else {
+                    TGM.get().getNickManager().addQueuedNick(p, newName);
                 }
 
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
@@ -111,11 +107,8 @@ public class NickCommands {
                     sender.sendMessage(ChatColor.RED + "Username must be shorter than 16 characters.");
                     return;
                 }
-                try {
-                    TGM.get().getNickManager().setSkin(p, newName, null);
-                } catch (UnirestException e) {
-                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
-                }
+
+                TGM.get().getNickManager().setSkin(p, newName, null);
                 sender.sendMessage(ChatColor.GREEN + "Updated skin to " + ChatColor.YELLOW + newName);
             } else if (option.equals("name") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
@@ -180,23 +173,26 @@ public class NickCommands {
                 }
             } else if (option.equals("rank") && cmd.argsLength() > 1) {
                 String newRank = cmd.getString(1);
-                Rank rank = null;
-                for (Rank r : TGM.get().getTeamClient().retrieveRanks()) {
-                    if (r.getName().equalsIgnoreCase(newRank)) rank = r;
-                }
-                if (newRank.equals("none")) {
-                    NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
-                    profile.setRanks(Collections.emptyList());
-                    TGM.get().getNickManager().getStats().put(p.getUniqueId(), profile);
-                    sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
-                    return;
-                }
-                if (rank != null) {
-                    TGM.get().getNickManager().setRank(p, rank);
-                    sender.sendMessage(ChatColor.GREEN + "Updated rank to " + ChatColor.YELLOW + rank.getName());
-                } else {
-                    sender.sendMessage(ChatColor.RED + "Invalid rank");
-                }
+
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    Rank rank = null;
+                    for (Rank r : TGM.get().getTeamClient().retrieveRanks()) {
+                        if (r.getName().equalsIgnoreCase(newRank)) rank = r;
+                    }
+                    if (newRank.equals("none")) {
+                        NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
+                        profile.setRanks(Collections.emptyList());
+                        TGM.get().getNickManager().getStats().put(p.getUniqueId(), profile);
+                        sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
+                        return;
+                    }
+                    if (rank != null) {
+                        TGM.get().getNickManager().setRank(p, rank);
+                        sender.sendMessage(ChatColor.GREEN + "Updated rank to " + ChatColor.YELLOW + rank.getName());
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "Invalid rank");
+                    }
+                });
             } else {
                 sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|stats|rank> <option>");
             }
