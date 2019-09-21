@@ -12,12 +12,15 @@ import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -98,7 +101,14 @@ public class DeathModule extends MatchModule implements Listener {
     private void onDeath(Player player) {
         DeathInfo deathInfo = getPlayer(player);
         if(deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
-        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.killer, deathInfo.cause, deathInfo.item));
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.asList(player.getInventory().getContents())));
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onPlayerDeath(TGMPlayerDeathEvent event) {
+        for (ItemStack stack : event.getDrops()) {
+            event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation().add(0, 1.5, 0), stack);
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -64,7 +65,7 @@ public class ItemRemoveModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    public void onDeath(TGMPlayerDeathEvent event) {
         List<ItemStack> toRemove = new ArrayList<>();
         for (ItemStack itemStack : event.getDrops()) {
             if (removed.contains(itemStack.getType())) {
