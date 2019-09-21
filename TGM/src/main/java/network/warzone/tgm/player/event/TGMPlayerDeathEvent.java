@@ -30,9 +30,7 @@ public class TGMPlayerDeathEvent extends Event {
         this.murderWeapon = murderWeapon;
     }
 
-    public HandlerList getHandlers() {
-        return handlers;
-    }
+    public HandlerList getHandlers() { return handlers; }
 
     public static HandlerList getHandlerList() {
         return handlers;

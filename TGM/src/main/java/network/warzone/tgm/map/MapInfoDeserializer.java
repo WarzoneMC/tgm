@@ -50,7 +50,9 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
             ChatColor teamColor = ChatColor.valueOf(teamJson.get("color").getAsString().toUpperCase().replace(" ", "_"));
             int teamMax = teamJson.get("max").getAsInt();
             int teamMin = teamJson.get("min").getAsInt();
-            parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamMax, teamMin));
+            int respawnDelay = 3;
+            if (teamJson.has("respawnDelay")) respawnDelay = teamJson.get("respawnDelay").getAsInt();
+            parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamMax, teamMin, respawnDelay));
         }
 
         return new MapInfo(name, version, authors, gameType, parsedTeams, json);

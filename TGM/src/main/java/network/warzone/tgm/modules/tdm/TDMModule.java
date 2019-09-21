@@ -12,6 +12,7 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -116,9 +117,9 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    public void onDeath(TGMPlayerDeathEvent event) {
         if (tdmObjective.equals(TDMObjective.DEATHS)) {
-            MatchTeam team = teamManager.getTeam(event.getEntity());
+            MatchTeam team = teamManager.getTeam(event.getVictim());
             for (MatchTeam matchTeam : teamManager.getTeams()) {
                 if (!matchTeam.equals(team) && !matchTeam.isSpectator()) {
                     incrementPoints(matchTeam, 1);
@@ -127,11 +128,11 @@ public class TDMModule extends MatchModule implements Listener {
             return;
         }
 
-        if (event.getEntity().getKiller() == null) {
+        if (event.getKiller() == null) {
             return;
         }
 
-        Player killer = event.getEntity().getKiller();
+        Player killer = event.getKiller();
         MatchTeam team = teamManager.getTeam(killer);
         incrementPoints(team, 1);
     }

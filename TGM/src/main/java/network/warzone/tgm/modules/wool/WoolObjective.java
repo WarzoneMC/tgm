@@ -9,6 +9,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -168,8 +169,8 @@ public class WoolObjective implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        handleWoolDrop(event.getEntity());
+    public void onDeath(TGMPlayerDeathEvent event) {
+        handleWoolDrop(event.getVictim());
     }
 
     @EventHandler
