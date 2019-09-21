@@ -34,7 +34,7 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true, 0, Integer.MAX_VALUE));
+        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true,  Integer.MAX_VALUE, 0));
 
         for (ParsedTeam parsedTeam : match.getMapContainer().getMapInfo().getTeams()) {
             teams.add(new MatchTeam(
