@@ -3,7 +3,7 @@ package network.warzone.tgm.modules.kit.parser;
 import com.google.gson.JsonObject;
 import network.warzone.tgm.modules.kit.KitNode;
 import network.warzone.tgm.modules.kit.types.ItemKitNode;
-import network.warzone.tgm.parser.item.ItemParser;
+import network.warzone.tgm.parser.item.ItemDeserializer;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class ItemKitNodeParser implements KitNodeParser {
     }
 
     private ItemStack parseItemStack(JsonObject jsonObject) {
-        ItemStack itemStack = ItemParser.parse(jsonObject);
+        ItemStack itemStack = ItemDeserializer.parse(jsonObject);
         if (jsonObject.has("color")) {
             if (itemStack.getType().name().contains("LEATHER_")) { // Leather armor
                 hasColor = true;

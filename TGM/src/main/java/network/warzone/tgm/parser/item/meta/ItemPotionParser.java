@@ -2,7 +2,7 @@ package network.warzone.tgm.parser.item.meta;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.tgm.parser.effect.EffectParser;
+import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.itemstack.ItemUtils;
 import org.bukkit.inventory.ItemStack;
@@ -60,7 +60,7 @@ public class ItemPotionParser implements ItemMetaParser {
         if (object.getAsJsonObject("potion").has("effects")) {
             for (JsonElement element : object.getAsJsonObject("potion").getAsJsonArray("effects")) {
                 if (!element.isJsonObject()) continue;
-                PotionEffect effect = EffectParser.parse(element.getAsJsonObject());
+                PotionEffect effect = EffectDeserializer.parse(element.getAsJsonObject());
                 potionMeta.addCustomEffect(effect, true);
             }
         }

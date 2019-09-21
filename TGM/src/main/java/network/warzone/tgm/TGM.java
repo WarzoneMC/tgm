@@ -18,9 +18,11 @@ import network.warzone.tgm.map.MapInfoDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
+import network.warzone.tgm.modules.killstreak.Killstreak;
+import network.warzone.tgm.modules.killstreak.KillstreakDeserializer;
 import network.warzone.tgm.nickname.NickManager;
-import network.warzone.tgm.parser.effect.EffectParser;
-import network.warzone.tgm.parser.item.ItemParser;
+import network.warzone.tgm.parser.effect.EffectDeserializer;
+import network.warzone.tgm.parser.item.ItemDeserializer;
 import network.warzone.tgm.player.PlayerManager;
 import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.client.TeamClient;
@@ -37,10 +39,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -77,13 +78,17 @@ public class TGM extends JavaPlugin {
         saveDefaultConfig();
 
         gson = new GsonBuilder()
+                // TGM
                 .registerTypeAdapter(MapInfo.class, new MapInfoDeserializer())
-                .registerTypeAdapter(ItemStack.class, new ItemParser())
-                .registerTypeAdapter(EffectParser.class, new EffectParser())
+                .registerTypeAdapter(Killstreak.class, new KillstreakDeserializer())
+                // Bukkit
+                .registerTypeAdapter(ItemStack.class, new ItemDeserializer())
+                .registerTypeAdapter(PotionEffect.class, new EffectDeserializer())
+
                 .create();
 
         ConfigurationSection apiConfig = fileConfiguration.getConfigurationSection("api");
-        if (apiConfig.getBoolean("enabled")) {
+        if (apiConfig != null && apiConfig.getBoolean("enabled")) {
             teamClient = new HttpClient(new HttpClientConfig() {
                 @Override
                 public String getBaseUrl() {
@@ -117,7 +122,7 @@ public class TGM extends JavaPlugin {
         commandManager.register(CycleCommands.class);
         commandManager.register(BroadcastCommands.class);
         commandManager.register(MiscCommands.class);
-        if (apiConfig.getBoolean("enabled", false)) {
+        if (apiConfig != null && apiConfig.getBoolean("enabled", false)) {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
         }
@@ -168,12 +173,10 @@ public class TGM extends JavaPlugin {
         HandlerList.unregisterAll(listener);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends MatchModule> T getModule(Class<T> clazz) {
         return matchManager.getMatch().getModule(clazz);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends MatchModule> List<T> getModules(Class<T> clazz) {
         return matchManager.getMatch().getModules(clazz);
     }

@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Created by Jorge on 09/14/2019
  */
-public class ItemParser implements JsonDeserializer<ItemStack> {
+public class ItemDeserializer implements JsonDeserializer<ItemStack> {
 
     @Getter @Setter static ItemTagParser<Material> materialParser = new ItemMaterialParser();
     @Getter @Setter static ItemTagParser<Integer> amountParser = new ItemAmountParser();

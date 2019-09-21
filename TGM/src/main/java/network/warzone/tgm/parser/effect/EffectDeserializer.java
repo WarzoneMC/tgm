@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 /**
  * Created by Jorge on 09/14/2019
  */
-public class EffectParser implements JsonDeserializer<PotionEffect> {
+public class EffectDeserializer implements JsonDeserializer<PotionEffect> {
 
     @Getter @Setter static EffectTagParser<PotionEffectType> typeParser = new EffectTypeParser();
     @Getter @Setter static EffectTagParser<Integer> durationParser = new EffectDurationParser();
