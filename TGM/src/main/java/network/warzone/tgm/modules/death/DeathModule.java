@@ -22,7 +22,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 public class DeathModule extends MatchModule implements Listener {
@@ -101,7 +103,7 @@ public class DeathModule extends MatchModule implements Listener {
     private void onDeath(Player player) {
         DeathInfo deathInfo = getPlayer(player);
         if(deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
-        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.asList(player.getInventory().getContents())));
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).collect(Collectors.toList())));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
