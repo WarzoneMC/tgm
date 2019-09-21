@@ -265,6 +265,7 @@ public class NickManager {
         }
         entityPlayer.playerConnection.sendPacket(playerTP);
         toExclude.updateInventory();
+        entityPlayer.updateAbilities();
     }
 
     private UUID getUUID(String name) throws UnirestException {
