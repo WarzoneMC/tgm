@@ -34,7 +34,7 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true, 0, Integer.MAX_VALUE, 0));
+        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true, 0, Integer.MAX_VALUE));
 
         for (ParsedTeam parsedTeam : match.getMapContainer().getMapInfo().getTeams()) {
             teams.add(new MatchTeam(
@@ -42,7 +42,6 @@ public class TeamManagerModule extends MatchModule implements Listener {
                     parsedTeam.getAlias(),
                     parsedTeam.getTeamColor(),
                     false,
-                    parsedTeam.getRespawnDelay(),
                     parsedTeam.getMax(),
                     parsedTeam.getMin()
             ));

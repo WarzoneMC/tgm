@@ -6,7 +6,7 @@ import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
-import network.warzone.tgm.modules.death.RespawnModule;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;

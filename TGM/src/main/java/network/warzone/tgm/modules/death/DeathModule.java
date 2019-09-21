@@ -107,7 +107,9 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
         for (ItemStack stack : event.getDrops()) {
-            event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation().add(0, 1.5, 0), stack);
+            if (stack != null) {
+                event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation().add(0, 1.5, 0), stack);
+            }
         }
     }
 

@@ -68,7 +68,7 @@ public class ItemRemoveModule extends MatchModule implements Listener {
     public void onDeath(TGMPlayerDeathEvent event) {
         List<ItemStack> toRemove = new ArrayList<>();
         for (ItemStack itemStack : event.getDrops()) {
-            if (removed.contains(itemStack.getType())) {
+            if (itemStack != null && removed.contains(itemStack.getType())) {
                 toRemove.add(itemStack);
             }
         }
