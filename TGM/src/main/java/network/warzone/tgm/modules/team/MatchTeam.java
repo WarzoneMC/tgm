@@ -22,6 +22,7 @@ public class MatchTeam {
     @Setter private String alias;
     private ChatColor color;
     private final boolean spectator;
+    private final int respawnDelay;
     @Setter private int max;
     @Setter private int min;
     private final List<PlayerContext> members = new ArrayList<>();

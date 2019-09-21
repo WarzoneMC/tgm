@@ -11,14 +11,15 @@ import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.util.Vector;
 
 @Getter
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
@@ -47,12 +48,11 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
+    public void onRespawn(TGMPlayerRespawnEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-        event.setRespawnLocation(getTeamSpawn(matchTeam).getLocation());
 
-        spawnPlayer(playerContext, matchTeam, false);
+        spawnPlayer(playerContext, matchTeam, true);
     }
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {
@@ -61,12 +61,18 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         if (teleport) {
             MatchManager matchManager = TGM.get().getMatchManager();
             GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
-            
+
+            playerContext.getPlayer().setVelocity(new Vector(0, 0, 0));
+            playerContext.getPlayer().setAllowFlight(true);
+            playerContext.getPlayer().setFlying(true);
             playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
         Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+            playerContext.getPlayer().setFlying(false);
+            playerContext.getPlayer().setAllowFlight(false);
+
             if (matchTeam.isSpectator()) {
                 spectatorModule.applySpectatorKit(playerContext);
             } else {

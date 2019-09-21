@@ -16,6 +16,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -174,7 +175,7 @@ public class FFAModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
+    public void onRespawn(TGMPlayerRespawnEvent event) {
         if (blitzMode && match.getMatchStatus().equals(MatchStatus.MID) && getLives(event.getPlayer()) <= 0) {
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
             event.getPlayer().setAllowFlight(true);
@@ -294,7 +295,7 @@ public class FFAModule extends MatchModule implements Listener {
         ScoreboardManagerModule scoreboardManagerModule = match.getModule(ScoreboardManagerModule.class);
 
         if (this.teamManagerModule.getTeamByAlias("winner") == null) {
-            this.teamManagerModule.addTeam(new MatchTeam("winner", player, ChatColor.YELLOW, false, 1, 1));
+            this.teamManagerModule.addTeam(new MatchTeam("winner", player, ChatColor.YELLOW, false, 0, 1, 1));
             TGM.get().getPlayerManager().getPlayers().forEach(playerContext -> {
                 scoreboardManagerModule.registerScoreboardTeam(scoreboardManagerModule.getScoreboard(playerContext.getPlayer()), this.teamManagerModule.getTeamByAlias("winner"), playerContext);
             });

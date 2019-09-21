@@ -49,6 +49,12 @@ public class DeathModule extends MatchModule implements Listener {
             deathInfo.playerTeam = teamManagerModule.getTeam(deathInfo.player);
             deathInfo.playerLocation = deathInfo.player.getLocation();
             deathInfo.cause = event.getCause();
+
+            Player p = (Player) event.getEntity();
+            if (p.getHealth() - event.getFinalDamage() <= 0 || event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
+                onDeath(p);
+                event.setDamage(0);
+            }
         }
     }
 
@@ -71,6 +77,12 @@ public class DeathModule extends MatchModule implements Listener {
             deathInfo.stampKill = damager == null ? -1 : System.currentTimeMillis();
             deathInfo.killerTeam = damager == null ? null : teamManagerModule.getTeam(damager);
             deathInfo.killerLocation = damager == null ? null : damager.getLocation();
+
+            Player p = (Player) event.getEntity();
+            if (p.getHealth() - event.getFinalDamage() <= 0) {
+                onDeath(p);
+                event.setDamage(0);
+            }
         }
     }
 
@@ -83,13 +95,10 @@ public class DeathModule extends MatchModule implements Listener {
         return players.get(playerUUID);
     }
 
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        DeathInfo deathInfo = getPlayer(event.getEntity());
+    private void onDeath(Player player) {
+        DeathInfo deathInfo = getPlayer(player);
         if(deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
         Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.killer, deathInfo.cause, deathInfo.item));
-
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> event.getEntity().spigot().respawn(), 1L);
     }
 
 }
