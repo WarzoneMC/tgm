@@ -32,7 +32,7 @@ public class RespawnModule extends MatchModule implements Listener {
 
     private List<Player> spectators;
     private Map<UUID, Integer> spectatorTime;
-    private List<Player> awaitingConfirm;
+    private List<Player> confirmed;
     private List<Player> frozen;
     private TeamManagerModule teamManagerModule;
 
@@ -45,7 +45,7 @@ public class RespawnModule extends MatchModule implements Listener {
         teamManagerModule = match.getModule(TeamManagerModule.class);
         spectatorTime = new HashMap<>();
         respawnRules = new ArrayList<>();
-        awaitingConfirm = new ArrayList<>();
+        confirmed = new ArrayList<>();
         frozen = new ArrayList<>();
 
         JsonObject settings = match.getMapContainer().getMapInfo().getJsonObject();
@@ -97,20 +97,22 @@ public class RespawnModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onPlayerPunch(PlayerInteractEvent event) {
+        MatchTeam team = teamManagerModule.getTeam(event.getPlayer());
         if (spectators.contains(event.getPlayer()) &&
                 (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) &&
-                awaitingConfirm.contains(event.getPlayer())) {
-            stopSpectating(event.getPlayer());
+                getRule(team).isConfirm()) {
+            confirmed.add(event.getPlayer());
         }
     }
 
     private void updateTitle() {
+        List<Player> toRemove = new ArrayList<>();
         for (Player spectator : spectators) {
             int timeLeft = (spectatorTime.get(spectator.getUniqueId()));
             if (timeLeft <= 0) {
                 spectator.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "RESPAWN",
                         ChatColor.GRAY + "Punch to respawn", 0, 2, 0);
-                if (!awaitingConfirm.contains(spectator)) awaitingConfirm.add(spectator);
+                if (confirmed.contains(spectator)) toRemove.add(spectator);
             } else {
                 spectator.sendTitle(
                         ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED",
@@ -119,6 +121,7 @@ public class RespawnModule extends MatchModule implements Listener {
                 spectatorTime.replace(spectator.getUniqueId(), timeLeft - 50);
             }
         }
+        toRemove.forEach(this::stopSpectating);
     }
 
     private void startSpectating(Player player, int respawnDelay, TGMPlayerDeathEvent event) {
@@ -160,7 +163,7 @@ public class RespawnModule extends MatchModule implements Listener {
     private void stopSpectating(Player player) {
         spectators.remove(player);
         frozen.remove(player);
-        awaitingConfirm.remove(player);
+        confirmed.remove(player);
         spectatorTime.remove(player.getUniqueId());
 
         player.removePotionEffect(PotionEffectType.BLINDNESS);
