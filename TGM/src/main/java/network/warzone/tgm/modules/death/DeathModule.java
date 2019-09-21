@@ -1,23 +1,19 @@
 package network.warzone.tgm.modules.death;
 
 import lombok.NoArgsConstructor;
-import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
-import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
