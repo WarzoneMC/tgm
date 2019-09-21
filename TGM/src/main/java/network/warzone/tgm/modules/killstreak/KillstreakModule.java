@@ -131,7 +131,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                         for(JsonElement jsonElem : actionObj.getAsJsonArray("items")) {
                             if (!jsonElem.isJsonObject()) continue;
                             JsonObject itemJson = jsonElem.getAsJsonObject();
-                            items.add(ItemParser.parseItemStack(itemJson));
+                            items.add(ItemParser.parse(itemJson));
                         }
                         killstreakActions.add(new ItemKillstreakAction(items));
                     }

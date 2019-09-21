@@ -19,6 +19,8 @@ import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
 import network.warzone.tgm.nickname.NickManager;
+import network.warzone.tgm.parser.effect.EffectParser;
+import network.warzone.tgm.parser.item.ItemParser;
 import network.warzone.tgm.player.PlayerManager;
 import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.client.TeamClient;
@@ -33,6 +35,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -73,7 +76,11 @@ public class TGM extends JavaPlugin {
         FileConfiguration fileConfiguration = getConfig();
         saveDefaultConfig();
 
-        gson = new GsonBuilder().registerTypeAdapter(MapInfo.class, new MapInfoDeserializer()).create();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(MapInfo.class, new MapInfoDeserializer())
+                .registerTypeAdapter(ItemStack.class, new ItemParser())
+                .registerTypeAdapter(EffectParser.class, new EffectParser())
+                .create();
 
         ConfigurationSection apiConfig = fileConfiguration.getConfigurationSection("api");
         if (apiConfig.getBoolean("enabled")) {

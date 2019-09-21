@@ -1,6 +1,6 @@
 package network.warzone.tgm.parser.item;
 
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.parser.item.meta.*;
@@ -12,13 +12,14 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Jorge on 09/14/2019
  */
-public class ItemParser {
+public class ItemParser implements JsonDeserializer<ItemStack> {
 
     @Getter @Setter static ItemTagParser<Material> materialParser = new ItemMaterialParser();
     @Getter @Setter static ItemTagParser<Integer> amountParser = new ItemAmountParser();
@@ -44,7 +45,7 @@ public class ItemParser {
         metaParsers.put(type, parser);
     }
 
-    public static ItemStack parseItemStack(JsonObject jsonObject) {
+    public static ItemStack parse(JsonObject jsonObject) {
         Material material = materialParser.parse(jsonObject);
         int amount = amountParser.parse(jsonObject);
         ItemStack itemStack = ItemFactory.createItem(material, amount);
@@ -55,4 +56,11 @@ public class ItemParser {
         itemStack.setItemMeta(meta);
         return itemStack;
     }
+
+    @Override
+    public ItemStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        assert json.isJsonObject() : "JSON element is not a valid object for item deserializing.";
+        return parse(json.getAsJsonObject());
+    }
+
 }
