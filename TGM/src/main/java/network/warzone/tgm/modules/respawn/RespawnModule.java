@@ -7,6 +7,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.MatchTeam;
+import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
@@ -19,6 +20,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -103,6 +105,23 @@ public class RespawnModule extends MatchModule implements Listener {
                 getRule(team).isConfirm()) {
             confirmed.add(event.getPlayer());
         }
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent event) {
+        remove(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onTeamSwitch(TeamChangeEvent event) {
+        remove(event.getPlayerContext().getPlayer());
+    }
+
+    private void remove(Player player) {
+        spectators.remove(player);
+        confirmed.remove(player);
+        spectatorTime.remove(player.getUniqueId());
+        frozen.remove(player);
     }
 
     private void updateTitle() {
