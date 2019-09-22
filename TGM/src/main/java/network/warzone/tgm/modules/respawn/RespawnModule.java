@@ -156,7 +156,7 @@ public class RespawnModule extends MatchModule implements Listener {
         }
         player.setGameMode(GameMode.SPECTATOR);
         if (!rule.isConfirm()) {
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> stopSpectating(event.getVictim()), respawnDelay * 20);
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> stopSpectating(event.getVictim()), respawnDelay / 50);
         }
     }
 
