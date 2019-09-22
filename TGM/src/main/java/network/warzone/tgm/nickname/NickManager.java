@@ -182,6 +182,12 @@ public class NickManager {
         stats.put(player.getUniqueId(), nickedStats);
     }
 
+    public void setNew(Player player, boolean isNew) {
+        NickedUserProfile nickedStats = getUserProfile(player);
+        nickedStats.setNew(isNew);
+        stats.put(player.getUniqueId(), nickedStats);
+    }
+
     private void updatePlayerList(Player player) {
         PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
         ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
