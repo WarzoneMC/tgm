@@ -136,9 +136,13 @@ public class RespawnModule extends MatchModule implements Listener {
                         ChatColor.GRAY + "Punch to respawn", 0, 2, 0);
                 if (confirmed.contains(spectator)) toRemove.add(spectator);
             } else {
-                spectator.sendTitle(
+                if (confirmed.contains(spectator)) spectator.sendTitle(
                         ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED",
                         ChatColor.GRAY + "Respawning in " + ChatColor.YELLOW + String.format("%.1f", timeLeft / 1000.0) + 's',
+                        0, 2, 0);
+                else spectator.sendTitle(
+                        ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED",
+                        ChatColor.GRAY + "Punch to respawn in " + ChatColor.YELLOW + String.format("%.1f", timeLeft / 1000.0) + 's',
                         0, 2, 0);
                 spectatorTime.replace(spectator.getUniqueId(), timeLeft - 50);
             }
@@ -149,36 +153,37 @@ public class RespawnModule extends MatchModule implements Listener {
     private void startSpectating(Player player, int respawnDelay, TGMPlayerDeathEvent event) {
         spectators.add(player);
         spectatorTime.put(player.getUniqueId(), respawnDelay);
-
         RespawnRule rule = getRule(teamManagerModule.getTeam(player));
+        if (rule.getDelay() > 0) {
+            player.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED", "", 0, 3, 0);
 
-        player.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED", "", 0, 3, 0);
-
-        if (event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
-            if (event.getKiller() != null) {
-                player.teleport(event.getKiller().getLocation(), PlayerTeleportEvent.TeleportCause.SPECTATE);
-            } else {
-                player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.SPECTATE);
+            if (event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
+                if (event.getKiller() != null) {
+                    player.teleport(event.getKiller().getLocation(), PlayerTeleportEvent.TeleportCause.SPECTATE);
+                } else {
+                    player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.SPECTATE);
+                }
             }
-        }
 
-        if (rule.isBlindness()) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 3, true));
-        }
-        if (rule.isFreeze()) {
-            frozen.add(player);
-        }
+            if (rule.isBlindness()) {
+                player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 3, true));
+            }
+            if (rule.isFreeze()) {
+                frozen.add(player);
+            }
 
-        player.setAllowFlight(true);
-        player.setFlying(true);
-        if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
-            player.setVelocity(player.getVelocity().setY(0.95));
-        } else {
-            player.setVelocity(player.getVelocity().setY(0));
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            if (!event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
+                player.setVelocity(player.getVelocity().setY(0.95));
+            } else {
+                player.setVelocity(player.getVelocity().setY(0));
+            }
+            player.setGameMode(GameMode.SPECTATOR);
         }
-        player.setGameMode(GameMode.SPECTATOR);
         if (!rule.isConfirm()) {
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> stopSpectating(event.getVictim()), respawnDelay / 50);
+            //Bukkit.getScheduler().runTaskLater(TGM.get(), () -> stopSpectating(event.getVictim()), respawnDelay / 50);
+            confirmed.add(player);
         }
     }
 
