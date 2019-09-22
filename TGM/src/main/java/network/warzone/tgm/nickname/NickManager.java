@@ -185,7 +185,8 @@ public class NickManager {
     private void updatePlayerList(Player player) {
         PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
         ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
-        scoreboardManagerModule.updatePlayerListName(context);
+        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+        scoreboardManagerModule.updatePlayerListName(context, teamManagerModule.getTeam(player));
     }
 
     private void updatePlayerTeam(Player player, MatchTeam team) {

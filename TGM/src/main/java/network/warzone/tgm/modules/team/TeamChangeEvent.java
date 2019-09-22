@@ -36,6 +36,7 @@ public class TeamChangeEvent extends Event implements Cancellable {
         return handlers;
     }
 
+    @Override
     public boolean isCancelled() {
         return !isForced() && this.cancelled;
     }
