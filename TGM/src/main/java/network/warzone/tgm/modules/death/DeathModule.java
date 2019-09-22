@@ -106,6 +106,7 @@ public class DeathModule extends MatchModule implements Listener {
         Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).collect(Collectors.toList())));
     }
 
+    @EventHandler
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
         for (ItemStack stack : event.getDrops()) {
             if (stack != null) {
