@@ -15,6 +15,7 @@ import network.warzone.tgm.util.Parser;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -112,9 +113,11 @@ public class RespawnModule extends MatchModule implements Listener {
         remove(event.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onTeamSwitch(TeamChangeEvent event) {
-        remove(event.getPlayerContext().getPlayer());
+        if (event.isCancelled()) return;
+        if (!event.isForced() && spectators.contains(event.getPlayerContext().getPlayer())) event.setCancelled(true);
+        else remove(event.getPlayerContext().getPlayer());
     }
 
     private void remove(Player player) {

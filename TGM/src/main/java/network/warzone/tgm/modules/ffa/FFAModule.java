@@ -112,6 +112,7 @@ public class FFAModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (event.getTeam().isSpectator()) {
             if (blitzMode && match.getMatchStatus().equals(MatchStatus.MID) && hasWinner()) {
                TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));

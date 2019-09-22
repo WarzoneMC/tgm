@@ -174,6 +174,7 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         //handleWoolDrop(event.getPlayerContext().getPlayer());
         if (!touches.containsKey(event.getPlayerContext().getPlayer().getUniqueId())) return;
 

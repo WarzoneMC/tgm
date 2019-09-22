@@ -705,7 +705,7 @@ public class CycleCommands {
         }
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
+        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam, ignoreFull);
     }
 
     private static TextComponent profileToTextComponent(UserProfile profile, int place) {

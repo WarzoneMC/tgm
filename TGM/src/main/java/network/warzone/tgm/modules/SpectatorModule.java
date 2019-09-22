@@ -99,7 +99,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 long moved = lastMovement.get(player.getUniqueId());
                 if (moved == 0) continue;
                 if (System.currentTimeMillis() > moved + (5 * 60 * 1000)) {
-                    teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators);
+                    teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators, true);
                     lastMovement.remove(player.getUniqueId());
                 }
             }
@@ -190,6 +190,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamJoin(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         updateMenu();
     }
 

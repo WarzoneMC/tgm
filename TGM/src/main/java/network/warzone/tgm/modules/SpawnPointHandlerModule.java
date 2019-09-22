@@ -34,6 +34,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
             spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
         }

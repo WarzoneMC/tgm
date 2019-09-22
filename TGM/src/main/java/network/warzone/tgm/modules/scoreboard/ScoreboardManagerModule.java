@@ -36,6 +36,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         updatePlayerTeam(event.getPlayerContext(), event.getOldTeam(), event.getTeam());
         updatePlayerListName(event.getPlayerContext());
     }

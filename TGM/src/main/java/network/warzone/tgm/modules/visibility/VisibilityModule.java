@@ -32,6 +32,7 @@ public class VisibilityModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (event.getOldTeam() != null) refreshPlayer(event.getPlayerContext().getPlayer());
     }
 

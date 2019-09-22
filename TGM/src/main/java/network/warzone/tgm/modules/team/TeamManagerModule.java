@@ -60,17 +60,19 @@ public class TeamManagerModule extends MatchModule implements Listener {
     @EventHandler
     public void onMatchJoin(MatchJoinEvent event) {
         MatchTeam matchTeam = teamJoinController.determineTeam(event.getPlayerContext());
-        joinTeam(event.getPlayerContext(), matchTeam);
+        joinTeam(event.getPlayerContext(), matchTeam, true);
     }
 
-    public void joinTeam(PlayerContext playerContext, MatchTeam matchTeam) {
+    public void joinTeam(PlayerContext playerContext, MatchTeam matchTeam, boolean forced) {
         MatchTeam oldTeam = getTeam(playerContext.getPlayer());
+        TeamChangeEvent event = new TeamChangeEvent(playerContext, matchTeam, oldTeam, false, forced);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
         if (oldTeam != null) {
             oldTeam.removePlayer(playerContext);
         }
 
         matchTeam.addPlayer(playerContext);
-        Bukkit.getPluginManager().callEvent(new TeamChangeEvent(playerContext, matchTeam, oldTeam));
     }
 
     @EventHandler
