@@ -4,6 +4,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.match.*;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -185,7 +186,8 @@ public class SpectatorModule extends MatchModule implements Listener {
      */
     public boolean isSpectating(Player player) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player);
+        RespawnModule respawnModule = TGM.get().getModule(RespawnModule.class);
+        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player) || respawnModule != null && respawnModule.isSpectating(player);
     }
 
     @EventHandler

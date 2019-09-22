@@ -31,7 +31,7 @@ import java.util.*;
 
 public class RespawnModule extends MatchModule implements Listener {
 
-    private final RespawnRule DEFAULT_RULE = new RespawnRule(null, 3000, false, true, true);
+    private final RespawnRule DEFAULT_RULE = new RespawnRule(null, 3000, true, true, true);
 
     private List<Player> spectators;
     private Map<UUID, Integer> spectatorTime;
@@ -59,13 +59,13 @@ public class RespawnModule extends MatchModule implements Listener {
                 for (JsonElement element : rules) {
                     JsonObject rule = element.getAsJsonObject();
                     List<MatchTeam> matchTeams = Parser.getTeamsFromElement(teamManagerModule, rule.get("teams"));
-                    int delay = 3000;
+                    int delay = DEFAULT_RULE.getDelay();
+                    boolean freeze = DEFAULT_RULE.isFreeze();
+                    boolean blindness = DEFAULT_RULE.isBlindness();
+                    boolean confirm = DEFAULT_RULE.isConfirm();
                     if (rule.has("delay")) delay = rule.get("delay").getAsInt();
-                    boolean freeze = false;
                     if (rule.has("freeze")) freeze = rule.get("freeze").getAsBoolean();
-                    boolean blindness = true;
                     if (rule.has("blindness")) blindness = rule.get("blindness").getAsBoolean();
-                    boolean confirm = true;
                     if (rule.has("confirm")) confirm = rule.get("confirm").getAsBoolean();
                     respawnRules.add(new RespawnRule(matchTeams, delay, freeze, blindness, confirm));
                 }
@@ -203,6 +203,10 @@ public class RespawnModule extends MatchModule implements Listener {
             }
         }
         return DEFAULT_RULE;
+    }
+
+    public boolean isSpectating(Player player) {
+        return this.spectators.contains(player);
     }
 
 }
