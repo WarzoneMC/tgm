@@ -73,7 +73,7 @@ public class MatchManager {
         //find a new map to cycle to.
         MapContainer mapContainer = forcedNextMap;
         if (mapContainer == null) {
-            mapContainer = mapRotation.cycle(matchNumber == 1);
+            mapContainer = mapRotation.cycle();
         }
         forcedNextMap = null;
 
