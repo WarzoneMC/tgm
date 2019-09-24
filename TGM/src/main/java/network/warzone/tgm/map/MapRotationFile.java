@@ -1,9 +1,8 @@
 package network.warzone.tgm.map;
 
 import com.google.common.io.Files;
-import network.warzone.tgm.TGM;
 import lombok.Getter;
-import org.bukkit.Bukkit;
+import network.warzone.tgm.TGM;
 
 import java.io.*;
 import java.nio.charset.Charset;
