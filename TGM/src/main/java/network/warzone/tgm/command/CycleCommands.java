@@ -603,18 +603,36 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage="(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
+    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage="(kills, xp, wins)", min = 1, max = 1, desc = "List the top 10 players on the server")
     public static void leaderboard(CommandContext cmd, CommandSender sender) {
         if (!TGM.get().getConfig().getBoolean("api.stats.enabled") || !TGM.get().getConfig().getBoolean("api.enabled")) {
             sender.sendMessage(ChatColor.RED + "Stat tracking is disabled");
         } else {
-            if (!cmd.getString(0).equalsIgnoreCase("kills"))  {
+            if (!cmd.getString(0).equalsIgnoreCase("kills") && !cmd.getString(0).equalsIgnoreCase("xp") && !cmd.getString(0).equalsIgnoreCase("wins"))  {
                 sender.sendMessage(ChatColor.RED + "Invalid stat: " + cmd.getString(0));
             } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
                 Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                     int place = 0;
-                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 25 players (kills)");
                     for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
+                        sender.sendMessage(profileToTextComponent(player, ++place).getText());
+                    }
+                });
+            }
+            else if (cmd.getString(0).equalsIgnoreCase("xp")) {
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    int place = 0;
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 25 players (xp)");
+                    for (UserProfile player : TGM.get().getTeamClient().getXpLeaderboard()) {
+                        sender.sendMessage(profileToTextComponent(player, ++place).getText());
+                    }
+                });
+            }
+            else if (cmd.getString(0).equalsIgnoreCase("wins")) {
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    int place = 0;
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 25 players (wins)");
+                    for (UserProfile player : TGM.get().getTeamClient().getWinsLeaderboard()) {
                         sender.sendMessage(profileToTextComponent(player, ++place).getText());
                     }
                 });
