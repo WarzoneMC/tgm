@@ -30,17 +30,17 @@ public class BuildFilterType implements FilterType, Listener {
     private final String message;
 
     @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
+    public void onBlockPlace(BlockCanBuildEvent event) {
         for (Region region : regions) {
-            if (region.contains(event.getBlockPlaced().getLocation())) {
+            if (region.contains(event.getBlock().getLocation())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
                         if (filterResult == FilterResult.DENY) {
-                            event.setCancelled(true);
+                            event.setBuildable(false);
                             event.getPlayer().sendMessage(message);
                         } else if (filterResult == FilterResult.ALLOW) {
-                            event.setCancelled(false);
+                            event.setBuildable(true);
                         }
                     }
                 }
