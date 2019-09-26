@@ -1,5 +1,6 @@
 package network.warzone.tgm.match;
 
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
@@ -15,6 +16,7 @@ import network.warzone.tgm.modules.portal.PortalLoaderModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
+import network.warzone.tgm.modules.stats.MatchStatsModule;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
@@ -79,6 +81,16 @@ public abstract class MatchManifest {
         modules.add(new WorldBorderModule());
         modules.add(new KnockbackModule());
         modules.add(new MapCommandsModule());
+        return modules;
+    }
+
+    /**
+     * Modules that are added depending on configuration
+     * @return
+     */
+    public List<MatchModule> allocateConditionalModules() {
+        List<MatchModule> modules = new ArrayList<>();
+        if(TGM.get().getConfig().getBoolean("chat.stats-summary")) modules.add(new MatchStatsModule());
         return modules;
     }
 }

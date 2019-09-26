@@ -6,6 +6,7 @@ api:
     enabled: true
 rotation: Maps/rotation.txt
 chat:
+  stats-summary: true
   enabled: true
   stats-hover: true
   messages:
