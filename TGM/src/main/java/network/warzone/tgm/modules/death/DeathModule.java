@@ -10,13 +10,16 @@ import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -61,17 +64,28 @@ public class DeathModule extends MatchModule implements Listener {
 
             if (event.getDamager() instanceof Player) damager = (Player) event.getDamager();
             if (event.getDamager() instanceof Arrow) damager = (Player) ((Arrow) event.getDamager()).getShooter();
+            else if (event.getDamager() instanceof Trident) damager = (Player) ((Trident) event.getDamager()).getShooter();
 
             if (damager != null && teamManagerModule.getTeam(damager).isSpectator()) return;
 
             deathInfo.killer = damager;
-            deathInfo.item = event.getDamager() instanceof Arrow ? ItemFactory.createItem(Material.BOW) : damager == null ? ItemFactory.createItem(Material.AIR) : damager.getInventory().getItemInMainHand();
+            deathInfo.item = determineItemFromDamager(event.getDamager(), damager);
 
             deathInfo.killerName = damager == null ? null : damager.getName();
             deathInfo.stampKill = damager == null ? -1 : System.currentTimeMillis();
             deathInfo.killerTeam = damager == null ? null : teamManagerModule.getTeam(damager);
             deathInfo.killerLocation = damager == null ? null : damager.getLocation();
         }
+    }
+
+    private static ItemStack determineItemFromDamager(Entity e, Player p) {
+        if (e instanceof Arrow) {
+            return ItemFactory.createItem(Material.BOW);
+        } else if (e instanceof Trident) {
+            return ItemFactory.createItem(Material.TRIDENT);
+        } else if (p == null) {
+            return ItemFactory.createItem(Material.AIR);
+        } else return p.getInventory().getItemInMainHand();
     }
 
     public DeathInfo getPlayer(Player player) {
