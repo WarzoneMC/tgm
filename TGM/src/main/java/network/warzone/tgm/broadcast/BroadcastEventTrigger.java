@@ -43,6 +43,7 @@ public class BroadcastEventTrigger implements Listener{
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamJoin(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (event.getOldTeam() == null || event.getTeam().isSpectator()) return;
         trigger(event.getPlayerContext().getPlayer(), "onTeamJoin");
     }
