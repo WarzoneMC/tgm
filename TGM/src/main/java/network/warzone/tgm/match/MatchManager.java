@@ -131,16 +131,16 @@ public class MatchManager {
 
             TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
 
-            Bukkit.unloadWorld(oldMatch.getWorld(), false);
-
-            //.getScheduler().runTaskLater(TGM.get(), () -> {
-
-                //try {
-                //    FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
-                //} catch (IOException e) {
-                //    e.printStackTrace();
-                //}
-            //}, 80L); // 4 seconds
+            boolean save = TGM.get().getConfig().getBoolean("map.save-matches", false);
+            Bukkit.unloadWorld(oldMatch.getWorld(), save);
+            if (!save)
+                Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
+                    try {
+                        FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }, 80L); // 4 seconds
         }
     }
 
