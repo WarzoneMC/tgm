@@ -4,6 +4,7 @@ import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
+import network.warzone.tgm.modules.damage.DamageControlModule;
 import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
@@ -82,6 +83,7 @@ public abstract class MatchManifest {
         modules.add(new KnockbackModule());
         modules.add(new MapCommandsModule());
         modules.add(new LegacyKitModule());
+        modules.add(new DamageControlModule());
         modules.add(new RespawnModule());
         return modules;
     }
