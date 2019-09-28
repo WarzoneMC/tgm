@@ -31,7 +31,7 @@ import java.util.*;
 
 public class RespawnModule extends MatchModule implements Listener {
 
-    private final RespawnRule DEFAULT_RULE = new RespawnRule(null, 3000, true, true, true);
+    private final RespawnRule DEFAULT_RULE = new RespawnRule(null, 3000, false, true, true);
 
     private List<Player> spectators;
     private Map<UUID, Integer> spectatorTime;

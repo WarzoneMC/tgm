@@ -15,6 +15,7 @@ import network.warzone.tgm.util.menu.Menu;
 import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.PublicMenu;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -382,6 +383,22 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         lastMovement.remove(event.getPlayer().getUniqueId());
         updateMenu();
+    }
+
+    @EventHandler
+    public void onAEC(AreaEffectCloudApplyEvent event) {
+        for (Entity entity : event.getAffectedEntities()) {
+            if (entity instanceof Player && isSpectating((Player) entity))
+                event.getAffectedEntities().remove(entity);
+        }
+    }
+
+    @EventHandler
+    public void onPotion(PotionSplashEvent event) {
+        for (Entity entity : event.getAffectedEntities()) {
+            if (entity instanceof Player && isSpectating((Player) entity))
+                event.getAffectedEntities().remove(entity);
+        }
     }
 
     @Override
