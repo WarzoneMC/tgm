@@ -18,8 +18,8 @@ public class DamageControlModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         JsonObject matchObj = match.getMapContainer().getMapInfo().getJsonObject();
-        if (matchObj.has("damage_control")) {
-            JsonObject damageControlObj = matchObj.getAsJsonObject("damage_control");
+        if (matchObj.has("damageControl")) {
+            JsonObject damageControlObj = matchObj.getAsJsonObject("damageControl");
             if (damageControlObj.has("fire")) fireDamage = damageControlObj.get("fire").getAsBoolean();
             if (damageControlObj.has("fall")) fallDamage = damageControlObj.get("fall").getAsBoolean();
             if (damageControlObj.has("suffocation")) suffocationDamage = damageControlObj.get("suffocation").getAsBoolean();
