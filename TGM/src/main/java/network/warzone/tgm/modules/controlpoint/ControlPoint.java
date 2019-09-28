@@ -93,6 +93,7 @@ public class ControlPoint implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         this.playersOnPoint.remove(event.getPlayerContext().getPlayer());
     }
 

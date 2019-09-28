@@ -17,6 +17,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.time.TimeUpdate;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Strings;
 import org.apache.commons.lang.StringUtils;
@@ -26,6 +27,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
@@ -210,7 +212,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     }
 
     @EventHandler
-    public void onRespawn(PlayerRespawnEvent event) {
+    public void onRespawn(TGMPlayerRespawnEvent event) {
         if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
             event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 1, true, false)));
         }
@@ -222,12 +224,13 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     }
 
     @EventHandler
-    public void onBukkitDeath(org.bukkit.event.entity.PlayerDeathEvent event) {
+    public void onBukkitDeath(PlayerDeathEvent event) {
         event.setDeathMessage("");
     }
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if(defaultScoreboardLoaded) {
             for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
         }
@@ -257,7 +260,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
     private void infect(Player player) {
         player.getWorld().strikeLightningEffect(player.getLocation());
 
-        teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"));
+        teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"), true);
         if (teamManager.getTeamById("humans").getMembers().size() > 0)
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
         player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
