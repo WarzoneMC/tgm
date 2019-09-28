@@ -23,7 +23,8 @@ public class Plugins {
     public static class ProtocolSupport {
 
         public static boolean isUsingOldVersion(Player player) {
-            return ProtocolSupportAPI.getProtocolVersion(player).isBefore(ProtocolVersion.MINECRAFT_1_9);
+            ProtocolVersion version = ProtocolSupportAPI.getProtocolVersion(player);
+            return version == ProtocolVersion.UNKNOWN || version.isBefore(ProtocolVersion.MINECRAFT_1_9);
         }
 
     }
