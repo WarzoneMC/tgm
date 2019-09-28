@@ -48,7 +48,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                             killerTeam.getColor() + deathInfo.killerName + ChatColor.GRAY + " using " +
                             itemToString(weapon);
             } else if (cause.equals(DamageCause.VOID)) {
-                if (weapon != null && weapon.getType().equals(Material.BOW))
+                if (weapon != null && (weapon.getType().equals(Material.BOW) || weapon.getType().equals(Material.TRIDENT)))
                     message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " was shot into the void by " +
                             killerTeam.getColor() + deathInfo.killerName + ChatColor.GRAY;
                 else
@@ -61,7 +61,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                     }
             } else if (cause.equals(DamageCause.PROJECTILE)) {
                 int distance = ((Double) deathInfo.killerLocation.distance(deathInfo.playerLocation)).intValue();
-                message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " was shot by " +
+                message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + (weapon.getType() == Material.TRIDENT ? " forked " : " was shot by ") +
                         killerTeam.getColor() + deathInfo.killerName + ChatColor.GRAY + " from " + distance + (distance == 1 ? " block" : " blocks");
             } else if (cause.equals(DamageCause.FIRE) || cause.equals(DamageCause.FIRE_TICK)) {
                 if (!deathInfo.playerName.equals(deathInfo.killerName)) {
