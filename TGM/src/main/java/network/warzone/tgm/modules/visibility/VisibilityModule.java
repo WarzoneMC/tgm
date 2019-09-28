@@ -6,11 +6,11 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
@@ -26,12 +26,13 @@ public class VisibilityModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        refreshPlayer(event.getEntity());
+    public void onDeath(TGMPlayerDeathEvent event) {
+        refreshPlayer(event.getVictim());
     }
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (event.getOldTeam() != null) refreshPlayer(event.getPlayerContext().getPlayer());
     }
 

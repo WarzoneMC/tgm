@@ -7,6 +7,7 @@ import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.death.DeathModule;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.infection.InfectionModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
@@ -76,6 +77,8 @@ public class InfectionManifest extends MatchManifest {
         modules.add(new PortalLoaderModule());
         modules.add(new WorldBorderModule());
         modules.add(new KnockbackModule());
+        modules.add(new MapCommandsModule());
+        modules.add(new RespawnModule());
 
         return modules;
     }

@@ -208,7 +208,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
     private void createDeath(Player player) {
         DeathInfo deathInfo = match.getModule(DeathModule.class).getPlayer(player);
-        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathInfo.killer, deathInfo.cause, deathInfo.item));
+        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).collect(Collectors.toList())));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -228,6 +228,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (event.getOldTeam() != null && !event.getOldTeam().isSpectator()) updateScoreboardTeamLine(event.getOldTeam(), getAlivePlayers(event.getOldTeam()).size());
         if (!event.getTeam().isSpectator()) updateScoreboardTeamLine(event.getTeam(), getAlivePlayers(event.getTeam()).size());
 

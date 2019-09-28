@@ -29,20 +29,21 @@ import java.util.UUID;
  * direct access to SimpleScoreboard objects through TGM.get().getModule(ScoreboardManagerModule.class)
  * to control scoreboards as needed.
  */
-@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
+@ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     private HashMap<UUID, SimpleScoreboard> scoreboards = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         updatePlayerTeam(event.getPlayerContext(), event.getOldTeam(), event.getTeam());
-        updatePlayerListName(event.getPlayerContext());
+        updatePlayerListName(event.getPlayerContext(), event.getTeam());
     }
 
     @EventHandler
     public void onPlayerXPEvent(PlayerXPEvent event) {
-        updatePlayerListName(event.getPlayerContext());
+        updatePlayerListName(event.getPlayerContext(), TGM.get().getModule(TeamManagerModule.class).getTeam(event.getPlayerContext().getPlayer()));
     }
 
     public void updatePlayerTeam(PlayerContext player, MatchTeam oldTeam, MatchTeam newTeam) {
@@ -65,8 +66,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         }
     }
 
-    public void updatePlayerListName(PlayerContext player) {
-        MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeam(player.getPlayer());
+    public void updatePlayerListName(PlayerContext player, MatchTeam team) {
         String prefix = player.getLevelString();
         if (prefix != null) {
             String name = player.getPlayer().getName();

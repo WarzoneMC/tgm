@@ -588,7 +588,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
+    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats/reload)", min = 1)
     @CommandPermissions({"tgm.config"})
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
@@ -609,6 +609,9 @@ public class CycleCommands {
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
             }
+        } else if (cmd.getString(0).equalsIgnoreCase("reload")) {
+            TGM.get().reloadConfig();
+            sender.sendMessage(ChatColor.GREEN + "Reloaded configuration!");
         }
     }
 
@@ -714,7 +717,7 @@ public class CycleCommands {
         }
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
+        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam, ignoreFull);
     }
 
     private static TextComponent profileToTextComponent(UserProfile profile, int place) {

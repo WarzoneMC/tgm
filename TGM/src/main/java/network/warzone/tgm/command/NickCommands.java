@@ -165,11 +165,15 @@ public class NickCommands {
                             int badDeaths = generateInt(100, 150);
                             TGM.get().getNickManager().setStats(p, (int) (badDeaths * badKDR), badDeaths, generateInt(20, 50), generateInt(50, 150), generateInt(1, 10));
                             break;
+                        case "new":
+                            TGM.get().getNickManager().setStats(p, 0, 0, 0, 0, 0);
+                            TGM.get().getNickManager().setNew(p, true);
+                            break;
                         default:
                             sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad> [value]");
                             return;
                     }
-                    sender.sendMessage(ChatColor.GREEN + "Set stats to preset ranges " + ChatColor.YELLOW + type);
+                    sender.sendMessage(ChatColor.GREEN + "Set stats to preset " + ChatColor.YELLOW + type);
                 }
             } else if (option.equals("rank") && cmd.argsLength() > 1) {
                 String newRank = cmd.getString(1);
