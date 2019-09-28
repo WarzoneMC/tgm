@@ -29,13 +29,24 @@ import java.util.UUID;
  * direct access to SimpleScoreboard objects through TGM.get().getModule(ScoreboardManagerModule.class)
  * to control scoreboards as needed.
  */
-@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
+@ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     private HashMap<UUID, SimpleScoreboard> scoreboards = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
+        updatePlayerTeam(event.getPlayerContext(), event.getOldTeam(), event.getTeam());
+        updatePlayerListName(event.getPlayerContext(), event.getTeam());
+    }
+
+    @EventHandler
+    public void onPlayerXPEvent(PlayerXPEvent event) {
+        updatePlayerListName(event.getPlayerContext(), TGM.get().getModule(TeamManagerModule.class).getTeam(event.getPlayerContext().getPlayer()));
+    }
+
+    public void updatePlayerTeam(PlayerContext player, MatchTeam oldTeam, MatchTeam newTeam) {
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             for (PlayerContext playerContext : matchTeam.getMembers()) {
                 SimpleScoreboard simpleScoreboard = getScoreboard(playerContext.getPlayer());
@@ -44,25 +55,18 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
                     simpleScoreboard = initScoreboard(playerContext);
                 }
 
-                if (event.getOldTeam() != null) {
-                    Team old = simpleScoreboard.getScoreboard().getTeam(event.getOldTeam().getId());
-                    old.removeEntry(event.getPlayerContext().getPlayer().getName());
+                if (oldTeam != null) {
+                    Team old = simpleScoreboard.getScoreboard().getTeam(oldTeam.getId());
+                    old.removeEntry(player.getPlayer().getName());
                 }
 
-                Team to = simpleScoreboard.getScoreboard().getTeam(event.getTeam().getId());
-                to.addEntry(event.getPlayerContext().getPlayer().getName());
+                Team to = simpleScoreboard.getScoreboard().getTeam(newTeam.getId());
+                to.addEntry(player.getPlayer().getName());
             }
         }
-        updatePlayerListName(event.getPlayerContext());
     }
 
-    @EventHandler
-    public void onPlayerXPEvent(PlayerXPEvent event) {
-        updatePlayerListName(event.getPlayerContext());
-    }
-
-    public void updatePlayerListName(PlayerContext player) {
-        MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeam(player.getPlayer());
+    public void updatePlayerListName(PlayerContext player, MatchTeam team) {
         String prefix = player.getLevelString();
         if (prefix != null) {
             String name = player.getPlayer().getName();

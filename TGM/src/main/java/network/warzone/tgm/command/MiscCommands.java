@@ -2,21 +2,11 @@ package network.warzone.tgm.command;
 
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
-import network.warzone.tgm.TGM;
-import network.warzone.tgm.nickname.NickedUserProfile;
-import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Players;
-import network.warzone.warzoneapi.models.Rank;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.Properties;
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 /*
 These commands MUST NOT use ANY API FUNCTIONALITY. This class will
@@ -25,7 +15,7 @@ be enabled WHETHER THE API IS ENABLED OR NOT.
 
 public class MiscCommands {
 
-    @Command(aliases= {"ping"}, desc = "Check player ping", max = 1, usage = "(name)")
+    @Command(aliases = {"ping"}, desc = "Check player ping", max = 1, usage = "(name)")
     public static void ping(CommandContext cmd, CommandSender sender) {
         Player player;
         if (cmd.argsLength() > 0) {
@@ -35,7 +25,7 @@ public class MiscCommands {
                 return;
             }
         } else if (sender instanceof Player) {
-            player = (Player) sender;   
+            player = (Player) sender;
         } else {
             sender.sendMessage(ChatColor.RED + "As console, you can use /ping <player> to check someone's ping.");
             return;
@@ -45,183 +35,4 @@ public class MiscCommands {
         sender.sendMessage(pingMsg);
     }
 
-    @Command(aliases={"nick"}, desc= "Change nickname", usage ="(name)")
-    @CommandPermissions({"tgm.command.nick"})
-    public static void nick(CommandContext cmd, CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("Player only command.");
-            return;
-        }
-        Player p = (Player) sender;
-        if (cmd.argsLength() > 0) {
-            String option = cmd.getString(0);
-            if (option.equals("set") && cmd.argsLength() > 1) {
-                String newName = cmd.getString(1);
-                if (newName.length() > 16) {
-                    sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
-                    return;
-                }
-                if (!newName.matches("^[a-z_A-Z0-9]+$")) {
-                    sender.sendMessage(ChatColor.RED + "Invalid name.");
-                    return;
-                }
-                if (
-                        Bukkit.getOnlinePlayers().stream().map(
-                                (Player player)->TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
-                        ).anyMatch((String name) -> name.equals(newName))) {
-                    sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
-                    return;
-                }
-                boolean force = false;
-                if (cmd.argsLength() > 2) {
-                    String arg2 = cmd.getString(2);
-                    force = arg2.equals("force");
-                }
-                if (force) {
-                    TGM.get().getNickManager().setNick(p, newName, null);
-                } else {
-                    TGM.get().getNickManager().setRelogNick(p, newName, null);
-                }
-                sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
-                if (!force) {
-                    sender.sendMessage(ChatColor.AQUA + "Relog for effects to take place!");
-                }
-            } else if (option.equals("reset")) {
-                String original = TGM.get().getNickManager().originalNames.get(p.getUniqueId());
-                if (original != null) {
-                    TGM.get().getNickManager().reset(p);
-                    sender.sendMessage(ChatColor.GREEN + "Reset username");
-                } else {
-                    sender.sendMessage(ChatColor.RED + "You are not nicked!");
-                }
-            } else if (option.equals("skin") && cmd.argsLength() > 1) {
-                String newName = cmd.getString(1);
-                if (newName.length() > 16) {
-                    sender.sendMessage(ChatColor.RED + "New skin name must be shorter than 16 characters.");
-                    return;
-                }
-                TGM.get().getNickManager().setSkin(p, newName, null);
-                sender.sendMessage(ChatColor.GREEN + "Updated skin to " + ChatColor.YELLOW + newName);
-            } else if (option.equals("name") && cmd.argsLength() > 1) {
-                String newName = cmd.getString(1);
-
-                if (!newName.matches("^[a-z_A-Z0-9]+$")) {
-                    sender.sendMessage(ChatColor.RED + "Invalid name.");
-                    return;
-                }
-                if (newName.length() > 16) {
-                    sender.sendMessage(ChatColor.RED + "New name must be shorter than 16 characters.");
-                    return;
-                }
-                if (
-                        Bukkit.getOnlinePlayers().stream().map(
-                                (Player player)-> TGM.get().getPlayerManager().getPlayerContext(player).getOriginalName()
-                        ).anyMatch((String name) -> name.equals(newName))) {
-                    sender.sendMessage(ChatColor.RED + "You cannot nick as an online player.");
-                    return;
-                }
-                TGM.get().getNickManager().setName(p, newName);
-                sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
-            } else if (option.equals("stats") && cmd.argsLength() > 1) {
-                if (cmd.argsLength() > 2) {
-                    try {
-                        String statToChange = cmd.getString(1);
-                        int value = cmd.getInteger(2);
-
-                        switch (statToChange) {
-                            case "kills":
-                                TGM.get().getNickManager().setStats(p, value, null, null, null, null);
-                                break;
-                            case "deaths":
-                                TGM.get().getNickManager().setStats(p, null, value, null, null, null);
-                                break;
-                            case "wins":
-                                TGM.get().getNickManager().setStats(p, null, null, value, null, null);
-                                break;
-                            case "losses":
-                                TGM.get().getNickManager().setStats(p, null, null, null, value, null);
-                                break;
-                            case "objectives":
-                                TGM.get().getNickManager().setStats(p, null, null, null, null, value);
-                                break;
-                            default:
-                                sender.sendMessage(ChatColor.RED + "Invalid stat. /nick stats <kills|deaths|wins|losses|objectives> <value>");
-                                return;
-                        }
-                        sender.sendMessage(ChatColor.GREEN + "Updated nicked " + ChatColor.YELLOW + statToChange + ChatColor.GREEN + " to " + ChatColor.YELLOW + value + ChatColor.GREEN + ".");
-                    } catch (CommandNumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    String type = cmd.getString(1);
-                    switch (type) {
-                        case "random":
-                            TGM.get().getNickManager().setStats(p, generateInt(10, 100), generateInt(45, 90), generateInt(10, 30), generateInt(10, 30), generateInt(10, 20));
-                            break;
-                        case "good":
-                            double goodKDR = generateDouble(1, 2);
-                            int goodDeaths = generateInt(35, 75);
-                            TGM.get().getNickManager().setStats(p, (int) (goodDeaths * goodKDR), goodDeaths, generateInt(50, 100), generateInt(25, 50), generateInt(50, 100));
-                            break;
-                        case "bad":
-                            double badKDR = generateDouble(0.1, 1);
-                            int badDeaths = generateInt(100, 150);
-                            TGM.get().getNickManager().setStats(p, (int) (badDeaths * badKDR), badDeaths, generateInt(20, 50), generateInt(50, 150), generateInt(1, 10));
-                            break;
-                        default:
-                            sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad> [value]");
-                            return;
-                    }
-                    sender.sendMessage(ChatColor.GREEN + "Set stats to preset ranges " + ChatColor.YELLOW + type);
-                }
-            } else if (option.equals("rank") && cmd.argsLength() > 1) {
-                String newRank = cmd.getString(1);
-                Rank rank = null;
-                for (Rank r : TGM.get().getTeamClient().retrieveRanks()) {
-                    if (r.getName().equalsIgnoreCase(newRank)) rank = r;
-                }
-                if (newRank.equals("none")) {
-                    NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
-                    if (profile.getHighestRank() != null) {
-                        profile.removeRank(profile.getHighestRank());
-                    }
-                    TGM.get().getNickManager().stats.put(p.getUniqueId(), profile);
-                    sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
-                    return;
-                }
-                if (rank != null) {
-                    TGM.get().getNickManager().setRank(p, rank);
-                    sender.sendMessage(ChatColor.GREEN + "Updated rank to " + ChatColor.YELLOW + rank.getName());
-                } else {
-                    sender.sendMessage(ChatColor.RED + "Invalid rank");
-                }
-            } else {
-                sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|stats|rank> <option>");
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "/nick <set|reset|name|skin|stats|rank> <option>");
-        }
-    }
-
-    @Command(aliases={"whois"}, desc ="Reveals a nicked player")
-    @CommandPermissions({"tgm.command.whois"})
-    public static void whois(CommandContext cmd, CommandSender sender) {
-        if (cmd.argsLength() > 0) {
-            String username = cmd.getString(0);
-            if (TGM.get().getNickManager().nickNames.containsValue(username)) {
-                UUID uuid = HashMaps.reverseGetFirst(username, TGM.get().getNickManager().nickNames);
-                String originalName = TGM.get().getNickManager().originalNames.get(uuid);
-                sender.sendMessage(ChatColor.YELLOW + username + ChatColor.GREEN + " is " + ChatColor.YELLOW + originalName);
-            } else {
-                sender.sendMessage(ChatColor.RED + "That user isn't nicked!");
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "Invalid user.");
-        }
-    }
-
-    public static double generateDouble(double min, double max) { return ThreadLocalRandom.current().nextDouble(min, max+1); }
-    public static int generateInt(int min, int max) {
-        return ThreadLocalRandom.current().nextInt(min, max + 1);
-    }
 }

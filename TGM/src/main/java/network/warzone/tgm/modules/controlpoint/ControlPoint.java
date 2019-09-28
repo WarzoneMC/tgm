@@ -10,9 +10,11 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Blocks;
+import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,6 +55,8 @@ public class ControlPoint implements Listener {
     private int progress = 0;
     private MatchTeam progressingTowardsTeam = null;
 
+    private boolean initialCapture = true;
+
     private int runnableId = -1;
 
     public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
@@ -89,6 +93,7 @@ public class ControlPoint implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         this.playersOnPoint.remove(event.getPlayerContext().getPlayer());
     }
 
@@ -141,6 +146,7 @@ public class ControlPoint implements Listener {
     }
 
     private void handleCap(MatchTeam matchTeam) {
+        boolean isInitial = initialCapture;
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
             progress++;
@@ -167,6 +173,7 @@ public class ControlPoint implements Listener {
                 if (controller == null) {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
+                    if (initialCapture) initialCapture = false;
                 } else {
                     controlPointService.holding(matchTeam);
                 }
@@ -177,26 +184,28 @@ public class ControlPoint implements Listener {
             }
         }
 
-        renderBlocks(matchTeam);
+        renderBlocks(matchTeam, isInitial);
     }
 
     public int getPercent() {
         return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
-    private void renderBlocks(MatchTeam matchTeam) { //TODO Test for 1.13
+    private void renderBlocks(MatchTeam matchTeam, boolean isInitial) {
+        ChatColor color1 = progressingTowardsTeam.getColor();
+        ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : (isInitial ? ChatColor.RESET : ChatColor.WHITE);
         Location center = region.getCenter();
-
+        double x = center.getX();
+        double z = center.getZ();
         double percent = Math.toRadians(getPercent() * 3.6);
-
         for (Block block : region.getBlocks()) {
             if (!Blocks.isVisualMaterial(block.getType())) continue;
-
-            double angle = Math.atan2(block.getZ() - center.getZ(), block.getX() - center.getX());
-
+            double dx = block.getX() - x;
+            double dz = block.getZ() - z;
+            double angle = Math.atan2(dz, dx);
             if (angle < 0) angle += 2 * Math.PI;
-
-            block.setType(regionSave.getBlockAt(new BlockVector(block.getLocation().toVector())));
+            ChatColor color = angle < percent ? color1 : color2;
+            if (color != ChatColor.RESET) block.setType(ColorConverter.convertChatColorToColoredBlock(block.getType(), color));
         }
     }
 

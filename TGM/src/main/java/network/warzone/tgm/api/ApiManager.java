@@ -108,22 +108,20 @@ public class ApiManager implements Listener {
                 teamMappings.add(new TeamMapping(matchTeam.getId(), playerContext.getUserProfile().getId().toString()));
             }
         }
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            MatchFinishPacket matchFinishPacket = new MatchFinishPacket(
+                    matchInProgress.getId(),
+                    matchInProgress.getMap(),
+                    event.getMatch().getStartedTime(),
+                    event.getMatch().getFinishedTime(),
+                    TGM.get().getModule(ChatModule.class).getChatLog(),
+                    winners,
+                    losers,
+                    event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,
+                    teamMappings);
+            TGM.get().getTeamClient().finishMatch(matchFinishPacket);
+        });
 
-        MatchFinishPacket matchFinishPacket = new MatchFinishPacket(
-                matchInProgress.getId(),
-                matchInProgress.getMap(),
-                event.getMatch().getStartedTime(),
-                event.getMatch().getFinishedTime(),
-                TGM.get().getModule(ChatModule.class).getChatLog(),
-                winners,
-                losers,
-                event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,
-                teamMappings);
-        TGM.get().getTeamClient().finishMatch(matchFinishPacket);
-
-        winners.clear();
-        losers.clear();
-        teamMappings.clear();
     }
 
     @EventHandler

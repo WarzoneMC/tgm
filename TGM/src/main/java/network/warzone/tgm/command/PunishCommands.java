@@ -354,7 +354,11 @@ public class PunishCommands {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("tgm.reports")) {
-                player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4[REPORT]&8 [" + amount + "] &5" + reporter.getName() + "&7 reported &d" + reported.getName() + "&7 for &r" + cmd.getJoinedStrings(1)));
+                TextComponent message = new TextComponent(ChatColor.translateAlternateColorCodes('&',
+                        "&4[REPORT]&8 [" + amount + "] &5" + reporter.getName() + " &7reported &d" +
+                                reported.getName() + " &7for &r" + cmd.getJoinedStrings(1)));
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp " + report.getReported()));
+                player.spigot().sendMessage(message);
             }
         }
 

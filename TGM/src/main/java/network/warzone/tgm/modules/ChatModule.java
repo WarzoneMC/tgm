@@ -126,7 +126,7 @@ public class ChatModule extends MatchModule implements Listener {
             MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
             event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
-                    prefix + matchTeam.getColor() + "%s" + ChatColor.WHITE + ": %s");
+                    prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
         }
     }
 
@@ -172,7 +172,7 @@ public class ChatModule extends MatchModule implements Listener {
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, stats));
                 player.spigot().sendMessage(message);
             });
-            Bukkit.getConsoleSender().sendMessage(String.format(event.getFormat(), playerContext.getPlayer().getName(), event.getMessage()));
+            Bukkit.getConsoleSender().sendMessage(event.getFormat().replace("%%", "%"));
         }
         event.setCancelled(true);
     }
