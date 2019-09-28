@@ -33,6 +33,7 @@ public class UserProfile {
     private List<String> ips;
     private List<String> ranks;
     private List<Rank> ranksLoaded;
+    private List<String> unlockedKits;
     private int coins;
     private int wins;
     private int losses;
@@ -93,6 +94,14 @@ public class UserProfile {
 
     public void addWoolDestroy() {
         wool_destroys++;
+    }
+
+    public void addCoins(int amount) {
+        coins += amount;
+    }
+
+    public void removeCoins(int amount) {
+        coins -= amount;
     }
 
     public int getXP() {

@@ -1,5 +1,6 @@
 package network.warzone.tgm.match;
 
+import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
@@ -82,9 +83,19 @@ public abstract class MatchManifest {
         modules.add(new WorldBorderModule());
         modules.add(new KnockbackModule());
         modules.add(new MapCommandsModule());
-        modules.add(new LegacyKitModule());
         modules.add(new DamageControlModule());
         modules.add(new RespawnModule());
         return modules;
     }
+
+    /**
+     * Modules that are allocated conditional to configuration
+     * settings (server and map)
+     */
+    public List<MatchModule> allocateConditionalModules(MapInfo mapInfo) {
+        List<MatchModule> modules = new ArrayList<>();
+        if (mapInfo.isUsingLegacyKits()) modules.add(new LegacyKitModule());
+        return modules;
+    }
+
 }

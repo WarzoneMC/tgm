@@ -13,7 +13,7 @@ import java.util.UUID;
  * Created by yikes on 09/27/19
  */
 public abstract class Ability implements Listener {
-    @Getter private Set<UUID> registeredPlayers = new HashSet<>();
+    @Getter protected Set<UUID> registeredPlayers = new HashSet<>();
     public Ability() {
         TGM.registerEvents(this);
     }

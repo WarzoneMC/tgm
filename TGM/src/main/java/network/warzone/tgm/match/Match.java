@@ -40,6 +40,7 @@ public class Match {
      */
     public void load() {
         modules.addAll(matchManifest.allocateCoreModules());
+        modules.addAll(matchManifest.allocateConditionalModules(mapContainer.getMapInfo()));
         modules.addAll(matchManifest.allocateGameModules());
 
         /*

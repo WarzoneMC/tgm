@@ -18,6 +18,8 @@ import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
+import network.warzone.tgm.modules.kit.legacy_kits.LegacyKit;
+import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
@@ -25,7 +27,9 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import network.warzone.tgm.util.menu.LegacyKitMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
+import network.warzone.warzoneapi.models.LegacyKitPurchaseRequest;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -283,13 +287,78 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"kits"}, desc = "Choose a kit.")
+    @Command(aliases = {"kits"}, desc = "Kit menu.")
     public static void kits(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
             return;
         }
+        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingLegacyKits()) {
+            sender.sendMessage(ChatColor.RED + "This map does not use legacy kits.");
+            return;
+        }
 
+        Player player = (Player) sender;
+        LegacyKitMenu.getLegacyKitMenu().open(player);
+    }
+
+    @Command(aliases = {"kit"}, desc = "Choose a kit.", min = 1, usage = "<kit name>")
+    public static void kit(CommandContext cmd, CommandSender sender) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
+            return;
+        }
+        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingLegacyKits()) {
+            sender.sendMessage(ChatColor.RED + "This map does not use legacy kits.");
+            return;
+        }
+
+        String chosenKitString = Strings.getTechnicalName(cmd.getString(0));
+        LegacyKitModule.LegacyKitStore actualKit = null;
+        for (LegacyKitModule.LegacyKitStore legacyKitStore : LegacyKitModule.LegacyKitStore.values()) {
+            if (legacyKitStore.name().equalsIgnoreCase(chosenKitString)) {
+                actualKit = legacyKitStore;
+                break;
+            }
+        }
+        Player player = (Player) sender;
+        if (actualKit == null) {
+            player.sendMessage(ChatColor.RED + "Invalid kit name! Try /kits!");
+            return;
+        }
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+        if (Strings.getTechnicalName(playerContext.getCurrentLegacyKit()).equals(chosenKitString)) {
+            player.sendMessage(ChatColor.RED + "You are using this kit currently!");
+            return;
+        }
+
+        boolean foundKitInList = false;
+        for (String unlockedKit : playerContext.getUserProfile().getUnlockedKits()) {
+            if(Strings.getTechnicalName(unlockedKit).equals(chosenKitString)) {
+                foundKitInList = true;
+                break;
+            }
+        }
+
+        if (!foundKitInList) {
+            if (playerContext.getUserProfile().getCoins() >= actualKit.getCost()) {
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().purchaseLegacyKit(new LegacyKitPurchaseRequest(player.getName(), chosenKitString)));
+                playerContext.getUserProfile().removeCoins(actualKit.getCost());
+                playerContext.getUserProfile().getUnlockedKits().add(chosenKitString);
+                player.sendMessage(ChatColor.GREEN + "You have purchased Kit " + actualKit.getDisplayName() + "!");
+            } else {
+                player.sendMessage(ChatColor.RED + "You do not have enough coins to buy this!");
+                return;
+            }
+        }
+
+
+        LegacyKitModule legacyKitModule = TGM.get().getModule(LegacyKitModule.class);
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
+            legacyKitModule.setLegacyKitForPlayer(playerContext, chosenKitString);
+        } else {
+            legacyKitModule.addSwitchKitRequest(playerContext, chosenKitString);
+        }
     }
     
     @Command(aliases = {"join", "play"}, desc = "Join a team.")

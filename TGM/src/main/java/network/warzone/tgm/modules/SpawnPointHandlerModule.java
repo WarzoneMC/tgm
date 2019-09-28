@@ -27,15 +27,13 @@ import org.bukkit.util.Vector;
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
     private SpectatorModule spectatorModule;
-    private boolean usingLegacyKits;
     private LegacyKitModule legacyKitModule;
 
     @Override
     public void load(Match match) {
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
-        this.usingLegacyKits = match.getMapContainer().getMapInfo().isUsingLegacyKits();
-        if (this.usingLegacyKits) legacyKitModule = TGM.get().getModule(LegacyKitModule.class);
+        legacyKitModule = match.getMapContainer().getMapInfo().isUsingLegacyKits() ? TGM.get().getModule(LegacyKitModule.class) : null;
     }
 
     @EventHandler
@@ -76,7 +74,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
-        if (usingLegacyKits) {
+        if (legacyKitModule != null) {
             if (playerContext.getCurrentLegacyKit() == null) playerContext.setCurrentLegacyKit(LegacyKitModule.DEFAULT_KIT);
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
                 if (matchTeam.isSpectator()) {

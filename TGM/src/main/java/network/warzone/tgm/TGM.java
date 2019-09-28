@@ -18,6 +18,7 @@ import network.warzone.tgm.map.MapInfoDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
+import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.player.PlayerManager;
 import network.warzone.tgm.util.menu.PunishMenu;
@@ -117,6 +118,7 @@ public class TGM extends JavaPlugin {
         }
 
         PunishMenu.getPresetsMenu().load();
+        LegacyKitModule.LegacyKitStore.adjustCosts();
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
