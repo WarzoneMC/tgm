@@ -8,6 +8,8 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.kit.legacy_kits.LegacyKit;
+import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -24,11 +26,15 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
     private SpectatorModule spectatorModule;
+    private boolean usingLegacyKits;
+    private LegacyKitModule legacyKitModule;
 
     @Override
     public void load(Match match) {
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
+        this.usingLegacyKits = match.getMapContainer().getMapInfo().isUsingLegacyKits();
+        if (this.usingLegacyKits) legacyKitModule = TGM.get().getModule(LegacyKitModule.class);
     }
 
     @EventHandler
@@ -65,15 +71,27 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
-
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-            if (matchTeam.isSpectator()) {
-                spectatorModule.applySpectatorKit(playerContext);
-            } else {
-                matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-                playerContext.getPlayer().updateInventory();
-            }
-        }, 1L);
+        if (usingLegacyKits) {
+            if (playerContext.getCurrentLegacyKit() == null) playerContext.setCurrentLegacyKit(LegacyKitModule.DEFAULT_KIT);
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                if (matchTeam.isSpectator()) {
+                    spectatorModule.applySpectatorKit(playerContext);
+                } else {
+                    legacyKitModule.performSwitch(playerContext);
+                    LegacyKit legacyKit = legacyKitModule.getLegacyKit(playerContext.getCurrentLegacyKit());
+                    if (legacyKit != null) legacyKit.apply(playerContext.getPlayer());
+                    playerContext.getPlayer().updateInventory();
+                }
+            }, 1L);
+        } else
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                if (matchTeam.isSpectator()) {
+                    spectatorModule.applySpectatorKit(playerContext);
+                } else {
+                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                    playerContext.getPlayer().updateInventory();
+                }
+            }, 1L);
     }
 
     @Override

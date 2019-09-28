@@ -282,6 +282,15 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "/sn <map_name>");
         }
     }
+
+    @Command(aliases = {"kits"}, desc = "Choose a kit.")
+    public static void kits(CommandContext cmd, CommandSender sender) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
+
+    }
     
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {

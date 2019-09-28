@@ -9,6 +9,7 @@ import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
+import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
 import network.warzone.tgm.modules.knockback.KnockbackModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.portal.PortalLoaderModule;
@@ -79,6 +80,7 @@ public abstract class MatchManifest {
         modules.add(new WorldBorderModule());
         modules.add(new KnockbackModule());
         modules.add(new MapCommandsModule());
+        modules.add(new LegacyKitModule());
         return modules;
     }
 }

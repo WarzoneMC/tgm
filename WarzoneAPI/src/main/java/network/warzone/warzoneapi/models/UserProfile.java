@@ -33,6 +33,7 @@ public class UserProfile {
     private List<String> ips;
     private List<String> ranks;
     private List<Rank> ranksLoaded;
+    private int coins;
     private int wins;
     private int losses;
     private int kills;

@@ -1,6 +1,7 @@
 package network.warzone.tgm.user;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.util.Ranks;
@@ -17,6 +18,7 @@ import java.util.List;
 public class PlayerContext {
     @Getter private Player player;
     private UserProfile userProfile;
+    @Getter @Setter private String currentLegacyKit;
 
     public PlayerContext(Player player, UserProfile userProfile) {
         this.player = player;
