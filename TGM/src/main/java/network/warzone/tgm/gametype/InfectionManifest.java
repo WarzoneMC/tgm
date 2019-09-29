@@ -6,6 +6,7 @@ import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
+import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
@@ -42,44 +43,12 @@ public class InfectionManifest extends MatchManifest {
 
     @Override
     public List<MatchModule> allocateCoreModules() {
-        List<MatchModule> modules = new ArrayList<>();
-
-        modules.add(new TeamJoinNotificationsModule());
-        modules.add(new SpectatorModule());
-        modules.add(new SpawnPointHandlerModule());
-        modules.add(new SpawnPointLoaderModule());
-        modules.add(new TeamManagerModule());
-        modules.add(new VisibilityModule());
-        modules.add(new TimeModule());
-        modules.add(new TabListModule());
-        modules.add(new MatchProgressNotifications());
-        modules.add(new MatchResultModule());
-        modules.add(new ScoreboardManagerModule());
-        modules.add(new RegionManagerModule());
-        modules.add(new TaskedModuleManager());
-        modules.add(new StartCountdown());
-        modules.add(new CycleCountdown());
-        modules.add(new KitLoaderModule());
-        modules.add(new DeathModule());
-        modules.add(new FilterManagerModule());
-        modules.add(new ChatModule());
-        modules.add(new DisabledCommandsModule());
-        modules.add(new PointsModule());
-        modules.add(new LegacyDamageModule());
-        modules.add(new EntityDamageModule());
-        modules.add(new FireworkDamageModule());
-        modules.add(new GameRuleModule());
-        modules.add(new ItemRemoveModule());
-        modules.add(new RegenModule());
-        modules.add(new KillstreakModule());
-        modules.add(new ReportsModule());
-        modules.add(new StatsModule());
-        modules.add(new PortalLoaderModule());
-        modules.add(new WorldBorderModule());
-        modules.add(new KnockbackModule());
-        modules.add(new MapCommandsModule());
-        modules.add(new RespawnModule());
-
+        List<MatchModule> modules = super.allocateCoreModules();
+        List<MatchModule> toRemove = new ArrayList<>();
+        for (MatchModule module : modules) {
+            if (module instanceof DeathMessageModule) toRemove.add(module);
+        }
+        modules.removeAll(toRemove);
         return modules;
     }
 
