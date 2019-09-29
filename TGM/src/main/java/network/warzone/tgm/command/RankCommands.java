@@ -107,6 +107,7 @@ public class RankCommands {
                         sender.sendMessage(ChatColor.GRAY + "Prefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', rank.getPrefix()));
                         sender.sendMessage(ChatColor.GRAY + "Priority: " + ChatColor.RESET + rank.getPriority());
                         sender.sendMessage(ChatColor.GRAY + "Staff: " + ChatColor.RESET + rank.isStaff());
+                        sender.sendMessage(ChatColor.GRAY + "Default: " + ChatColor.RESET + rank.isDef());
                         sender.sendMessage(ChatColor.GRAY + "Permissions: ");
                         for (String permission : rank.getPermissions()) {
                             sender.spigot().sendMessage(permissionToTextComponent(rank.getName(), permission));
@@ -120,27 +121,27 @@ public class RankCommands {
         } else if (cmd.getString(0).equalsIgnoreCase("create")) {
 
             if (cmd.argsLength() < 2) {
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " create <name> [prefix] [staff(true|false)] [priority]");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " create <name> [prefix] [staff(true|false)] [priority] [default(true|false)]");
                 return;
             }
 
             String name = cmd.getString(1);
             String prefix = cmd.argsLength() >= 3 ? cmd.getString(2) : null;
-            boolean staff = cmd.argsLength() >= 4 ? Boolean.valueOf(cmd.getString(3)) : null;
-            int priority = 0;
+            boolean staff = cmd.argsLength() >= 4 && Boolean.parseBoolean(cmd.getString(3));
+            int priority;
             try {
                 priority = cmd.argsLength() >= 5 ? cmd.getInteger(4) : 0;
             } catch (CommandNumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Unknown priority \"" + cmd.getString(0) + "\"");
+                sender.sendMessage(ChatColor.RED + "Not a number \"" + cmd.getString(0) + "\"");
                 return;
             }
-            RankManageRequest request = new RankManageRequest(name, priority, prefix, new ArrayList<>(), staff);
+            boolean def = cmd.argsLength() >= 6 && Boolean.parseBoolean(cmd.getString(5));
+            RankManageRequest request = new RankManageRequest(name, priority, prefix, new ArrayList<>(), staff, def);
 
             Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                 RankManageResponse response = TGM.get().getTeamClient().manageRank(RankManageRequest.Action.CREATE, request);
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.GRAY + "Created rank " + ChatColor.RESET + response.getRank().getName());
                 }
@@ -156,7 +157,6 @@ public class RankCommands {
                 RankManageResponse response = TGM.get().getTeamClient().manageRank(RankManageRequest.Action.DELETE, new RankManageRequest(name));
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.GRAY + "Deleted rank " + ChatColor.RESET + response.getRank().getName());
                 }
@@ -165,7 +165,7 @@ public class RankCommands {
         } else if (cmd.getString(0).equalsIgnoreCase("edit")) {
 
             if (cmd.argsLength() < 4) {
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <name> <prefix|staff|priority|permissions> <value>");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <name> <prefix|staff|priority|permissions|default> <value>");
                 return;
             }
             String name = cmd.getString(1);
@@ -176,7 +176,6 @@ public class RankCommands {
                 RankManageResponse response = TGM.get().getTeamClient().editRank(field, new RankEditRequest(name, value));
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.GRAY + "Set value of " + ChatColor.RESET + field.toString().toLowerCase() + ChatColor.GRAY + " to " + ChatColor.RESET + value.toString() + ChatColor.GRAY + " for " + ChatColor.RESET + name);
                     Ranks.update(response.getRank());
@@ -203,7 +202,6 @@ public class RankCommands {
                 RankManageResponse response = TGM.get().getTeamClient().editPermissions(action, new RankPermissionsUpdateRequest(name, permissions));
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     switch (action) {
                         case ADD:
@@ -222,13 +220,15 @@ public class RankCommands {
     }
 
     private static TextComponent rankToTextComponent(Rank rank) {
-        TextComponent main = new TextComponent(ChatColor.GRAY + " - " + ChatColor.RESET + rank.getPriority() + ChatColor.GRAY + ": " + ChatColor.RESET + rank.getName() + ChatColor.GRAY + " - " + ChatColor.translateAlternateColorCodes('&', rank.getPrefix()));
+        String prefix = rank.getPrefix() == null ? "" : rank.getPrefix();
+        TextComponent main = new TextComponent(ChatColor.GRAY + " - " + ChatColor.RESET + rank.getPriority() + ChatColor.GRAY + ": " + ChatColor.RESET + rank.getName() + ChatColor.GRAY + " - " + ChatColor.translateAlternateColorCodes('&', prefix));
         main.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
                 new TextComponent(ChatColor.GRAY + "ID: " + ChatColor.RESET + rank.getId().toString()),
                 new TextComponent(ChatColor.GRAY + "\nName: " + ChatColor.RESET + rank.getName()),
-                new TextComponent(ChatColor.GRAY + "\nPrefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', rank.getPrefix())),
+                new TextComponent(ChatColor.GRAY + "\nPrefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', prefix)),
                 new TextComponent(ChatColor.GRAY + "\nPriority: " + ChatColor.RESET + rank.getPriority()),
                 new TextComponent(ChatColor.GRAY + "\nStaff: " + ChatColor.RESET + rank.isStaff()),
+                new TextComponent(ChatColor.GRAY + "\nDefault: " + ChatColor.RESET + rank.isDef()),
                 new TextComponent(ChatColor.YELLOW + "\n\nClick for full info"),
         }));
         main.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rank info " + rank.getName()));
