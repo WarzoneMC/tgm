@@ -9,6 +9,7 @@ import network.warzone.tgm.util.Strings;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -64,7 +65,7 @@ public class ItemRemoveModule extends MatchModule implements Listener {
         removed.clear();
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onDeath(TGMPlayerDeathEvent event) {
         List<ItemStack> toRemove = new ArrayList<>();
         for (ItemStack itemStack : event.getDrops()) {

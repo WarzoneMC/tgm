@@ -1,11 +1,12 @@
 package network.warzone.tgm.modules.death;
 
 import lombok.NoArgsConstructor;
-import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -14,11 +15,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,6 +31,7 @@ import java.util.stream.Collectors;
 public class DeathModule extends MatchModule implements Listener {
 
     private HashMap<UUID, DeathInfo> players = new HashMap<>();
+    private HashMap<UUID, Boolean> dead = new HashMap<>();
     private TeamManagerModule teamManagerModule;
 
     public void load(Match match) {
@@ -45,11 +45,23 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         players.remove(event.getPlayer().getUniqueId());
+        notDead(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onTeamChange(TeamChangeEvent event) {
+        notDead(event.getPlayerContext().getPlayer());
     }
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
+        if (event instanceof EntityDamageByEntityEvent) return;
         if (event.getEntity() instanceof Player) {
+            Player p = (Player) event.getEntity();
+            if (isDead(p)) {
+                event.setDamage(0);
+                return;
+            }
             DeathInfo deathInfo = getPlayer((Player) event.getEntity());
 
             deathInfo.playerName = deathInfo.player.getName();
@@ -57,7 +69,6 @@ public class DeathModule extends MatchModule implements Listener {
             deathInfo.playerLocation = deathInfo.player.getLocation();
             deathInfo.cause = event.getCause();
 
-            Player p = (Player) event.getEntity();
             if (p.getHealth() - event.getFinalDamage() <= 0 || event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
                 onDeath(p);
                 event.setDamage(0);
@@ -68,6 +79,11 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
+            Player p = (Player) event.getEntity();
+            if (isDead(p)) {
+                event.setDamage(0);
+                return;
+            }
             DeathInfo deathInfo = getPlayer((Player) event.getEntity());
 
             Player damager = null;
@@ -86,7 +102,6 @@ public class DeathModule extends MatchModule implements Listener {
             deathInfo.killerTeam = damager == null ? null : teamManagerModule.getTeam(damager);
             deathInfo.killerLocation = damager == null ? null : damager.getLocation();
 
-            Player p = (Player) event.getEntity();
             if (p.getHealth() - event.getFinalDamage() <= 0) {
                 onDeath(p);
                 event.setDamage(0);
@@ -121,11 +136,29 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
+        setDead(event.getVictim());
         for (ItemStack stack : event.getDrops()) {
             if (stack != null) {
                 event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation(), stack);
             }
         }
+    }
+
+    @EventHandler
+    private void onRespawn(TGMPlayerRespawnEvent event) {
+        notDead(event.getPlayer());
+    }
+
+    private void setDead(Player player) {
+        this.dead.put(player.getUniqueId(), true);
+    }
+
+    private void notDead(Player player) {
+        this.dead.remove(player.getUniqueId());
+    }
+
+    private boolean isDead(Player player) {
+        return this.dead.containsKey(player.getUniqueId());
     }
 
 }
