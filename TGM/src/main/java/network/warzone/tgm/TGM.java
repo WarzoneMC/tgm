@@ -116,7 +116,6 @@ public class TGM extends JavaPlugin {
         }
 
         PunishMenu.getPresetsMenu().load();
-        GameClassModule.GameClassStore.adjustCosts();
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 

@@ -174,11 +174,6 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void purchaseClass(ClassPurchaseRequest request) {
-
-    }
-
-    @Override
     public KillsLeaderboardResponse getKillsLeaderboard() {
         try {
             HttpResponse<KillsLeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/kills?limit=10")

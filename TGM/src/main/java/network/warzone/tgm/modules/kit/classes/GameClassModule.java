@@ -35,37 +35,29 @@ public class GameClassModule extends MatchModule implements Listener {
         PHOENIX(PhoenixClass.class,
                 ItemFactory.createItem(Material.FIRE_CHARGE,
                 ChatColor.GOLD + "Phoenix",
-                    Arrays.asList(ChatColor.YELLOW + "Fight with the power of the sun!")), 900),
+                    Arrays.asList(ChatColor.YELLOW + "Fight with the power of the sun!"))),
 
         NINJA(NinjaClass.class,
                 ItemFactory.createItem(Material.FLINT,
                 ChatColor.WHITE + "Ninja",
-                    Arrays.asList(ChatColor.YELLOW + "Don't need armor when you can't get hit!")), 800),
+                    Arrays.asList(ChatColor.YELLOW + "Don't need armor when you can't get hit!"))),
 
         BUILDER(BuilderClass.class,
                 ItemFactory.createItem(Material.OAK_STAIRS,
                 ChatColor.YELLOW + "Builder",
-                    Arrays.asList(ChatColor.YELLOW + "Extra blocks to help build fortifications.")), 300);
+                    Arrays.asList(ChatColor.YELLOW + "Extra blocks to help build fortifications.")));
 
         @Getter private Class hostKit;
         @Getter private ItemStack menuItem;
-        @Getter @Setter private int cost;
 
-        GameClassStore(Class hostKit, ItemStack menuItem, int cost) {
+        GameClassStore(Class hostKit, ItemStack menuItem) {
             this.hostKit = hostKit;
             this.menuItem = menuItem;
-            this.cost = cost;
         }
 
         public String getDisplayName() {
             if (menuItem.getItemMeta() == null) return Strings.capitalizeString(this.name().toLowerCase());
             return menuItem.getItemMeta().getDisplayName();
-        }
-
-        public static void adjustCosts() {
-            // set costs to 0 if offline
-            if (!(TGM.get().getTeamClient() instanceof HttpClient))
-                for(GameClassStore gameClassStore : GameClassStore.values()) gameClassStore.setCost(0);
         }
     }
 

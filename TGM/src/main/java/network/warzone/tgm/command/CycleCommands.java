@@ -28,7 +28,6 @@ import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.menu.ClassMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
-import network.warzone.warzoneapi.models.ClassPurchaseRequest;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -330,27 +329,6 @@ public class CycleCommands {
             player.sendMessage(ChatColor.RED + "You are using this class currently!");
             return;
         }
-
-        boolean foundKitInList = false;
-        for (String unlockedKit : playerContext.getUserProfile().getUnlockedKits()) {
-            if(Strings.getTechnicalName(unlockedKit).equals(chosenKitString)) {
-                foundKitInList = true;
-                break;
-            }
-        }
-
-        if (!foundKitInList) {
-            if (playerContext.getUserProfile().getCoins() >= actualKit.getCost()) {
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().purchaseClass(new ClassPurchaseRequest(player.getName(), chosenKitString)));
-                playerContext.getUserProfile().removeCoins(actualKit.getCost());
-                playerContext.getUserProfile().getUnlockedKits().add(chosenKitString);
-                player.sendMessage(ChatColor.GREEN + "You have purchased Class " + actualKit.getDisplayName() + "!");
-            } else {
-                player.sendMessage(ChatColor.RED + "You do not have enough coins to buy this!");
-                return;
-            }
-        }
-
 
         GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
