@@ -82,7 +82,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 } else {
                     legacyKitModule.performSwitch(playerContext);
                     LegacyKit legacyKit = legacyKitModule.getLegacyKit(playerContext.getCurrentLegacyKit());
-                    if (legacyKit != null) legacyKit.apply(playerContext.getPlayer());
+                    if (legacyKit != null) legacyKit.apply(playerContext.getPlayer(), matchTeam.getColor());
                     playerContext.getPlayer().updateInventory();
                 }
             }, 1L);

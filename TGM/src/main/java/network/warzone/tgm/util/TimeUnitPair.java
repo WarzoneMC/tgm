@@ -2,6 +2,7 @@ package network.warzone.tgm.util;
 
 import lombok.Getter;
 
+import java.text.DecimalFormat;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -82,6 +83,14 @@ public class TimeUnitPair {
         timeUnit = TimeUnitPair.getChronoUnit(unit);
         if (timeUnit == null) return null;
         return new TimeUnitPair(Integer.parseInt(time.toString()), timeUnit);
+    }
+
+    public static String formatToSeconds(double ticks) {
+        DecimalFormat df = new DecimalFormat("0.0");
+        double ticksPerSecond = 20;
+        double d = (ticks / ticksPerSecond);
+
+        return df.format(d);
     }
 
 }

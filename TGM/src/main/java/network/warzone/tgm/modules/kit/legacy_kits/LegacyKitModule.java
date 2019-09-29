@@ -74,16 +74,14 @@ public class LegacyKitModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-
         abilityManager = new AbilityManager();
         teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         legacyKitSet.add(new PhoenixKit(abilityManager.getAbility(PhoenixAbility.class)));
         legacyKitSet.add(new NinjaKit(abilityManager.getAbility(NinjaAbility.class)));
-
     }
 
     @Override
-    public void unload() {
+    public void disable() {
         abilityManager.destroyAbilities();
         legacyKitSet = null;
         kitSwitches = null;
