@@ -32,6 +32,6 @@ public class DamageControlModule extends MatchModule implements Listener {
         if((event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK) && !fireDamage) shouldCancel = true;
         else if(event.getCause() == DamageCause.SUFFOCATION && !suffocationDamage) shouldCancel = true;
         else if(event.getCause() == DamageCause.FALL && !fallDamage) shouldCancel = true;
-        event.setCancelled(shouldCancel);
+        if (shouldCancel) event.setCancelled(true);
     }
 }
