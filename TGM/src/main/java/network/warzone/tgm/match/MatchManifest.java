@@ -12,7 +12,7 @@ import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
-import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.knockback.KnockbackModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.portal.PortalLoaderModule;
@@ -94,7 +94,7 @@ public abstract class MatchManifest {
      */
     public List<MatchModule> allocateConditionalModules(MapInfo mapInfo) {
         List<MatchModule> modules = new ArrayList<>();
-        if (mapInfo.isUsingLegacyKits()) modules.add(new LegacyKitModule());
+        if (mapInfo.isUsingClasses()) modules.add(new GameClassModule());
         return modules;
     }
 

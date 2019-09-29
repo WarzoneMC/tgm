@@ -18,7 +18,7 @@ import java.util.List;
 public class PlayerContext {
     @Getter private Player player;
     private UserProfile userProfile;
-    @Getter @Setter private String currentLegacyKit;
+    @Getter @Setter private String currentClass;
 
     public PlayerContext(Player player, UserProfile userProfile) {
         this.player = player;

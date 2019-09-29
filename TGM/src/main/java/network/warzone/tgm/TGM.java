@@ -18,7 +18,7 @@ import network.warzone.tgm.map.MapInfoDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
-import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.player.PlayerManager;
 import network.warzone.tgm.util.menu.PunishMenu;
@@ -36,9 +36,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -118,7 +116,7 @@ public class TGM extends JavaPlugin {
         }
 
         PunishMenu.getPresetsMenu().load();
-        LegacyKitModule.LegacyKitStore.adjustCosts();
+        GameClassModule.GameClassStore.adjustCosts();
 
         GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 

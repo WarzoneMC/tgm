@@ -18,6 +18,6 @@ public class MapInfo {
     private List<Author> authors;
     private GameType gametype;
     private List<ParsedTeam> teams;
-    private boolean usingLegacyKits;
+    private boolean usingClasses;
     private JsonObject jsonObject;
 }

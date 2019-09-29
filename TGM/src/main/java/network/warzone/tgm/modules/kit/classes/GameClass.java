@@ -1,6 +1,6 @@
-package network.warzone.tgm.modules.kit.legacy_kits;
+package network.warzone.tgm.modules.kit.classes;
 
-import network.warzone.tgm.modules.kit.legacy_kits.abilities.Ability;
+import network.warzone.tgm.modules.kit.classes.abilities.Ability;
 import network.warzone.tgm.util.ArmorType;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.itemstack.Unbreakable;
@@ -12,11 +12,11 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.*;
 
-public abstract class LegacyKit {
+public abstract class GameClass {
     private Set<Ability> abilities;
     protected HashMap<Integer, ItemStack> items = new HashMap<>();
 
-    LegacyKit(Ability... abilities) {
+    GameClass(Ability... abilities) {
         this.abilities = new HashSet<>(Arrays.asList(abilities));
     }
 

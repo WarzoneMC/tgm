@@ -1,7 +1,6 @@
-package network.warzone.tgm.modules.kit.legacy_kits.abilities;
+package network.warzone.tgm.modules.kit.classes.abilities;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -13,7 +12,8 @@ import java.util.Set;
 public class AbilityManager {
     public enum AbilityStore {
         PHOENIX(PhoenixAbility.class),
-        NINJA(NinjaAbility.class);
+        NINJA(NinjaAbility.class),
+        BUILDER(BuilderAbility.class);
 
         @Getter private Class hostAbility;
         AbilityStore(Class hostAbility) {

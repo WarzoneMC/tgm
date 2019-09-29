@@ -53,9 +53,9 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
             parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamMax, teamMin));
         }
 
-        boolean usingLegacyKits = json.has("legacyKits") && json.get("legacyKits").getAsBoolean();
+        boolean usingClasses = json.has("classes") && json.get("classes").getAsBoolean();
 
-        return new MapInfo(name, version, authors, gameType, parsedTeams, usingLegacyKits, json);
+        return new MapInfo(name, version, authors, gameType, parsedTeams, usingClasses, json);
     }
 
     private static String getCurrentName(UUID uuid) throws Exception {

@@ -58,7 +58,7 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public void purchaseLegacyKit(LegacyKitPurchaseRequest request) {
+    public void purchaseClass(ClassPurchaseRequest request) {
 
     }
 

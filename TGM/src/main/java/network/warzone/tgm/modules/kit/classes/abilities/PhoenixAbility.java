@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.kit.legacy_kits.abilities;
+package network.warzone.tgm.modules.kit.classes.abilities;
 
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.team.MatchTeam;

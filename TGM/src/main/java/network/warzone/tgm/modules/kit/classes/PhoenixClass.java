@@ -1,13 +1,12 @@
-package network.warzone.tgm.modules.kit.legacy_kits;
+package network.warzone.tgm.modules.kit.classes;
 
-import network.warzone.tgm.modules.kit.legacy_kits.abilities.Ability;
+import network.warzone.tgm.modules.kit.classes.abilities.Ability;
 import network.warzone.tgm.util.SlotType;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
-public class PhoenixKit extends LegacyKit {
-    PhoenixKit(Ability... abilities) {
+public class PhoenixClass extends GameClass {
+    PhoenixClass(Ability... abilities) {
         super(abilities);
         super.setItem(0, ItemFactory.createItem(Material.WOODEN_SWORD));
         super.setItem(1, ItemFactory.createItem(Material.BOW));

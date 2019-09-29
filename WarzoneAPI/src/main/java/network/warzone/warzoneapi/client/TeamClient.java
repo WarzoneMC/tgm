@@ -2,8 +2,6 @@ package network.warzone.warzoneapi.client;
 
 import network.warzone.warzoneapi.models.*;
 
-import java.util.List;
-
 /**
  * Created by luke on 4/27/17.
  */
@@ -36,7 +34,7 @@ public interface TeamClient {
 
     void destroyWool(DestroyWoolRequest destroyWoolRequest);
 
-    void purchaseLegacyKit(LegacyKitPurchaseRequest request);
+    void purchaseClass(ClassPurchaseRequest request);
     
     RankList retrieveRanks();
 

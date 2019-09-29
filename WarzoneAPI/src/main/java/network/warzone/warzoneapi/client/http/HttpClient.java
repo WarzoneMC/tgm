@@ -174,7 +174,7 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public void purchaseLegacyKit(LegacyKitPurchaseRequest request) {
+    public void purchaseClass(ClassPurchaseRequest request) {
 
     }
 

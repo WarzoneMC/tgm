@@ -8,8 +8,8 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.kit.legacy_kits.LegacyKit;
-import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
+import network.warzone.tgm.modules.kit.classes.GameClass;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -27,13 +27,13 @@ import org.bukkit.util.Vector;
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
     private SpectatorModule spectatorModule;
-    private LegacyKitModule legacyKitModule;
+    private GameClassModule gameClassModule;
 
     @Override
     public void load(Match match) {
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
-        legacyKitModule = match.getMapContainer().getMapInfo().isUsingLegacyKits() ? TGM.get().getModule(LegacyKitModule.class) : null;
+        gameClassModule = match.getMapContainer().getMapInfo().isUsingClasses() ? TGM.get().getModule(GameClassModule.class) : null;
     }
 
     @EventHandler
@@ -74,15 +74,15 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
-        if (legacyKitModule != null) {
-            if (playerContext.getCurrentLegacyKit() == null) playerContext.setCurrentLegacyKit(LegacyKitModule.DEFAULT_KIT);
+        if (gameClassModule != null) {
+            if (playerContext.getCurrentClass() == null) playerContext.setCurrentClass(GameClassModule.DEFAULT_CLASS);
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else {
-                    legacyKitModule.performSwitch(playerContext);
-                    LegacyKit legacyKit = legacyKitModule.getLegacyKit(playerContext.getCurrentLegacyKit());
-                    if (legacyKit != null) legacyKit.apply(playerContext.getPlayer(), matchTeam.getColor());
+                    gameClassModule.performSwitch(playerContext);
+                    GameClass gameClass = gameClassModule.getGameClass(playerContext.getCurrentClass());
+                    if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
                     playerContext.getPlayer().updateInventory();
                 }
             }, 1L);

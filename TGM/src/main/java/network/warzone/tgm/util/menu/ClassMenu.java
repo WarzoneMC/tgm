@@ -1,6 +1,6 @@
 package network.warzone.tgm.util.menu;
 
-import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -11,27 +11,27 @@ import java.util.List;
 /**
  * Created by yikes on 09/27/19
  */
-public class LegacyKitMenu extends Menu {
-    private static LegacyKitMenu legacyKitMenu;
-    public static LegacyKitMenu getLegacyKitMenu() {
-        if (legacyKitMenu == null) {
-            legacyKitMenu = new LegacyKitMenu(ChatColor.UNDERLINE + "Kits!", 27);
-            legacyKitMenu.setup();
+public class ClassMenu extends Menu {
+    private static ClassMenu classMenu;
+    public static ClassMenu getClassMenu() {
+        if (classMenu == null) {
+            classMenu = new ClassMenu(ChatColor.UNDERLINE + "Classes!", 27);
+            classMenu.setup();
         }
-        return legacyKitMenu;
+        return classMenu;
     }
 
-    private LegacyKitMenu(String name, int slots) {
+    private ClassMenu(String name, int slots) {
         super(name, slots);
     }
 
     private void setup() {
         int start = 0;
-        for(LegacyKitModule.LegacyKitStore legacyKitStore : LegacyKitModule.LegacyKitStore.values()) {
-            ItemStack item = legacyKitStore.getMenuItem().clone();
+        for(GameClassModule.GameClassStore gameClassStore : GameClassModule.GameClassStore.values()) {
+            ItemStack item = gameClassStore.getMenuItem().clone();
             appendKitTitle(item);
-            appendCost(item, legacyKitStore.getCost());
-            setItem(start, item, ((player, event) -> player.performCommand("kit " + legacyKitStore.name())));
+            appendCost(item, gameClassStore.getCost());
+            setItem(start, item, ((player, event) -> player.performCommand("kit " + gameClassStore.name())));
             start++;
         }
     }
@@ -50,8 +50,8 @@ public class LegacyKitMenu extends Menu {
         List<String> ogLore = itemMeta.getLore();
         if (ogLore == null) ogLore = new ArrayList<>();
         ogLore.add("");
-        ogLore.add(ChatColor.GRAY + "Cost: " + cost + " coins!");
-        inItem.getItemMeta().setLore(ogLore);
+        ogLore.add(cost == 0 ? ChatColor.GOLD + "FREE!" : ChatColor.GRAY + "Cost: " + cost + " coins!");
+        itemMeta.setLore(ogLore);
         inItem.setItemMeta(itemMeta);
     }
 }

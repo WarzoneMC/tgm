@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.kit.legacy_kits.abilities;
+package network.warzone.tgm.modules.kit.classes.abilities;
 
 import lombok.Getter;
 import network.warzone.tgm.TGM;
@@ -197,7 +197,7 @@ public abstract class Ability implements Listener {
     }
 
     private void informPlayerOfCooldown(Player player) {
-        player.sendMessage(ChatColor.YELLOW + this.abilityName + ChatColor.GRAY + " is usable in " + ChatColor.GREEN + TimeUnitPair.formatToSeconds(this.getCooldown(player)));
+        player.sendMessage(ChatColor.BLUE + "Ability> " + ChatColor.YELLOW + this.abilityName + ChatColor.GRAY + " is usable in " + ChatColor.GREEN + TimeUnitPair.formatToSeconds(this.getCooldown(player)));
     }
 
     private int getCooldown(Player player) {

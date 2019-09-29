@@ -18,8 +18,7 @@ import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
-import network.warzone.tgm.modules.kit.legacy_kits.LegacyKit;
-import network.warzone.tgm.modules.kit.legacy_kits.LegacyKitModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
@@ -27,9 +26,9 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
-import network.warzone.tgm.util.menu.LegacyKitMenu;
+import network.warzone.tgm.util.menu.ClassMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
-import network.warzone.warzoneapi.models.LegacyKitPurchaseRequest;
+import network.warzone.warzoneapi.models.ClassPurchaseRequest;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -293,13 +292,13 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
             return;
         }
-        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingLegacyKits()) {
-            sender.sendMessage(ChatColor.RED + "This map does not use legacy kits.");
+        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingClasses()) {
+            sender.sendMessage(ChatColor.RED + "This map does not use classes.");
             return;
         }
 
         Player player = (Player) sender;
-        LegacyKitMenu.getLegacyKitMenu().open(player);
+        ClassMenu.getClassMenu().open(player);
     }
 
     @Command(aliases = {"kit"}, desc = "Choose a kit.", min = 1, usage = "<kit name>")
@@ -308,16 +307,16 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
             return;
         }
-        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingLegacyKits()) {
-            sender.sendMessage(ChatColor.RED + "This map does not use legacy kits.");
+        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingClasses()) {
+            sender.sendMessage(ChatColor.RED + "This map does not use classes.");
             return;
         }
 
         String chosenKitString = Strings.getTechnicalName(cmd.getString(0));
-        LegacyKitModule.LegacyKitStore actualKit = null;
-        for (LegacyKitModule.LegacyKitStore legacyKitStore : LegacyKitModule.LegacyKitStore.values()) {
-            if (legacyKitStore.name().equalsIgnoreCase(chosenKitString)) {
-                actualKit = legacyKitStore;
+        GameClassModule.GameClassStore actualKit = null;
+        for (GameClassModule.GameClassStore gameClassStore : GameClassModule.GameClassStore.values()) {
+            if (gameClassStore.name().equalsIgnoreCase(chosenKitString)) {
+                actualKit = gameClassStore;
                 break;
             }
         }
@@ -327,8 +326,8 @@ public class CycleCommands {
             return;
         }
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        if (Strings.getTechnicalName(playerContext.getCurrentLegacyKit()).equals(chosenKitString)) {
-            player.sendMessage(ChatColor.RED + "You are using this kit currently!");
+        if (Strings.getTechnicalName(playerContext.getCurrentClass()).equals(chosenKitString)) {
+            player.sendMessage(ChatColor.RED + "You are using this class currently!");
             return;
         }
 
@@ -342,10 +341,10 @@ public class CycleCommands {
 
         if (!foundKitInList) {
             if (playerContext.getUserProfile().getCoins() >= actualKit.getCost()) {
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().purchaseLegacyKit(new LegacyKitPurchaseRequest(player.getName(), chosenKitString)));
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().purchaseClass(new ClassPurchaseRequest(player.getName(), chosenKitString)));
                 playerContext.getUserProfile().removeCoins(actualKit.getCost());
                 playerContext.getUserProfile().getUnlockedKits().add(chosenKitString);
-                player.sendMessage(ChatColor.GREEN + "You have purchased Kit " + actualKit.getDisplayName() + "!");
+                player.sendMessage(ChatColor.GREEN + "You have purchased Class " + actualKit.getDisplayName() + "!");
             } else {
                 player.sendMessage(ChatColor.RED + "You do not have enough coins to buy this!");
                 return;
@@ -353,11 +352,11 @@ public class CycleCommands {
         }
 
 
-        LegacyKitModule legacyKitModule = TGM.get().getModule(LegacyKitModule.class);
+        GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
-            legacyKitModule.setLegacyKitForPlayer(playerContext, chosenKitString);
+            gameClassModule.setClassForPlayer(playerContext, chosenKitString);
         } else {
-            legacyKitModule.addSwitchKitRequest(playerContext, chosenKitString);
+            gameClassModule.addSwitchClassRequest(playerContext, chosenKitString);
         }
     }
     
