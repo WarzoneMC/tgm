@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class NickCommands {
 
     @Command(aliases = {"nicks"}, desc = "View all nicked players")
-    @CommandPermissions({"tgm.command.nicks"})
+    @CommandPermissions({"tgm.command.whois"})
     public static void nicks(CommandContext cmd, CommandSender sender) {
         HashMap<UUID, String> originalNames = TGM.get().getNickManager().getOriginalNames();
         HashMap<UUID, String> nickNames = TGM.get().getNickManager().getNickNames();

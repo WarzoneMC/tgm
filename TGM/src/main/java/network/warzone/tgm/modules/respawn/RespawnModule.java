@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -118,6 +119,11 @@ public class RespawnModule extends MatchModule implements Listener {
         if (event.isCancelled()) return;
         if (!event.isForced() && spectators.contains(event.getPlayerContext().getPlayer())) event.setCancelled(true);
         else remove(event.getPlayerContext().getPlayer());
+    }
+
+    @EventHandler
+    public void onMatchResult(MatchResultEvent event) {
+        spectators.forEach(this::stopSpectating);
     }
 
     private void remove(Player player) {
