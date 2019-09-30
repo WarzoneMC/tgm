@@ -22,6 +22,8 @@ public class Rank {
     private String prefix;
     private List<String> permissions;
     private boolean staff;
+    @SerializedName("default")
+    private boolean def;
 
     public void set(Rank rank) {
         this.name = rank.name;
@@ -29,6 +31,7 @@ public class Rank {
         this.prefix = rank.prefix;
         this.permissions = rank.permissions;
         this.staff = rank.staff;
+        this.def = rank.def;
     }
 
 }
