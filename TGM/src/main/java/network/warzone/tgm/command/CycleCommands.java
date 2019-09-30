@@ -312,31 +312,31 @@ public class CycleCommands {
             return;
         }
 
-        String chosenKitString = Strings.getTechnicalName(cmd.getString(0));
+        String chosenClassString = Strings.getTechnicalName(cmd.getString(0));
         GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
 
         GameClassModule.GameClassStore actualKit = null;
         for (GameClassModule.GameClassStore gameClassStore : GameClassModule.GameClassStore.values()) {
-            if (gameClassStore.name().equals(chosenKitString) && gameClassModule.classSetHasInstance(gameClassStore.getHostGameClass())) {
+            if (gameClassStore.name().equals(chosenClassString) && gameClassModule.classSetHasInstance(gameClassStore.getHostGameClass())) {
                 actualKit = gameClassStore;
                 break;
             }
         }
         Player player = (Player) sender;
         if (actualKit == null) {
-            player.sendMessage(ChatColor.RED + "Invalid class name! Try /kits!");
+            player.sendMessage(ChatColor.RED + "Invalid class name! Try /classes!");
             return;
         }
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        if (Strings.getTechnicalName(playerContext.getCurrentClass()).equals(chosenKitString)) {
+        if (Strings.getTechnicalName(playerContext.getCurrentClass()).equals(chosenClassString)) {
             player.sendMessage(ChatColor.RED + "You are using this class currently!");
             return;
         }
 
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
-            gameClassModule.setClassForPlayer(playerContext, chosenKitString);
+            gameClassModule.setClassForPlayer(playerContext, chosenClassString);
         } else {
-            gameClassModule.addSwitchClassRequest(playerContext, chosenKitString);
+            gameClassModule.addSwitchClassRequest(playerContext, chosenClassString);
         }
     }
     

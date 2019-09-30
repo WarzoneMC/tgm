@@ -172,11 +172,11 @@ public class GameClassModule extends MatchModule implements Listener {
         return rawUsedClasses.contains(normalized);
     }
 
-    public void setClassForPlayer(PlayerContext playerContext, String chosenKitString) {
+    public void setClassForPlayer(PlayerContext playerContext, String chosenClassString) {
         GameClass oldGameClass = getGameClass(playerContext.getCurrentClass());
         if (oldGameClass != null) removeClassForPlayer(playerContext, oldGameClass);
-        playerContext.setCurrentClass(chosenKitString);
-        playerContext.getPlayer().sendMessage(ChatColor.AQUA + "Switched to class " + GameClassStore.valueOf(chosenKitString).getDisplayName() + "!");
+        playerContext.setCurrentClass(chosenClassString);
+        playerContext.getPlayer().sendMessage(ChatColor.AQUA + "Switched to class " + GameClassStore.valueOf(chosenClassString).getDisplayName() + "!");
         if(!teamManagerModule.getTeam(playerContext.getPlayer()).isSpectator()) setupClassForPlayer(playerContext);
     }
 

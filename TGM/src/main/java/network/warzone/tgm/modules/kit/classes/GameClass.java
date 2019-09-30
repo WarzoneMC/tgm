@@ -80,7 +80,7 @@ public abstract class GameClass {
     protected void extraApply(Player player) {}
 
     /**
-     * Adds player's UUID to each of the kits' abilities registeredPlayers
+     * Adds player's UUID to each of the classes' abilities registeredPlayers
      * @param p
      */
     public void addToAbilityCaches(Player p) {
@@ -91,7 +91,7 @@ public abstract class GameClass {
     }
 
     /**
-     * Removes player's UUID to each of the kits' abilities registeredPlayers
+     * Removes player's UUID to each of the classes' abilities registeredPlayers
      * @param p
      */
     public void removeFromAbilityCaches(Player p) {
