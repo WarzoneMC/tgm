@@ -6,7 +6,7 @@ import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Material;
 
 public class PhoenixClass extends GameClass {
-    PhoenixClass(Ability... abilities) {
+    public PhoenixClass(Ability... abilities) {
         super(abilities);
         super.setItem(0, ItemFactory.createItem(Material.WOODEN_SWORD));
         super.setItem(1, ItemFactory.createItem(Material.BOW));

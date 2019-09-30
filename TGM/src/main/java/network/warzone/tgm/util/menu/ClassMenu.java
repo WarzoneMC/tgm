@@ -1,12 +1,10 @@
 package network.warzone.tgm.util.menu;
 
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by yikes on 09/27/19
@@ -21,16 +19,24 @@ public class ClassMenu extends Menu {
         return classMenu;
     }
 
+    public static void destroyInstance() {
+        classMenu = null;
+    }
+
     private ClassMenu(String name, int slots) {
         super(name, slots);
     }
 
+    // it can be assumed the current match is one that uses classes, due to when this is called
+    @SuppressWarnings("unchecked")
     private void setup() {
+        GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
         int start = 0;
         for(GameClassModule.GameClassStore gameClassStore : GameClassModule.GameClassStore.values()) {
+            if (!gameClassModule.classSetHasInstance(gameClassStore.getHostGameClass())) continue;
             ItemStack item = gameClassStore.getMenuItem().clone();
             appendKitTitle(item);
-            setItem(start, item, ((player, event) -> player.performCommand("kit " + gameClassStore.name())));
+            setItem(start, item, ((player, event) -> player.performCommand("class " + gameClassStore.name())));
             start++;
         }
     }
@@ -39,7 +45,7 @@ public class ClassMenu extends Menu {
         ItemMeta itemMeta = inItem.getItemMeta();
         if (itemMeta == null) return;
         String ogName = itemMeta.getDisplayName();
-        inItem.getItemMeta().setDisplayName(ChatColor.GRAY + "Kit " + ogName);
+        inItem.getItemMeta().setDisplayName(ChatColor.GRAY + "Class " + ogName);
         inItem.setItemMeta(itemMeta);
     }
 }

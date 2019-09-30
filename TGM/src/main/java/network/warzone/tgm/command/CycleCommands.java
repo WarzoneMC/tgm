@@ -285,8 +285,8 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"kits"}, desc = "Kit menu.")
-    public static void kits(CommandContext cmd, CommandSender sender) {
+    @Command(aliases = {"classes"}, desc = "Class menu.")
+    public static void classes(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
             return;
@@ -300,8 +300,9 @@ public class CycleCommands {
         ClassMenu.getClassMenu().open(player);
     }
 
-    @Command(aliases = {"kit"}, desc = "Choose a kit.", min = 1, usage = "<kit name>")
-    public static void kit(CommandContext cmd, CommandSender sender) {
+    @SuppressWarnings("unchecked")
+    @Command(aliases = {"class"}, desc = "Choose a class.", min = 1, usage = "<kit name>")
+    public static void classCommand(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
             return;
@@ -312,16 +313,18 @@ public class CycleCommands {
         }
 
         String chosenKitString = Strings.getTechnicalName(cmd.getString(0));
+        GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
+
         GameClassModule.GameClassStore actualKit = null;
         for (GameClassModule.GameClassStore gameClassStore : GameClassModule.GameClassStore.values()) {
-            if (gameClassStore.name().equalsIgnoreCase(chosenKitString)) {
+            if (gameClassStore.name().equals(chosenKitString) && gameClassModule.classSetHasInstance(gameClassStore.getHostGameClass())) {
                 actualKit = gameClassStore;
                 break;
             }
         }
         Player player = (Player) sender;
         if (actualKit == null) {
-            player.sendMessage(ChatColor.RED + "Invalid kit name! Try /kits!");
+            player.sendMessage(ChatColor.RED + "Invalid class name! Try /kits!");
             return;
         }
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
@@ -330,7 +333,6 @@ public class CycleCommands {
             return;
         }
 
-        GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
             gameClassModule.setClassForPlayer(playerContext, chosenKitString);
         } else {

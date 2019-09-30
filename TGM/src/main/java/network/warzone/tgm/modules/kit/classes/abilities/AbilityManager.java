@@ -23,10 +23,11 @@ public class AbilityManager {
     
     private Set<Ability> abilities = new HashSet<>();
 
-    public AbilityManager() {
+    public AbilityManager(Set<Class<? extends Ability>> abilitySet) {
         for(AbilityStore abilityStore : AbilityStore.values()) {
+            if (!abilitySet.contains(abilityStore.hostAbility)) continue;
             try {
-                abilities.add((Ability) abilityStore.getHostAbility().getConstructors()[0].newInstance());
+                abilities.add((Ability) abilityStore.hostAbility.getConstructors()[0].newInstance());
             } catch (Exception e) {
                 e.printStackTrace();
             }

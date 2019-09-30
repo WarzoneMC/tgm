@@ -9,7 +9,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class NinjaClass extends GameClass {
-    NinjaClass(Ability... abilities) {
+    public NinjaClass(Ability... abilities) {
         super(abilities);
         super.setItem(0, ItemFactory.createItem(Material.WOODEN_SWORD));
         super.setItem(1, ItemFactory.createItem(Material.GOLDEN_APPLE));
