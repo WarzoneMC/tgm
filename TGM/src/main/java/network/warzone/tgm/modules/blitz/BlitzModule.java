@@ -66,8 +66,8 @@ public class BlitzModule extends MatchModule implements Listener {
         if (mapInfo.has("blitz")) {
             JsonObject blitz = mapInfo.getAsJsonObject("blitz");
 
-            if (blitz.has("death-title")) title = blitz.get("death-title").getAsString();
-            if (blitz.has("death-subtitle")) subtitle = blitz.get("death-subtitle").getAsString();
+            if (blitz.has("deathTitle")) title = blitz.get("deathTitle").getAsString();
+            if (blitz.has("deathSubtitle")) subtitle = blitz.get("deathSubtitle").getAsString();
             if (blitz.has("actionbar")) actionbar = blitz.get("actionbar").getAsString();
             for (JsonElement teamElement : blitz.getAsJsonArray("lives")) {
                 JsonObject teamObject = (JsonObject) teamElement;
