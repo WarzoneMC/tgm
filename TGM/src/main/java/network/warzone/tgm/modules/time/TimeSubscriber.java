@@ -1,5 +1,5 @@
 package network.warzone.tgm.modules.time;
 
-public interface TimeUpdate {
+public interface TimeSubscriber {
     void processSecond(int elapsed);
 }
