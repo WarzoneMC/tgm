@@ -187,6 +187,36 @@ public class HttpClient implements TeamClient {
             return new KillsLeaderboardResponse();
         }
     }
+    
+    @Override
+    public WinsLeaderboardResponse getWinsLeaderboard() {
+        try {
+            HttpResponse<WinsLeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/wins?limit=10")
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(WinsLeaderboardResponse.class);
+            System.out.println(response.getBody());
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return new WinsLeaderboardResponse();
+        }
+    }
+    
+    @Override
+    public XpLeaderboardResponse getXpLeaderboard() {
+        try {
+            HttpResponse<XpLeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/xp?limit=10")
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(XpLeaderboardResponse.class);
+            System.out.println(response.getBody());
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return new XpLeaderboardResponse();
+        }
+    }
 
     @Override
     public RankList retrieveRanks() {
