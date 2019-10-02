@@ -8,30 +8,28 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import java.util.HashMap;
+
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class DamageControlModule extends MatchModule implements Listener {
-    private boolean fireDamage = true;
-    private boolean fallDamage = true;
-    private boolean suffocationDamage = true;
+
+    private HashMap<DamageCause, Boolean> enabled = new HashMap<>();
 
     @Override
     public void load(Match match) {
         JsonObject matchObj = match.getMapContainer().getMapInfo().getJsonObject();
         if (matchObj.has("damageControl")) {
             JsonObject damageControlObj = matchObj.getAsJsonObject("damageControl");
-            if (damageControlObj.has("fire")) fireDamage = damageControlObj.get("fire").getAsBoolean();
-            if (damageControlObj.has("fall")) fallDamage = damageControlObj.get("fall").getAsBoolean();
-            if (damageControlObj.has("suffocation")) suffocationDamage = damageControlObj.get("suffocation").getAsBoolean();
+            for (DamageCause cause : DamageCause.values()) {
+                enabled.put(cause, !damageControlObj.has(cause.name()) || damageControlObj.get(cause.name()).getAsBoolean());
+            }
         }
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(EntityDamageEvent event) {
-        boolean shouldCancel = false;
-        if((event.getCause() == DamageCause.FIRE || event.getCause() == DamageCause.FIRE_TICK) && !fireDamage) shouldCancel = true;
-        else if(event.getCause() == DamageCause.SUFFOCATION && !suffocationDamage) shouldCancel = true;
-        else if(event.getCause() == DamageCause.FALL && !fallDamage) shouldCancel = true;
-        if (shouldCancel) event.setCancelled(true);
+        if (!this.enabled.getOrDefault(event.getCause(), true))
+            event.setCancelled(true);
     }
 }
