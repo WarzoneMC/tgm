@@ -96,6 +96,12 @@ public class OfflineClient implements TeamClient {
     public KillsLeaderboardResponse getKillsLeaderboard() { return new KillsLeaderboardResponse(); }
 
     @Override
+    public WinsLeaderboardResponse getWinsLeaderboard() { return new WinsLeaderboardResponse(); }
+    
+    @Override
+    public XpLeaderboardResponse getXpLeaderboard() { return new XpLeaderboardResponse(); }
+    
+    @Override
     public RevertPunishmentResponse revertPunishment(String id) {
         return null;
     }
