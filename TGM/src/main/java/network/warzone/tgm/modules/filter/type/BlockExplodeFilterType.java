@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.region.Region;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import network.warzone.tgm.modules.region.RegionManagerModule;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +26,7 @@ import java.util.List;
 public class BlockExplodeFilterType implements FilterType, Listener {
     private final List<Region> regions;
     private final FilterEvaluator evaluator;
+    private final boolean inverted;
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
@@ -33,7 +35,7 @@ public class BlockExplodeFilterType implements FilterType, Listener {
             for (Region region : regions) {
                 FilterResult filterResult = evaluator.evaluate();
                 if (filterResult == FilterResult.DENY) {
-                    if (region.contains(block.getLocation())){
+                    if (contains(region, block.getLocation())){
                         if (!cancelledBlocks.contains(block)) cancelledBlocks.add(block);
                     }
                 }
@@ -43,6 +45,11 @@ public class BlockExplodeFilterType implements FilterType, Listener {
         for (Block block : cancelledBlocks){
             event.blockList().remove(block);
         }
+    }
+
+    private boolean contains(Region region, Location location) {
+        if (!inverted) return region.contains(location);
+        else return !region.contains(location);
     }
 
     public static BlockExplodeFilterType parse(Match match, JsonObject jsonObject) {
@@ -55,7 +62,8 @@ public class BlockExplodeFilterType implements FilterType, Listener {
         }
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
-        return new BlockExplodeFilterType(regions, filterEvaluator);
+        boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
+        return new BlockExplodeFilterType(regions, filterEvaluator, inverted);
     }
 
 }

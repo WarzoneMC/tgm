@@ -14,6 +14,7 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -32,11 +33,12 @@ public class UseBowFilterType implements FilterType, Listener {
     private final List<Region> regions;
     private final FilterEvaluator evaluator;
     private final String message;
+    private final boolean inverted;
 
     @EventHandler
     public void onShootBowTest(EntityShootBowEvent e) {
         for (Region region : regions) {
-            if (region.contains(e.getEntity().getLocation())) {
+            if (contains(region, e.getEntity().getLocation())) {
                 FilterResult filterResult = evaluator.evaluate(e.getEntity());
                 if (filterResult == FilterResult.DENY) {
                     e.setCancelled(true);
@@ -46,6 +48,11 @@ public class UseBowFilterType implements FilterType, Listener {
                 }
             }
         }
+    }
+
+    private boolean contains(Region region, Location location) {
+        if (!inverted) return region.contains(location);
+        else return !region.contains(location);
     }
 
     public static UseBowFilterType parse(Match match, JsonObject jsonObject) {
@@ -61,6 +68,7 @@ public class UseBowFilterType implements FilterType, Listener {
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
         String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-        return new UseBowFilterType(matchTeams, regions, filterEvaluator, message);
+        boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
+        return new UseBowFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }
 }

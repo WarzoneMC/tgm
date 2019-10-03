@@ -14,6 +14,7 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -28,12 +29,13 @@ public class LeaveFilterType implements FilterType, Listener {
     private final List<Region> regions;
     private final FilterEvaluator evaluator;
     private final String message;
+    private final boolean inverted;
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (event.getFrom().getX() == event.getTo().getX() && event.getFrom().getY() == event.getTo().getY() && event.getFrom().getZ() == event.getTo().getZ()) return;
         for (Region region : regions) {
-            if (!region.contains(event.getFrom()) && region.contains(event.getTo())) {
+            if (!contains(region, event.getFrom()) && contains(region, event.getTo())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
@@ -49,6 +51,11 @@ public class LeaveFilterType implements FilterType, Listener {
         }
     }
 
+    private boolean contains(Region region, Location location) {
+        if (!inverted) return region.contains(location);
+        else return !region.contains(location);
+    }
+
     public static LeaveFilterType parse(Match match, JsonObject jsonObject) {
         List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
         List<Region> regions = new ArrayList<>();
@@ -62,7 +69,8 @@ public class LeaveFilterType implements FilterType, Listener {
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
         String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-        return new LeaveFilterType(matchTeams, regions, filterEvaluator, message);
+        boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
+        return new LeaveFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }
 
 }

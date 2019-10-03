@@ -15,6 +15,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,11 +36,12 @@ public class BlockPlaceFilterType implements FilterType, Listener {
     private final FilterEvaluator evaluator;
     private final String message;
     private final List<Material> blocks;
+    private final boolean inverted;
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlaceEvent(BlockPlaceEvent event) {
         for (Region region : regions) {
-            if (region.contains(event.getBlockPlaced().getLocation())) {
+            if (contains(region, event.getBlockPlaced().getLocation())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
@@ -52,6 +54,11 @@ public class BlockPlaceFilterType implements FilterType, Listener {
                 }
             }
         }
+    }
+
+    private boolean contains(Region region, Location location) {
+        if (!inverted) return region.contains(location);
+        else return !region.contains(location);
     }
 
 
@@ -86,7 +93,8 @@ public class BlockPlaceFilterType implements FilterType, Listener {
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
         String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-        return new BlockPlaceFilterType(matchTeams, regions, filterEvaluator, message, blocks);
+        boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
+        return new BlockPlaceFilterType(matchTeams, regions, filterEvaluator, message, blocks, inverted);
     }
 
 }
