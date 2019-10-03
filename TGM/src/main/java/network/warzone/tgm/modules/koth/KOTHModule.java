@@ -128,22 +128,26 @@ public class KOTHModule extends MatchModule implements Listener {
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
         int i;
+        int j = 2;
         for (i = 0; i < controlPoints.size(); i++) {
             ControlPoint controlPoint = controlPoints.get(i);
 
-            controlPointScoreboardLines.put(controlPoint.getDefinition(), i);
-            simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), i);
+            controlPointScoreboardLines.put(controlPoint.getDefinition(), j);
+            simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), j);
+            j++;
         }
 
         i++;
-        simpleScoreboard.add(" ", i);
+        simpleScoreboard.add(" ", j);
 
         i++;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
 
-            simpleScoreboard.add(getTeamScoreLine(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i);
+            j++;
+
+            simpleScoreboard.add(getTeamScoreLine(matchTeam), j);
+            teamScoreboardLines.put(matchTeam, j);
 
             i++;
         }

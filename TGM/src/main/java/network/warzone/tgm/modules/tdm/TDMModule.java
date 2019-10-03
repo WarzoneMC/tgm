@@ -84,7 +84,7 @@ public class TDMModule extends MatchModule implements Listener {
 
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
-        int i = 0;
+        int i = 2;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam), i);

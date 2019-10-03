@@ -126,7 +126,7 @@ public class BlitzModule extends MatchModule implements Listener {
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
         simpleScoreboard.setTitle(ChatColor.AQUA + "Players");
 
-        int i = 0;
+        int i = 2;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam, getAlivePlayers(matchTeam).size()), i);
