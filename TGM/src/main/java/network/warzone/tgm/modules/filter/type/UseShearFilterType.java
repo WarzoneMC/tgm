@@ -44,7 +44,7 @@ public class UseShearFilterType implements FilterType, Listener {
                         FilterResult filterResult = evaluator.evaluate(e.getPlayer());
                         if (filterResult == FilterResult.DENY) {
                             e.setCancelled(true);
-                            e.getPlayer().sendMessage(message);
+                            if (message != null) e.getPlayer().sendMessage(message);
                         } else if (filterResult == FilterResult.ALLOW) {
                             e.setCancelled(false);
                         }
@@ -71,7 +71,7 @@ public class UseShearFilterType implements FilterType, Listener {
         }
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
-        String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+        String message = jsonObject.has("message") ? ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString()) : null;
         boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
         return new UseShearFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }

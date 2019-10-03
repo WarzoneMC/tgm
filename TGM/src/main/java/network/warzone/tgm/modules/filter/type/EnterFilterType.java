@@ -39,7 +39,7 @@ public class EnterFilterType implements FilterType, Listener {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
                         if (filterResult == FilterResult.DENY) {
                             event.setCancelled(true);
-                            event.getPlayer().sendMessage(message);
+                            if (message != null) event.getPlayer().sendMessage(message);
                         } else if (filterResult == FilterResult.ALLOW) {
                             event.setCancelled(false);
                         }
@@ -66,7 +66,7 @@ public class EnterFilterType implements FilterType, Listener {
         }
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
-        String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+        String message = jsonObject.has("message") ? ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString()) : null;
         boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
         return new EnterFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }

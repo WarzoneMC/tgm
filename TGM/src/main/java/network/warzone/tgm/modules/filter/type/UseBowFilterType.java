@@ -42,7 +42,7 @@ public class UseBowFilterType implements FilterType, Listener {
                 FilterResult filterResult = evaluator.evaluate(e.getEntity());
                 if (filterResult == FilterResult.DENY) {
                     e.setCancelled(true);
-                    e.getEntity().sendMessage(message);
+                    if (message != null) e.getEntity().sendMessage(message);
                 } else if (filterResult == FilterResult.ALLOW) {
                     e.setCancelled(false);
                 }
@@ -67,7 +67,7 @@ public class UseBowFilterType implements FilterType, Listener {
         }
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
-        String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+        String message = jsonObject.has("message") ? ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString()) : null;
         boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
         return new UseBowFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }

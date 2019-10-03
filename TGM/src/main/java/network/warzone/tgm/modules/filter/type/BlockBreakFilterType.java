@@ -47,7 +47,7 @@ public class BlockBreakFilterType implements FilterType, Listener {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
                         if (!canBreak(event, filterResult)) {
                             event.setCancelled(true);
-                            event.getPlayer().sendMessage(message);
+                            if (message != null) event.getPlayer().sendMessage(message);
                         }
                         break;
                     }
@@ -91,7 +91,7 @@ public class BlockBreakFilterType implements FilterType, Listener {
             }
 
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
-        String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+        String message = jsonObject.has("message") ? ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString()) : null;
         boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
         return new BlockBreakFilterType(matchTeams, regions, filterEvaluator, message, blocks, inverted);
     }
