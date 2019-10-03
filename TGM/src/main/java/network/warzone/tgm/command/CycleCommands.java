@@ -394,7 +394,7 @@ public class CycleCommands {
                         player.sendMessage(ChatColor.RED + "Player not found");
                         return;
                     }
-                    player.teleport(tpTo.getLocation());
+                    player.teleportAsync(tpTo.getLocation());
                     player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
                     return;
                 }
