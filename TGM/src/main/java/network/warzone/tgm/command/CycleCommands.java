@@ -613,7 +613,7 @@ public class CycleCommands {
             } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
                 Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                     int place = 0;
-                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 25 players (kills)");
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
                     for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
                         sender.sendMessage(profileToTextComponent(player, ++place).getText());
                     }
@@ -622,7 +622,7 @@ public class CycleCommands {
             else if (cmd.getString(0).equalsIgnoreCase("xp")) {
                 Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                     int place = 0;
-                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 25 players (xp)");
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (xp)");
                     for (UserProfile player : TGM.get().getTeamClient().getXpLeaderboard()) {
                         sender.sendMessage(profileToTextComponent(player, ++place).getText());
                     }
@@ -631,7 +631,7 @@ public class CycleCommands {
             else if (cmd.getString(0).equalsIgnoreCase("wins")) {
                 Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                     int place = 0;
-                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 25 players (wins)");
+                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (wins)");
                     for (UserProfile player : TGM.get().getTeamClient().getWinsLeaderboard()) {
                         sender.sendMessage(profileToTextComponent(player, ++place).getText());
                     }
