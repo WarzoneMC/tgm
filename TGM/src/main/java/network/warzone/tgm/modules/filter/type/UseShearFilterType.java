@@ -1,15 +1,24 @@
 package network.warzone.tgm.modules.filter.type;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.match.Match;
+import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.filter.FilterResult;
 import network.warzone.tgm.modules.filter.evaluate.FilterEvaluator;
 import network.warzone.tgm.modules.region.Region;
+import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.util.Parser;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,5 +50,21 @@ public class UseShearFilterType implements FilterType, Listener {
                 }
             }
         }
+    }
+
+    public static UseShearFilterType parse(Match match, JsonObject jsonObject) {
+        List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
+        List<Region> regions = new ArrayList<>();
+
+        for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+            Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+            if (region != null) {
+                regions.add(region);
+            }
+        }
+
+        FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
+        String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
+        return new UseShearFilterType(matchTeams, regions, filterEvaluator, message);
     }
 }

@@ -15,6 +15,7 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
+import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -60,100 +61,25 @@ public class FilterManagerModule extends MatchModule {
     private List<FilterType> initFilter(Match match, JsonObject jsonObject) {
         List<FilterType> filterTypes = new ArrayList<>();
 
-        String type = jsonObject.get("type").getAsString().toLowerCase();
+        String type = jsonObject.get("type").getAsString()
+                .replace(" ", "")
+                .replace("_", "")
+                .replace("-", "")
+                .toLowerCase();
 
-        if (type.equals("build")) {
-            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-            List<Region> regions = new ArrayList<>();
-
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-
-            filterTypes.add(new BuildFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("enter")) {
-            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-            List<Region> regions = new ArrayList<>();
-
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-
-            filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("use-bow")) {
-            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-            List<Region> regions = new ArrayList<>();
-
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-
-            filterTypes.add(new UseBowFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("use-shear")) {
-            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-            List<Region> regions = new ArrayList<>();
-
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-
-            filterTypes.add(new UseShearFilterType(matchTeams, regions, filterEvaluator, message));     
-        } else if (type.equals("leave")) {
-            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-            List<Region> regions = new ArrayList<>();
-
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-
-            filterTypes.add(new LeaveFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("block-explode")) {
-            List<Region> regions = new ArrayList<>();
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            filterTypes.add(new BlockExplodeFilterType(regions, filterEvaluator));
-        }
+        if (type.equals("build"))               filterTypes.add(BuildFilterType.parse(match, jsonObject));
+        else if (type.equals("enter"))          filterTypes.add(EnterFilterType.parse(match, jsonObject));
+        else if (type.equals("usebow"))         filterTypes.add(UseBowFilterType.parse(match, jsonObject));
+        else if (type.equals("useshear"))       filterTypes.add(UseShearFilterType.parse(match, jsonObject));
+        else if (type.equals("leave"))          filterTypes.add(LeaveFilterType.parse(match, jsonObject));
+        else if (type.equals("blockexplode"))   filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
+        else if (type.equals("blockplace"))     filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
+        else if (type.equals("blockbreak"))     filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));
 
         return filterTypes;
     }
 
-    private FilterEvaluator initEvaluator(Match match, JsonObject parent) {
+    public static FilterEvaluator initEvaluator(Match match, JsonObject parent) {
         switch (parent.get("evaluate").getAsString()) {
             case "allow":
                 return new AllowFilterEvaluator();

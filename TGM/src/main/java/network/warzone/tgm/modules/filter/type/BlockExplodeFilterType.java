@@ -1,10 +1,15 @@
 package network.warzone.tgm.modules.filter.type;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import network.warzone.tgm.match.Match;
+import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.filter.FilterResult;
 import network.warzone.tgm.modules.filter.evaluate.FilterEvaluator;
 import network.warzone.tgm.modules.region.Region;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.modules.region.RegionManagerModule;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,6 +43,19 @@ public class BlockExplodeFilterType implements FilterType, Listener {
         for (Block block : cancelledBlocks){
             event.blockList().remove(block);
         }
+    }
+
+    public static BlockExplodeFilterType parse(Match match, JsonObject jsonObject) {
+        List<Region> regions = new ArrayList<>();
+        for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+            Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+            if (region != null) {
+                regions.add(region);
+            }
+        }
+
+        FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
+        return new BlockExplodeFilterType(regions, filterEvaluator);
     }
 
 }
