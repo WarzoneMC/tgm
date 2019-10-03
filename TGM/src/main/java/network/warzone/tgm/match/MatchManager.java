@@ -133,11 +133,9 @@ public class MatchManager {
 
             boolean save = TGM.get().getConfig().getBoolean("map.save-matches", false);
             Bukkit.unloadWorld(oldMatch.getWorld(), save);
-            Bukkit.broadcastMessage(".unloading: " + save);
             if (!save)
                 Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
                     try {
-                        Bukkit.broadcastMessage(oldMatch.getWorld().getWorldFolder().toString());
                         FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
                     } catch (IOException e) {
                         e.printStackTrace();
