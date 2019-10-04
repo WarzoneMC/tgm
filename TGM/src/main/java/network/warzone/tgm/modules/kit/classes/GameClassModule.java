@@ -108,6 +108,7 @@ public class GameClassModule extends MatchModule implements Listener {
                 e.printStackTrace();
             }
         }
+        ClassMenu.destroyInstance();
     }
 
     public boolean classSetHasInstance(Class<? extends GameClass> candidate) {
@@ -126,7 +127,6 @@ public class GameClassModule extends MatchModule implements Listener {
         abilityManager.destroyAbilities();
         gameClassSet = null;
         classSwitches = null;
-        ClassMenu.destroyInstance();
     }
 
     @EventHandler
