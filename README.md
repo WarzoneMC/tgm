@@ -42,7 +42,7 @@ As an example, a map should be able to provide different spawn points as the mat
   
 ## Local Server Setup
  
-1. Start with the latest stable [Spigot](https://spigotmc.org) build. 
+1. Start with the latest stable [Paper (PaperSpigot)](https://papermc.io/downloads) build. 
 
 2. Compile the latest version of TGM or download it from our [Jenkins](https://jenkins.bennydoesstuff.me/job/TGM/).
  

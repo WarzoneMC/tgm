@@ -1,12 +1,10 @@
-package network.warzone.tgm.nickname;
+package network.warzone.warzoneapi.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@AllArgsConstructor @Getter @Setter
 public class Skin {
     public String value;
     public String signature;

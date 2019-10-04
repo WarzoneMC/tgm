@@ -9,7 +9,7 @@ import network.warzone.tgm.match.MatchPostLoadEvent;
 import network.warzone.tgm.modules.ChatModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.QueuedNick;
-import network.warzone.tgm.nickname.Skin;
+import network.warzone.warzoneapi.models.Skin;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Ranks;
@@ -18,18 +18,15 @@ import network.warzone.warzoneapi.models.Punishment;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.event.world.WorldInitEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Function;
 
 /**
  * Created by luke on 4/27/17.

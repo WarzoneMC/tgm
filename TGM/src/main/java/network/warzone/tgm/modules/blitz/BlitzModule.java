@@ -9,9 +9,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.death.DeathInfo;
-import network.warzone.tgm.modules.death.DeathModule;
-import network.warzone.tgm.modules.SpawnPointHandlerModule;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -28,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -64,8 +61,8 @@ public class BlitzModule extends MatchModule implements Listener {
         if (mapInfo.has("blitz")) {
             JsonObject blitz = mapInfo.getAsJsonObject("blitz");
 
-            if (blitz.has("death-title")) title = blitz.get("death-title").getAsString();
-            if (blitz.has("death-subtitle")) subtitle = blitz.get("death-subtitle").getAsString();
+            if (blitz.has("deathTitle")) title = blitz.get("deathTitle").getAsString();
+            if (blitz.has("deathSubtitle")) subtitle = blitz.get("deathSubtitle").getAsString();
             if (blitz.has("actionbar")) actionbar = blitz.get("actionbar").getAsString();
             for (JsonElement teamElement : blitz.getAsJsonArray("lives")) {
                 JsonObject teamObject = (JsonObject) teamElement;
@@ -81,6 +78,7 @@ public class BlitzModule extends MatchModule implements Listener {
         }
 
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getBiggestTeam);
+        TGM.get().getModule(RespawnModule.class).addRespawnService(this::isAlive);
     }
 
     private MatchTeam getBiggestTeam() {
@@ -97,7 +95,7 @@ public class BlitzModule extends MatchModule implements Listener {
         }
         if (highest != null) {
             final MatchTeam team = highest;
-            int amount = teamManagerModule.getTeams().stream().filter(t -> getAlivePlayers(team) == getAlivePlayers(t) && !t.isSpectator()).collect(Collectors.toList()).size();
+            int amount = (int) teamManagerModule.getTeams().stream().filter(t -> getAlivePlayers(team) == getAlivePlayers(t) && !t.isSpectator()).count();
             if (amount > 1) return null;
             else return team;
         }
@@ -162,26 +160,11 @@ public class BlitzModule extends MatchModule implements Listener {
         );
     }
 
-    @EventHandler
-    public void onDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
-        Player player = (Player) event.getEntity();
-        if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID) || teamManagerModule.getTeam(player).isSpectator())
-            return;
-        if (player.getHealth() - event.getFinalDamage() >= 0.5) return;
-
-        event.setDamage(0);
-
-        createDeath((Player) event.getEntity());
+    @EventHandler(priority = EventPriority.LOW)
+    public void onDeath(TGMPlayerDeathEvent event) {
+        Player player = event.getVictim();
         removeLife(player);
-
-        TGM.get().getModule(SpawnPointHandlerModule.class).spawnPlayer(TGM.get().getPlayerManager().getPlayerContext(player), teamManagerModule.getTeam(player), false);
-
         if (getLives(player) <= 0) {
-            player.setGameMode(GameMode.SPECTATOR);
-            player.setAllowFlight(true);
-            player.setFlying(true);
-            player.getInventory().clear();
 
             if (player.getLocation().getY() < 0) {
                 player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
@@ -197,18 +180,16 @@ public class BlitzModule extends MatchModule implements Listener {
             showLives(player);
             player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
         }
+    }
 
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDeathHigh(TGMPlayerDeathEvent event) {
         if (lastTeamAlive()) {
             MatchTeam winnerTeam = teamManagerModule.getTeams().stream().filter(matchTeam -> !matchTeam.isSpectator()).filter(matchTeam -> getAlivePlayers(matchTeam).size() > 0).findFirst()
                     .orElseGet(() -> teamManagerModule.getTeams().get(1));
 
             TGM.get().getMatchManager().endMatch(winnerTeam);
         }
-    }
-
-    private void createDeath(Player player) {
-        DeathInfo deathInfo = match.getModule(DeathModule.class).getPlayer(player);
-        Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).collect(Collectors.toList())));
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -253,6 +234,10 @@ public class BlitzModule extends MatchModule implements Listener {
         return playerLives.getOrDefault(player.getUniqueId(), 0);
     }
 
+    private boolean isAlive(Player player) {
+        return getLives(player) > 0;
+    }
+
     private boolean lastTeamAlive() {
         List<MatchTeam> aliveTeams = new ArrayList<>();
 
@@ -266,7 +251,7 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     private List<PlayerContext> getAlivePlayers(MatchTeam matchTeam) {
-        return matchTeam.getMembers().stream().filter(playerContext -> playerContext.getPlayer().getGameMode() != GameMode.SPECTATOR).collect(Collectors.toList());
+        return matchTeam.getMembers().stream().filter(playerContext -> playerContext.getPlayer().getGameMode() != GameMode.SPECTATOR || isAlive(playerContext.getPlayer())).collect(Collectors.toList());
     }
 
 }

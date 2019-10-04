@@ -18,28 +18,29 @@ public class ColorConverter {
     private static Material[] orderedStainedGlassPane = {Material.WHITE_STAINED_GLASS_PANE, Material.LIGHT_BLUE_STAINED_GLASS_PANE, Material.ORANGE_STAINED_GLASS_PANE, Material.MAGENTA_STAINED_GLASS_PANE, Material.YELLOW_STAINED_GLASS_PANE, Material.LIME_STAINED_GLASS_PANE, Material.RED_STAINED_GLASS_PANE, Material.LIGHT_GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE, Material.CYAN_STAINED_GLASS_PANE, Material.PURPLE_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE, Material.BLACK_STAINED_GLASS_PANE};
 
     public static Color getColor(ChatColor color) {
-        if (color == ChatColor.RED) {
-            return Color.RED;
-        } else if (color == ChatColor.BLUE) {
-            return Color.BLUE;
-        } else if (color == ChatColor.LIGHT_PURPLE) {
-            return Color.FUCHSIA;
-        } else if (color == ChatColor.GREEN) {
-            return Color.LIME;
-        } else if (color == ChatColor.DARK_GREEN) {
-            return Color.GREEN;
-        } else if (color == ChatColor.YELLOW) {
-            return Color.YELLOW;
-        } else if (color == ChatColor.GOLD) {
-            return Color.ORANGE;
-        } else if (color == ChatColor.AQUA) {
-            return Color.AQUA;
-        } else if (color == ChatColor.DARK_PURPLE) {
-            return Color.PURPLE;
-        } else if (color == ChatColor.DARK_AQUA) {
-            return Color.TEAL;
-        } else {
-            return Color.WHITE;
+        switch (color) {
+            case RED:
+                return Color.RED;
+            case BLUE:
+                return Color.BLUE;
+            case LIGHT_PURPLE:
+                return Color.FUCHSIA;
+            case GREEN:
+                return Color.LIME;
+            case DARK_GREEN:
+                return Color.GREEN;
+            case YELLOW:
+                return Color.YELLOW;
+            case GOLD:
+                return Color.ORANGE;
+            case AQUA:
+                return Color.AQUA;
+            case DARK_AQUA:
+                return Color.TEAL;
+            case DARK_PURPLE:
+                return Color.PURPLE;
+            default:
+                return getColorAll(color);
         }
     }
 

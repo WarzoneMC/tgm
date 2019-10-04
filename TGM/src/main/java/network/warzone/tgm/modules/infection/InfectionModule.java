@@ -15,7 +15,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
-import network.warzone.tgm.modules.time.TimeUpdate;
+import network.warzone.tgm.modules.time.TimeSubscriber;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
@@ -29,7 +29,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -42,7 +41,7 @@ import java.util.Random;
  * Created by Draem on 7/31/2017.
  */
 @Getter
-public class InfectionModule extends MatchModule implements Listener, TimeUpdate {
+public class InfectionModule extends MatchModule implements Listener, TimeSubscriber {
 
     private Match match;
     private TeamManagerModule teamManager;
@@ -68,7 +67,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeUpdate
 
         TimeModule time = TGM.get().getModule(TimeModule.class);
         time.setTimeLimitService(this::getWinningTeam);
-        time.getDependents().add(this);
+        time.getTimeSubscribers().add(this);
         time.setTimeLimit(length * 60);
         time.setTimeLimited(true);
         this.timeScoreboardValue = length + ":00";

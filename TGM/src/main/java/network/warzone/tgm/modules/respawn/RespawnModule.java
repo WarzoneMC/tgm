@@ -3,10 +3,9 @@ package network.warzone.tgm.modules.respawn;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.match.Match;
-import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.match.MatchResultEvent;
+import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -30,6 +29,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
+@ModuleData(load = ModuleLoadTime.EARLIER)
 public class RespawnModule extends MatchModule implements Listener {
 
     private final RespawnRule DEFAULT_RULE = new RespawnRule(null, 3000, false, true, true);
@@ -42,6 +42,8 @@ public class RespawnModule extends MatchModule implements Listener {
 
     private List<RespawnRule> respawnRules;
 
+    @Getter private List<RespawnService> respawnServices;
+
     private BukkitTask task;
 
     public void load(Match match) {
@@ -49,6 +51,7 @@ public class RespawnModule extends MatchModule implements Listener {
         teamManagerModule = match.getModule(TeamManagerModule.class);
         spectatorTime = new HashMap<>();
         respawnRules = new ArrayList<>();
+        respawnServices = new ArrayList<>();
         confirmed = new ArrayList<>();
         frozen = new ArrayList<>();
 
@@ -102,9 +105,8 @@ public class RespawnModule extends MatchModule implements Listener {
     @EventHandler
     public void onPlayerPunch(PlayerInteractEvent event) {
         MatchTeam team = teamManagerModule.getTeam(event.getPlayer());
-        if (spectators.contains(event.getPlayer()) &&
-                (event.getAction().equals(Action.LEFT_CLICK_AIR) || event.getAction().equals(Action.LEFT_CLICK_BLOCK)) &&
-                getRule(team).isConfirm()) {
+        if (shouldRespawn(event.getPlayer()) && (spectators.contains(event.getPlayer()) && (event.getAction().equals(Action.LEFT_CLICK_AIR) ||
+            event.getAction().equals(Action.LEFT_CLICK_BLOCK)) && getRule(team).isConfirm())) {
             confirmed.add(event.getPlayer());
         }
     }
@@ -123,7 +125,7 @@ public class RespawnModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onMatchResult(MatchResultEvent event) {
-        spectators.forEach(this::stopSpectating);
+        new ArrayList<>(this.spectators).forEach(this::stopSpectating);
     }
 
     private void remove(Player player) {
@@ -136,20 +138,21 @@ public class RespawnModule extends MatchModule implements Listener {
     private void updateTitle() {
         List<Player> toRemove = new ArrayList<>();
         for (Player spectator : spectators) {
+            if (!shouldRespawn(spectator)) continue;
             int timeLeft = (spectatorTime.get(spectator.getUniqueId()));
             if (timeLeft <= 0) {
                 spectator.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "RESPAWN",
-                        ChatColor.GRAY + "Punch to respawn", 0, 2, 0);
+                        ChatColor.GRAY + "Punch to respawn", 0, 20, 0);
                 if (confirmed.contains(spectator)) toRemove.add(spectator);
             } else {
                 if (confirmed.contains(spectator)) spectator.sendTitle(
                         ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED",
                         ChatColor.GRAY + "Respawning in " + ChatColor.YELLOW + String.format("%.1f", timeLeft / 1000.0) + 's',
-                        0, 2, 0);
+                        0, 20, 0);
                 else spectator.sendTitle(
                         ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED",
                         ChatColor.GRAY + "Punch to respawn in " + ChatColor.YELLOW + String.format("%.1f", timeLeft / 1000.0) + 's',
-                        0, 2, 0);
+                        0, 20, 0);
                 spectatorTime.replace(spectator.getUniqueId(), timeLeft - 50);
             }
         }
@@ -160,8 +163,8 @@ public class RespawnModule extends MatchModule implements Listener {
         spectators.add(player);
         spectatorTime.put(player.getUniqueId(), respawnDelay);
         RespawnRule rule = getRule(teamManagerModule.getTeam(player));
-        if (rule.getDelay() > 0) {
-            player.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED", "", 0, 3, 0);
+        if (rule.getDelay() > 0 || !shouldRespawn(player)) {
+            player.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "YOU DIED", "", 0, 60, 0);
 
             if (event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
                 if (event.getKiller() != null) {
@@ -171,12 +174,10 @@ public class RespawnModule extends MatchModule implements Listener {
                 }
             }
 
-            if (rule.isBlindness()) {
+            if (rule.isBlindness())
                 player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 1000000, 3, true));
-            }
-            if (rule.isFreeze()) {
+            if (rule.isFreeze())
                 frozen.add(player);
-            }
 
             player.setAllowFlight(true);
             player.setFlying(true);
@@ -187,10 +188,8 @@ public class RespawnModule extends MatchModule implements Listener {
             }
             player.setGameMode(GameMode.SPECTATOR);
         }
-        if (!rule.isConfirm()) {
-            //Bukkit.getScheduler().runTaskLater(TGM.get(), () -> stopSpectating(event.getVictim()), respawnDelay / 50);
+        if (!rule.isConfirm())
             confirmed.add(player);
-        }
     }
 
     private void stopSpectating(Player player) {
@@ -198,7 +197,7 @@ public class RespawnModule extends MatchModule implements Listener {
         frozen.remove(player);
         confirmed.remove(player);
         spectatorTime.remove(player.getUniqueId());
-
+        player.sendTitle("", "", 0, 0, 0);
         player.removePotionEffect(PotionEffectType.BLINDNESS);
         player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 999, 1);
         player.setAllowFlight(false);
@@ -218,6 +217,19 @@ public class RespawnModule extends MatchModule implements Listener {
 
     public boolean isSpectating(Player player) {
         return this.spectators.contains(player);
+    }
+
+    public boolean shouldRespawn(Player player) {
+        boolean shouldRespawn = true;
+        if (this.respawnServices != null && !this.respawnServices.isEmpty()) {
+            for (RespawnService service : this.respawnServices)
+                shouldRespawn = shouldRespawn && service.shouldRespawn(player);
+        }
+        return shouldRespawn;
+    }
+
+    public void addRespawnService(RespawnService service) {
+        this.respawnServices.add(service);
     }
 
 }

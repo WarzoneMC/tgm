@@ -1,24 +1,34 @@
 package network.warzone.tgm.modules.filter.type;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.match.Match;
+import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.filter.FilterResult;
 import network.warzone.tgm.modules.filter.evaluate.FilterEvaluator;
 import network.warzone.tgm.modules.region.Region;
+import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.bukkit.Material;
+import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.util.Parser;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor @Getter
@@ -28,17 +38,18 @@ public class BuildFilterType implements FilterType, Listener {
     private final List<Region> regions;
     private final FilterEvaluator evaluator;
     private final String message;
+    private final boolean inverted;
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         for (Region region : regions) {
-            if (region.contains(event.getBlockPlaced().getLocation())) {
+            if (contains(region, event.getBlockPlaced().getLocation())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
                         if (filterResult == FilterResult.DENY) {
                             event.setCancelled(true);
-                            event.getPlayer().sendMessage(message);
+                            if (message != null) event.getPlayer().sendMessage(message);
                         } else if (filterResult == FilterResult.ALLOW) {
                             event.setCancelled(false);
                         }
@@ -49,34 +60,9 @@ public class BuildFilterType implements FilterType, Listener {
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            ItemStack item = event.getItem();
-            if (item != null && item.getType() != Material.BOW && !item.getType().isBlock()) {
-                for (Region region : regions) {
-                    if (region.contains(event.getClickedBlock().getRelative(event.getBlockFace()).getLocation())) {
-                        for (MatchTeam matchTeam : teams) {
-                            if (matchTeam.containsPlayer(event.getPlayer())) {
-                                FilterResult filterResult = evaluator.evaluate(event.getPlayer());
-                                if (filterResult == FilterResult.DENY) {
-                                    event.setCancelled(true);
-                                    event.getPlayer().sendMessage(message);
-                                } else if (filterResult == FilterResult.ALLOW) {
-                                    event.setCancelled(false);
-                                }
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         for (Region region : regions) {
-            if (region.contains(event.getBlock().getLocation())) {
+            if (contains(region, event.getBlock().getLocation())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
@@ -96,7 +82,7 @@ public class BuildFilterType implements FilterType, Listener {
     public void onPlayerClickItemFram(PlayerInteractEntityEvent event) {
         if (!event.isCancelled() && event.getRightClicked() != null && event.getRightClicked() instanceof ItemFrame) {
             for (Region region : regions) {
-                if (region.contains(event.getRightClicked().getLocation())) {
+                if (contains(region, event.getRightClicked().getLocation())) {
                     for (MatchTeam matchTeam : teams) {
                         if (matchTeam.containsPlayer(event.getPlayer())) {
                             FilterResult filterResult = evaluator.evaluate(event.getPlayer());
@@ -120,7 +106,7 @@ public class BuildFilterType implements FilterType, Listener {
                 Player player = ((Player) event.getDamager()).getPlayer();
 
                 for (Region region : regions) {
-                    if (region.contains(player.getLocation())) {
+                    if (contains(region, player.getLocation())) {
                         for (MatchTeam matchTeam : teams) {
                             if (matchTeam.containsPlayer(player)) {
                                 FilterResult filterResult = evaluator.evaluate(player);
@@ -136,7 +122,7 @@ public class BuildFilterType implements FilterType, Listener {
                 }
             } else {
                 for (Region region : regions) {
-                    if (region.contains(event.getEntity().getLocation())) {
+                    if (contains(region, event.getEntity().getLocation())) {
                         event.setCancelled(true);
                     }
                 }
@@ -145,10 +131,10 @@ public class BuildFilterType implements FilterType, Listener {
     }
 
     @EventHandler
-    public void onHangingDamage(HangingBreakEvent event) {
+    public void onHangingBreak(HangingBreakEvent event) {
         if (!event.isCancelled()) {
             for (Region region : regions) {
-                if (region.contains(event.getEntity().getLocation())) {
+                if (contains(region, event.getEntity().getLocation())) {
                     event.setCancelled(true);
                 }
             }
@@ -161,12 +147,12 @@ public class BuildFilterType implements FilterType, Listener {
             FilterResult filterResult = evaluator.evaluate();
             if (filterResult == FilterResult.DENY) {
                 for (Region region : regions) {
-                    if (region.contains(event.getBlock().getLocation().clone().add(event.getDirection().getModX(), event.getDirection().getModY(), event.getDirection().getModZ()))) {
+                    if (contains(region, event.getBlock().getLocation().clone().add(event.getDirection().getModX(), event.getDirection().getModY(), event.getDirection().getModZ()))) {
                         event.setCancelled(true);
                         return;
                     } else {
                         for (Block block : event.getBlocks()) {
-                            if (region.contains(event.getBlock().getLocation().clone().add(event.getDirection().getModX(), event.getDirection().getModY(), event.getDirection().getModZ())) || region.contains(block.getLocation().clone().add(event.getDirection().getModX(), event.getDirection().getModY(), event.getDirection().getModZ()))) {
+                            if (contains(region, event.getBlock().getLocation().clone().add(event.getDirection().getModX(), event.getDirection().getModY(), event.getDirection().getModZ())) || contains(region, block.getLocation().clone().add(event.getDirection().getModX(), event.getDirection().getModY(), event.getDirection().getModZ()))) {
                                 event.setCancelled(true);
                                 return;
                             }
@@ -183,12 +169,12 @@ public class BuildFilterType implements FilterType, Listener {
             FilterResult filterResult = evaluator.evaluate();
             if (filterResult == FilterResult.DENY) {
                 for (Region region : regions) {
-                    if (region.contains(event.getBlock().getLocation().clone().add(event.getDirection().getOppositeFace().getModX(), event.getDirection().getOppositeFace().getModY(), event.getDirection().getOppositeFace().getModZ()))) {
+                    if (contains(region, event.getBlock().getLocation().clone().add(event.getDirection().getOppositeFace().getModX(), event.getDirection().getOppositeFace().getModY(), event.getDirection().getOppositeFace().getModZ()))) {
                         event.setCancelled(true);
                         return;
                     } else {
                         for (Block block : event.getBlocks()) {
-                            if (region.contains(block.getLocation().clone().add(event.getDirection().getOppositeFace().getModX(), event.getDirection().getOppositeFace().getModY(), event.getDirection().getOppositeFace().getModZ()))) {
+                            if (contains(region, block.getLocation().clone().add(event.getDirection().getOppositeFace().getModX(), event.getDirection().getOppositeFace().getModY(), event.getDirection().getOppositeFace().getModZ()))) {
                                 event.setCancelled(true);
                                 return;
                             }
@@ -197,6 +183,28 @@ public class BuildFilterType implements FilterType, Listener {
                 }
             }
         }
+    }
+
+    private boolean contains(Region region, Location location) {
+        if (!inverted) return region.contains(location);
+        else return !region.contains(location);
+    }
+
+    public static BuildFilterType parse(Match match, JsonObject jsonObject) {
+        List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
+        List<Region> regions = new ArrayList<>();
+
+        for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
+            Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
+            if (region != null) {
+                regions.add(region);
+            }
+        }
+
+        FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
+        String message = jsonObject.has("message") ? ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString()) : null;
+        boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
+        return new BuildFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }
 
 }
