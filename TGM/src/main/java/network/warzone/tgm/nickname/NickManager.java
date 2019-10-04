@@ -16,7 +16,9 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.visibility.VisibilityController;
 import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.warzoneapi.models.MojangProfile;
 import network.warzone.warzoneapi.models.Rank;
+import network.warzone.warzoneapi.models.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
@@ -48,8 +50,8 @@ public class NickManager {
     @Getter
     private List<QueuedNick> queuedNicks = new ArrayList<>();
 
-    private HashMap<String, UUID> uuidCache = new HashMap<>();
-    private HashMap<String, Skin> skinCache = new HashMap<>();
+    private ProfileCache profileCache = new ProfileCache();
+    //private HashMap<String, Skin> skinCache = new HashMap<>();
 
     public NickManager() {
         visiblityController = new VisibilityControllerImpl(TGM.get().getModule(SpectatorModule.class));
@@ -58,13 +60,8 @@ public class NickManager {
     public void addQueuedNick(Player player, String newName) {
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             Skin skin;
-            try {
-                UUID nickedUUID = getUUID(newName);
-                skin = getSkin(nickedUUID);
-            } catch (UnirestException exception) {
-                player.sendMessage(RATELIMITED_MESSAGE);
-                return;
-            }
+            UUID nickedUUID = getUUID(newName);
+            skin = getSkin(nickedUUID);
 
             queuedNicks.add(new QueuedNick(newName, skin, player));
         });
@@ -219,18 +216,13 @@ public class NickManager {
     public void setSkin(Player player, String nameOfPlayer, @Nullable UUID uuid) {
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             Skin skin;
-            try {
-                UUID theUUID = uuid;
-                if (theUUID == null) {
-                    theUUID = getUUID(nameOfPlayer);
-                }
-                skin = getSkin(theUUID);
-            } catch (UnirestException exception) {
-                player.sendMessage(RATELIMITED_MESSAGE);
-                return;
+            UUID theUUID = uuid;
+            if (theUUID == null) {
+                theUUID = getUUID(nameOfPlayer);
             }
+            skin = getSkin(theUUID);
 
-            setSkin(player, skin);
+            if (skin != null) setSkin(player, skin);
         });
     }
 
@@ -275,56 +267,35 @@ public class NickManager {
         entityPlayer.updateAbilities();
     }
 
-    private UUID getUUID(String name) throws UnirestException {
-        if (uuidCache.containsKey(name)) {
-            return uuidCache.get(name);
+    private UUID getUUID(String name) {
+        MojangProfile profile = retrieveProfile(name);
+        if (profile == null) return null;
+        return profile.getUuid();
+    }
+
+    private Skin getSkin(UUID uuid) {
+        MojangProfile profile = retrieveProfile(uuid);
+        if (profile == null) return null;
+        return profile.getTextures().getSkin();
+    }
+
+    private MojangProfile retrieveProfile(String name) {
+        if (profileCache.contains(name)) {
+            return profileCache.get(name);
         } else {
-            UUID uuid = fetchUUID(name);
-            uuidCache.put(name, uuid);
-            return uuid;
+            MojangProfile profile = TGM.get().getTeamClient().getMojangProfile(name);
+            profileCache.add(profile);
+            return profile;
         }
     }
 
-    private Skin getSkin(UUID uuid) throws UnirestException {
-        if (skinCache.containsKey(uuid.toString())) {
-            return skinCache.get(uuid.toString());
+    private MojangProfile retrieveProfile(UUID uuid) {
+        if (profileCache.contains(uuid)) {
+            return profileCache.get(uuid);
         } else {
-            Skin skin = fetchSkin(uuid);
-            skinCache.put(uuid.toString(), skin);
-            return skin;
-        }
-    }
-
-    private  UUID fetchUUID(String name) throws UnirestException {
-        HttpResponse<String> response = Unirest.get("https://api.mojang.com/users/profiles/minecraft/" + name).asString();
-        if (response.getStatus() == 200) {
-            return UUID.fromString(insertDashUUID(new JSONObject(response.getBody()).getString("id")));
-        }
-        return null;
-    }
-
-    private static String insertDashUUID(String uuid) {
-        StringBuilder sb = new StringBuilder(uuid);
-        sb.insert(8, "-");
-        sb = new StringBuilder(sb.toString());
-        sb.insert(13, "-");
-        sb = new StringBuilder(sb.toString());
-        sb.insert(18, "-");
-        sb = new StringBuilder(sb.toString());
-        sb.insert(23, "-");
-
-        return sb.toString();
-    }
-
-    private Skin fetchSkin(UUID uuid) throws UnirestException {
-        HttpResponse<String> response = Unirest.get(String.format("https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false", UUIDTypeAdapter.fromUUID(uuid))).asString();
-        if (response.getStatus() == 200) {
-            JSONObject object = new JSONObject(response.getBody());
-            JSONObject properties = object.getJSONArray("properties").getJSONObject(0);
-            return new Skin(properties.getString("value"), properties.getString("signature"));
-        } else {
-            System.out.println("Connection couldn't be established code=" + response.getStatus());
-            return null;
+            MojangProfile profile = TGM.get().getTeamClient().getMojangProfile(uuid);
+            profileCache.add(profile);
+            return profile;
         }
     }
 

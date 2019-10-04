@@ -2,6 +2,7 @@ package network.warzone.tgm.nickname;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.warzoneapi.models.Skin;
 import org.bukkit.entity.Player;
 
 @Getter @AllArgsConstructor
