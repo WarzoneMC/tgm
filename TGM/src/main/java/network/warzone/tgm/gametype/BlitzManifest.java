@@ -20,15 +20,4 @@ public class BlitzManifest extends MatchManifest {
         matchModules.add(new BlitzModule());
         return matchModules;
     }
-
-    @Override
-    public List<MatchModule> allocateCoreModules() {
-        List<MatchModule> modules = super.allocateCoreModules();
-        List<MatchModule> toRemove = new ArrayList<>();
-        for (MatchModule module : modules) {
-            if (module instanceof RespawnModule) toRemove.add(module);
-        }
-        modules.removeAll(toRemove);
-        return modules;
-    }
 }

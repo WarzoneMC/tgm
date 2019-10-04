@@ -65,6 +65,7 @@ public class ApiManager implements Listener {
             Heartbeat heartbeat = new Heartbeat(serverId,
                     TGM.get().getConfig().getString("server.name"),
                     TGM.get().getConfig().getString("server.id"),
+                    Bukkit.getMotd(),
                     players,
                     playerNames,
                     playerCount,

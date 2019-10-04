@@ -11,6 +11,8 @@ import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 
+import java.util.UUID;
+
 /**
  * Created by luke on 4/27/17.
  */
@@ -339,6 +341,23 @@ public class HttpClient implements TeamClient {
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .asObject(PlayerAltsResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public MojangProfile getMojangProfile(UUID uuid) {
+        return getMojangProfile(uuid.toString());
+    }
+
+    @Override
+    public MojangProfile getMojangProfile(String username) {
+        try {
+            HttpResponse<MojangProfile> response = Unirest.get("https://api.ashcon.app/mojang/v2/user/" + username)
+                    .asObject(MojangProfile.class);
             return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();

@@ -1,17 +1,16 @@
 package network.warzone.tgm.map;
 
 import com.google.gson.*;
-import com.mashape.unirest.http.Unirest;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.warzoneapi.models.Author;
+import network.warzone.warzoneapi.models.MojangProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by luke on 4/27/17.
@@ -32,7 +31,9 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
                     Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                         if (author != null && author.getUuid() != null) {
                             try {
-                                author.setDisplayUsername(getCurrentName(author.getUuid()));
+                                MojangProfile profile = TGM.get().getTeamClient().getMojangProfile(author.getUuid());
+                                if (profile != null && profile.getCode() == 0)
+                                    author.setDisplayUsername(profile.getUsername());
                             } catch (Exception e) {
                                 TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);
                             }
@@ -56,17 +57,6 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
         boolean usingClasses = (json.has("classes") && ((json.get("classes").isJsonPrimitive() && json.get("classes").getAsJsonPrimitive().isBoolean() && json.get("classes").getAsBoolean()) || json.get("classes").isJsonArray()));
 
         return new MapInfo(name, version, authors, gameType, parsedTeams, usingClasses, json);
-    }
-
-    private static String getCurrentName(UUID uuid) throws Exception {
-        MojangProfile body = Unirest.get("https://api.ashcon.app/mojang/v2/user/" + uuid.toString())
-                .asObject(MojangProfile.class)
-                .getBody();
-        return body.username;
-    }
-
-    private static class MojangProfile {
-        private String username;
     }
 
 }

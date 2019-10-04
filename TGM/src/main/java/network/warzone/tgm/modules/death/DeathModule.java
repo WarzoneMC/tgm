@@ -55,7 +55,6 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if (event instanceof EntityDamageByEntityEvent) return;
         if (event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
             if (isDead(p)) {
@@ -131,12 +130,12 @@ public class DeathModule extends MatchModule implements Listener {
     private void onDeath(Player player) {
         DeathInfo deathInfo = getPlayer(player);
         if(deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
+        setDead(player);
         Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).collect(Collectors.toList())));
     }
 
     @EventHandler
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
-        setDead(event.getVictim());
         for (ItemStack stack : event.getDrops()) {
             if (stack != null) {
                 event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation(), stack);
