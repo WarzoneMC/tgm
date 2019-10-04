@@ -66,7 +66,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             playerContext.getPlayer().setVelocity(new Vector(0, 0, 0));
             playerContext.getPlayer().setAllowFlight(true);
             playerContext.getPlayer().setFlying(true);
-            playerContext.getPlayer().teleportAsync(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
