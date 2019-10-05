@@ -311,6 +311,10 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "This map does not use classes.");
             return;
         }
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST) {
+            sender.sendMessage(ChatColor.RED + "You cannot change classes at this time!");
+            return;
+        }
 
         String chosenClassString = Strings.getTechnicalName(cmd.getString(0));
         GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
