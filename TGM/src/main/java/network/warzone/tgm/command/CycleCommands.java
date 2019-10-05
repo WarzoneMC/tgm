@@ -328,7 +328,7 @@ public class CycleCommands {
             return;
         }
 
-        if (Strings.getTechnicalName(GameClassModule.getCurrentClass(player)).equals(chosenClassString)) {
+        if (Strings.getTechnicalName(gameClassModule.getCurrentClass(player)).equals(chosenClassString)) {
             player.sendMessage(ChatColor.RED + "You are using this class currently!");
             return;
         }

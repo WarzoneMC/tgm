@@ -75,13 +75,13 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         }
 
         if (gameClassModule != null) {
-            if (GameClassModule.getCurrentClass(playerContext.getPlayer()) == null) GameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
+            if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else {
                     gameClassModule.performSwitch(playerContext.getPlayer());
-                    GameClass gameClass = gameClassModule.getGameClass(GameClassModule.getCurrentClass(playerContext.getPlayer()));
+                    GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
                     if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
                     playerContext.getPlayer().updateInventory();
                 }

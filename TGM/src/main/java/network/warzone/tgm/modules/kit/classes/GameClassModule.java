@@ -33,13 +33,13 @@ import java.util.stream.Collectors;
 public class GameClassModule extends MatchModule implements Listener {
     @Getter private String defaultClass;
 
-    private static HashMap<UUID, String> playerClasses = new HashMap<>();
+    private HashMap<UUID, String> playerClasses = new HashMap<>();
 
-    public static String getCurrentClass(Player p) {
+    public String getCurrentClass(Player p) {
         return playerClasses.get(p.getUniqueId());
     }
 
-    public static void setCurrentClass(Player p, String className) {
+    public void setCurrentClass(Player p, String className) {
         playerClasses.put(p.getUniqueId(), className);
     }
 
@@ -138,6 +138,11 @@ public class GameClassModule extends MatchModule implements Listener {
         abilityManager.destroyAbilities();
         gameClassSet = null;
         classSwitches = null;
+    }
+
+    @Override
+    public void unload() {
+        playerClasses = null;
     }
 
     @EventHandler
