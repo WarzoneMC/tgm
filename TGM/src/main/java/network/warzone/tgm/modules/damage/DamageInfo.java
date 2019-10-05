@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.death;
+package network.warzone.tgm.modules.damage;
 
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
