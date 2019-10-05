@@ -27,8 +27,8 @@ public class BuilderClass extends GameClass {
         super.setItem(21, ItemFactory.createItem(Material.ARROW, 64));
 
 
-        super.setItem(SlotType.HELMET.slot, ItemFactory.createItem(Material.LEATHER_HELMET));
-        super.setItem(SlotType.CHESTPLATE.slot, ItemFactory.createItem(Material.LEATHER_CHESTPLATE));
-        super.setItem(SlotType.BOOTS.slot, ItemFactory.createItem(Material.IRON_BOOTS));
+        super.setItem(SlotType.HELMET.getSlot(), ItemFactory.createItem(Material.LEATHER_HELMET));
+        super.setItem(SlotType.CHESTPLATE.getSlot(), ItemFactory.createItem(Material.LEATHER_CHESTPLATE));
+        super.setItem(SlotType.BOOTS.getSlot(), ItemFactory.createItem(Material.IRON_BOOTS));
     }
 }

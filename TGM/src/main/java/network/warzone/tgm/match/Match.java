@@ -39,8 +39,7 @@ public class Match {
      * No players are in the world at this point.
      */
     public void load() {
-        modules.addAll(matchManifest.allocateCoreModules());
-        modules.addAll(matchManifest.allocateConditionalModules(mapContainer.getMapInfo()));
+        modules.addAll(matchManifest.allocateCoreModules(mapContainer.getMapInfo().getJsonObject()));
         modules.addAll(matchManifest.allocateGameModules());
 
         /*

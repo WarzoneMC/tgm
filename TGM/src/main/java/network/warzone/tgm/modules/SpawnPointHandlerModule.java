@@ -33,7 +33,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     public void load(Match match) {
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
-        gameClassModule = match.getMapContainer().getMapInfo().isUsingClasses() ? TGM.get().getModule(GameClassModule.class) : null;
+        gameClassModule = TGM.get().getModule(GameClassModule.class);
     }
 
     @EventHandler
@@ -75,13 +75,13 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         }
 
         if (gameClassModule != null) {
-            if (playerContext.getCurrentClass() == null) playerContext.setCurrentClass(gameClassModule.getDefaultClass());
+            if (GameClassModule.getCurrentClass(playerContext.getPlayer()) == null) GameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else {
-                    gameClassModule.performSwitch(playerContext);
-                    GameClass gameClass = gameClassModule.getGameClass(playerContext.getCurrentClass());
+                    gameClassModule.performSwitch(playerContext.getPlayer());
+                    GameClass gameClass = gameClassModule.getGameClass(GameClassModule.getCurrentClass(playerContext.getPlayer()));
                     if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
                     playerContext.getPlayer().updateInventory();
                 }

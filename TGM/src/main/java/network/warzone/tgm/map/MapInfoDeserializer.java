@@ -54,9 +54,7 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
             parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamMax, teamMin));
         }
 
-        boolean usingClasses = (json.has("classes") && ((json.get("classes").isJsonPrimitive() && json.get("classes").getAsJsonPrimitive().isBoolean() && json.get("classes").getAsBoolean()) || json.get("classes").isJsonArray()));
-
-        return new MapInfo(name, version, authors, gameType, parsedTeams, usingClasses, json);
+        return new MapInfo(name, version, authors, gameType, parsedTeams, json);
     }
 
 }

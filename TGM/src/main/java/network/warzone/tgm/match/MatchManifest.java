@@ -1,5 +1,6 @@
 package network.warzone.tgm.match;
 
+import com.google.gson.JsonObject;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
@@ -46,7 +47,7 @@ public abstract class MatchManifest {
      * if needed.
      * @return
      */
-    public List<MatchModule> allocateCoreModules() {
+    public List<MatchModule> allocateCoreModules(JsonObject mapJson) {
         List<MatchModule> modules = new ArrayList<>();
 
         modules.add(new TeamJoinNotificationsModule());
@@ -86,17 +87,10 @@ public abstract class MatchManifest {
         modules.add(new MapCommandsModule());
         modules.add(new DamageControlModule());
         modules.add(new RespawnModule());
+
+        if (mapJson.has("classes") && ((mapJson.get("classes").isJsonPrimitive() && mapJson.get("classes").getAsJsonPrimitive().isBoolean() && mapJson.get("classes").getAsBoolean()) || mapJson.get("classes").isJsonArray())) {
+            modules.add(new GameClassModule());
+        }
         return modules;
     }
-
-    /**
-     * Modules that are allocated conditional to configuration
-     * settings (server and map)
-     */
-    public List<MatchModule> allocateConditionalModules(MapInfo mapInfo) {
-        List<MatchModule> modules = new ArrayList<>();
-        if (mapInfo.isUsingClasses()) modules.add(new GameClassModule());
-        return modules;
-    }
-
 }

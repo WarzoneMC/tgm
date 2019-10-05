@@ -19,8 +19,8 @@ public class NinjaClass extends GameClass {
         super.setItem(6, ItemFactory.createItem(Material.OAK_PLANKS, 64));
         super.setItem(7, ItemFactory.createItem(Material.WOODEN_AXE));
 
-        super.setItem(SlotType.HELMET.slot, ItemFactory.createItem(Material.LEATHER_HELMET));
-        super.setItem(SlotType.BOOTS.slot, ItemFactory.createItem(Material.LEATHER_BOOTS));
+        super.setItem(SlotType.HELMET.getSlot(), ItemFactory.createItem(Material.LEATHER_HELMET));
+        super.setItem(SlotType.BOOTS.getSlot(), ItemFactory.createItem(Material.LEATHER_BOOTS));
     }
 
     @Override

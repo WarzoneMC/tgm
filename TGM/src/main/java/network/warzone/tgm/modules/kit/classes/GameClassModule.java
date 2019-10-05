@@ -17,6 +17,7 @@ import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.ClassMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -31,6 +32,16 @@ import java.util.stream.Collectors;
 @ModuleData(load = ModuleLoadTime.EARLIER)
 public class GameClassModule extends MatchModule implements Listener {
     @Getter private String defaultClass;
+
+    private static HashMap<UUID, String> playerClasses = new HashMap<>();
+
+    public static String getCurrentClass(Player p) {
+        return playerClasses.get(p.getUniqueId());
+    }
+
+    public static void setCurrentClass(Player p, String className) {
+        playerClasses.put(p.getUniqueId(), className);
+    }
 
     public enum GameClassStore {
         PHOENIX(PhoenixClass.class,
@@ -132,39 +143,39 @@ public class GameClassModule extends MatchModule implements Listener {
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
         if (event.getTeam().isSpectator()) {
-            removeClassForPlayer(event.getPlayerContext());
+            removeClassForPlayer(event.getPlayerContext().getPlayer());
         } else if (event.getOldTeam().isSpectator()) {
-            setupClassForPlayer(event.getPlayerContext());
+            setupClassForPlayer(event.getPlayerContext().getPlayer());
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        removeClassForPlayer(TGM.get().getPlayerManager().getPlayerContext(event.getPlayer()));
+        removeClassForPlayer(event.getPlayer());
     }
 
 
-    public void addSwitchClassRequest(PlayerContext p, String desiredClass) {
+    public void addSwitchClassRequest(Player p, String desiredClass) {
         addSwitchClassRequest(p, desiredClass, true);
     }
 
-    public void addSwitchClassRequest(PlayerContext p, String desiredClass, boolean showMsg) {
-        MatchTeam team = teamManagerModule.getTeam(p.getPlayer());
+    public void addSwitchClassRequest(Player p, String desiredClass, boolean showMsg) {
+        MatchTeam team = teamManagerModule.getTeam(p);
         if(team == null || team.isSpectator()) {
             setClassForPlayer(p, desiredClass);
         } else {
-            if (showMsg) p.getPlayer().sendMessage(ChatColor.GREEN + "Class will be applied when you respawn!");
-            classSwitches.put(p.getPlayer().getUniqueId(), desiredClass);
+            if (showMsg) p.sendMessage(ChatColor.GREEN + "Class will be applied when you respawn!");
+            classSwitches.put(p.getUniqueId(), desiredClass);
         }
     }
 
-    private void setupClassForPlayer(PlayerContext playerContext) {
-        if (playerContext.getCurrentClass() == null || !classIsAllowed(playerContext.getCurrentClass())) playerContext.setCurrentClass(defaultClass);
-        GameClass newGameClass = getGameClass(playerContext.getCurrentClass());
-        newGameClass.addToAbilityCaches(playerContext.getPlayer());
+    private void setupClassForPlayer(Player player) {
+        if (getCurrentClass(player) == null || !classIsAllowed(getCurrentClass(player))) setCurrentClass(player, defaultClass);
+        GameClass newGameClass = getGameClass(getCurrentClass(player));
+        newGameClass.addToAbilityCaches(player);
 
         // forget about respawn switcher class if it exists
-        classSwitches.remove(playerContext.getPlayer().getUniqueId());
+        classSwitches.remove(player.getUniqueId());
     }
 
     private boolean classIsAllowed(String className) {
@@ -172,31 +183,31 @@ public class GameClassModule extends MatchModule implements Listener {
         return rawUsedClasses.contains(normalized);
     }
 
-    public void setClassForPlayer(PlayerContext playerContext, String chosenClassString) {
-        GameClass oldGameClass = getGameClass(playerContext.getCurrentClass());
-        if (oldGameClass != null) removeClassForPlayer(playerContext, oldGameClass);
-        playerContext.setCurrentClass(chosenClassString);
-        playerContext.getPlayer().sendMessage(ChatColor.AQUA + "Switched to class " + GameClassStore.valueOf(chosenClassString).getDisplayName() + "!");
-        if(!teamManagerModule.getTeam(playerContext.getPlayer()).isSpectator()) setupClassForPlayer(playerContext);
+    public void setClassForPlayer(Player player, String chosenClassString) {
+        GameClass oldGameClass = getGameClass(getCurrentClass(player));
+        if (oldGameClass != null) removeClassForPlayer(player, oldGameClass);
+        setCurrentClass(player, chosenClassString);
+        player.sendMessage(ChatColor.AQUA + "Switched to class " + GameClassStore.valueOf(chosenClassString).getDisplayName() + "!");
+        if(!teamManagerModule.getTeam(player).isSpectator()) setupClassForPlayer(player);
     }
 
-    public void performSwitch(PlayerContext playerContext) {
-        if (!classSwitches.containsKey(playerContext.getPlayer().getUniqueId())) return;
-        GameClass gameClass = getGameClass(playerContext.getCurrentClass());
-        gameClass.removeFromAbilityCaches(playerContext.getPlayer());
-        playerContext.setCurrentClass(classSwitches.get(playerContext.getPlayer().getUniqueId()));
-        setupClassForPlayer(playerContext);
+    public void performSwitch(Player player) {
+        if (!classSwitches.containsKey(player.getUniqueId())) return;
+        GameClass gameClass = getGameClass(getCurrentClass(player));
+        gameClass.removeFromAbilityCaches(player);
+        setCurrentClass(player, classSwitches.get(player.getUniqueId()));
+        setupClassForPlayer(player);
     }
 
 
 
-    private void removeClassForPlayer(PlayerContext playerContext) {
-        GameClass gameClass = getGameClass(playerContext.getCurrentClass());
-        removeClassForPlayer(playerContext, gameClass);
+    private void removeClassForPlayer(Player player) {
+        GameClass gameClass = getGameClass(getCurrentClass(player));
+        removeClassForPlayer(player, gameClass);
     }
 
-    private void removeClassForPlayer(PlayerContext playerContext, GameClass gameClass) {
-        if (gameClass != null) gameClass.removeFromAbilityCaches(playerContext.getPlayer());
+    private void removeClassForPlayer(Player player, GameClass gameClass) {
+        if (gameClass != null) gameClass.removeFromAbilityCaches(player);
     }
 
     @SuppressWarnings("unchecked")

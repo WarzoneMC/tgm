@@ -20,7 +20,7 @@ public class PhoenixClass extends GameClass {
 
         super.setItem(8,  ItemFactory.createItem(Material.ARROW, 64));
 
-        super.setItem(SlotType.HELMET.slot, ItemFactory.createItem(Material.CHAINMAIL_HELMET));
-        super.setItem(SlotType.CHESTPLATE.slot, ItemFactory.createItem(Material.LEATHER_CHESTPLATE));
+        super.setItem(SlotType.HELMET.getSlot(), ItemFactory.createItem(Material.CHAINMAIL_HELMET));
+        super.setItem(SlotType.CHESTPLATE.getSlot(), ItemFactory.createItem(Material.LEATHER_CHESTPLATE));
     }
 }

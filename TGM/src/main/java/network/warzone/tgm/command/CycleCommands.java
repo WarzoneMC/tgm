@@ -291,7 +291,7 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
             return;
         }
-        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingClasses()) {
+        if (TGM.get().getModule(GameClassModule.class) == null) {
             sender.sendMessage(ChatColor.RED + "This map does not use classes.");
             return;
         }
@@ -307,7 +307,7 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
             return;
         }
-        if (!TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().isUsingClasses()) {
+        if (TGM.get().getModule(GameClassModule.class) == null) {
             sender.sendMessage(ChatColor.RED + "This map does not use classes.");
             return;
         }
@@ -327,16 +327,16 @@ public class CycleCommands {
             player.sendMessage(ChatColor.RED + "Invalid class name! Try /classes!");
             return;
         }
-        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        if (Strings.getTechnicalName(playerContext.getCurrentClass()).equals(chosenClassString)) {
+
+        if (Strings.getTechnicalName(GameClassModule.getCurrentClass(player)).equals(chosenClassString)) {
             player.sendMessage(ChatColor.RED + "You are using this class currently!");
             return;
         }
 
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
-            gameClassModule.setClassForPlayer(playerContext, chosenClassString);
+            gameClassModule.setClassForPlayer(player, chosenClassString);
         } else {
-            gameClassModule.addSwitchClassRequest(playerContext, chosenClassString);
+            gameClassModule.addSwitchClassRequest(player, chosenClassString);
         }
     }
     

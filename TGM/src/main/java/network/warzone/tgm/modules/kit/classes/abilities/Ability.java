@@ -4,7 +4,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.TimeUnitPair;
-import network.warzone.tgm.util.damage.DamageInfo;
+import network.warzone.tgm.modules.death.DamageInfo;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

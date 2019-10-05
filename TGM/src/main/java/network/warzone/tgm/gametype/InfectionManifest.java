@@ -1,5 +1,7 @@
 package network.warzone.tgm.gametype;
 
+import com.google.gson.JsonObject;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchManifest;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.death.DeathMessageModule;
@@ -23,8 +25,8 @@ public class InfectionManifest extends MatchManifest {
     }
 
     @Override
-    public List<MatchModule> allocateCoreModules() {
-        List<MatchModule> modules = super.allocateCoreModules();
+    public List<MatchModule> allocateCoreModules(JsonObject mapJson) {
+        List<MatchModule> modules = super.allocateCoreModules(mapJson);
         List<MatchModule> toRemove = new ArrayList<>();
         for (MatchModule module : modules) {
             if (module instanceof DeathMessageModule) toRemove.add(module);
