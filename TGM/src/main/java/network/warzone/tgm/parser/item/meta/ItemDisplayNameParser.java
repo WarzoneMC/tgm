@@ -12,7 +12,7 @@ public class ItemDisplayNameParser implements ItemMetaParser {
 
     @Override
     public void parse(ItemStack itemStack, ItemMeta meta, JsonObject object) {
-        if (object.has("display_name"))
-            meta.setDisplayName(ColorConverter.filterString(object.get("display_name").getAsString()));
+        if (object.has("displayName"))
+            meta.setDisplayName(ColorConverter.filterString(object.get("displayName").getAsString()));
     }
 }
