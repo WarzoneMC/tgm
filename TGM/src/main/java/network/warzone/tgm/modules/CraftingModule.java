@@ -89,7 +89,7 @@ public class CraftingModule extends MatchModule implements Listener {
 
     private static Recipe parseRecipe(JsonObject jsonObject) {
         String type = jsonObject.get("type").getAsString();
-        ItemStack result = ItemDeserializer.parse(jsonObject.get("result").getAsJsonObject());
+        ItemStack result = ItemDeserializer.parse(jsonObject.get("result").getAsJsonObject())
         switch (type) {
             case "shapeless":
                 ShapelessRecipe recipe = new ShapelessRecipe(getKey(result.getType().name() + new Date().getTime()), result);

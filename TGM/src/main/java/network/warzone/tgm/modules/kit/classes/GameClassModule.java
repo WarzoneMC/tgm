@@ -146,6 +146,8 @@ public class GameClassModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
+        gameClassSet = null;
+        classSwitches = null;
         playerClasses = null;
     }
 
