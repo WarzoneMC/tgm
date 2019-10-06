@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.parser.item.ItemDeserializer;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.Bukkit;
@@ -88,7 +89,7 @@ public class CraftingModule extends MatchModule implements Listener {
 
     private static Recipe parseRecipe(JsonObject jsonObject) {
         String type = jsonObject.get("type").getAsString();
-        ItemStack result = Parser.parseItemStack(jsonObject.get("result").getAsJsonObject());
+        ItemStack result = ItemDeserializer.parse(jsonObject.get("result").getAsJsonObject());
         switch (type) {
             case "shapeless":
                 ShapelessRecipe recipe = new ShapelessRecipe(getKey(result.getType().name() + new Date().getTime()), result);
@@ -112,7 +113,7 @@ public class CraftingModule extends MatchModule implements Listener {
 
     private static RecipeChoice parseRecipeIngredient(JsonElement jsonElement) {
         if (jsonElement.isJsonObject()) {
-            ItemStack item = Parser.parseItemStack(jsonElement.getAsJsonObject());
+            ItemStack item = ItemDeserializer.parse(jsonElement.getAsJsonObject());
             return new RecipeChoice.ExactChoice(item);
         } else if (jsonElement.isJsonPrimitive()) {
             Material material = Material.valueOf(Strings.getTechnicalName(jsonElement.getAsString()));

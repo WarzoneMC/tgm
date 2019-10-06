@@ -1,5 +1,6 @@
 package network.warzone.tgm.util.itemstack;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -17,5 +18,9 @@ public class ItemUtils {
             }
         }
         return false;
+    }
+    
+    public static boolean isPotion(Material material) {
+        return material.equals(Material.POTION) || material.equals(Material.SPLASH_POTION) || material.equals(Material.LINGERING_POTION);
     }
 }
