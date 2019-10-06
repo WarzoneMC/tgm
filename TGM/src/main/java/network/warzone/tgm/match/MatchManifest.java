@@ -88,9 +88,8 @@ public abstract class MatchManifest {
         modules.add(new DamageControlModule());
         modules.add(new RespawnModule());
 
-        if (mapJson.has("classes") && ((mapJson.get("classes").isJsonPrimitive() && mapJson.get("classes").getAsJsonPrimitive().isBoolean() && mapJson.get("classes").getAsBoolean()) || mapJson.get("classes").isJsonArray())) {
-            modules.add(new GameClassModule());
-        }
+        if (GameClassModule.isUsingClasses(mapJson)) modules.add(new GameClassModule());
+
         return modules;
     }
 }

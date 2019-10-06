@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.kit.classes;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
@@ -11,7 +12,6 @@ import network.warzone.tgm.modules.kit.classes.abilities.*;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.ClassMenu;
@@ -41,6 +41,10 @@ public class GameClassModule extends MatchModule implements Listener {
 
     public void setCurrentClass(Player p, String className) {
         playerClasses.put(p.getUniqueId(), className);
+    }
+
+    public static boolean isUsingClasses(JsonObject mapJson) {
+        return (mapJson.has("classes") && ((mapJson.get("classes").isJsonPrimitive() && mapJson.get("classes").getAsJsonPrimitive().isBoolean() && mapJson.get("classes").getAsBoolean()) || mapJson.get("classes").isJsonArray()));
     }
 
     public enum GameClassStore {
