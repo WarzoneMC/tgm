@@ -87,6 +87,7 @@ public abstract class MatchManifest {
         modules.add(new MapCommandsModule());
         modules.add(new DamageControlModule());
         modules.add(new RespawnModule());
+        modules.add(new CraftingModule());
 
         if (GameClassModule.isUsingClasses(mapJson)) modules.add(new GameClassModule());
 
