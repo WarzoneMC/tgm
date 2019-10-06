@@ -5,7 +5,6 @@ import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
-import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.TimeUnitPair;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.ConfirmMenu;
@@ -191,39 +190,50 @@ public class PunishCommands {
         });
     }
 
-    @Command(aliases = {"lookup", "lu"}, desc = "Get player info", min = 1, max = 1, usage = "(name|ip)")
+    @Command(aliases = {"lookup", "lu"}, desc = "Get player info", min = 1, max = 1, usage = "(name)")
     @CommandPermissions({"tgm.lookup"})
     public static void lookup(CommandContext cmd, CommandSender sender) {
         String filter = cmd.getString(0);
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            PlayerInfoResponse playerInfoResponse = TGM.get().getTeamClient().getPlayerInfo(new PlayerInfoRequest(isIP(filter) ? null : filter, isIP(filter) ? filter : null));
+            PlayerInfoResponse playerInfoResponse = TGM.get().getTeamClient().getPlayerInfo(new PlayerInfoRequest(filter, null));
             if (playerInfoResponse.isError()) {
                 sender.sendMessage(ChatColor.RED + playerInfoResponse.getMessage());
             } else {
                 sender.sendMessage(ChatColor.YELLOW + "Info for " + playerInfoResponse.getQueryFilter() + ":");
-                if (isIP(playerInfoResponse.getQueryFilter())) {
-                    sender.sendMessage(ChatColor.GRAY + "Users " + ChatColor.RESET + "(" + playerInfoResponse.getUsers().size() + ")" + ChatColor.GRAY + ":");
-                    for (UserProfile profile : playerInfoResponse.getUsers()) {
-                        sender.spigot().sendMessage(new ComponentBuilder(ChatColor.GRAY + " - " + ChatColor.RESET + profile.getName()).event(
-                                new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
-                                        ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
+                if (playerInfoResponse.getUsers().isEmpty()) return;
+                UserProfile profile = playerInfoResponse.getUsers().get(0);
+                sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
+                        "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
+                        "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
+                        "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
+                        "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString()
+                );
+            }
+        });
+    }
+
+    @Command(aliases = {"lookupip", "luip"}, desc = "Get IP info", min = 1, max = 1, usage = "(ip)")
+    @CommandPermissions({"tgm.lookup"})
+    public static void lookupip(CommandContext cmd, CommandSender sender) {
+        String filter = cmd.getString(0);
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            PlayerInfoResponse playerInfoResponse = TGM.get().getTeamClient().getPlayerInfo(new PlayerInfoRequest(null, filter));
+            if (playerInfoResponse.isError()) {
+                sender.sendMessage(ChatColor.RED + playerInfoResponse.getMessage());
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "Info for IP " + playerInfoResponse.getQueryFilter() + ":");
+                sender.sendMessage(ChatColor.GRAY + "Users " + ChatColor.RESET + "(" + playerInfoResponse.getUsers().size() + ")" + ChatColor.GRAY + ":");
+                for (UserProfile profile : playerInfoResponse.getUsers()) {
+                    sender.spigot().sendMessage(new ComponentBuilder(ChatColor.GRAY + " - " + ChatColor.RESET + profile.getName()).event(
+                            new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
+                                    ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
                                             "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
                                             "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
                                             "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
                                             "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString()
-                                ).create())).event(
-                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lookup " + profile.getName())
-                        ).create());
-                    }
-                } else {
-                    if (playerInfoResponse.getUsers().isEmpty()) return;
-                    UserProfile profile = playerInfoResponse.getUsers().get(0);
-                    sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
-                            "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
-                            "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
-                            "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
-                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString()
-                    );
+                            ).create())).event(
+                            new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lookup " + profile.getName())
+                    ).create());
                 }
             }
         });
