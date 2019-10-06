@@ -35,8 +35,10 @@ public class KillstreakModule extends MatchModule implements Listener {
         this.match = match;
         deathModule = match.getModule(DeathModule.class);
         this.addDefaults();
-        Killstreak[] parsedKillstreaks = TGM.get().getGson().fromJson(match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("killstreaks"), Killstreak[].class);
-        Collections.addAll(this.killstreaks, parsedKillstreaks);
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("killstreaks")) {
+            Killstreak[] parsedKillstreaks = TGM.get().getGson().fromJson(match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("killstreaks"), Killstreak[].class);
+            Collections.addAll(this.killstreaks, parsedKillstreaks);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST) // DeathMessageModule sets killer to null so this has to be first
