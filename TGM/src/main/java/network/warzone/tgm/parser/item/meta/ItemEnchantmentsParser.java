@@ -17,7 +17,7 @@ public class ItemEnchantmentsParser implements ItemMetaParser {
         if (object.has("enchantments")) {
             for (JsonElement element : object.getAsJsonArray("enchantments")) {
                 String[] split = element.getAsString().split(":");
-                String id = split[0];
+                String id = split[0].toLowerCase().replace(" ", "_");
                 int level = Integer.parseInt(split[1]);
                 Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(id));
                 if (enchantment != null) {
