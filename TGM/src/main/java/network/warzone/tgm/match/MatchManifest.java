@@ -1,5 +1,7 @@
 package network.warzone.tgm.match;
 
+import com.google.gson.JsonObject;
+import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
@@ -12,6 +14,7 @@ import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.knockback.KnockbackModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.portal.PortalLoaderModule;
@@ -44,7 +47,7 @@ public abstract class MatchManifest {
      * if needed.
      * @return
      */
-    public List<MatchModule> allocateCoreModules() {
+    public List<MatchModule> allocateCoreModules(JsonObject mapJson) {
         List<MatchModule> modules = new ArrayList<>();
 
         modules.add(new TeamJoinNotificationsModule());
@@ -84,6 +87,9 @@ public abstract class MatchManifest {
         modules.add(new MapCommandsModule());
         modules.add(new DamageControlModule());
         modules.add(new RespawnModule());
+
+        if (GameClassModule.isUsingClasses(mapJson)) modules.add(new GameClassModule());
+
         return modules;
     }
 }

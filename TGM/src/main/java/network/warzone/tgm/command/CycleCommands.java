@@ -18,6 +18,7 @@ import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
@@ -25,6 +26,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import network.warzone.tgm.util.menu.ClassMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
@@ -280,6 +282,65 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.GREEN + "Set the next map to " + ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
         } else {
             sender.sendMessage(ChatColor.RED + "/sn <map_name>");
+        }
+    }
+
+    @Command(aliases = {"classes"}, desc = "Class menu.")
+    public static void classes(CommandContext cmd, CommandSender sender) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
+        if (TGM.get().getModule(GameClassModule.class) == null) {
+            sender.sendMessage(ChatColor.RED + "This map does not use classes.");
+            return;
+        }
+
+        Player player = (Player) sender;
+        ClassMenu.getClassMenu().open(player);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Command(aliases = {"class"}, desc = "Choose a class.", min = 1, usage = "<kit name>")
+    public static void classCommand(CommandContext cmd, CommandSender sender) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
+            return;
+        }
+        if (TGM.get().getModule(GameClassModule.class) == null) {
+            sender.sendMessage(ChatColor.RED + "This map does not use classes.");
+            return;
+        }
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST) {
+            sender.sendMessage(ChatColor.RED + "You cannot change classes at this time!");
+            return;
+        }
+
+        String chosenClassString = Strings.getTechnicalName(cmd.getString(0));
+        GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
+
+        GameClassModule.GameClassStore actualKit = null;
+        for (GameClassModule.GameClassStore gameClassStore : GameClassModule.GameClassStore.values()) {
+            if (gameClassStore.name().equals(chosenClassString) && gameClassModule.classSetHasInstance(gameClassStore.getHostGameClass())) {
+                actualKit = gameClassStore;
+                break;
+            }
+        }
+        Player player = (Player) sender;
+        if (actualKit == null) {
+            player.sendMessage(ChatColor.RED + "Invalid class name! Try /classes!");
+            return;
+        }
+
+        if (Strings.getTechnicalName(gameClassModule.getCurrentClass(player)).equals(chosenClassString)) {
+            player.sendMessage(ChatColor.RED + "You are using this class currently!");
+            return;
+        }
+
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
+            gameClassModule.setClassForPlayer(player, chosenClassString);
+        } else {
+            gameClassModule.addSwitchClassRequest(player, chosenClassString);
         }
     }
     

@@ -8,6 +8,8 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.kit.classes.GameClass;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -25,11 +27,13 @@ import org.bukkit.util.Vector;
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
     private SpectatorModule spectatorModule;
+    private GameClassModule gameClassModule;
 
     @Override
     public void load(Match match) {
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
+        gameClassModule = TGM.get().getModule(GameClassModule.class);
     }
 
     @EventHandler
@@ -70,17 +74,30 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-            playerContext.getPlayer().setFlying(false);
-            playerContext.getPlayer().setAllowFlight(false);
+        if (gameClassModule != null) {
+            if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                if (matchTeam.isSpectator()) {
+                    spectatorModule.applySpectatorKit(playerContext);
+                } else {
+                    gameClassModule.performSwitch(playerContext.getPlayer());
+                    GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
+                    if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
+                    playerContext.getPlayer().updateInventory();
+                }
+            }, 1L);
+        } else
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                playerContext.getPlayer().setFlying(false);
+                playerContext.getPlayer().setAllowFlight(false);
 
-            if (matchTeam.isSpectator()) {
-                spectatorModule.applySpectatorKit(playerContext);
-            } else {
-                matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-                playerContext.getPlayer().updateInventory();
-            }
-        }, 1L);
+                if (matchTeam.isSpectator()) {
+                    spectatorModule.applySpectatorKit(playerContext);
+                } else {
+                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                    playerContext.getPlayer().updateInventory();
+                }
+            }, 1L);
     }
 
     @Override

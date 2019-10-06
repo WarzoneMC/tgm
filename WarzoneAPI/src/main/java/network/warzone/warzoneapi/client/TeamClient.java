@@ -2,7 +2,7 @@ package network.warzone.warzoneapi.client;
 
 import network.warzone.warzoneapi.models.*;
 
-import java.util.List;
+
 import java.util.UUID;
 
 /**

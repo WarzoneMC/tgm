@@ -54,8 +54,7 @@ public class OfflineClient implements TeamClient {
     public UserProfile login(PlayerLogin playerLogin) {
         List<String> ranks = new ArrayList<String>();
         return new UserProfile(new ObjectId(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
-                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), ranks, new ArrayList<Rank>(),
-                0, 0, 0, 0, 0, new ArrayList<Punishment>(), false);
+                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), ranks, new ArrayList<Rank>(), 0, 0, 0, 0, 0, new ArrayList<Punishment>(), false);
     }
 
     @Override
