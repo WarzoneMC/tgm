@@ -324,7 +324,7 @@ public class PunishCommands {
         }
     }
 
-    @Command(aliases = {"report"}, desc = "Report a player", min = 2, usage = "(name) (reason...)")
+    @Command(aliases = {"report", "wdr"}, desc = "Report a player", min = 2, usage = "(name) (reason...)")
     public static void report(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Only players can use this command.");
