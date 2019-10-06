@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.util.BossBarUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
@@ -49,6 +50,7 @@ public class StartCountdown extends BossBarCountdown {
             getBossBar().setColor(BarColor.RED);
 
             setTimeLeft(getTimeMax());
+            BossBarUtil.displayForOldVersions(getBossBar());
             return;
         }
 
@@ -58,7 +60,7 @@ public class StartCountdown extends BossBarCountdown {
             getBossBar().setColor(BarColor.GREEN);
             getBossBar().setTitle(ChatColor.GREEN + "Match starting in " + ChatColor.DARK_RED + getTimeLeftSeconds() +
                     ChatColor.GREEN + " second" + (getTimeLeftSeconds() > 1 ? "s" : ""));
-
+            BossBarUtil.displayForOldVersions(getBossBar());
             if (getTimeLeftSeconds() <= 3) {
                 Bukkit.getOnlinePlayers().forEach(player -> {
                     player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_BLOCK_PLING, 1000, 1);

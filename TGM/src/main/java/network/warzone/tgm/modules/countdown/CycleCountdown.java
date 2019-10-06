@@ -3,6 +3,7 @@ package network.warzone.tgm.modules.countdown;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
+import network.warzone.tgm.util.BossBarUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -43,6 +44,7 @@ public class CycleCountdown extends BossBarCountdown {
             getBossBar().setTitle(ChatColor.DARK_AQUA + "Cycling to " + ChatColor.AQUA + TGM.get().getMatchManager().getNextMap().getMapInfo().getName()
                     + ChatColor.DARK_AQUA + " in " + ChatColor.DARK_RED + getTimeLeftSeconds()
                     + ChatColor.DARK_AQUA + " second" + (getTimeLeftSeconds() > 1 ? "s" : ""));
+            BossBarUtil.displayForOldVersions(getBossBar());
         }
     }
 

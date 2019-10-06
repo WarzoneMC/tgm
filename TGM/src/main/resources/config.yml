@@ -1,21 +1,52 @@
 api:
+  # Toggle data linking to an API instance. https://github.com/WarzoneMC/API
+  # Default: false
   enabled: false
+  # URL that points to the API instance.
+  # Must not end in / .
   url: https://api.warz.one
+  # Authentication token to enable data linking between API instance and server
   auth: secret
   stats:
+    # Toggle user statistics linking. Does not affect match and server data linking.
+    # Default: true
     enabled: true
+# Location of the map rotation file.
+# Default: Maps/rotation.txt
 rotation: Maps/rotation.txt
+
 chat:
+  # Allow players to talk in chat. Can be toggled in-game with the `/chat mute` command and can be bypassed with the tgm.chat.bypass permission node.
+  # Default: true
   enabled: true
+  # Add a hover event for chat messages that displays the player statistics.
+  # Might cause unwanted behavior if other chat-related plugins are present.
+  # Default: true
   stats-hover: true
   messages:
-    muted: "&cChat is currently disabled. If you believe this is an error, please contact a staff member on our Discord."
+    # Message that will be displayed to players when the chat is muted if they do not have permission to bypass the chat mute.
+    # Default: "&cChat is currently disabled."
+    muted: "&cChat is currently disabled."
 map:
+  # Retrieve map author names from the Mojang API using the UUIDs specified in the map.json.
+  # Recommended for production use only.
+  # Default: false
   get-names: false
+  # Store the game matches in the `matches` folder found in the server root directory.
+  # Default: false
+  save-matches: false
+  # Map repository location.
   sources:
   - Maps
 server:
+  # Display name for the server object served by the API.
+  # Default: Warzone
   name: "Warzone"
+  # ID for the server object served by the API.
+  # Default: Warzone
   id: "warzone"
+  # Store link displayed when a player tries to join a specific team.
   store: "https://tgmwarzone.tebex.io/"
+  # Text displayed after the match time on the tablist header.
+  # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"

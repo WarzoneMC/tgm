@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules;
+package network.warzone.tgm.modules.damage;
 
 import network.warzone.tgm.match.MatchModule;
 import org.bukkit.entity.Firework;

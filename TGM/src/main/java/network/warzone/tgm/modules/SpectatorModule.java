@@ -4,6 +4,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.match.*;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -14,6 +15,7 @@ import network.warzone.tgm.util.menu.Menu;
 import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.PublicMenu;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -99,7 +101,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 long moved = lastMovement.get(player.getUniqueId());
                 if (moved == 0) continue;
                 if (System.currentTimeMillis() > moved + (5 * 60 * 1000)) {
-                    teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators);
+                    teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators, true);
                     lastMovement.remove(player.getUniqueId());
                 }
             }
@@ -185,11 +187,13 @@ public class SpectatorModule extends MatchModule implements Listener {
      */
     public boolean isSpectating(Player player) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player);
+        RespawnModule respawnModule = TGM.get().getModule(RespawnModule.class);
+        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player) || respawnModule != null && respawnModule.isSpectating(player);
     }
 
     @EventHandler
     public void onTeamJoin(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         updateMenu();
     }
 
@@ -379,6 +383,22 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         lastMovement.remove(event.getPlayer().getUniqueId());
         updateMenu();
+    }
+
+    @EventHandler
+    public void onAEC(AreaEffectCloudApplyEvent event) {
+        for (Entity entity : event.getAffectedEntities()) {
+            if (entity instanceof Player && isSpectating((Player) entity))
+                event.getAffectedEntities().remove(entity);
+        }
+    }
+
+    @EventHandler
+    public void onPotion(PotionSplashEvent event) {
+        for (Entity entity : event.getAffectedEntities()) {
+            if (entity instanceof Player && isSpectating((Player) entity))
+                event.getAffectedEntities().remove(entity);
+        }
     }
 
     @Override

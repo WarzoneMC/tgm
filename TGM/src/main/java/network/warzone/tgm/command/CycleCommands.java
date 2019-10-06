@@ -18,6 +18,7 @@ import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
@@ -25,6 +26,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
+import network.warzone.tgm.util.menu.ClassMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
@@ -209,8 +211,9 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
                 }
             }
-            sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
-            TGM.get().getModule(StartCountdown.class).start(time);
+            boolean soloStart = Bukkit.getOnlinePlayers().size() <= 1;
+            if(!soloStart) sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
+            TGM.get().getModule(StartCountdown.class).start((soloStart) ? 0 : time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -279,6 +282,65 @@ public class CycleCommands {
             sender.sendMessage(ChatColor.GREEN + "Set the next map to " + ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
         } else {
             sender.sendMessage(ChatColor.RED + "/sn <map_name>");
+        }
+    }
+
+    @Command(aliases = {"classes"}, desc = "Class menu.")
+    public static void classes(CommandContext cmd, CommandSender sender) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            return;
+        }
+        if (TGM.get().getModule(GameClassModule.class) == null) {
+            sender.sendMessage(ChatColor.RED + "This map does not use classes.");
+            return;
+        }
+
+        Player player = (Player) sender;
+        ClassMenu.getClassMenu().open(player);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Command(aliases = {"class"}, desc = "Choose a class.", min = 1, usage = "<kit name>")
+    public static void classCommand(CommandContext cmd, CommandSender sender) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
+            return;
+        }
+        if (TGM.get().getModule(GameClassModule.class) == null) {
+            sender.sendMessage(ChatColor.RED + "This map does not use classes.");
+            return;
+        }
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST) {
+            sender.sendMessage(ChatColor.RED + "You cannot change classes at this time!");
+            return;
+        }
+
+        String chosenClassString = Strings.getTechnicalName(cmd.getString(0));
+        GameClassModule gameClassModule = TGM.get().getModule(GameClassModule.class);
+
+        GameClassModule.GameClassStore actualKit = null;
+        for (GameClassModule.GameClassStore gameClassStore : GameClassModule.GameClassStore.values()) {
+            if (gameClassStore.name().equals(chosenClassString) && gameClassModule.classSetHasInstance(gameClassStore.getHostGameClass())) {
+                actualKit = gameClassStore;
+                break;
+            }
+        }
+        Player player = (Player) sender;
+        if (actualKit == null) {
+            player.sendMessage(ChatColor.RED + "Invalid class name! Try /classes!");
+            return;
+        }
+
+        if (Strings.getTechnicalName(gameClassModule.getCurrentClass(player)).equals(chosenClassString)) {
+            player.sendMessage(ChatColor.RED + "You are using this class currently!");
+            return;
+        }
+
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.MID) {
+            gameClassModule.setClassForPlayer(player, chosenClassString);
+        } else {
+            gameClassModule.addSwitchClassRequest(player, chosenClassString);
         }
     }
     
@@ -578,7 +640,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats)", min = 1)
+    @Command(aliases = {"config"}, desc = "Edit the configuration", usage = "(stats/reload)", min = 1)
     @CommandPermissions({"tgm.config"})
     public static void config(CommandContext cmd, CommandSender sender) {
         if (cmd.getString(0).equalsIgnoreCase("stats")) {
@@ -599,6 +661,9 @@ public class CycleCommands {
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown value \"" + cmd.getString(0) + "\". Please specify [on/off]");
             }
+        } else if (cmd.getString(0).equalsIgnoreCase("reload")) {
+            TGM.get().reloadConfig();
+            sender.sendMessage(ChatColor.GREEN + "Reloaded configuration!");
         }
     }
 
@@ -662,19 +727,22 @@ public class CycleCommands {
             return;
         }
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
+        boolean getNickedStats = !target.equalsIgnoreCase(targetUser.getOriginalName()) && targetUser.isNicked();
+        UserProfile profile = getNickedStats ? targetUser.getUserProfile() : targetUser.getUserProfile(true);
+        String levelString = getNickedStats ? targetUser.getLevelString() : targetUser.getLevelString(true);
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + targetPlayer.getName());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + (target.equalsIgnoreCase(targetUser.getOriginalName()) ? targetUser.getOriginalName() : targetUser.getDisplayName()));
         sender.sendMessage("");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + targetUser.getLevelString().replace("[", "").replace("]", ""));
-        sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + targetUser.getUserProfile().getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(targetUser.getUserProfile().getLevel() + 1) + " (approx.)");
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + levelString.replace("[", "").replace("]", ""));
+        sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + profile.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(profile.getLevel() + 1) + " (approx.)");
         sender.sendMessage("");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + targetUser.getUserProfile().getKills());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + targetUser.getUserProfile().getDeaths());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + targetUser.getUserProfile().getKDR());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Kills: " + ChatColor.GREEN + profile.getKills());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Deaths: " + ChatColor.RED + profile.getDeaths());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   K/D: " + ChatColor.AQUA + profile.getKDR());
         sender.sendMessage("");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + targetUser.getUserProfile().getWins());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + targetUser.getUserProfile().getLosses());
-        sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + targetUser.getUserProfile().getWLR());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Wins: " + ChatColor.GREEN + profile.getWins());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Losses: " + ChatColor.RED + profile.getLosses());
+        sender.sendMessage(ChatColor.DARK_AQUA + "   W/L: " + ChatColor.AQUA + profile.getWLR());
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
     }
 
@@ -701,7 +769,7 @@ public class CycleCommands {
         }
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam);
+        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam, ignoreFull);
     }
 
     private static TextComponent profileToTextComponent(UserProfile profile, int place) {

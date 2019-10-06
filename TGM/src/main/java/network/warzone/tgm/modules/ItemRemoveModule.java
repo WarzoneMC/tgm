@@ -4,10 +4,12 @@ import com.google.gson.JsonElement;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -21,6 +23,8 @@ public class ItemRemoveModule extends MatchModule implements Listener {
 
     private final List<Material> removed = new ArrayList<>();
 
+    private boolean removeAll = false;
+
     public void add(Material material) {
         this.removed.add(material);
     }
@@ -32,6 +36,11 @@ public class ItemRemoveModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         if (match.getMapContainer().getMapInfo().getJsonObject().has("itemremove")) {
+            if (match.getMapContainer().getMapInfo().getJsonObject().get("itemremove").isJsonPrimitive()) {
+                String itemVal = match.getMapContainer().getMapInfo().getJsonObject().get("itemremove").getAsString();
+                if ("*".equals(itemVal)) removeAll = true;
+                return;
+            }
             for (JsonElement itemElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("itemremove")) {
                 try {
                     // 1.13 temp fix
@@ -63,11 +72,15 @@ public class ItemRemoveModule extends MatchModule implements Listener {
         removed.clear();
     }
 
-    @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDeath(TGMPlayerDeathEvent event) {
+        if (removeAll) {
+            event.getDrops().clear();
+            return;
+        }
         List<ItemStack> toRemove = new ArrayList<>();
         for (ItemStack itemStack : event.getDrops()) {
-            if (removed.contains(itemStack.getType())) {
+            if (itemStack != null && removed.contains(itemStack.getType())) {
                 toRemove.add(itemStack);
             }
         }
@@ -79,14 +92,14 @@ public class ItemRemoveModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
-        if (removed.contains(event.getItemDrop().getItemStack().getType())) {
+        if (removeAll || removed.contains(event.getItemDrop().getItemStack().getType())) {
             event.getItemDrop().remove();
         }
     }
 
     @EventHandler
     public void onItemSpawn(ItemSpawnEvent event) {
-        if (removed.contains(event.getEntity().getItemStack().getType())) {
+        if (removeAll || removed.contains(event.getEntity().getItemStack().getType())) {
             event.setCancelled(true);
         }
     }

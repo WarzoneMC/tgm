@@ -122,7 +122,8 @@ public class TGM extends JavaPlugin {
         commandManager.register(CycleCommands.class);
         commandManager.register(BroadcastCommands.class);
         commandManager.register(MiscCommands.class);
-        if (apiConfig != null && apiConfig.getBoolean("enabled", false)) {
+        commandManager.register(NickCommands.class);
+        if (apiConfig.getBoolean("enabled", false)) {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
         }

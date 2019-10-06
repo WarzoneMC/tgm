@@ -55,4 +55,7 @@ public class Strings {
         return author.getDisplayUsername() != null ? author.getDisplayUsername() : author.getUsername() != null ? author.getUsername() : "Unknown";
     }
 
+    public static String capitalizeString(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
 }

@@ -48,10 +48,12 @@ As an example, a map should be able to provide different spawn points as the mat
  
 3. Create a `Maps` folder in the root folder and insert a supported TGM map. Make sure you also include a rotation.txt with the maps you would like to be present in the rotation.
     - You can download our Maps folder as a reference on the Maps repo located [here](https://github.com/WarzoneMC/Maps).
+    - If you would like to access multiple repositories or simply change the repository location, you can change the repository location found in the `plugins/TGM/config.yml` file.
  
 4. (Optional) Install WorldEdit to enable the Teleport Tool. 
  
-5. Start the server. If you would like stats to be saved, you need to setup the API [here](https://github.com/WarzoneMC/api).
+5. Start the server. 
+   - Additionally, if you would like stats to be saved, you need to setup the API [here](https://github.com/WarzoneMC/api) and enable the API feature in the `plugins/TGM/config.yml` file.
  
 ## Developer Tips
 

@@ -34,10 +34,17 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true, Integer.MAX_VALUE, 0));
+        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true,  Integer.MAX_VALUE, 0));
 
         for (ParsedTeam parsedTeam : match.getMapContainer().getMapInfo().getTeams()) {
-            teams.add(new MatchTeam(parsedTeam.getId(), parsedTeam.getAlias(), parsedTeam.getTeamColor(), false, parsedTeam.getMax(), parsedTeam.getMin()));
+            teams.add(new MatchTeam(
+                    parsedTeam.getId(),
+                    parsedTeam.getAlias(),
+                    parsedTeam.getTeamColor(),
+                    false,
+                    parsedTeam.getMax(),
+                    parsedTeam.getMin()
+            ));
         }
     }
 
@@ -53,17 +60,21 @@ public class TeamManagerModule extends MatchModule implements Listener {
     @EventHandler
     public void onMatchJoin(MatchJoinEvent event) {
         MatchTeam matchTeam = teamJoinController.determineTeam(event.getPlayerContext());
-        joinTeam(event.getPlayerContext(), matchTeam);
+        joinTeam(event.getPlayerContext(), matchTeam, true);
     }
 
-    public void joinTeam(PlayerContext playerContext, MatchTeam matchTeam) {
+    public void joinTeam(PlayerContext playerContext, MatchTeam matchTeam, boolean forced) {
         MatchTeam oldTeam = getTeam(playerContext.getPlayer());
-        if (oldTeam != null) {
-            oldTeam.removePlayer(playerContext);
-        }
+        if (oldTeam != null) oldTeam.removePlayer(playerContext);
 
         matchTeam.addPlayer(playerContext);
-        Bukkit.getPluginManager().callEvent(new TeamChangeEvent(playerContext, matchTeam, oldTeam));
+
+        TeamChangeEvent event = new TeamChangeEvent(playerContext, matchTeam, oldTeam, false, forced);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            matchTeam.removePlayer(playerContext);
+            if (oldTeam != null) oldTeam.addPlayer(playerContext);
+        }
     }
 
     @EventHandler

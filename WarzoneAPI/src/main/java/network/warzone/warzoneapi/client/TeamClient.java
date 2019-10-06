@@ -2,7 +2,8 @@ package network.warzone.warzoneapi.client;
 
 import network.warzone.warzoneapi.models.*;
 
-import java.util.List;
+
+import java.util.UUID;
 
 /**
  * Created by luke on 4/27/17.
@@ -57,5 +58,9 @@ public interface TeamClient {
     PlayerAltsResponse getAlts(String name);
 
     KillsLeaderboardResponse getKillsLeaderboard();
+
+    MojangProfile getMojangProfile(UUID uuid);
+
+    MojangProfile getMojangProfile(String username);
 
 }

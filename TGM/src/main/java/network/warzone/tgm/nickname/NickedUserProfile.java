@@ -51,18 +51,8 @@ public class NickedUserProfile extends UserProfile {
     }
 
     @Override
-    public void removeRank(Rank r) {
-        super.removeRank(r);
-    }
-
-    @Override
     public boolean isStaff() {
         return TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).isStaff();
-    }
-
-    @Override
-    public void addRank(Rank rank) {
-        super.addRank(rank);
     }
 
     static NickedUserProfile createFromUserProfile(UserProfile profile) {
