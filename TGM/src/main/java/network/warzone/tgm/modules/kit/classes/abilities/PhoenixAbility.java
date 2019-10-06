@@ -47,11 +47,11 @@ public class PhoenixAbility extends Ability {
     }
 
     private void createFire(Player player, Vector velocity, MatchTeam team) {
-        final FallingBlock fallingBlock = player.getWorld().spawnFallingBlock(player.getLocation(), Material.FIRE.createBlockData());
+        final FallingBlock fallingBlock = player.getWorld().spawnFallingBlock(player.getLocation().clone().add(0, 0.4, 0), Material.FIRE.createBlockData());
         fallingBlock.setVelocity(velocity);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SAND_FALL, 1, 1);
         tasks.put(fallingBlock, Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-            if (fallingBlock.isDead()) {
+            if (fallingBlock.isDead() && tasks.containsKey(fallingBlock)) {
                 tasks.get(fallingBlock).cancel();
             } else if (fallingBlock.isOnGround()) {
                 fallingBlock.remove();
@@ -79,6 +79,7 @@ public class PhoenixAbility extends Ability {
     @Override
     public void terminate() {
         super.terminate();
+        for (BukkitTask bukkitTask : tasks.values()) bukkitTask.cancel();
         tasks = null;
     }
 
