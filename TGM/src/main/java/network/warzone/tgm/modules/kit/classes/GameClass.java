@@ -1,5 +1,7 @@
 package network.warzone.tgm.modules.kit.classes;
 
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.ItemRemoveModule;
 import network.warzone.tgm.modules.kit.classes.abilities.Ability;
 import network.warzone.tgm.util.ArmorType;
 import network.warzone.tgm.util.ColorConverter;
@@ -21,6 +23,7 @@ public abstract class GameClass {
     }
 
     public void setItem(int slot, ItemStack itemStack) {
+        TGM.get().getModule(ItemRemoveModule.class).add(itemStack.getType());
         this.items.put(slot, itemStack);
     }
 
