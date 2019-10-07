@@ -13,6 +13,7 @@ import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.chat.ChatChannel;
+import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
@@ -289,7 +290,7 @@ public class CycleCommands {
     @Command(aliases = {"classes"}, desc = "Class menu.")
     public static void classes(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         if (TGM.get().getModule(GameClassModule.class) == null) {
@@ -305,7 +306,7 @@ public class CycleCommands {
     @Command(aliases = {"class"}, desc = "Choose a class.", min = 1, usage = "<kit name>")
     public static void classCommand(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         if (TGM.get().getModule(GameClassModule.class) == null) {
@@ -348,7 +349,7 @@ public class CycleCommands {
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
@@ -419,7 +420,7 @@ public class CycleCommands {
     @Command(aliases = {"killstreak", "ks"}, desc = "See your current killstreak")
     public static void killstreak(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
@@ -442,7 +443,7 @@ public class CycleCommands {
     @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
     public static void teleport(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
@@ -545,7 +546,7 @@ public class CycleCommands {
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage("Error: Only players can use this command.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
@@ -574,7 +575,7 @@ public class CycleCommands {
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         if (cmd.argsLength() > 0) {

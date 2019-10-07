@@ -6,6 +6,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.NickedUserProfile;
 import network.warzone.tgm.util.HashMaps;
@@ -52,7 +53,7 @@ public class NickCommands {
     @CommandPermissions({"tgm.command.nick"})
     public static void nick(CommandContext cmd, CommandSender sender) throws IllegalAccessException, NoSuchFieldException, UnirestException {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Player only command.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player p = (Player) sender;

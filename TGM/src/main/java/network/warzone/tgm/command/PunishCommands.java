@@ -3,6 +3,7 @@ package network.warzone.tgm.command;
 import com.sk89q.minecraft.util.commands.*;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.util.TimeUnitPair;
@@ -327,7 +328,7 @@ public class PunishCommands {
     @Command(aliases = {"report"}, desc = "Report a player", min = 2, usage = "(name) (reason...)")
     public static void report(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
 
