@@ -41,9 +41,9 @@ public class MiscCommands {
     }
 
     // TODO: Provide more essential info
-    @Command(aliases = {"tgmdebug"}, desc = "Get essential server info.")
-    @CommandPermissions({"tgm.command.tgmdebug"})
-    public static void debug(CommandContext commandContext, CommandSender sender) {
+    @Command(aliases = {"tgm"}, desc = "Get essential server info.")
+    @CommandPermissions({"tgm.command.tgm"})
+    public static void tgm(CommandContext commandContext, CommandSender sender) {
         String uptime = Strings.getFullAgo(TGM.get().getStartupTime());
 
         sender.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "SERVER INFO");
