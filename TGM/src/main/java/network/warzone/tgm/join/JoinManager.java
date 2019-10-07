@@ -6,7 +6,8 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
-import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.modules.chat.ChatConstant;
+import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.QueuedNick;
 import network.warzone.warzoneapi.models.Skin;
@@ -123,7 +124,7 @@ public class JoinManager implements Listener {
                 try {
                     nickManager.reset(player, false);
                 } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
-                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
+                    p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
                 }
             }
         }
@@ -160,7 +161,7 @@ public class JoinManager implements Listener {
                 try {
                     nickManager.reset(p, false);
                 } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
-                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
+                    p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
                 }
                 // Invalidate the nick.
                 name = null;

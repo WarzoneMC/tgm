@@ -1,14 +1,13 @@
-package network.warzone.tgm.modules;
+package network.warzone.tgm.modules.chat;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.modules.StatsModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
@@ -30,30 +29,10 @@ import java.util.*;
 @Getter
 public class ChatModule extends MatchModule implements Listener {
 
-    @AllArgsConstructor @NoArgsConstructor
-    public enum Channel {
-        ALL, TEAM, STAFF("tgm.staffchat");
-
-        private String permission;
-
-        public boolean hasPermission(Player player) {
-            return permission == null || player.hasPermission(permission);
-        }
-
-        public static Channel byName(String name) {
-            for (Channel channel : values()) {
-                if (channel.name().equalsIgnoreCase(name)) {
-                    return channel;
-                }
-            }
-            return null;
-        }
-    }
-
     private TeamManagerModule teamManagerModule;
     private TimeModule timeModule;
     private final List<Chat> chatLog = new ArrayList<>();
-    private static final Map<String, Channel> channels = new HashMap<>();
+    private static final Map<String, ChatChannel> channels = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -61,7 +40,7 @@ public class ChatModule extends MatchModule implements Listener {
         timeModule = match.getModule(TimeModule.class);
     }
 
-    public static Map<String, Channel> getChannels() {
+    public static Map<String, ChatChannel> getChannels() {
         return channels;
     }
 
@@ -102,18 +81,18 @@ public class ChatModule extends MatchModule implements Listener {
         }
 
         if(!(channels.containsKey(event.getPlayer().getUniqueId().toString()))) {
-            channels.put(event.getPlayer().getUniqueId().toString(), Channel.ALL);
+            channels.put(event.getPlayer().getUniqueId().toString(), ChatChannel.ALL);
         }
 
-        Channel channel = channels.get(event.getPlayer().getUniqueId().toString());
+        ChatChannel channel = channels.get(event.getPlayer().getUniqueId().toString());
 
-        if(channel == Channel.TEAM) {
+        if(channel == ChatChannel.TEAM) {
             TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, event.getMessage());
             event.setCancelled(true);
             return;
         }
 
-        if(channel == Channel.STAFF) {
+        if(channel == ChatChannel.STAFF) {
             String prefix;
             prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
 
@@ -122,7 +101,7 @@ public class ChatModule extends MatchModule implements Listener {
             return;
         }
 
-        if (channel == Channel.ALL) {
+        if (channel == ChatChannel.ALL) {
             MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
             String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
             event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
