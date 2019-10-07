@@ -116,19 +116,35 @@ public class CraftingModule extends MatchModule implements Listener {
             case "furnace":
                 RecipeChoice furnaceIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (furnaceIngredient == null) return null;
-                return new FurnaceRecipe(getKey(result.getType().name() + new Date().getTime()), result, furnaceIngredient, 0, 200);
+                int furnaceExp = 0;
+                int furnaceCookingTime = 200;
+                if (jsonObject.has("experience")) furnaceExp = jsonObject.get("experience").getAsInt();
+                if (jsonObject.has("cookingTime")) furnaceCookingTime = jsonObject.get("cookingTime").getAsInt();
+                return new FurnaceRecipe(getKey(result.getType().name() + new Date().getTime()), result, furnaceIngredient, furnaceExp, furnaceCookingTime);
             case "smoking":
                 RecipeChoice smokingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (smokingIngredient == null) return null;
-                return new SmokingRecipe(getKey(result.getType().name() + new Date().getTime()), result, smokingIngredient, 0, 100);
+                int smokingExp = 0;
+                int smokingCookingTime = 100;
+                if (jsonObject.has("experience")) smokingExp = jsonObject.get("experience").getAsInt();
+                if (jsonObject.has("cookingTime")) smokingCookingTime = jsonObject.get("cookingTime").getAsInt();
+                return new SmokingRecipe(getKey(result.getType().name() + new Date().getTime()), result, smokingIngredient, smokingExp, smokingCookingTime);
             case "blasting":
                 RecipeChoice blastingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (blastingIngredient == null) return null;
-                return new BlastingRecipe(getKey(result.getType().name() + new Date().getTime()), result, blastingIngredient, 0, 100);
+                int blastingExp = 0;
+                int blastingCookingTime = 100;
+                if (jsonObject.has("experience")) blastingExp = jsonObject.get("experience").getAsInt();
+                if (jsonObject.has("cookingTime")) blastingCookingTime = jsonObject.get("cookingTime").getAsInt();
+                return new BlastingRecipe(getKey(result.getType().name() + new Date().getTime()), result, blastingIngredient, blastingExp, blastingCookingTime);
             case "campfire":
                 RecipeChoice campfireIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (campfireIngredient == null) return null;
-                return new CampfireRecipe(getKey(result.getType().name() + new Date().getTime()), result, campfireIngredient, 0, 600);
+                int campfireExp = 0;
+                int campfireCookingTime = 600;
+                if (jsonObject.has("experience")) campfireExp = jsonObject.get("experience").getAsInt();
+                if (jsonObject.has("cookingTime")) campfireCookingTime = jsonObject.get("cookingTime").getAsInt();
+                return new CampfireRecipe(getKey(result.getType().name() + new Date().getTime()), result, campfireIngredient, campfireExp, campfireCookingTime);
             case "stonecutting":
                 RecipeChoice stonecuttingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (stonecuttingIngredient == null) return null;
