@@ -206,11 +206,6 @@ public class JoinManager implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onWorldInit(WorldInitEvent e) {
-        e.getWorld().setKeepSpawnInMemory(false);
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " left.");
