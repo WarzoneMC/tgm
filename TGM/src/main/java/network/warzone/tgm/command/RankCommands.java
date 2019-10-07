@@ -9,7 +9,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.*;

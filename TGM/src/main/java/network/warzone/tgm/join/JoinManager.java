@@ -6,7 +6,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
-import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.QueuedNick;
 import network.warzone.warzoneapi.models.Skin;
