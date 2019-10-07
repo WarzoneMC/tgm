@@ -132,7 +132,7 @@ public class NickCommands {
                 try {
                     TGM.get().getNickManager().setName(p, newName);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
-                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
+                    p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
                 }
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("stats") && cmd.argsLength() > 1) {

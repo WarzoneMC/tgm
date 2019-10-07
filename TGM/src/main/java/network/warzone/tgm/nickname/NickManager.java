@@ -31,8 +31,6 @@ import java.util.*;
 
 public class NickManager {
 
-    public static String RATELIMITED_MESSAGE = ChatColor.GOLD.toString() + ChatColor.BOLD + "Slow Down! " + ChatColor.RESET.toString() + ChatColor.RED + "You're being ratelimited.";
-
     private VisibilityController visiblityController;
 
     @Getter
