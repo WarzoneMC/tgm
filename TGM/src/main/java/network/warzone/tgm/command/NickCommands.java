@@ -172,7 +172,7 @@ public class NickCommands {
                             TGM.get().getNickManager().setNew(p, true);
                             break;
                         default:
-                            sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad> [value]");
+                            sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad|new> [value]");
                             return;
                     }
                     sender.sendMessage(ChatColor.GREEN + "Set stats to preset " + ChatColor.YELLOW + type);
