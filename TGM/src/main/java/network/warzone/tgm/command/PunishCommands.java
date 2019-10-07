@@ -6,6 +6,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
+import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.TimeUnitPair;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.ConfirmMenu;
@@ -363,11 +364,20 @@ public class PunishCommands {
         ReportsModule.setAmount(reported.getUniqueId().toString(), amount);
         ReportsModule.setCooldown(reporter.getUniqueId().toString(), report.getTimestamp());
 
+        PlayerContext reportedContext = TGM.get().getPlayerManager().getPlayerContext(reported.getUniqueId());
+        StringBuilder reportedNameBuilder = new StringBuilder(reported.getName());
+
+        if (reportedContext.isNicked()) {
+            reportedNameBuilder.append(" ").append("&8(&a").append(reportedContext.getOriginalName()).append("&8)");
+        }
+
+        String reportedName = reportedNameBuilder.toString();
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("tgm.reports")) {
                 TextComponent message = new TextComponent(ChatColor.translateAlternateColorCodes('&',
                         "&4[REPORT]&8 [" + amount + "] &5" + reporter.getName() + " &7reported &d" +
-                                reported.getName() + " &7for &r" + cmd.getJoinedStrings(1)));
+                                reportedName + " &7for &r" + cmd.getJoinedStrings(1)));
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp " + report.getReported()));
                 player.spigot().sendMessage(message);
             }
