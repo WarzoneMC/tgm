@@ -172,7 +172,7 @@ public class NickManager {
 
     public void setRank(Player player, Rank rank) {
         NickedUserProfile nickedStats = getUserProfile(player);
-        nickedStats.setRanksLoaded(Collections.emptyList());
+        nickedStats.setRanksLoaded(new ArrayList<>());
         nickedStats.addRank(rank);
         stats.put(player.getUniqueId(), nickedStats);
     }
