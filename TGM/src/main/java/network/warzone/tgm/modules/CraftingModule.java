@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
@@ -12,15 +13,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.RecipeChoice;
-import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Jorge on 10/06/2019
@@ -92,20 +87,52 @@ public class CraftingModule extends MatchModule implements Listener {
         ItemStack result = ItemDeserializer.parse(jsonObject.get("result").getAsJsonObject());
         switch (type) {
             case "shapeless":
-                ShapelessRecipe recipe = new ShapelessRecipe(getKey(result.getType().name() + new Date().getTime()), result);
+                ShapelessRecipe shapelessRecipe = new ShapelessRecipe(getKey(result.getType().name() + new Date().getTime()), result);
                 for (JsonElement element : jsonObject.getAsJsonArray("ingredients")) {
                     RecipeChoice ingredient = parseRecipeIngredient(element);
                     if (ingredient == null) continue;
-                    recipe.addIngredient(ingredient);
+                    shapelessRecipe.addIngredient(ingredient);
                 }
-                return recipe;
-            // TODO: All of these
+                return shapelessRecipe;
             case "shaped":
+                ShapedRecipe shapedRecipe = new ShapedRecipe(getKey(result.getType().name() + new Date().getTime()), result);
+                JsonArray shapeArray = jsonObject.getAsJsonArray("shape");
+                String[] shape = new String[shapeArray.size()];
+                for (int i = 0; i < shapeArray.size(); i++) {
+                    shape[i] = shapeArray.get(i).getAsString();
+                }
+                shapedRecipe.shape(shape);
+                for (Map.Entry<String, JsonElement> entry : jsonObject.getAsJsonObject("ingredients").entrySet()) {
+                    try {
+                        char key = entry.getKey().charAt(0);
+                        RecipeChoice ingredient = parseRecipeIngredient(entry.getValue());
+                        if (ingredient == null) continue;
+                        shapedRecipe.setIngredient(key, ingredient);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return shapedRecipe;
             case "furnace":
+                RecipeChoice furnaceIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
+                if (furnaceIngredient == null) return null;
+                return new FurnaceRecipe(getKey(result.getType().name() + new Date().getTime()), result, furnaceIngredient, 0, 200);
             case "smoking":
+                RecipeChoice smokingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
+                if (smokingIngredient == null) return null;
+                return new SmokingRecipe(getKey(result.getType().name() + new Date().getTime()), result, smokingIngredient, 0, 100);
             case "blasting":
+                RecipeChoice blastingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
+                if (blastingIngredient == null) return null;
+                return new BlastingRecipe(getKey(result.getType().name() + new Date().getTime()), result, blastingIngredient, 0, 100);
             case "campfire":
+                RecipeChoice campfireIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
+                if (campfireIngredient == null) return null;
+                return new CampfireRecipe(getKey(result.getType().name() + new Date().getTime()), result, campfireIngredient, 0, 600);
             case "stonecutting":
+                RecipeChoice stonecuttingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
+                if (stonecuttingIngredient == null) return null;
+                return new StonecuttingRecipe(getKey(result.getType().name() + new Date().getTime()), result, stonecuttingIngredient);
             default:
                 return null;
         }
