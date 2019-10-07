@@ -15,6 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
@@ -185,7 +186,7 @@ public class NickCommands {
                     }
                     if (newRank.equals("none")) {
                         NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
-                        profile.setRanks(Collections.emptyList());
+                        profile.setRanksLoaded(new ArrayList<>());
                         TGM.get().getNickManager().getStats().put(p.getUniqueId(), profile);
                         sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
                         return;
