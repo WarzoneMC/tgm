@@ -8,6 +8,8 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.death.DeathInfo;
 import network.warzone.tgm.modules.death.DeathModule;
+import network.warzone.tgm.modules.respawn.RespawnModule;
+import network.warzone.tgm.modules.respawn.RespawnRule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -56,6 +58,8 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     private int length;
 
+    private final RespawnRule defaultRespawnRule = new RespawnRule(null, 3000, true, true, false);
+
     @Override
     public void load(Match match) {
         JsonObject json = match.getMapContainer().getMapInfo().getJsonObject().get("infection").getAsJsonObject();
@@ -64,7 +68,6 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         deathModule = match.getModule(DeathModule.class);
         this.match = match;
 
-
         TimeModule time = TGM.get().getModule(TimeModule.class);
         time.setTimeLimitService(this::getWinningTeam);
         time.getTimeSubscribers().add(this);
@@ -72,6 +75,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         time.setTimeLimited(true);
         this.timeScoreboardValue = length + ":00";
         this.scoreboardManagerController = TGM.get().getModule(ScoreboardManagerModule.class);
+        TGM.get().getModule(RespawnModule.class).setDefaultRule(defaultRespawnRule);
     }
 
 

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -32,7 +33,8 @@ import java.util.*;
 @ModuleData(load = ModuleLoadTime.EARLIER)
 public class RespawnModule extends MatchModule implements Listener {
 
-    private final RespawnRule DEFAULT_RULE = new RespawnRule(null, 3000, false, true, true);
+    @Getter @Setter
+    private RespawnRule defaultRule = new RespawnRule(null, 3000, false, true, true);
 
     private List<Player> spectators;
     private Map<UUID, Integer> spectatorTime;
@@ -63,10 +65,10 @@ public class RespawnModule extends MatchModule implements Listener {
                 for (JsonElement element : rules) {
                     JsonObject rule = element.getAsJsonObject();
                     List<MatchTeam> matchTeams = Parser.getTeamsFromElement(teamManagerModule, rule.get("teams"));
-                    int delay = DEFAULT_RULE.getDelay();
-                    boolean freeze = DEFAULT_RULE.isFreeze();
-                    boolean blindness = DEFAULT_RULE.isBlindness();
-                    boolean confirm = DEFAULT_RULE.isConfirm();
+                    int delay = defaultRule.getDelay();
+                    boolean freeze = defaultRule.isFreeze();
+                    boolean blindness = defaultRule.isBlindness();
+                    boolean confirm = defaultRule.isConfirm();
                     if (rule.has("delay")) delay = rule.get("delay").getAsInt();
                     if (rule.has("freeze")) freeze = rule.get("freeze").getAsBoolean();
                     if (rule.has("blindness")) blindness = rule.get("blindness").getAsBoolean();
@@ -108,6 +110,13 @@ public class RespawnModule extends MatchModule implements Listener {
         if (shouldRespawn(event.getPlayer()) && (spectators.contains(event.getPlayer()) && (event.getAction().equals(Action.LEFT_CLICK_AIR) ||
             event.getAction().equals(Action.LEFT_CLICK_BLOCK)) && getRule(team).isConfirm())) {
             confirmed.add(event.getPlayer());
+        }
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event) {
+        if (event.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE && isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
         }
     }
 
@@ -168,9 +177,9 @@ public class RespawnModule extends MatchModule implements Listener {
 
             if (event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
                 if (event.getKiller() != null) {
-                    player.teleport(event.getKiller().getLocation(), PlayerTeleportEvent.TeleportCause.SPECTATE);
+                    player.teleport(event.getKiller().getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                 } else {
-                    player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.SPECTATE);
+                    player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                 }
             }
 
@@ -212,7 +221,7 @@ public class RespawnModule extends MatchModule implements Listener {
                 return rule;
             }
         }
-        return DEFAULT_RULE;
+        return defaultRule;
     }
 
     public boolean isSpectating(Player player) {
