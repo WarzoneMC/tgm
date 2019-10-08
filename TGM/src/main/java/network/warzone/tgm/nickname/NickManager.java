@@ -48,7 +48,7 @@ public class NickManager {
     @Getter
     private List<QueuedNick> queuedNicks = new ArrayList<>();
 
-    private ProfileCache profileCache = new ProfileCache();
+    private ProfileCache profileCache = ProfileCache.getInstance();
     //private HashMap<String, Skin> skinCache = new HashMap<>();
 
     public NickManager() {

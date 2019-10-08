@@ -1,5 +1,6 @@
 package network.warzone.tgm.nickname;
 
+import lombok.Getter;
 import network.warzone.warzoneapi.models.MojangProfile;
 
 import java.util.ArrayList;
@@ -9,6 +10,11 @@ import java.util.UUID;
  * Created by Jorge on 10/03/2019
  */
 public class ProfileCache extends ArrayList<MojangProfile> {
+
+    @Getter private static ProfileCache instance = new ProfileCache();
+
+    private ProfileCache() {
+    }
 
     @Override
     public boolean add(MojangProfile mojangProfile) {
