@@ -247,7 +247,7 @@ public class DTMModule extends MatchModule implements Listener {
                 return "  " + ChatColor.RED.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
             }
         } else {
-            return "  " + ChatColor.STRIKETHROUGH + monument.getName();
+            return ChatColor.WHITE + "  " + ChatColor.STRIKETHROUGH + monument.getName();
         }
     }
 
