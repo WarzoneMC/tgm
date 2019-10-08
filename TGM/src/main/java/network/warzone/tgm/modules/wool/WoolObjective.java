@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.util.itemstack.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -56,9 +57,25 @@ public class WoolObjective implements Listener {
         this.color = color;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlace(BlockPlaceEvent event) {
-        if (event.getBlockPlaced().getType() == block) { //TODO 1.13 Temp fix
+        if (event.getBlockPlaced().getType() == block) {
+            if (!completed && podium.contains(event.getBlockPlaced().getLocation()) && owner.containsPlayer(event.getPlayer()))
+                event.setCancelled(true);
+        } else {
+            if (podium.contains(event.getBlockPlaced().getLocation())) {
+                event.setCancelled(true);
+                event.getPlayer().sendMessage(ChatColor.RED + "You may only place " + ChatColor.YELLOW + ItemUtils.materialToString(block) + ChatColor.RED + " in the podium!");
+            }
+        }
+    }
+
+    /*
+    Prevents filter messages
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlaceHighest(BlockPlaceEvent event) {
+        if (event.getBlockPlaced().getType() == block) {
             if (!completed) {
 
                 if (!podium.contains(event.getBlockPlaced().getLocation())) {
@@ -79,12 +96,9 @@ public class WoolObjective implements Listener {
                     woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
                 }
             }
-        } else {
-            if (podium.contains(event.getBlockPlaced().getLocation())) {
-                event.setCancelled(true);
-            }
         }
     }
+
 
     @EventHandler
     public void onWoolCraft(CraftItemEvent event) {
@@ -174,7 +188,7 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        if (event.isCancelled()) return;
+        if (completed || event.isCancelled()) return;
         //handleWoolDrop(event.getPlayerContext().getPlayer());
         if (!touches.containsKey(event.getPlayerContext().getPlayer().getUniqueId())) return;
 

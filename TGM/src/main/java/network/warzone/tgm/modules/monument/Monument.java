@@ -34,8 +34,27 @@ public class Monument implements Listener {
 
     private final List<MonumentService> services = new ArrayList<>();
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
+        if (region.contains(event.getBlock().getLocation())) {
+            if (materials == null || materials.contains(event.getBlock().getType())) {
+                if (canDamage(event.getPlayer())) {
+                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                        event.setCancelled(true); //override filters
+                    }
+                } else {
+                    event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    /*
+    Prevents filter messages
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockBreakHighest(BlockBreakEvent event) {
         if (region.contains(event.getBlock().getLocation())) {
             if (materials == null || materials.contains(event.getBlock().getType())) {
                 if (canDamage(event.getPlayer())) {
@@ -57,9 +76,6 @@ public class Monument implements Listener {
                             }
                         }
                     }
-                } else {
-                    event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
-                    event.setCancelled(true);
                 }
             }
         }

@@ -4,6 +4,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.util.itemstack.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -46,7 +47,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 else
                     message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " was thrown off a high place by " +
                             killerTeam.getColor() + deathInfo.killerName + ChatColor.GRAY + " using " +
-                            itemToString(weapon);
+                            ItemUtils.itemToString(weapon);
             } else if (cause.equals(DamageCause.VOID)) {
                 if (weapon != null && (weapon.getType().equals(Material.BOW) || weapon.getType().equals(Material.TRIDENT)))
                     message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " was shot into the void by " +
@@ -55,7 +56,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                     if (!deathInfo.playerName.equals(deathInfo.killerName)) {
                         message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " was thrown into the void by " +
                                 killerTeam.getColor() + deathInfo.killerName + ChatColor.GRAY + " using " +
-                                itemToString(weapon);
+                                ItemUtils.itemToString(weapon);
                     } else {
                         message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " fell into the void";
                     }
@@ -73,7 +74,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 if (!deathInfo.playerName.equals(deathInfo.killerName)) {
                     message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " was killed by " +
                             killerTeam.getColor() + deathInfo.killerName + ChatColor.GRAY + " using " +
-                            (cause.equals(DamageCause.ENTITY_ATTACK) ? itemToString(weapon) : "the environment");
+                            (cause.equals(DamageCause.ENTITY_ATTACK) ? ItemUtils.itemToString(weapon) : "the environment");
                 } else {
                     message = playerTeam.getColor() + deathInfo.playerName + ChatColor.GRAY + " died to the environment";
                 }
@@ -101,21 +102,6 @@ public class DeathMessageModule extends MatchModule implements Listener {
             deathInfo.killerName = null;
         }
 
-    }
-
-    private String itemToString(ItemStack item) {
-        if (item == null || item.getType().equals(Material.AIR)) {
-            return "their hands";
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        if (item.hasItemMeta() && item.getItemMeta().hasEnchants()) stringBuilder.append("Enchanted ");
-        String materialName = item.getType().toString();
-        for (String word : materialName.split("_")) {
-            word = word.toLowerCase();
-            word = word.substring(0, 1).toUpperCase() + word.substring(1) + " ";
-            stringBuilder.append(word);
-        }
-        return stringBuilder.toString().trim();
     }
 
     private void broadcastDeathMessage(Player dead, Player killer, String message) {
