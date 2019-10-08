@@ -46,13 +46,13 @@ public class MiscCommands {
     public static void tgm(CommandContext commandContext, CommandSender sender) {
         String uptime = Strings.getFullAgo(TGM.get().getStartupTime());
 
-        sender.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "SERVER INFO");
+        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "SERVER INFO");
         sender.sendMessage(String.format("%sUptime: %s%s", ChatColor.GRAY, ChatColor.WHITE, uptime));
         sender.sendMessage(String.format("%sMemory usage: (%s%s/%s%1$s):", ChatColor.GRAY, ChatColor.WHITE, ServerUtil.getFormattedUsedMemory(), ServerUtil.getFormattedTotalMemory()));
         sender.sendMessage(String.format("%sLoaded worlds (%s%d%1$s):", ChatColor.GRAY, ChatColor.WHITE, Bukkit.getWorlds().size()));
         Bukkit.getWorlds().forEach(w -> sender.sendMessage(ChatColor.GRAY + " - " + ChatColor.WHITE + w.getName()));
 
-        sender.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "TGM INFO");
+        sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "TGM INFO");
         sender.sendMessage(String.format("%sMatch number: %s%s", ChatColor.GRAY, ChatColor.WHITE, TGM.get().getMatchManager().getMatchNumber()));
         sender.sendMessage(String.format("%sPlayer contexts: %s%s%s", ChatColor.GRAY, ChatColor.WHITE, TGM.get().getPlayerManager().getPlayers().size(),
                 TGM.get().getPlayerManager().getPlayers().size() != Bukkit.getOnlinePlayers().size() ? ChatColor.RED + "" + ChatColor.BOLD + " !" : ""));
