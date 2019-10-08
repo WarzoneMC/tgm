@@ -48,18 +48,8 @@ public class MatchManager {
     public void endMatch(MatchTeam winningTeam) {
         List<MatchTeam> losers = new ArrayList<>();
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-            if (!matchTeam.isSpectator()) {
-                matchTeam.getMembers().forEach(playerContext -> {
-                    playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
-                    playerContext.getPlayer().setAllowFlight(true);
-                    playerContext.getPlayer().setVelocity(playerContext.getPlayer().getVelocity().setY(1.0)); // Weeee!
-                    playerContext.getPlayer().setFlying(true);
-                    playerContext.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 5, true, false), true);
-                });
-
-                if (matchTeam != winningTeam) {
-                    losers.add(matchTeam);
-                }
+            if (!matchTeam.isSpectator() && matchTeam != winningTeam) {
+                losers.add(matchTeam);
             }
         }
         match.disable();

@@ -76,28 +76,24 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
         if (gameClassModule != null) {
             if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-                if (matchTeam.isSpectator()) {
-                    spectatorModule.applySpectatorKit(playerContext);
-                } else {
-                    gameClassModule.performSwitch(playerContext.getPlayer());
-                    GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
-                    if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
-                    playerContext.getPlayer().updateInventory();
-                }
-            }, 1L);
+            if (matchTeam.isSpectator()) {
+                spectatorModule.applySpectatorKit(playerContext);
+            } else {
+                gameClassModule.performSwitch(playerContext.getPlayer());
+                GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
+                if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
+                playerContext.getPlayer().updateInventory();
+            }
         } else
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
-                playerContext.getPlayer().setFlying(false);
-                playerContext.getPlayer().setAllowFlight(false);
+            playerContext.getPlayer().setFlying(false);
+            playerContext.getPlayer().setAllowFlight(false);
 
-                if (matchTeam.isSpectator()) {
-                    spectatorModule.applySpectatorKit(playerContext);
-                } else {
-                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-                    playerContext.getPlayer().updateInventory();
-                }
-            }, 1L);
+            if (matchTeam.isSpectator()) {
+                spectatorModule.applySpectatorKit(playerContext);
+            } else {
+                matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                playerContext.getPlayer().updateInventory();
+            }
     }
 
     @Override
