@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.damage.DamageControlModule;
 import network.warzone.tgm.modules.damage.FireworkDamageModule;
 import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
+import network.warzone.tgm.modules.generator.GeneratorModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
@@ -90,6 +91,7 @@ public abstract class MatchManifest {
         modules.add(new CraftingModule());
 
         if (GameClassModule.isUsingClasses(mapJson)) modules.add(new GameClassModule());
+        if (GeneratorModule.hasGenerators(mapJson)) modules.add(new GeneratorModule());
 
         return modules;
     }
