@@ -6,6 +6,7 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.HoverEvent;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.nickname.ProfileCache;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.ServerUtil;
 import network.warzone.tgm.util.Strings;
@@ -57,7 +58,16 @@ public class MiscCommands {
         sender.sendMessage(String.format("%sPlayer contexts: %s%s%s", ChatColor.GRAY, ChatColor.WHITE, TGM.get().getPlayerManager().getPlayers().size(),
                 TGM.get().getPlayerManager().getPlayers().size() != Bukkit.getOnlinePlayers().size() ? ChatColor.RED + "" + ChatColor.BOLD + " !" : ""));
         sender.sendMessage(String.format("%sModules loaded: %s%s", ChatColor.GRAY, ChatColor.WHITE, TGM.get().getMatchManager().getMatch().getModules().size()));
+        sender.sendMessage(String.format("%sCached profiles: %s%s", ChatColor.GRAY, ChatColor.WHITE, ProfileCache.getInstance().size()));
+    }
 
+    @Command(aliases = {"profilecache"}, desc = "Manage the profile cache.", usage = "<clear>", min = 1)
+    @CommandPermissions({"tgm.command.profilecache"})
+    public static void profileCache(CommandContext commandContext, CommandSender sender) {
+        if (commandContext.getString(0).equals("clear")) {
+            ProfileCache.getInstance().clear();
+            sender.sendMessage(ChatColor.YELLOW + "Cleared the profile cache.");
+        }
     }
 
 }
