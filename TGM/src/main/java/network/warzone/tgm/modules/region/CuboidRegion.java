@@ -50,6 +50,11 @@ public class CuboidRegion implements Region {
     }
 
     @Override
+    public boolean contains(Block block) {
+        return contains(block.getLocation());
+    }
+
+    @Override
     public Location getCenter() {
         Vector v = getMin().toVector().getMidpoint(getMax().toVector());
         return new Location(world, v.getX(), v.getY(), v.getZ());

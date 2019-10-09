@@ -35,7 +35,9 @@ public class DamageControlModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onDamage(EntityDamageEvent event) {
-        if (!this.enabled.getOrDefault(event.getCause(), true))
+        if (!this.enabled.getOrDefault(event.getCause(), true)) {
             event.setCancelled(true);
+            event.setDamage(0);
+        }
     }
 }
