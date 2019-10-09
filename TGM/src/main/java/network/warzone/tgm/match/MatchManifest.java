@@ -11,6 +11,8 @@ import network.warzone.tgm.modules.damage.FireworkDamageModule;
 import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.generator.GeneratorModule;
+import network.warzone.tgm.modules.launchpad.LaunchPadLoaderModule;
+import network.warzone.tgm.modules.launchpad.LaunchPadModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
@@ -83,6 +85,7 @@ public abstract class MatchManifest {
         modules.add(new ReportsModule());
         modules.add(new StatsModule());
         modules.add(new PortalLoaderModule());
+        modules.add(new LaunchPadLoaderModule());
         modules.add(new WorldBorderModule());
         modules.add(new KnockbackModule());
         modules.add(new MapCommandsModule());

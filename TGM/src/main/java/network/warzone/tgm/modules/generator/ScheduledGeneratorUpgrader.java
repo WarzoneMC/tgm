@@ -15,16 +15,19 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
     private Iterator<ScheduledGeneratorUpgrade> scheduledGeneratorUpgradeIterator;
     private ScheduledGeneratorUpgrade upcomingUpgrade;
 
-    private int runnableID;
+    private int runnableID = -1;
 
     public ScheduledGeneratorUpgrader(List<ScheduledGeneratorUpgrade> scheduledGeneratorUpgrades) {
         this.scheduledGeneratorUpgradeIterator = scheduledGeneratorUpgrades.iterator();
+        loadNextUpgrade();
+    }
+
+    @Override
+    public void enable() {
         this.runnableID = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
             if (hostGenerator == null || upcomingUpgrade == null) return;
-            Bukkit.broadcastMessage("test " + hostGenerator.getRunningTime());
             if (hostGenerator.getRunningTime() == upcomingUpgrade.getTime()) upgrade();
         }, 0L, 0L);
-        loadNextUpgrade();
     }
 
     @Override
@@ -32,6 +35,7 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
         generatorLevel++;
         applyUpgrade();
         loadNextUpgrade();
+        hostGenerator.resetTimer();
     }
 
     private void applyUpgrade() {
@@ -41,7 +45,11 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
     }
 
     private void loadNextUpgrade() {
-        upcomingUpgrade = scheduledGeneratorUpgradeIterator.next();
+        try {
+            upcomingUpgrade = scheduledGeneratorUpgradeIterator.next();
+        } catch (Exception e) {
+            upcomingUpgrade = null;
+        }
         if (upcomingUpgrade == null) unload();
     }
 

@@ -24,6 +24,7 @@ public class ManualGeneratorUpgrader extends GeneratorUpgrader {
         generatorLevel++;
         applyUpgrade();
         loadNextUpgrade();
+        hostGenerator.resetTimer();
     }
 
     private void applyUpgrade() {
@@ -33,7 +34,11 @@ public class ManualGeneratorUpgrader extends GeneratorUpgrader {
     }
 
     private void loadNextUpgrade() {
-        upcomingUpgrade = manualGeneratorUpgrades.next();
+        try {
+            upcomingUpgrade = manualGeneratorUpgrades.next();
+        } catch (Exception e) {
+            upcomingUpgrade = null;
+        }
     }
 
     public static ManualGeneratorUpgrader deserialize(JsonObject upgradeObject) {

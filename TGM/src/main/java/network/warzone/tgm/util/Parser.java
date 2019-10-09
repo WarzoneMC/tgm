@@ -7,6 +7,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,22 @@ public class Parser {
             }
 
             return new Location(world, x, y, z, yaw, pitch);
+        }
+    }
+
+    public static Vector convertVector(JsonElement vectorElement) {
+        if (vectorElement.isJsonObject()) {
+            JsonObject vectorJson = vectorElement.getAsJsonObject();
+            double x = vectorJson.get("x").getAsDouble();
+            double y = vectorJson.get("y").getAsDouble();
+            double z = vectorJson.get("z").getAsDouble();
+            return new Vector(x, y, z);
+        } else {
+            String[] split = vectorElement.getAsString().replaceAll(" ", "").split(",");
+            double x = Double.parseDouble(split[0].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            double y = Double.parseDouble(split[1].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            double z = Double.parseDouble(split[2].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            return new Vector(x, y, z);
         }
     }
 

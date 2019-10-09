@@ -35,6 +35,7 @@ public class GeneratorModule extends MatchModule implements TaskedModule {
     @Override
     public void enable() {
         matchStarted = true;
+        for (Generator generator : generators) generator.enable();
     }
 
     @Override
@@ -70,7 +71,7 @@ public class GeneratorModule extends MatchModule implements TaskedModule {
     }
 
     @Override
-    public void unload() {
+    public void disable() {
         for (Generator generator : generators) {
             generator.getGeneratorUpgrader().unload();
         }

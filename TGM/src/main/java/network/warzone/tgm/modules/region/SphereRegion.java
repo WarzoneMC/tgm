@@ -33,6 +33,11 @@ public class SphereRegion implements Region {
     }
 
     @Override
+    public boolean contains(Block block) {
+        return contains(block.getLocation());
+    }
+
+    @Override
     public Location getCenter() {
         return this.center;
     }

@@ -13,5 +13,7 @@ public abstract class GeneratorUpgrader {
         return broadcast.replace("%name%", hostGenerator.getName()).replace("%level%", Integer.toString(generatorLevel));
     }
 
+    public void enable() {}
+
     void unload() {}
 }

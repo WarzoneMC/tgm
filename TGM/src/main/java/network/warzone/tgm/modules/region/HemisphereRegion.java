@@ -68,6 +68,11 @@ public class HemisphereRegion implements Region {
     }
 
     @Override
+    public boolean contains(Block block) {
+        return contains(block.getLocation());
+    }
+
+    @Override
     public Location getCenter() {
         return this.focalPoint;
     }

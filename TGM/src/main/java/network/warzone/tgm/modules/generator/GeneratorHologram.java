@@ -41,7 +41,6 @@ public class GeneratorHologram {
             parsed = remainingTicks / 20;
             timeSpan = parsed + " second" + (parsed == 1 ? "" : "s");
         }
-        if (parsed == 0) return;
         String formatted = baseContent
             .replace("%name%", name)
             .replace("%material%",
