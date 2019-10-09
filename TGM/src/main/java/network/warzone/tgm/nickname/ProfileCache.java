@@ -18,8 +18,8 @@ public class ProfileCache extends ArrayList<MojangProfile> {
 
     @Override
     public boolean add(MojangProfile mojangProfile) {
-        while (this.size() >= 20) this.remove(0);
-        return super.add(mojangProfile);
+        if (!contains(mojangProfile.getUuid())) super.add(mojangProfile);
+        return true;
     }
 
     public boolean contains(String name) {
