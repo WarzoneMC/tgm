@@ -195,11 +195,11 @@ public class ColorConverter {
             case "CARPET":
                 targetMaterial = orderedCarpet[targetIndex];
                 break;
-            case "STAINED_GLASS":
-                targetMaterial = orderedStainedGlass[targetIndex];
-                break;
             case "STAINED_GLASS_PANE":
                 targetMaterial = orderedStainedGlassPane[targetIndex];
+                break;
+            case "STAINED_GLASS":
+                targetMaterial = orderedStainedGlass[targetIndex];
                 break;
             case "TERRACOTTA":
             default:

@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import java.util.Set;
 
 public class Blocks {
-    private static String[] visualChoices = {"WOOL", "CARPET", "TERRACOTTA", "STAINED_GLASS", "STAINED_GLASS_PANE"};
+    private static String[] visualChoices = {"WOOL", "CARPET", "TERRACOTTA", "STAINED_GLASS_PANE", "STAINED_GLASS"};
     public static boolean isVisualMaterial(Material material) {
         String name = material.name();
         for(String visualChoice : visualChoices) if(name.contains(visualChoice)) return true;
