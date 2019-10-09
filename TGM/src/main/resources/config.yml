@@ -45,8 +45,8 @@ server:
   # ID for the server object served by the API.
   # Default: Warzone
   id: "warzone"
-  # Displayed on the scoreboard. Feel free to use color codes if you don't want yellow text.
-  ip: "play.warz.one"
+  # Message displayed on the last line of the scoreboards. Color codes accepted.
+  ip: "your.server.ip"
   # Store link displayed when a player tries to join a specific team.
   store: "https://tgmwarzone.tebex.io/"
   # Text displayed after the match time on the tablist header.

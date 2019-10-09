@@ -97,7 +97,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         Bukkit.getPluginManager().callEvent(new ScoreboardInitEvent(playerContext.getPlayer(), simpleScoreboard));
 
         simpleScoreboard.add(" ", 1);
-        simpleScoreboard.add(ChatColor.YELLOW + ChatColor.translateAlternateColorCodes('&', TGM.get().getConfig().getString("server.ip") == null ? "play.warz.one" : TGM.get().getConfig().getString("server.ip")), 0);
+        simpleScoreboard.add(ChatColor.YELLOW + ChatColor.translateAlternateColorCodes('&', TGM.get().getConfig().getString("server.ip", "your.server.ip")), 0);
         simpleScoreboard.send(playerContext.getPlayer());
         scoreboards.put(playerContext.getPlayer().getUniqueId(), simpleScoreboard);
         simpleScoreboard.update();
