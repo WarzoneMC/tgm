@@ -105,7 +105,7 @@ public class FFAModule extends MatchModule implements Listener {
         if (event.isCancelled()) return;
         if (event.getTeam().isSpectator()) {
             if (blitzMode && match.getMatchStatus().equals(MatchStatus.MID) && hasWinner()) {
-               TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
+                TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
             }
         } else {
             if (blitzMode && event.getTeam().equals(playersTeam)) {
@@ -188,8 +188,6 @@ public class FFAModule extends MatchModule implements Listener {
             simpleScoreboard.add(playerScoreboardLines.get(i), i);
             if (i > line) line = i;
         }
-        line++;
-        simpleScoreboard.add(ChatColor.RESET + "", line);
         simpleScoreboard.update();
     }
 
@@ -207,7 +205,7 @@ public class FFAModule extends MatchModule implements Listener {
             Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>) e;
             String player = entry.getKey();
             int score = entry.getValue();
-            if (lines.size() > 14) {
+            if (lines.size() > 12) {
                 lines.remove(0);
             }
             if (blitzMode) lines.add(this.playersTeam.getColor() + player + "" + ChatColor.GRAY + ": " + ChatColor.RESET + score);
@@ -219,7 +217,7 @@ public class FFAModule extends MatchModule implements Listener {
                 }
             }
         }
-        int i = 0;
+        int i = 2;
         for (String line : lines) {
             playerScoreboardLines.put(i, line);
             i++;
