@@ -31,8 +31,6 @@ import java.util.*;
 
 public class NickManager {
 
-    public static String RATELIMITED_MESSAGE = ChatColor.GOLD.toString() + ChatColor.BOLD + "Slow Down! " + ChatColor.RESET.toString() + ChatColor.RED + "You're being ratelimited.";
-
     private VisibilityController visiblityController;
 
     @Getter
@@ -50,7 +48,7 @@ public class NickManager {
     @Getter
     private List<QueuedNick> queuedNicks = new ArrayList<>();
 
-    private ProfileCache profileCache = new ProfileCache();
+    private ProfileCache profileCache = ProfileCache.getInstance();
     //private HashMap<String, Skin> skinCache = new HashMap<>();
 
     public NickManager() {
@@ -174,7 +172,7 @@ public class NickManager {
 
     public void setRank(Player player, Rank rank) {
         NickedUserProfile nickedStats = getUserProfile(player);
-        nickedStats.setRanksLoaded(Collections.emptyList());
+        nickedStats.setRanksLoaded(new ArrayList<>());
         nickedStats.addRank(rank);
         stats.put(player.getUniqueId(), nickedStats);
     }

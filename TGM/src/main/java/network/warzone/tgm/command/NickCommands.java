@@ -6,6 +6,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.NickedUserProfile;
 import network.warzone.tgm.util.HashMaps;
@@ -15,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
@@ -52,7 +54,7 @@ public class NickCommands {
     @CommandPermissions({"tgm.command.nick"})
     public static void nick(CommandContext cmd, CommandSender sender) throws IllegalAccessException, NoSuchFieldException, UnirestException {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Player only command.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player p = (Player) sender;
@@ -131,7 +133,7 @@ public class NickCommands {
                 try {
                     TGM.get().getNickManager().setName(p, newName);
                 } catch (NoSuchFieldException | IllegalAccessException e) {
-                    p.sendMessage(NickManager.RATELIMITED_MESSAGE);
+                    p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
                 }
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
             } else if (option.equals("stats") && cmd.argsLength() > 1) {
@@ -170,7 +172,7 @@ public class NickCommands {
                             TGM.get().getNickManager().setNew(p, true);
                             break;
                         default:
-                            sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad> [value]");
+                            sender.sendMessage(ChatColor.RED + "/nick stats <statName|good|random|bad|new> [value]");
                             return;
                     }
                     sender.sendMessage(ChatColor.GREEN + "Set stats to preset " + ChatColor.YELLOW + type);
@@ -185,7 +187,7 @@ public class NickCommands {
                     }
                     if (newRank.equals("none")) {
                         NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
-                        profile.setRanks(Collections.emptyList());
+                        profile.setRanksLoaded(new ArrayList<>());
                         TGM.get().getNickManager().getStats().put(p.getUniqueId(), profile);
                         sender.sendMessage(ChatColor.GREEN + "Removed nicked rank");
                         return;

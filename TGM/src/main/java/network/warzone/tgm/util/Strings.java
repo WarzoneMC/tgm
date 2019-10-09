@@ -51,6 +51,40 @@ public class Strings {
         }
     }
 
+    public static String getFullAgo(long timestamp) {
+        double time = (System.currentTimeMillis() - timestamp) / 1000D;
+        StringBuilder result = new StringBuilder();
+        int t;
+        if ((t = (int) Math.floor(time / 31536000)) > 0) {
+            result.append((t == 1) ? "1 year " : t + " years ");
+            time -= t * 31536000;
+        }
+        if ((t = (int) Math.floor(time / 2592000)) > 0) {
+            result.append((t == 1) ? "1 month " : t + " months ");
+            time -= t * 2592000;
+        }
+        if ((t = (int) Math.floor(time / 604800)) > 0) {
+            result.append((t == 1) ? "1 week " : t + " weeks ");
+            time -= t * 604800;
+        }
+        if ((t = (int) Math.floor(time / 86400)) > 0) {
+            result.append((t == 1) ? "1 day " : t + " days ");
+            time -= t * 86400;
+        }
+        if ((t = (int) Math.floor(time / 3600)) > 0) {
+            result.append((t == 1) ? "1 hour " : t + " hours ");
+            time -= t * 3600;
+        }
+        if ((t = (int) Math.floor(time / 60)) > 0) {
+            result.append((t == 1) ? "1 minute " : t + " minutes ");
+            time -= t * 60;
+        }
+        if ((t = (int) Math.floor(time)) > 0) {
+            result.append((t == 1) ? "1 second " : t + " seconds ");
+        }
+        return result.toString().trim();
+    }
+
     public static String getAuthorUsername(Author author) {
         return author.getDisplayUsername() != null ? author.getDisplayUsername() : author.getUsername() != null ? author.getUsername() : "Unknown";
     }

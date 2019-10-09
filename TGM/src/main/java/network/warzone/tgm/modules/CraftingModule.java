@@ -85,9 +85,10 @@ public class CraftingModule extends MatchModule implements Listener {
     private static Recipe parseRecipe(JsonObject jsonObject) {
         String type = jsonObject.get("type").getAsString();
         ItemStack result = ItemDeserializer.parse(jsonObject.get("result").getAsJsonObject());
+        NamespacedKey namespacedKey = TGM.getKey(result.getType().name() + new Date().getTime());
         switch (type) {
             case "shapeless":
-                ShapelessRecipe shapelessRecipe = new ShapelessRecipe(getKey(result.getType().name() + new Date().getTime()), result);
+                ShapelessRecipe shapelessRecipe = new ShapelessRecipe(namespacedKey, result);
                 for (JsonElement element : jsonObject.getAsJsonArray("ingredients")) {
                     RecipeChoice ingredient = parseRecipeIngredient(element);
                     if (ingredient == null) continue;
@@ -95,7 +96,7 @@ public class CraftingModule extends MatchModule implements Listener {
                 }
                 return shapelessRecipe;
             case "shaped":
-                ShapedRecipe shapedRecipe = new ShapedRecipe(getKey(result.getType().name() + new Date().getTime()), result);
+                ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, result);
                 JsonArray shapeArray = jsonObject.getAsJsonArray("shape");
                 String[] shape = new String[shapeArray.size()];
                 for (int i = 0; i < shapeArray.size(); i++) {
@@ -120,7 +121,7 @@ public class CraftingModule extends MatchModule implements Listener {
                 int furnaceCookingTime = 200;
                 if (jsonObject.has("experience")) furnaceExp = jsonObject.get("experience").getAsInt();
                 if (jsonObject.has("cookingTime")) furnaceCookingTime = jsonObject.get("cookingTime").getAsInt();
-                return new FurnaceRecipe(getKey(result.getType().name() + new Date().getTime()), result, furnaceIngredient, furnaceExp, furnaceCookingTime);
+                return new FurnaceRecipe(namespacedKey, result, furnaceIngredient, furnaceExp, furnaceCookingTime);
             case "smoking":
                 RecipeChoice smokingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (smokingIngredient == null) return null;
@@ -128,7 +129,7 @@ public class CraftingModule extends MatchModule implements Listener {
                 int smokingCookingTime = 100;
                 if (jsonObject.has("experience")) smokingExp = jsonObject.get("experience").getAsInt();
                 if (jsonObject.has("cookingTime")) smokingCookingTime = jsonObject.get("cookingTime").getAsInt();
-                return new SmokingRecipe(getKey(result.getType().name() + new Date().getTime()), result, smokingIngredient, smokingExp, smokingCookingTime);
+                return new SmokingRecipe(namespacedKey, result, smokingIngredient, smokingExp, smokingCookingTime);
             case "blasting":
                 RecipeChoice blastingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (blastingIngredient == null) return null;
@@ -136,7 +137,7 @@ public class CraftingModule extends MatchModule implements Listener {
                 int blastingCookingTime = 100;
                 if (jsonObject.has("experience")) blastingExp = jsonObject.get("experience").getAsInt();
                 if (jsonObject.has("cookingTime")) blastingCookingTime = jsonObject.get("cookingTime").getAsInt();
-                return new BlastingRecipe(getKey(result.getType().name() + new Date().getTime()), result, blastingIngredient, blastingExp, blastingCookingTime);
+                return new BlastingRecipe(namespacedKey, result, blastingIngredient, blastingExp, blastingCookingTime);
             case "campfire":
                 RecipeChoice campfireIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (campfireIngredient == null) return null;
@@ -144,11 +145,11 @@ public class CraftingModule extends MatchModule implements Listener {
                 int campfireCookingTime = 600;
                 if (jsonObject.has("experience")) campfireExp = jsonObject.get("experience").getAsInt();
                 if (jsonObject.has("cookingTime")) campfireCookingTime = jsonObject.get("cookingTime").getAsInt();
-                return new CampfireRecipe(getKey(result.getType().name() + new Date().getTime()), result, campfireIngredient, campfireExp, campfireCookingTime);
+                return new CampfireRecipe(namespacedKey, result, campfireIngredient, campfireExp, campfireCookingTime);
             case "stonecutting":
                 RecipeChoice stonecuttingIngredient = parseRecipeIngredient(jsonObject.get("ingredient"));
                 if (stonecuttingIngredient == null) return null;
-                return new StonecuttingRecipe(getKey(result.getType().name() + new Date().getTime()), result, stonecuttingIngredient);
+                return new StonecuttingRecipe(namespacedKey, result, stonecuttingIngredient);
             default:
                 return null;
         }
@@ -163,11 +164,6 @@ public class CraftingModule extends MatchModule implements Listener {
             return new RecipeChoice.MaterialChoice(material);
         }
         return null;
-    }
-
-    // Will be moved to TGM class
-    public static NamespacedKey getKey(String name) {
-        return new NamespacedKey(TGM.get(), name);
     }
 
 }

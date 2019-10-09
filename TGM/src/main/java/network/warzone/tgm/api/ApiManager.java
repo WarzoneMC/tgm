@@ -6,7 +6,7 @@ import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.ParsedTeam;
 import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
-import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.death.DeathInfo;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.StatsModule;

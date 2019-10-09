@@ -30,6 +30,7 @@ import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.client.http.HttpClientConfig;
 import network.warzone.warzoneapi.client.offline.OfflineClient;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -42,6 +43,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -67,6 +69,8 @@ public class TGM extends JavaPlugin {
     private CommandsManager<CommandSender> commands;
     private CommandsManagerRegistration commandManager;
 
+    @Getter private long startupTime;
+
     public static TGM get() {
         return instance;
     }
@@ -74,6 +78,7 @@ public class TGM extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        this.startupTime = new Date().getTime();
         FileConfiguration fileConfiguration = getConfig();
         saveDefaultConfig();
 
@@ -180,5 +185,9 @@ public class TGM extends JavaPlugin {
 
     public <T extends MatchModule> List<T> getModules(Class<T> clazz) {
         return matchManager.getMatch().getModules(clazz);
+    }
+
+    public static NamespacedKey getKey(String name) {
+        return new NamespacedKey(TGM.get(), name);
     }
 }

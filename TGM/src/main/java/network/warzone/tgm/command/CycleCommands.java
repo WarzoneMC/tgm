@@ -12,7 +12,9 @@ import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.modules.chat.ChatChannel;
+import network.warzone.tgm.modules.chat.ChatConstant;
+import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
@@ -288,7 +290,7 @@ public class CycleCommands {
     @Command(aliases = {"classes"}, desc = "Class menu.")
     public static void classes(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         if (TGM.get().getModule(GameClassModule.class) == null) {
@@ -304,7 +306,7 @@ public class CycleCommands {
     @Command(aliases = {"class"}, desc = "Choose a class.", min = 1, usage = "<kit name>")
     public static void classCommand(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do this.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         if (TGM.get().getModule(GameClassModule.class) == null) {
@@ -347,7 +349,7 @@ public class CycleCommands {
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
@@ -418,7 +420,7 @@ public class CycleCommands {
     @Command(aliases = {"killstreak", "ks"}, desc = "See your current killstreak")
     public static void killstreak(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
@@ -441,7 +443,7 @@ public class CycleCommands {
     @Command(aliases = {"teleport", "tp"}, desc = "Teleport to a player")
     public static void teleport(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
@@ -544,7 +546,7 @@ public class CycleCommands {
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
         if(!(sender instanceof Player)) {
-            sender.sendMessage("Error: Only players can use this command.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
@@ -554,10 +556,10 @@ public class CycleCommands {
         }
 
         String channelName = cmd.getString(0).toUpperCase();
-        ChatModule.Channel channel = ChatModule.Channel.byName(channelName);
+        ChatChannel channel = ChatChannel.byName(channelName);
         if (channel == null) {
           player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
-          player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatModule.Channel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
+          player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatChannel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
           return;
         }
 
@@ -573,7 +575,7 @@ public class CycleCommands {
     @Command(aliases = {"t"}, desc = "Send a message to your team.", usage = "(message)", min = 1)
     public static void t(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to do that.");
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         if (cmd.argsLength() > 0) {

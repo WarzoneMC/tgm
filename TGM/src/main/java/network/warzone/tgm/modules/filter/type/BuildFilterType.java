@@ -40,7 +40,7 @@ public class BuildFilterType implements FilterType, Listener {
     private final String message;
     private final boolean inverted;
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         for (Region region : regions) {
             if (contains(region, event.getBlockPlaced().getLocation())) {
@@ -59,7 +59,7 @@ public class BuildFilterType implements FilterType, Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         for (Region region : regions) {
             if (contains(region, event.getBlock().getLocation())) {

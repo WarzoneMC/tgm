@@ -3,6 +3,7 @@ package network.warzone.tgm.map;
 import com.google.gson.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
+import network.warzone.tgm.nickname.ProfileCache;
 import network.warzone.warzoneapi.models.Author;
 import network.warzone.warzoneapi.models.MojangProfile;
 import org.bukkit.Bukkit;
@@ -31,9 +32,15 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
                     Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                         if (author != null && author.getUuid() != null) {
                             try {
-                                MojangProfile profile = TGM.get().getTeamClient().getMojangProfile(author.getUuid());
+                                MojangProfile profile = ProfileCache.getInstance().get(author.getUuid());
+                                if (profile == null) {
+                                    profile = TGM.get().getTeamClient().getMojangProfile(author.getUuid());
+                                    ProfileCache.getInstance().add(profile);
+                                }
                                 if (profile != null && profile.getCode() == 0)
                                     author.setDisplayUsername(profile.getUsername());
+                                else
+                                    throw new Exception();
                             } catch (Exception e) {
                                 TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);
                             }

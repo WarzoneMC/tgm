@@ -10,10 +10,7 @@ import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -88,8 +85,10 @@ public class DeathModule extends MatchModule implements Listener {
             Player damager = null;
 
             if (event.getDamager() instanceof Player) damager = (Player) event.getDamager();
-            if (event.getDamager() instanceof Arrow) damager = (Player) ((Arrow) event.getDamager()).getShooter();
-            else if (event.getDamager() instanceof Trident) damager = (Player) ((Trident) event.getDamager()).getShooter();
+            else if (event.getDamager() instanceof Projectile) {
+                Projectile projectile = (Projectile) event.getDamager();
+                if (projectile.getShooter() instanceof Player) damager = (Player) projectile.getShooter();
+            }
 
             if (damager != null && teamManagerModule.getTeam(damager).isSpectator()) return;
 

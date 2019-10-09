@@ -38,7 +38,7 @@ public class BlockBreakFilterType implements FilterType, Listener {
     private final List<Material> blocks;
     private final boolean inverted;
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlaceEvent(BlockBreakEvent event) {
         for (Region region : regions) {
             if (contains(region, event.getBlock().getLocation())) {

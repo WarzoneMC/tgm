@@ -1,5 +1,6 @@
 package network.warzone.tgm.nickname;
 
+import lombok.Getter;
 import network.warzone.warzoneapi.models.MojangProfile;
 
 import java.util.ArrayList;
@@ -10,10 +11,15 @@ import java.util.UUID;
  */
 public class ProfileCache extends ArrayList<MojangProfile> {
 
+    @Getter private static ProfileCache instance = new ProfileCache();
+
+    private ProfileCache() {
+    }
+
     @Override
     public boolean add(MojangProfile mojangProfile) {
-        while (this.size() >= 20) this.remove(0);
-        return super.add(mojangProfile);
+        if (!contains(mojangProfile.getUuid())) super.add(mojangProfile);
+        return true;
     }
 
     public boolean contains(String name) {

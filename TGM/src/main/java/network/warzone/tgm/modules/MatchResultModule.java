@@ -7,17 +7,17 @@ import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class MatchResultModule extends MatchModule implements Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onMatchResult(MatchResultEvent event) {
         MatchTeam spectators = TGM.get().getModule(TeamManagerModule.class).getSpectators();
 
@@ -33,6 +33,12 @@ public class MatchResultModule extends MatchModule implements Listener {
             if (spectators.containsPlayer(player)) {
                 player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
             } else {
+                player.setGameMode(GameMode.ADVENTURE);
+                player.setAllowFlight(true);
+                player.setVelocity(player.getVelocity().setY(1.0)); // Weeee!
+                player.setFlying(true);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 5, true, false), true);
+
                 if (event.getWinningTeam() == null) {
                     player.sendTitle("", ChatColor.YELLOW + "The result was a tie!", 10, 40, 10);
                     player.playSound(location, Sound.ENTITY_WITHER_SPAWN, 1000, 1);
