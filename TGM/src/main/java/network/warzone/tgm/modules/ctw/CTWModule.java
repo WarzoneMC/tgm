@@ -177,7 +177,7 @@ public class CTWModule extends MatchModule implements Listener {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
         int spaceCount = 1;
-        int i = 0;
+        int i = 2;
         for (MatchTeam matchTeam : teams) {
             if(matchTeam.isSpectator()) continue;
 

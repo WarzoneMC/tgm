@@ -183,7 +183,7 @@ public class FFAModule extends MatchModule implements Listener {
 
     private void refreshScoreboard(SimpleScoreboard simpleScoreboard) {
         simpleScoreboard.setTitle(ChatColor.translateAlternateColorCodes('&', title));
-        int line = 0;
+        int line = 2;
         for (int i : playerScoreboardLines.keySet()) {
             simpleScoreboard.add(playerScoreboardLines.get(i), i);
             if (i > line) line = i;
