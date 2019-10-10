@@ -30,6 +30,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -251,6 +253,15 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
+        handleQuit(event);
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        handleQuit(event);
+    }
+
+    private void handleQuit(PlayerEvent event) {
         if (teamManager.getTeamById("infected").getMembers().size() == 0 && match.getMatchStatus().equals(MatchStatus.MID)) {
             PlayerContext player = teamManager.getTeamById("humans").getMembers().get(teamManager.getTeamById("humans").getMembers().size() - 1);
             broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));

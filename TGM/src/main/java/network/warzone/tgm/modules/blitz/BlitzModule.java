@@ -26,6 +26,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -194,6 +196,15 @@ public class BlitzModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
+        handleQuit(event);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onKick(PlayerKickEvent event) {
+        handleQuit(event);
+    }
+
+    private void handleQuit(PlayerEvent event) {
         if ((teamManagerModule.getTeam(event.getPlayer()) != null && teamManagerModule.getTeam(event.getPlayer()).isSpectator())) return;
         updateScoreboardTeamLine(teamManagerModule.getTeam(event.getPlayer()), getAlivePlayers(teamManagerModule.getTeam(event.getPlayer())).size() - 1);
 
