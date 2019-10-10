@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.death;
 
 import lombok.NoArgsConstructor;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -9,6 +10,7 @@ import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -27,11 +29,14 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class DeathModule extends MatchModule implements Listener {
 
+    private Match match;
+
     private HashMap<UUID, DeathInfo> players = new HashMap<>();
     private HashMap<UUID, Boolean> dead = new HashMap<>();
     private TeamManagerModule teamManagerModule;
 
     public void load(Match match) {
+        this.match = match;
         teamManagerModule = match.getModule(TeamManagerModule.class);
     }
 
@@ -135,6 +140,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
+        if (match.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) return;
         for (ItemStack stack : event.getDrops()) {
             if (stack != null) {
                 event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation(), stack);

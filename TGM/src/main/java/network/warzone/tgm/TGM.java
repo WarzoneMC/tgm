@@ -135,7 +135,7 @@ public class TGM extends JavaPlugin {
 
         PunishMenu.getPresetsMenu().load();
 
-        GameRuleModule.setGameRules(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
+        GameRuleModule.setGameRuleDefaults(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
         matchManager.cycleNextMatch();
         nickManager = new NickManager(); 
