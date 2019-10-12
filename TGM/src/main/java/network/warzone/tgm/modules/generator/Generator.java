@@ -13,6 +13,7 @@ public class Generator {
     @Setter private ItemStack item;
     private Location location;
     private int limit;
+    private int range;
     @Setter private int interval;
     private GeneratorHologram generatorHologram;
     private GeneratorUpgrader generatorUpgrader;
@@ -21,24 +22,27 @@ public class Generator {
     private int runningTime = 0;
     private GeneratorTimeHandle generatorTimeHandle;
 
-    public Generator(String id, ItemStack item, Location location, int limit, int interval, GeneratorHologram generatorHologram, GeneratorUpgrader generatorUpgrader) {
+    public Generator(String id, ItemStack item, Location location, int limit, int range, int interval, GeneratorHologram generatorHologram, GeneratorUpgrader generatorUpgrader) {
         this.id = id;
         this.item = item;
         this.location = location;
         this.limit = limit;
+        this.range = range;
         this.interval = interval;
         this.currentInterval = interval;
         this.generatorHologram = generatorHologram;
         this.generatorUpgrader = generatorUpgrader;
-        this.generatorUpgrader.setHostGenerator(this);
 
-        if (generatorHologram != null) setupTimeHandle();
+        if (this.generatorUpgrader != null) this.generatorUpgrader.setHostGenerator(this);
+        if (this.generatorHologram != null) setupTimeHandle();
     }
 
     public void enable() {
-        generatorHologram.makeVisible();
-        generatorHologram.displayContent(item.getType(), currentInterval, generatorUpgrader.getGeneratorLevel());
-        generatorUpgrader.enable();
+        if (this.generatorHologram != null) {
+            generatorHologram.makeVisible();
+            generatorHologram.displayContent(item.getType(), currentInterval, generatorUpgrader.getGeneratorLevel());
+        }
+        if (this.generatorUpgrader != null) generatorUpgrader.enable();
     }
 
     private void setupTimeHandle() {
@@ -73,6 +77,7 @@ public class Generator {
     }
 
     private void perform() {
+        if (range >= 0 && location.getWorld().getNearbyPlayers(location, range).size() == 0) return;
         if (limit > 0) {
             int nearbySimilarItems = location.getWorld().getNearbyEntitiesByType(Item.class, location, 2, (theEntity) -> theEntity.getItemStack().getType() == item.getType()).stream().mapToInt((itemEntity) -> itemEntity.getItemStack().getAmount()).sum();
             if (nearbySimilarItems >= limit) return;
