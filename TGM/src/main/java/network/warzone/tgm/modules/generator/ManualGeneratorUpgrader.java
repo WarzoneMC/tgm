@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import network.warzone.tgm.parser.item.ItemDeserializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ public class ManualGeneratorUpgrader extends GeneratorUpgrader {
         loadNextUpgrade();
     }
 
-    @Override
     public void upgrade() {
         generatorLevel++;
         applyUpgrade();
@@ -31,6 +31,7 @@ public class ManualGeneratorUpgrader extends GeneratorUpgrader {
         if (upcomingUpgrade.getItem() != null) hostGenerator.setItem(upcomingUpgrade.getItem());
         if (upcomingUpgrade.getInterval() > 0) hostGenerator.setInterval(upcomingUpgrade.getInterval());
         if (upcomingUpgrade.getBroadcast() != null) Bukkit.broadcastMessage(parseCurrentBroadcast(upcomingUpgrade.getBroadcast()));
+        if (upcomingUpgrade.getHoloContent() != null && hostGenerator.getGeneratorHologram() != null) hostGenerator.getGeneratorHologram().setBaseContent(upcomingUpgrade.getHoloContent());
     }
 
     private void loadNextUpgrade() {
@@ -50,8 +51,10 @@ public class ManualGeneratorUpgrader extends GeneratorUpgrader {
             ItemStack item = null;
             if (sequenceObject.has("item")) item = ItemDeserializer.parse(sequenceObject.get("item").getAsJsonObject());
             String message = null;
-            if (sequenceObject.has("message")) message = sequenceObject.get("message").getAsString();
-            manualGeneratorUpgrades.add(new ManualGeneratorUpgrade(interval, item, message));
+            if (sequenceObject.has("message")) message = ChatColor.translateAlternateColorCodes('&', sequenceObject.get("message").getAsString());
+            String holoContent = null;
+            if (sequenceObject.has("holoContent")) holoContent = ChatColor.translateAlternateColorCodes('&', sequenceObject.get("holoContent").getAsString());
+            manualGeneratorUpgrades.add(new ManualGeneratorUpgrade(interval, item, message, holoContent));
         }
         return new ManualGeneratorUpgrader(manualGeneratorUpgrades);
     }

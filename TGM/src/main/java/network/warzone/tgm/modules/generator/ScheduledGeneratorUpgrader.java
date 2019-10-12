@@ -5,59 +5,50 @@ import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.parser.item.ItemDeserializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
-    private Iterator<ScheduledGeneratorUpgrade> scheduledGeneratorUpgradeIterator;
-    private ScheduledGeneratorUpgrade upcomingUpgrade;
-
-    private int runnableID = -1;
+    private List<ScheduledGeneratorUpgrade> scheduledGeneratorUpgrades;
+    private HashMap<Integer, Integer> taskMap = new HashMap<>();
 
     public ScheduledGeneratorUpgrader(List<ScheduledGeneratorUpgrade> scheduledGeneratorUpgrades) {
-        this.scheduledGeneratorUpgradeIterator = scheduledGeneratorUpgrades.iterator();
-        loadNextUpgrade();
+        this.scheduledGeneratorUpgrades = scheduledGeneratorUpgrades;
     }
 
     @Override
     public void enable() {
-        this.runnableID = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
-            if (hostGenerator == null || upcomingUpgrade == null) return;
-            if (hostGenerator.getRunningTime() == upcomingUpgrade.getTime()) upgrade();
-        }, 0L, 0L);
+        for (ScheduledGeneratorUpgrade scheduledGeneratorUpgrade : scheduledGeneratorUpgrades) {
+            if (taskMap.containsKey(scheduledGeneratorUpgrade.getTime())) continue;
+            taskMap.put(scheduledGeneratorUpgrade.getTime(),
+                    Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                        upgrade(scheduledGeneratorUpgrade);
+                    }, scheduledGeneratorUpgrade.getTime()).getTaskId()
+            );
+        }
     }
 
-    @Override
-    public void upgrade() {
+    void upgrade(ScheduledGeneratorUpgrade scheduledGeneratorUpgrade) {
         generatorLevel++;
-        applyUpgrade();
-        loadNextUpgrade();
+        applyUpgrade(scheduledGeneratorUpgrade);
         hostGenerator.resetTimer();
     }
 
-    private void applyUpgrade() {
-        if (upcomingUpgrade.getItem() != null) hostGenerator.setItem(upcomingUpgrade.getItem());
-        if (upcomingUpgrade.getInterval() > 0) hostGenerator.setInterval(upcomingUpgrade.getInterval());
-        if (upcomingUpgrade.getBroadcast() != null) Bukkit.broadcastMessage(parseCurrentBroadcast(upcomingUpgrade.getBroadcast()));
-    }
-
-    private void loadNextUpgrade() {
-        try {
-            upcomingUpgrade = scheduledGeneratorUpgradeIterator.next();
-        } catch (Exception e) {
-            upcomingUpgrade = null;
-        }
-        if (upcomingUpgrade == null) unload();
+    private void applyUpgrade(ScheduledGeneratorUpgrade scheduledGeneratorUpgrade) {
+        if (scheduledGeneratorUpgrade.getItem() != null) hostGenerator.setItem(scheduledGeneratorUpgrade.getItem());
+        if (scheduledGeneratorUpgrade.getInterval() > 0) hostGenerator.setInterval(scheduledGeneratorUpgrade.getInterval());
+        if (scheduledGeneratorUpgrade.getBroadcast() != null) Bukkit.broadcastMessage(parseCurrentBroadcast(scheduledGeneratorUpgrade.getBroadcast()));
+        if (scheduledGeneratorUpgrade.getHoloContent() != null && hostGenerator.getGeneratorHologram() != null) hostGenerator.getGeneratorHologram().setBaseContent(scheduledGeneratorUpgrade.getHoloContent());
     }
 
     @Override
     void unload() {
-        if (runnableID > 0) {
-            Bukkit.getScheduler().cancelTask(this.runnableID);
-            runnableID = -1;
+        int timeRan = hostGenerator.getRunningTime();
+        for (Map.Entry<Integer, Integer> mapEntry : taskMap.entrySet()) {
+            if (mapEntry.getKey() < timeRan) continue;
+            Bukkit.getScheduler().cancelTask(mapEntry.getValue());
         }
     }
 
@@ -72,8 +63,10 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
             ItemStack item = null;
             if (sequenceObject.has("item")) item = ItemDeserializer.parse(sequenceObject.get("item").getAsJsonObject());
             String message = null;
-            if (sequenceObject.has("message")) message = sequenceObject.get("message").getAsString();
-            scheduledGeneratorUpgrades.add(new ScheduledGeneratorUpgrade(time, interval, item, message));
+            if (sequenceObject.has("message")) message = ChatColor.translateAlternateColorCodes('&', sequenceObject.get("message").getAsString());
+            String holoContent = null;
+            if (sequenceObject.has("holoContent")) holoContent = ChatColor.translateAlternateColorCodes('&', sequenceObject.get("holoContent").getAsString());
+            scheduledGeneratorUpgrades.add(new ScheduledGeneratorUpgrade(time, interval, item, message, holoContent));
         }
         return new ScheduledGeneratorUpgrader(scheduledGeneratorUpgrades);
     }

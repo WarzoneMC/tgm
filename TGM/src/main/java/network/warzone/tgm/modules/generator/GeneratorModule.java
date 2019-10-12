@@ -75,6 +75,8 @@ public class GeneratorModule extends MatchModule implements TaskedModule {
         for (Generator generator : generators) {
             generator.getGeneratorUpgrader().unload();
         }
+        matchStarted = false;
+        generators = null;
     }
 
 }

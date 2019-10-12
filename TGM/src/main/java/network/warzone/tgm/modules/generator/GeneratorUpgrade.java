@@ -9,4 +9,5 @@ public class GeneratorUpgrade {
     private int interval;
     private ItemStack item;
     private String broadcast;
+    private String holoContent;
 }
