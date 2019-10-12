@@ -76,9 +76,7 @@ public class KillstreakDeserializer implements JsonDeserializer<Killstreak> {
             if(actionObj.has("items")) {
                 Set<ItemStack> items = new HashSet<>();
                 for(JsonElement jsonElem : actionObj.getAsJsonArray("items")) {
-                    if (!jsonElem.isJsonObject()) continue;
-                    JsonObject itemJson = jsonElem.getAsJsonObject();
-                    items.add(ItemDeserializer.parse(itemJson));
+                    items.add(ItemDeserializer.parse(jsonElem));
                 }
                 killstreakActions.add(new ItemKillstreakAction(items));
             }
