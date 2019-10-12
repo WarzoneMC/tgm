@@ -45,11 +45,11 @@ public class GeneratorModule extends MatchModule implements TaskedModule {
     }
 
     private static Generator deserializeGenerator(World matchWorld, JsonObject generatorObject) {
+        assert generatorObject.has("id") : "Generator needs an ID specified";
         assert generatorObject.has("item") : "Generator needs an item specified";
         assert generatorObject.has("location") : "Generator needs a location specified";
         assert generatorObject.has("interval") : "Generator needs a spawnRate specified";
-        String generatorName = ChatColor.YELLOW + "Generator";
-        if (generatorObject.has("name")) generatorName = ChatColor.translateAlternateColorCodes('&', generatorObject.get("name").getAsString());
+        String generatorID = generatorObject.get("id").getAsString();
         ItemStack generatorItem = ItemDeserializer.parse(generatorObject.get("item").getAsJsonObject());
         Location generatorLocation = Parser.convertLocation(matchWorld, generatorObject.get("location"));
         int generatorLimit = 0;
@@ -67,7 +67,7 @@ public class GeneratorModule extends MatchModule implements TaskedModule {
             else generatorUpgrader = ManualGeneratorUpgrader.deserialize(upgradeObject);
 
         }
-        return new Generator(generatorName, generatorItem, generatorLocation, generatorLimit, generatorInterval, generatorHologram, generatorUpgrader);
+        return new Generator(generatorID, generatorItem, generatorLocation, generatorLimit, generatorInterval, generatorHologram, generatorUpgrader);
     }
 
     @Override
