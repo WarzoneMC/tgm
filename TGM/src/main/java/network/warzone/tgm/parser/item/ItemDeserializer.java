@@ -13,7 +13,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,12 +39,22 @@ public class ItemDeserializer implements JsonDeserializer<ItemStack> {
         put(ItemMetaParserType.COLOR,        ItemMetaParserType.COLOR.newDefaultInstance());
     }};
 
+    private static List<ItemMetaParser> extraParsers = new ArrayList<>();
+
     public static ItemMetaParser getItemMetaParser(ItemMetaParserType type) {
         return metaParsers.get(type);
     }
 
     public static void setItemMetaParser(ItemMetaParserType type, ItemMetaParser parser) {
         metaParsers.put(type, parser);
+    }
+
+    public static void addExtraParser(ItemMetaParser itemMetaParser) {
+        extraParsers.add(itemMetaParser);
+    }
+
+    public static void removeExtraParser(ItemMetaParser itemMetaParser) {
+        extraParsers.remove(itemMetaParser);
     }
 
     public static ItemStack parse(JsonObject jsonObject) {
@@ -52,6 +64,9 @@ public class ItemDeserializer implements JsonDeserializer<ItemStack> {
         ItemMeta meta = itemStack.getItemMeta();
         for (ItemMetaParser itemMetaParser : metaParsers.values()) {
             itemMetaParser.parse(itemStack, meta, jsonObject);
+        }
+        for (ItemMetaParser extraParser : extraParsers) {
+            extraParser.parse(itemStack, meta, jsonObject);
         }
         itemStack.setItemMeta(meta);
         return itemStack;
