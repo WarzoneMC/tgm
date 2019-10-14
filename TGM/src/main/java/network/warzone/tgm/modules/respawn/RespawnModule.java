@@ -66,11 +66,12 @@ public class RespawnModule extends MatchModule implements Listener {
                 JsonArray rules = respawnSettings.get("rules").getAsJsonArray();
                 for (JsonElement element : rules) {
                     JsonObject rule = element.getAsJsonObject();
-                    List<MatchTeam> matchTeams = Parser.getTeamsFromElement(teamManagerModule, rule.get("teams"));
+                    List<MatchTeam> matchTeams = new ArrayList<>();
                     int delay = defaultRule.getDelay();
                     boolean freeze = defaultRule.isFreeze();
                     boolean blindness = defaultRule.isBlindness();
                     boolean confirm = defaultRule.isConfirm();
+                    if (rule.has("teams")) matchTeams = Parser.getTeamsFromElement(teamManagerModule, rule.get("teams"));;
                     if (rule.has("delay")) delay = rule.get("delay").getAsInt();
                     if (rule.has("freeze")) freeze = rule.get("freeze").getAsBoolean();
                     if (rule.has("blindness")) blindness = rule.get("blindness").getAsBoolean();
@@ -99,6 +100,7 @@ public class RespawnModule extends MatchModule implements Listener {
     @EventHandler
     public void onPlayerDeath(TGMPlayerDeathEvent event) {
         Player victim = event.getVictim();
+        victim.getWorld().spawnParticle()
         MatchTeam matchTeam = teamManagerModule.getTeam(victim);
 
         if (matchTeam.isSpectator()) return;
@@ -224,7 +226,7 @@ public class RespawnModule extends MatchModule implements Listener {
 
     private RespawnRule getRule(MatchTeam team) {
         for (RespawnRule rule : respawnRules) {
-            if (rule.getTeams().contains(team)) {
+            if (rule.getTeams().isEmpty() || rule.getTeams().contains(team)) {
                 return rule;
             }
         }
