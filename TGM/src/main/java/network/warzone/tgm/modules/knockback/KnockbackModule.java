@@ -40,9 +40,10 @@ public class KnockbackModule extends MatchModule implements Listener {
     }
 
     private void applyBowKnockback(Arrow a, Entity e) {
-        Vector normalVelocity = a.getVelocity().normalize();
-        normalVelocity.setY(normalVelocity.getY() / 1.5);
-        e.setVelocity(normalVelocity.normalize().multiply(0.75f));
+        Vector normalVelocity = a.getVelocity();
+        if (e.isOnGround()) normalVelocity.setY(0.3);
+        else normalVelocity.setY(0);
+        e.setVelocity(normalVelocity.normalize().multiply(0.55f));
     }
 
     private void applyMeleeKnockback(LivingEntity attacker, LivingEntity victim) {
