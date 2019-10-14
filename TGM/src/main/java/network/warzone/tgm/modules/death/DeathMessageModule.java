@@ -57,7 +57,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
     public static void broadcastDeathMessage(Player dead, Player killer, String message, Object... args) {
         message = String.format(message, args);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.getPlayer().sendMessage(message);
+            player.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
     }
 
@@ -72,21 +72,18 @@ public class DeathMessageModule extends MatchModule implements Listener {
         put(DamageCause.ENTITY_ATTACK, Arrays.asList(
                 (d) -> {
                     if (d.killer != null) return false;
-                    broadcastDeathMessage(d.player, null, "%s%s%s died",
+                    broadcastDeathMessage(d.player, null, "%s%s&7 died",
                             d.playerTeam.getColor(),
-                            d.playerName,
-                            ChatColor.GRAY
+                            d.playerName
                     );
                     return true;
                 },
                 (d) -> {
-                    broadcastDeathMessage(d.player, d.killer, "%s%s%s was killed by %s%s%s using %s",
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was killed by %s%s&7 using %s",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             d.killerTeam.getColor(),
                             d.killerName,
-                            ChatColor.GRAY,
                             (d.cause.equals(DamageCause.ENTITY_ATTACK) ? ItemUtils.itemToString(d.item) : "the environment")
 
                     );
@@ -97,32 +94,28 @@ public class DeathMessageModule extends MatchModule implements Listener {
         put(DamageCause.FALL, Arrays.asList(
                 (d) -> {
                     if (d.killer != null) return false;
-                    broadcastDeathMessage(d.player, null, "%s%s%s fell from a high place",
+                    broadcastDeathMessage(d.player, null, "%s%s&7 fell from a high place",
                             d.playerTeam.getColor(),
-                            d.playerName,
-                            ChatColor.GRAY
+                            d.playerName
                     );
                     return true;
                 },
                 (d) -> {
                     if (d.item == null || !d.item.getType().equals(Material.BOW)) return false;
-                    broadcastDeathMessage(d.player, d.killer, "%s%s%s was shot off a high place by %s%s",
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was shot off a high place by %s%s",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             d.killerTeam.getColor(),
                             d.killerName
                     );
                     return true;
                 },
                 (d) -> {
-                    broadcastDeathMessage(d.player, d.killer, "%s%s%s was thrown off a high place by %s%s%s using %s",
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was thrown off a high place by %s%s&7 using %s",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             d.killerTeam.getColor(),
                             d.killerName,
-                            ChatColor.GRAY,
                             ItemUtils.itemToString(d.item)
                     );
                     return true;
@@ -131,32 +124,28 @@ public class DeathMessageModule extends MatchModule implements Listener {
         put(DamageCause.VOID, Arrays.asList(
                 (d) -> {
                     if (d.killer != null) return false;
-                    broadcastDeathMessage(d.player, null, "%s%s%s fell into the void",
+                    broadcastDeathMessage(d.player, null, "%s%s&7 fell into the void",
                             d.playerTeam.getColor(),
-                            d.playerName,
-                            ChatColor.GRAY
+                            d.playerName
                     );
                     return true;
                 },
                 (d) -> {
                     if (d.item == null || !d.item.getType().equals(Material.BOW)) return false;
-                    broadcastDeathMessage(d.player, d.killer, "%s%s%s was shot into the void by %s%s",
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was shot into the void by %s%s",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             d.killerTeam.getColor(),
                             d.killerName
                     );
                     return true;
                 },
                 (d) -> {
-                    broadcastDeathMessage(d.player, d.killer, "%s%s%s was thrown into the void by %s%s%s using %s",
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was thrown into the void by %s%s&7 using %s",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             d.killerTeam.getColor(),
                             d.killerName,
-                            ChatColor.GRAY,
                             ItemUtils.itemToString(d.item)
                     );
                     return true;
@@ -165,10 +154,9 @@ public class DeathMessageModule extends MatchModule implements Listener {
         put(DamageCause.PROJECTILE, Arrays.asList(
                 (d) -> {
                     if (d.killer != null) return false;
-                    broadcastDeathMessage(d.player, null, "%s%s%s was %s to death",
+                    broadcastDeathMessage(d.player, null, "%s%s&7 was %s to death",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             (d.item.getType() == Material.TRIDENT ? "forked" : "shot")
                     );
                     return true;
@@ -176,14 +164,12 @@ public class DeathMessageModule extends MatchModule implements Listener {
                 (d) -> {
                     if (d.item == null) return false;
                     int distance = ((Double) d.killerLocation.distance(d.playerLocation)).intValue();
-                    broadcastDeathMessage(d.player, d.killer, "%s%s%s was %s by %s%s%s from %d%s",
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was %s by %s%s&7 from %d%s",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             (d.item.getType() == Material.TRIDENT ? "forked" : "shot"),
                             d.killerTeam.getColor(),
                             d.killerName,
-                            ChatColor.GRAY,
                             distance,
                             (distance == 1 ? " block" : " blocks")
                     );
@@ -193,18 +179,16 @@ public class DeathMessageModule extends MatchModule implements Listener {
         put(DamageCause.FIRE, Arrays.asList(
                 (d) -> {
                     if (d.killer != null) return false;
-                    broadcastDeathMessage(d.player, null, "%s%s%s burned to death",
+                    broadcastDeathMessage(d.player, null, "%s%s&7 burned to death",
                             d.playerTeam.getColor(),
-                            d.playerName,
-                            ChatColor.GRAY
+                            d.playerName
                     );
                     return true;
                 },
                 (d) -> {
-                    broadcastDeathMessage(d.player, d.killer, "%s%s%s was burned to death by %s%s",
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was burned to death by %s%s",
                             d.playerTeam.getColor(),
                             d.playerName,
-                            ChatColor.GRAY,
                             d.killerTeam.getColor(),
                             d.killerName
                     );
@@ -214,10 +198,9 @@ public class DeathMessageModule extends MatchModule implements Listener {
         put(DamageCause.FIRE_TICK, get(DamageCause.FIRE));
         put(DamageCause.SUFFOCATION, Arrays.asList(
                 (d) -> {
-                    broadcastDeathMessage(d.player, null, "%s%s%s suffocated to death",
+                    broadcastDeathMessage(d.player, null, "%s%s&7 suffocated to death",
                             d.playerTeam.getColor(),
-                            d.playerName,
-                            ChatColor.GRAY
+                            d.playerName
                     );
                     return true;
                 })
