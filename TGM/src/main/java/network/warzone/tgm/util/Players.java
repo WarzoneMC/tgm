@@ -7,8 +7,9 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 
 public class Players {
@@ -31,7 +32,7 @@ public class Players {
             } catch (NullPointerException ignored) {}
         });
 
-        player.setFireTicks(0);
+        player.setFireTicks(-20);
         player.setFallDistance(0);
         player.setTotalExperience(0);
         player.setExp(0);
@@ -56,6 +57,7 @@ public class Players {
             }
         }
         player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 24.000D, AttributeModifier.Operation.ADD_SCALAR));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 1, 0)); // Weird lava bug
 
         player.updateInventory();
     }

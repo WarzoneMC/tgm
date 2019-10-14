@@ -83,12 +83,14 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else {
-                    if (!reset) return;
-                    gameClassModule.performSwitch(playerContext.getPlayer());
-                    GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
-                    if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
-                    playerContext.getPlayer().updateInventory();
+                    if (reset) {
+                        gameClassModule.performSwitch(playerContext.getPlayer());
+                        GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
+                        if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
+                        playerContext.getPlayer().updateInventory();
+                    }
                 }
+                playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
             }, 1L);
         } else
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
@@ -98,10 +100,12 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else {
-                    if (!reset) return;
-                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-                    playerContext.getPlayer().updateInventory();
+                    if (reset) {
+                        matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                        playerContext.getPlayer().updateInventory();
+                    }
                 }
+                playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
             }, 1L);
     }
 
