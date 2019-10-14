@@ -195,6 +195,25 @@ public class DeathMessageModule extends MatchModule implements Listener {
                     return true;
                 }
         ));
+        put(DamageCause.LAVA, Arrays.asList(
+                (d) -> {
+                    if (d.killer != null) return false;
+                    broadcastDeathMessage(d.player, null, "%s%s&7 tried to swim in lava",
+                            d.playerTeam.getColor(),
+                            d.playerName
+                    );
+                    return true;
+                },
+                (d) -> {
+                    broadcastDeathMessage(d.player, d.killer, "%s%s&7 was thrown into lava by %s%s",
+                            d.playerTeam.getColor(),
+                            d.playerName,
+                            d.killerTeam.getColor(),
+                            d.killerName
+                    );
+                    return true;
+                }
+        ));
         put(DamageCause.FIRE_TICK, get(DamageCause.FIRE));
         put(DamageCause.SUFFOCATION, Arrays.asList(
                 (d) -> {
