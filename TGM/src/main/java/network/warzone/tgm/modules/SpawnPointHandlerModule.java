@@ -65,7 +65,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport, boolean firstSpawn) {
         boolean reset = firstSpawn || !match.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
-        if (reset) Players.reset(playerContext.getPlayer(), true);
+        Players.reset(playerContext.getPlayer(), true, !reset);
 
         if (teleport) {
             MatchManager matchManager = TGM.get().getMatchManager();
@@ -77,13 +77,13 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
-        if (!reset) return;
         if (gameClassModule != null) {
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
                 if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else {
+                    if (!reset) return;
                     gameClassModule.performSwitch(playerContext.getPlayer());
                     GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
                     if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
@@ -98,6 +98,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else {
+                    if (!reset) return;
                     matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
                     playerContext.getPlayer().updateInventory();
                 }

@@ -13,13 +13,17 @@ import java.util.UUID;
 
 public class Players {
 
-    public static void reset(Player player, boolean heal) {
-        if (heal) player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
-        player.setFoodLevel(20);
-        player.setSaturation(20);
-        player.getInventory().clear();
-        player.getInventory().setArmorContents(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR)});
-        player.setItemOnCursor(new ItemStack(Material.AIR));
+    public static void reset(Player player, boolean heal, boolean keepInv) {
+        if (heal) {
+            player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            player.setFoodLevel(20);
+            player.setSaturation(20);
+        }
+        if (!keepInv) {
+            player.getInventory().clear();
+            player.getInventory().setArmorContents(new ItemStack[]{new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR)});
+            player.setItemOnCursor(new ItemStack(Material.AIR));
+        }
 
         player.getActivePotionEffects().forEach(potionEffect -> {
             try {
@@ -43,10 +47,12 @@ public class Players {
 
         player.resetTitle();
 
-        for (Attribute attribute : Attribute.values()) {
-            if (player.getAttribute(attribute) == null) continue;
-            for (AttributeModifier modifier : player.getAttribute(attribute).getModifiers()) {
-                player.getAttribute(attribute).removeModifier(modifier);
+        if (!keepInv) {
+            for (Attribute attribute : Attribute.values()) {
+                if (player.getAttribute(attribute) == null) continue;
+                for (AttributeModifier modifier : player.getAttribute(attribute).getModifiers()) {
+                    player.getAttribute(attribute).removeModifier(modifier);
+                }
             }
         }
         player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 24.000D, AttributeModifier.Operation.ADD_SCALAR));
