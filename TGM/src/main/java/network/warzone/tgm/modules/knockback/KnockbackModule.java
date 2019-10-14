@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.knockback;
 
 import network.warzone.tgm.match.MatchModule;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,15 +16,16 @@ public class KnockbackModule extends MatchModule implements Listener {
 
     @EventHandler(priority= EventPriority.NORMAL)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity)) return;
+        LivingEntity livingEntity = (LivingEntity) event.getEntity();
         if (event.getDamager() instanceof Arrow) {
-            Entity e = event.getEntity();
             Arrow arrow = (Arrow) event.getDamager();
             event.setDamage(event.getDamage() / 1.75);
-            applyBowKnockback(arrow, e);
+            applyBowKnockback(arrow, livingEntity);
         }
 
-        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getDamager() instanceof LivingEntity && event.getEntity() instanceof Player) {
-            applyMeleeKnockback((LivingEntity) event.getDamager(), (Player) event.getEntity());
+        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getDamager() instanceof LivingEntity) {
+            applyMeleeKnockback((LivingEntity) event.getDamager(), livingEntity);
         }
     }
 
@@ -39,12 +41,12 @@ public class KnockbackModule extends MatchModule implements Listener {
 
     private void applyBowKnockback(Arrow a, Entity e) {
         Vector normalVelocity = a.getVelocity().normalize();
-        normalVelocity.setY(normalVelocity.getY() / 3);
-        e.setVelocity(normalVelocity.normalize().multiply(0.15f));
+        normalVelocity.setY(normalVelocity.getY() / 1.5);
+        e.setVelocity(normalVelocity.normalize().multiply(0.75f));
     }
 
-    private void applyMeleeKnockback(LivingEntity attacker, Player victim) {
-        Vector kb = attacker.getLocation().getDirection().setY(0).normalize().multiply(0.65f);
+    private void applyMeleeKnockback(LivingEntity attacker, LivingEntity victim) {
+        Vector kb = attacker.getLocation().getDirection().setY(victim.isOnGround() ? 0.4 : 0).normalize().multiply(0.25f);
         victim.setVelocity(kb);
     }
 
