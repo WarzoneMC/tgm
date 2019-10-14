@@ -67,6 +67,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
         event.setDeathMessage("");
     }
 
+    @Getter
     private Map<DamageCause, List<DeathMessageEvaluator>> deathMessages = new LinkedHashMap<DamageCause, List<DeathMessageEvaluator>>() {{
         put(DamageCause.ENTITY_ATTACK, Arrays.asList(
                 (d) -> {
