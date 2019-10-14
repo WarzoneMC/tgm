@@ -34,7 +34,7 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true,  Integer.MAX_VALUE, 0));
+        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true,  Integer.MAX_VALUE, 0, false));
 
         for (ParsedTeam parsedTeam : match.getMapContainer().getMapInfo().getTeams()) {
             teams.add(new MatchTeam(
@@ -43,7 +43,8 @@ public class TeamManagerModule extends MatchModule implements Listener {
                     parsedTeam.getTeamColor(),
                     false,
                     parsedTeam.getMax(),
-                    parsedTeam.getMin()
+                    parsedTeam.getMin(),
+                    parsedTeam.isFriendlyFire()
             ));
         }
     }

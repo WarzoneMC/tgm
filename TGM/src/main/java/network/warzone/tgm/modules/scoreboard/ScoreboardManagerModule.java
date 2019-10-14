@@ -111,7 +111,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         team.setColor(matchTeam.getColor());
         team.setPrefix(matchTeam.getColor() + " "); // Hacky fix for team colors not showing up in older versions
         team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
-        team.setAllowFriendlyFire(false);
+        team.setAllowFriendlyFire(matchTeam.isFriendlyFire());
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 
         for (PlayerContext player : matchTeam.getMembers()) {

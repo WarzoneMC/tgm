@@ -47,7 +47,7 @@ public class EntityDamageModule extends MatchModule implements Listener {
             Player damaged = (Player) event.getEntity();
             Player playerShooter = (Player) shooter;
             MatchTeam damagedTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(damaged);
-            if(damagedTeam == null || damagedTeam.containsPlayer(playerShooter)) return;
+            if(damagedTeam == null) return;
             if(!damagedTeam.isSpectator() && (damaged.getHealth() - event.getFinalDamage() >= 0)) playerShooter.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(damagedTeam.getColor() + damaged.getName() + ChatColor.DARK_GRAY + " [" + ChatColor.WHITE + ((int)damaged.getHealth() - (int) event.getFinalDamage()) + ChatColor.GRAY + "/" + damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() + ChatColor.DARK_GRAY + "]"));
         }
     }
