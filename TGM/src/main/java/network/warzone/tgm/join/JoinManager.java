@@ -212,11 +212,6 @@ public class JoinManager implements Listener {
         handleQuit(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onKick(PlayerKickEvent event) {
-        handleQuit(event.getPlayer());
-    }
-
     private void handleQuit(Player player) {
         TGM.get().getPlayerManager().removePlayer(TGM.get().getPlayerManager().getPlayerContext(player));
         Ranks.removeAttachment(player);
