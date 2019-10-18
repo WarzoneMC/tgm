@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -82,14 +83,15 @@ public class MetaRegion implements Region {
             maxY = r.getMax().getBlockY();
             maxZ = r.getMax().getBlockZ();
             for (Region region : getRegions()) {
-                Block b = region.getMin().getBlock();
-                if (minX > b.getX()) minX = region.getMin().getBlockX();
-                if (minY > b.getY()) minY = region.getMin().getBlockY();
-                if (minZ > b.getZ()) minZ = region.getMin().getBlockZ();
+                Block min = region.getMin().getBlock();
+                Block max = region.getMax().getBlock();
+                if (minX > min.getX()) minX = min.getX();
+                if (minY > min.getY()) minY = min.getY();
+                if (minZ > min.getZ()) minZ = min.getZ();
 
-                if (maxX < b.getX()) maxX = region.getMax().getBlockX();
-                if (maxY < b.getY()) maxY = region.getMax().getBlockY();
-                if (maxZ < b.getZ()) maxZ = region.getMax().getBlockZ();
+                if (maxX < max.getX()) maxX = max.getX();
+                if (maxY < max.getY()) maxY = max.getY();
+                if (maxZ < max.getZ()) maxZ = max.getZ();
             }
         }
         this.min = new Location(world, minX, minY, minZ);
