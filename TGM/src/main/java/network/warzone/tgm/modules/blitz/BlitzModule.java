@@ -10,6 +10,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.respawn.RespawnModule;
+import network.warzone.tgm.modules.respawn.RespawnRule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -54,6 +55,8 @@ public class BlitzModule extends MatchModule implements Listener {
 
     private Match match;
 
+    private final RespawnRule respawnRule = new RespawnRule(null, 3000, false, false, false);
+
     @Override
     public void load(Match match) {
         this.match = match;
@@ -80,6 +83,7 @@ public class BlitzModule extends MatchModule implements Listener {
         }
 
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getBiggestTeam);
+        TGM.get().getModule(RespawnModule.class).setDefaultRule(respawnRule);
         TGM.get().getModule(RespawnModule.class).addRespawnService(this::isAlive);
     }
 
@@ -116,7 +120,7 @@ public class BlitzModule extends MatchModule implements Listener {
         livesDisplayTaskId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (teamManagerModule.getTeam(player).isSpectator()) return;
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName()))));
+                player.sendActionBar(ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())));
             }
         }, 2L, 2L).getTaskId();
     }
@@ -262,7 +266,7 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     private List<PlayerContext> getAlivePlayers(MatchTeam matchTeam) {
-        return matchTeam.getMembers().stream().filter(playerContext -> playerContext.getPlayer().getGameMode() != GameMode.SPECTATOR || isAlive(playerContext.getPlayer())).collect(Collectors.toList());
+        return matchTeam.getMembers().stream().filter(playerContext -> isAlive(playerContext.getPlayer())).collect(Collectors.toList());
     }
 
 }
