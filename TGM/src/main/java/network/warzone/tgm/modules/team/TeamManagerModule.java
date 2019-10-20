@@ -14,7 +14,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
@@ -46,6 +48,18 @@ public class TeamManagerModule extends MatchModule implements Listener {
                     parsedTeam.getMin(),
                     parsedTeam.isFriendlyFire()
             ));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        Player damager = (Player) event.getDamager();
+        MatchTeam team = getTeam(player);
+        if (!team.isFriendlyFire() && team.equals(getTeam(damager))) {
+            event.setCancelled(true);
+            event.setDamage(0);
         }
     }
 
