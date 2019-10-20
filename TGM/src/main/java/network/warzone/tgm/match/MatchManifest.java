@@ -54,6 +54,7 @@ public abstract class MatchManifest {
 
         modules.add(new TeamJoinNotificationsModule());
         modules.add(new SpectatorModule());
+        modules.add(new InventoryPreviewModule());
         modules.add(new SpawnPointHandlerModule());
         modules.add(new SpawnPointLoaderModule());
         modules.add(new TeamManagerModule());
