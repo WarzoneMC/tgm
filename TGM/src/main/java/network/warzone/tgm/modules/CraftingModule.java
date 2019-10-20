@@ -36,7 +36,7 @@ public class CraftingModule extends MatchModule implements Listener {
                 if (crafting.get("remove").isJsonArray()) {
                     for (JsonElement jsonElement : crafting.getAsJsonArray("remove")) {
                         if (!jsonElement.isJsonPrimitive()) continue;
-                        Material mat = Material.valueOf(jsonElement.getAsString());
+                        Material mat = Material.valueOf(Strings.getTechnicalName(jsonElement.getAsString()));
                         if (mat == null) continue;
                         this.removedRecipes.add(mat);
                     }
