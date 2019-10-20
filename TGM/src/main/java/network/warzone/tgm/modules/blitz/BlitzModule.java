@@ -169,7 +169,7 @@ public class BlitzModule extends MatchModule implements Listener {
         if (getLives(player) <= 0) {
 
             if (player.getLocation().getY() < 0) {
-                player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation());
             }
 
             MatchTeam team = teamManagerModule.getTeam(player);
@@ -180,7 +180,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
         } else {
             showLives(player);
-            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation());
         }
     }
 

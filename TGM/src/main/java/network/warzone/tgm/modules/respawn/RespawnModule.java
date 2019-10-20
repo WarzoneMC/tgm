@@ -185,9 +185,9 @@ public class RespawnModule extends MatchModule implements Listener {
 
             if (event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
                 if (event.getKiller() != null) {
-                    player.teleport(event.getKiller().getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    player.teleport(event.getKiller().getLocation());
                 } else {
-                    player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation());
                 }
             }
 

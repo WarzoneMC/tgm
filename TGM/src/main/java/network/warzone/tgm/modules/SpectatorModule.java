@@ -308,7 +308,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                     ChatColor teamColor = entry.getValue();
                     teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
                             (clicker, clickEvent) -> {
-                        if (player.isOnline()) clicker.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        if (player.isOnline()) clicker.teleport(player.getLocation());
                     });
                     i++;
                     if (i >= size) break;
