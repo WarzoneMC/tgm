@@ -13,6 +13,7 @@ public class FireworkDamageModule extends MatchModule implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Firework) {
             event.setCancelled(true);
+            event.setDamage(0);
         }
     }
 }
