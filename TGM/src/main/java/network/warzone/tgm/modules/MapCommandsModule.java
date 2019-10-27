@@ -5,9 +5,9 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 
 public class MapCommandsModule extends MatchModule {
-    Match match;
 
-    String startCommand;
+    private Match match;
+    private String startCommand;
 
     @Override
     public void enable() {

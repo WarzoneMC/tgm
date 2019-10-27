@@ -6,7 +6,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 
 import java.util.List;
 
-@Getter @AllArgsConstructor
+@AllArgsConstructor @Getter
 public class RespawnRule {
 
        private List<MatchTeam> teams;

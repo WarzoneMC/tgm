@@ -47,7 +47,7 @@ public class Levels {
      *
      * Returns the total XP needed to get to the specified level.
      *
-     * @param level target level
+     * @param l target level
      *
      */
     public static int getXPRequiredForLevel(int l) {

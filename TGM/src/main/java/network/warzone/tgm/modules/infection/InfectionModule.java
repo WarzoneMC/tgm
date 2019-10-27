@@ -136,7 +136,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     public void processSecond(int elapsed) {
         int diff = (length * 60) - elapsed;
-        if(diff < 0) diff = 0;
+        if (diff < 0) diff = 0;
         timeScoreboardValue = ChatColor.WHITE + "Time left: " + ChatColor.AQUA + Strings.formatTime(diff);
         for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
     }
@@ -153,13 +153,13 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
 
     private void refreshScoreboard(SimpleScoreboard board) {
-        if(board == null) return;
+        if (board == null) return;
         teamScoreboardLines.forEach((i, s) -> board.add(s, i));
         refreshOnlyDynamicScoreboard(board);
     }
 
     private void refreshOnlyDynamicScoreboard(SimpleScoreboard board) {
-        if(board == null) return;
+        if (board == null) return;
         teamAliveScoreboardLines.forEach((id, i) -> board.add(
                 "  " + ChatColor.YELLOW + teamManager.getTeamById(id).getMembers().size() + ChatColor.WHITE + " alive", i));
         board.add(timeScoreboardValue, timeScoreboardLine);
@@ -177,8 +177,8 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         teamAliveScoreboardLines.clear();
         int positionOnScoreboard = 1;
         int spaceCount = 1;
-        for(MatchTeam team : teamManager.getTeams()) {
-            if(team.isSpectator()) continue;
+        for (MatchTeam team : teamManager.getTeams()) {
+            if (team.isSpectator()) continue;
             teamScoreboardLines.put(positionOnScoreboard, StringUtils.repeat(" ", spaceCount++));
             positionOnScoreboard++;
             teamAliveScoreboardLines.put(team.getId(), positionOnScoreboard);
@@ -226,7 +226,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
         if (event.isCancelled()) return;
-        if(defaultScoreboardLoaded) {
+        if (defaultScoreboardLoaded) {
             for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
         }
         if (teamManager.getTeamById("humans").getMembers().size() == 0 && match.getMatchStatus().equals(MatchStatus.MID)) {

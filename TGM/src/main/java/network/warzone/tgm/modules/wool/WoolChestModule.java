@@ -43,7 +43,7 @@ public class WoolChestModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onOpen(InventoryOpenEvent event) {
-        if (event.getInventory().getLocation() == null || event.getInventory().getLocation().getBlock() == null) return;
+        if (event.getInventory().getLocation() == null) return;
         BlockState state = event.getInventory().getLocation().getBlock().getState();
 
         if (state instanceof Chest) {
@@ -100,7 +100,7 @@ public class WoolChestModule extends MatchModule implements Listener {
 
     private void registerInventory(Inventory inventory) {
         for (ItemStack itemStack : inventory.getContents()) {
-            if (itemStack != null && itemStack.getType() != null && itemStack.getData() != null &&
+            if (itemStack != null && itemStack.getData() != null &&
                     itemStack.getType().name().contains("WOOL")) {
                 woolChests.put(inventory.getHolder(), itemStack);
                 fillInventoryWithWool(inventory, itemStack);

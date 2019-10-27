@@ -8,7 +8,6 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.util.Strings;
-import network.warzone.tgm.util.TitleAPI;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

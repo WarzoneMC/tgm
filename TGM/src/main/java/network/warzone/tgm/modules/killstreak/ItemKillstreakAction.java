@@ -8,10 +8,12 @@ import java.util.Set;
 
 @AllArgsConstructor
 class ItemKillstreakAction implements KillstreakAction {
+
     private Set<ItemStack> items;
+
     @Override
     public void apply(Player killer) {
-        for(ItemStack item : items) killer.getInventory().addItem(item);
+        for (ItemStack item : items) killer.getInventory().addItem(item);
         killer.updateInventory();
     }
 }
