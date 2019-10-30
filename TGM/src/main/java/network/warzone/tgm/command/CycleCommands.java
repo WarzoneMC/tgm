@@ -420,7 +420,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"killstreak", "ks"}, max = 1, usage = "[player]", desc = "See your current killstreak") // TODO FIX NPE WHEN /ks PLAYER is offline!!!
+    @Command(aliases = {"killstreak", "ks"}, max = 1, usage = "[player]", desc = "See your current killstreak")
     public static void killstreak(CommandContext cmd, CommandSender sender) {
         boolean otherPlayer;
         Player player;
