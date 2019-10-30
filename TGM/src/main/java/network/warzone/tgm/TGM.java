@@ -24,6 +24,7 @@ import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.parser.item.ItemDeserializer;
 import network.warzone.tgm.player.PlayerManager;
+import network.warzone.tgm.util.TextManager;
 import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.client.http.HttpClient;
@@ -43,7 +44,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 
 import java.io.IOException;
-import java.util.Date;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Properties;
 
@@ -58,6 +59,7 @@ public class TGM extends JavaPlugin {
     private Gson gson;
     private TeamClient teamClient;
 
+    private TextManager textManager;
     private MatchManager matchManager;
     private PlayerManager playerManager;
     private JoinManager joinManager;
@@ -69,18 +71,27 @@ public class TGM extends JavaPlugin {
     private CommandsManager<CommandSender> commands;
     private CommandsManagerRegistration commandManager;
 
-    @Getter private long startupTime;
+    @Getter private long startTime, loadTime;
+    @Getter private boolean apiEnabled;
 
     public static TGM get() {
         return instance;
     }
 
     @Override
+    public void onLoad() {
+        startTime = System.currentTimeMillis();
+    }
+
+    @Override
     public void onEnable() {
         instance = this;
-        this.startupTime = new Date().getTime();
-        FileConfiguration fileConfiguration = getConfig();
+
+        FileConfiguration fileConfig = getConfig();
         saveDefaultConfig();
+
+        ConfigurationSection apiConfig = fileConfig.getConfigurationSection("api");
+        boolean apiEnabled = this.apiEnabled = (apiConfig != null && apiConfig.getBoolean("enabled"));
 
         gson = new GsonBuilder()
                 // TGM
@@ -92,8 +103,7 @@ public class TGM extends JavaPlugin {
 
                 .create();
 
-        ConfigurationSection apiConfig = fileConfiguration.getConfigurationSection("api");
-        if (apiConfig != null && apiConfig.getBoolean("enabled")) {
+        if (apiEnabled) {
             teamClient = new HttpClient(new HttpClientConfig() {
                 @Override
                 public String getBaseUrl() {
@@ -116,19 +126,20 @@ public class TGM extends JavaPlugin {
             }
         };
 
-        matchManager = new MatchManager(fileConfiguration);
+        textManager = new TextManager();
+        matchManager = new MatchManager(fileConfig);
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
         apiManager = new ApiManager();
         broadcastManager = new BroadcastManager();
 
-        this.commandManager = new CommandsManagerRegistration(this, this.commands);
+        commandManager = new CommandsManagerRegistration(this, commands);
 
-        commandManager.register(CycleCommands.class);
         commandManager.register(BroadcastCommands.class);
+        commandManager.register(CycleCommands.class);
         commandManager.register(MiscCommands.class);
         commandManager.register(NickCommands.class);
-        if (apiConfig.getBoolean("enabled", false)) {
+        if (apiEnabled) {
             commandManager.register(PunishCommands.class);
             commandManager.register(RankCommands.class);
         }
@@ -138,7 +149,10 @@ public class TGM extends JavaPlugin {
         GameRuleModule.setGameRuleDefaults(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
         matchManager.cycleNextMatch();
-        nickManager = new NickManager(); 
+        nickManager = new NickManager();
+
+        loadTime = System.currentTimeMillis() - startTime;
+        getLogger().info("TGM Fully Enabled. Took " + new DecimalFormat("#.###").format(loadTime / 1000d) + "s!");
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.HoverEvent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.nickname.ProfileCache;
 import network.warzone.tgm.util.Players;
@@ -41,11 +40,18 @@ public class MiscCommands {
         sender.sendMessage(pingMsg);
     }
 
-    // TODO: Provide more essential info
+    @Command(aliases = {"help"}, desc = "")
+    public static void help(CommandContext commandContext, CommandSender sender) {
+        sender.sendMessage(TGM.get().getTextManager().getMessage("command.help.general"));
+    }
+
+    //TODO Provide more essential info
+    //TODO Split into sub commands, add a reload and general info command. (Show info by default) Suggested format: /tgm <reload|info|debug>
+    //TODO Base reload should reload everything but allow selecting just messages, persistent modules, etc.
     @Command(aliases = {"tgm"}, desc = "Get essential server info.")
     @CommandPermissions({"tgm.command.tgm"})
     public static void tgm(CommandContext commandContext, CommandSender sender) {
-        String uptime = Strings.getFullAgo(TGM.get().getStartupTime());
+        String uptime = Strings.getFullAgo(TGM.get().getStartTime());
 
         sender.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "SERVER INFO");
         sender.sendMessage(String.format("%sUptime: %s%s", ChatColor.GRAY, ChatColor.WHITE, uptime));
