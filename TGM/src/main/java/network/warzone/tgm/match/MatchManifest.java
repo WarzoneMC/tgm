@@ -11,18 +11,18 @@ import network.warzone.tgm.modules.damage.DamageControlModule;
 import network.warzone.tgm.modules.damage.FireworkDamageModule;
 import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
-import network.warzone.tgm.modules.launchpad.LaunchPadLoaderModule;
-import network.warzone.tgm.modules.launchpad.LaunchPadModule;
-import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
+import network.warzone.tgm.modules.generator.GeneratorModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.knockback.KnockbackModule;
+import network.warzone.tgm.modules.launchpad.LaunchPadLoaderModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.portal.PortalLoaderModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.reports.ReportsModule;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -94,6 +94,7 @@ public abstract class MatchManifest {
         modules.add(new CraftingModule());
 
         if (GameClassModule.isUsingClasses(mapJson)) modules.add(new GameClassModule());
+        if (GeneratorModule.hasGenerators(mapJson)) modules.add(new GeneratorModule());
 
         return modules;
     }
