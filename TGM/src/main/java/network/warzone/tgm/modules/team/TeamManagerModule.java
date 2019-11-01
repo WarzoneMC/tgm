@@ -12,6 +12,7 @@ import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,13 +37,14 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true,  Integer.MAX_VALUE, 0, false));
+        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, GameMode.ADVENTURE, true,  Integer.MAX_VALUE, 0, false));
 
         for (ParsedTeam parsedTeam : match.getMapContainer().getMapInfo().getTeams()) {
             teams.add(new MatchTeam(
                     parsedTeam.getId(),
                     parsedTeam.getAlias(),
                     parsedTeam.getTeamColor(),
+                    parsedTeam.getTeamGamemode(),
                     false,
                     parsedTeam.getMax(),
                     parsedTeam.getMin(),

@@ -289,7 +289,7 @@ public class FFAModule extends MatchModule implements Listener {
         ScoreboardManagerModule scoreboardManagerModule = match.getModule(ScoreboardManagerModule.class);
 
         if (this.teamManagerModule.getTeamByAlias("winner") == null) {
-            this.teamManagerModule.addTeam(new MatchTeam("winner", player, ChatColor.YELLOW, false, 0, 1, true));
+            this.teamManagerModule.addTeam(new MatchTeam("winner", player, ChatColor.YELLOW, GameMode.SURVIVAL, false, 0, 1, true));
             TGM.get().getPlayerManager().getPlayers().forEach(playerContext -> {
                 scoreboardManagerModule.registerScoreboardTeam(
                         scoreboardManagerModule.getScoreboard(playerContext.getPlayer()),

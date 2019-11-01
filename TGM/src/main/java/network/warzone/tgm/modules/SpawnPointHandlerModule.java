@@ -75,7 +75,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             playerContext.getPlayer().setAllowFlight(true);
             playerContext.getPlayer().setFlying(true);
             playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
-            if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
+            if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(matchTeam.getGamemode());
         }
         if (gameClassModule != null) {
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {

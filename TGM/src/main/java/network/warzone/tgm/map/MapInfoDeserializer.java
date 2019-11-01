@@ -4,10 +4,12 @@ import com.google.gson.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.nickname.ProfileCache;
+import network.warzone.tgm.util.Strings;
 import network.warzone.warzoneapi.models.Author;
 import network.warzone.warzoneapi.models.MojangProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -56,10 +58,11 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
             String teamId = teamJson.get("id").getAsString();
             String teamName = teamJson.get("name").getAsString();
             ChatColor teamColor = ChatColor.valueOf(teamJson.get("color").getAsString().toUpperCase().replace(" ", "_"));
+            GameMode teamGamemode = teamJson.has("gamemode") ? GameMode.valueOf(Strings.getTechnicalName(teamJson.get("gamemode").getAsString())) : GameMode.SURVIVAL;
             int teamMax = teamJson.get("max").getAsInt();
             int teamMin = teamJson.get("min").getAsInt();
             boolean friendlyFire = teamJson.has("friendlyFire") && teamJson.get("friendlyFire").getAsBoolean();
-            parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamMax, teamMin, friendlyFire));
+            parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamGamemode, teamMax, teamMin, friendlyFire));
         }
 
         return new MapInfo(name, version, authors, gameType, parsedTeams, json);
