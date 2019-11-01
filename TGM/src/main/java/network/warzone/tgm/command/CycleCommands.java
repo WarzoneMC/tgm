@@ -15,10 +15,8 @@ import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.chat.ChatChannel;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.chat.ChatModule;
-import network.warzone.tgm.modules.countdown.Countdown;
-import network.warzone.tgm.modules.countdown.CycleCountdown;
-import network.warzone.tgm.modules.countdown.StartCountdown;
-import network.warzone.tgm.modules.gametypes.ffa.FFAModule;
+import network.warzone.tgm.modules.countdown.*;
+import network.warzone.tgm.modules.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -34,12 +32,15 @@ import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CycleCommands {
@@ -698,6 +699,115 @@ public class CycleCommands {
             viewStats(sender, sender.getName());
         } else {
             viewStats(sender, cmd.getString(0));
+        }
+    }
+
+    @Command(aliases = {"countdown", "cd"}, desc = "Manage custom countdowns", usage = "<list|start|create|edit|cancel>", min = 1)
+    public static void countdown(CommandContext cmd, CommandSender sender) throws CommandNumberFormatException {
+        CountdownManagerModule countdownManagerModule = TGM.get().getModule(CountdownManagerModule.class);
+        if (cmd.getString(0).equalsIgnoreCase("list")) {
+            Map<String, CustomCountdown> countdowns = countdownManagerModule.getCustomCountdowns();
+            if (countdowns.size() > 0) {
+                sender.sendMessage(ChatColor.GREEN + "Registered countdowns:");
+                countdowns.forEach((id, cd) -> sender.sendMessage(" - " + id));
+            } else {
+                sender.sendMessage(ChatColor.RED + "There are no registered countdowns.");
+            }
+        }
+        else if (cmd.getString(0).equalsIgnoreCase("start")) {
+            if (cmd.argsLength() <= 1) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " start (id)");
+                return;
+            }
+            CustomCountdown countdown = countdownManagerModule.getCountdown(cmd.getString(1));
+            if (countdown == null) {
+                sender.sendMessage(ChatColor.RED + "Unknown countdown.");
+                return;
+            }
+            if (cmd.argsLength() <= 2) countdown.start();
+            else countdown.start(cmd.getInteger(2));
+            if (sender instanceof Player) sender.sendMessage(ChatColor.GREEN + "Countdown started.");
+        } else if (cmd.getString(0).equalsIgnoreCase("create")) {
+            if (cmd.argsLength() <= 3) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " create <id> <time> <title> [color] [style] [visible] [invert] [teams] [onFinish]");
+                return;
+            }
+            String id = cmd.getString(1);
+            int time = cmd.getInteger(2);
+            String title = cmd.getString(3);
+            BarColor color = cmd.argsLength() > 4 ? BarColor.valueOf(Strings.getTechnicalName(cmd.getString(4))) : BarColor.PURPLE;
+            BarStyle style = cmd.argsLength() > 5 ? BarStyle.valueOf(Strings.getTechnicalName(cmd.getString(5))) : BarStyle.SOLID;
+            boolean visible = cmd.argsLength() <= 6 || Boolean.parseBoolean(cmd.getString(6));
+            boolean invert = cmd.argsLength() > 7 && Boolean.parseBoolean(cmd.getString(7));
+            List<MatchTeam> teams = cmd.argsLength() > 8 ?
+                    Arrays.stream(cmd.getString(8).split(",")).map(t -> TGM.get().getModule(TeamManagerModule.class).getTeamById(t)).collect(Collectors.toList()) :
+                    new ArrayList<>();
+            List<String> onFinish = cmd.argsLength() > 9 ?
+                    Arrays.asList(cmd.getString(9).split(",")) :
+                    new ArrayList<>();
+            countdownManagerModule.addCountdown(id, new CustomCountdown(time, title, color, style, visible, invert, teams, onFinish));
+            sender.sendMessage(ChatColor.GREEN + "Created new countdown.");
+        } else if (cmd.getString(0).equalsIgnoreCase("edit")) {
+            if (cmd.argsLength() < 3) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <id> <time|title|color|style|visible|invert|teams|onFinish> <value>");
+                return;
+            }
+            String id = cmd.getString(1);
+            CustomCountdown countdown = countdownManagerModule.getCountdown(id);
+            switch (cmd.getString(2)) {
+                case "time":
+                    countdown.setTime(cmd.getInteger(3));
+                    break;
+                case "title":
+                    countdown.setTitle(cmd.getRemainingString(3));
+                    break;
+                case "color":
+                    countdown.setColor(BarColor.valueOf(Strings.getTechnicalName(cmd.getRemainingString(3))));
+                    break;
+                case "style":
+                    countdown.setStyle(BarStyle.valueOf(Strings.getTechnicalName(cmd.getRemainingString(3))));
+                    break;
+                case "visible":
+                    countdown.setVisible(Boolean.parseBoolean(cmd.getString(3)));
+                    break;
+                case "invert":
+                    countdown.setInvert(Boolean.parseBoolean(cmd.getString(3)));
+                    break;
+                case "teams":
+                    if (cmd.getRemainingString(3).equalsIgnoreCase("-")) {
+                        countdown.setTeams(new ArrayList<>());
+                        break;
+                    }
+                    TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+                    countdown.setTeams(Arrays.stream(cmd.getRemainingString(3).split(";")).map(teamManagerModule::getTeamFromInput).collect(Collectors.toList()));
+                    break;
+                case "onFinish":
+                    if (cmd.getRemainingString(3).equalsIgnoreCase("-")) {
+                        countdown.setOnFinish(new ArrayList<>());
+                        break;
+                    }
+                    countdown.setOnFinish(Arrays.asList(cmd.getRemainingString(3).split(";")));
+                    break;
+                default:
+                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <id> <time|title|color|style|visible|invert|teams|onFinish> [value]");
+                    return;
+            }
+            sender.sendMessage(ChatColor.GREEN + "Updated countdown.");
+        } else if (cmd.getString(0).equalsIgnoreCase("cancel")) {
+            if (cmd.argsLength() < 2) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " cancel <id>");
+                return;
+            }
+            String id = cmd.getString(1);
+            CustomCountdown countdown = countdownManagerModule.getCountdown(id);
+            if (countdown == null) {
+                sender.sendMessage(ChatColor.RED + "Countdown not found!");
+                return;
+            }
+            countdown.cancel();
+            sender.sendMessage(ChatColor.YELLOW + "Countdown cancelled.");
+        } else {
+            sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " <list|start|create|edit|cancel>");
         }
     }
 

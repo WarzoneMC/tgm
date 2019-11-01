@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,7 +43,7 @@ public class ItemRemoveModule extends MatchModule implements Listener {
             for (JsonElement itemElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("itemremove")) {
                 try {
                     // 1.13 temp fix
-                    if(Strings.getTechnicalName(itemElement.getAsString()).equalsIgnoreCase("WOOL")) {
+                    if (Strings.getTechnicalName(itemElement.getAsString()).equalsIgnoreCase("WOOL")) {
                         removed.add(Material.WHITE_WOOL);
                         removed.add(Material.BLACK_WOOL);
                         removed.add(Material.BLUE_WOOL);

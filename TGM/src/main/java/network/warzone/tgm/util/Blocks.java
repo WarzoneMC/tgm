@@ -1,12 +1,11 @@
 package network.warzone.tgm.util;
 
-import com.google.common.collect.Sets;
 import org.bukkit.Material;
 
-import java.util.Set;
-
 public class Blocks {
+
     private static String[] visualChoices = {"WOOL", "CARPET", "TERRACOTTA", "STAINED_GLASS_PANE", "STAINED_GLASS"};
+
     public static boolean isVisualMaterial(Material material) {
         String name = material.name();
         for(String visualChoice : visualChoices) if(name.contains(visualChoice)) return true;

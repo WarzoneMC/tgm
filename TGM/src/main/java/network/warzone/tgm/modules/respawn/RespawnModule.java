@@ -1,6 +1,5 @@
 package network.warzone.tgm.modules.respawn;
 
-import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent;
 import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

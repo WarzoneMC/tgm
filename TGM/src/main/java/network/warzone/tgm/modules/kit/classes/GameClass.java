@@ -37,7 +37,7 @@ public abstract class GameClass {
             Unbreakable.setUnbreakable(item);
 
 
-            if (ArmorType.getArmorType(item) == ArmorType.helmet) {
+            if (ArmorType.getArmorType(item) == ArmorType.HELMET) {
 
                 if (item.getType() == Material.LEATHER_HELMET) {
                     LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
@@ -46,7 +46,7 @@ public abstract class GameClass {
                 }
 
                 player.getInventory().setHelmet(item);
-            } else if (ArmorType.getArmorType(item) == ArmorType.chestplate) {
+            } else if (ArmorType.getArmorType(item) == ArmorType.CHESTPLATE) {
 
                 if (item.getType() == Material.LEATHER_CHESTPLATE) {
                     LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
@@ -55,7 +55,7 @@ public abstract class GameClass {
                 }
 
                 player.getInventory().setChestplate(item);
-            } else if (ArmorType.getArmorType(item) == ArmorType.leggings) {
+            } else if (ArmorType.getArmorType(item) == ArmorType.LEGGINGS) {
 
                 if (item.getType() == Material.LEATHER_LEGGINGS) {
                     LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
@@ -64,7 +64,7 @@ public abstract class GameClass {
                 }
 
                 player.getInventory().setLeggings(item);
-            } else if (ArmorType.getArmorType(item) == ArmorType.boots) {
+            } else if (ArmorType.getArmorType(item) == ArmorType.BOOTS) {
 
                 if (item.getType() == Material.LEATHER_BOOTS) {
                     LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();

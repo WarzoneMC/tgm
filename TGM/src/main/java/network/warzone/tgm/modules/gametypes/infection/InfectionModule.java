@@ -153,13 +153,13 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
 
     private void refreshScoreboard(SimpleScoreboard board) {
-        if(board == null) return;
+        if (board == null) return;
         teamScoreboardLines.forEach((i, s) -> board.add(s, i));
         refreshOnlyDynamicScoreboard(board);
     }
 
     private void refreshOnlyDynamicScoreboard(SimpleScoreboard board) {
-        if(board == null) return;
+        if (board == null) return;
         teamAliveScoreboardLines.forEach((id, i) -> board.add(
                 "  " + ChatColor.YELLOW + teamManager.getTeamById(id).getMembers().size() + ChatColor.WHITE + " alive", i));
         board.add(timeScoreboardValue, timeScoreboardLine);

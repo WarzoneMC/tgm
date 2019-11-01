@@ -18,8 +18,8 @@ import java.util.UUID;
 /**
  * Created by MatrixTunnel on 8/30/2017.
  *
- * https://github.com/gvlfm78/BukkitOldCombatMechanics/blob/master/src/main/java/gvlfm78/plugin/OldCombatMechanics/module/ModulePlayerRegen.java
- * @author gvlfm78 & Rayzr522
+ * https://github.com/kernitus/BukkitOldCombatMechanics/blob/master/src/main/java/kernitus/plugin/OldCombatMechanics/module/ModulePlayerRegen.java
+ * @author kernitus
  */
 public class RegenModule extends MatchModule implements Listener {
 

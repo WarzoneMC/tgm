@@ -2,10 +2,9 @@ package network.warzone.tgm.modules;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import network.warzone.tgm.match.Match;
-import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.match.ModuleData;
-import network.warzone.tgm.match.ModuleLoadTime;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.*;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.tasked.TaskedModule;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.util.InventoryUtil;
@@ -64,7 +63,7 @@ public class InventoryPreviewModule extends MatchModule implements Listener, Tas
     @EventHandler
     public void onInteractBlock(PlayerInteractEvent event) {
         if (!this.isEnabled()) return;
-        if (event.getHand() == EquipmentSlot.OFF_HAND || !spectatorModule.isSpectating(event.getPlayer())) return;
+        if (event.getHand() == EquipmentSlot.OFF_HAND || !isSpectating(event.getPlayer())) return;
         if (event.getClickedBlock() != null && event.getClickedBlock().getState() instanceof Container) {
             Container container = (Container) event.getClickedBlock().getState();
             Inventory clone = this.inventoryClones.get(container.getInventory());
@@ -80,10 +79,10 @@ public class InventoryPreviewModule extends MatchModule implements Listener, Tas
     @EventHandler
     public void onInteractEntity(PlayerInteractEntityEvent event) {
         if (!this.isEnabled()) return;
-        if (event.getHand() == EquipmentSlot.OFF_HAND || !spectatorModule.isSpectating(event.getPlayer())) return;
+        if (event.getHand() == EquipmentSlot.OFF_HAND || !isSpectating(event.getPlayer())) return;
         if (event.getRightClicked() instanceof Player) {
             Player target = (Player) event.getRightClicked();
-            if (spectatorModule.isSpectating(target)) return;
+            if (isSpectating(target)) return;
             Inventory real = target.getInventory();
             Inventory clone = this.inventoryClones.get(real);
             if (clone == null) {
@@ -141,4 +140,12 @@ public class InventoryPreviewModule extends MatchModule implements Listener, Tas
         }
     }
 
+    /**
+     * Different from SpectatorModule.isSpectating().
+     * Respawning players should not be able to preview inventories.
+     */
+    public boolean isSpectating(Player player) {
+        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
+        return matchStatus != MatchStatus.MID || spectatorModule.getSpectators().containsPlayer(player);
+    }
 }
