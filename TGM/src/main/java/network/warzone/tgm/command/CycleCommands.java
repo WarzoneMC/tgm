@@ -16,7 +16,7 @@ import network.warzone.tgm.modules.chat.ChatChannel;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.countdown.*;
-import network.warzone.tgm.modules.ffa.FFAModule;
+import network.warzone.tgm.modules.gametypes.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
