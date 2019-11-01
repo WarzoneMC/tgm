@@ -51,14 +51,14 @@ public class CTWModule extends MatchModule implements Listener {
     public void load(Match match) {
         JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("ctw").getAsJsonObject();
 
-        for (JsonElement monumentElement : dtmJson.getAsJsonArray("wools")) {
-            JsonObject monumentJson = monumentElement.getAsJsonObject();
+        for (JsonElement woolElement : dtmJson.getAsJsonArray("wools")) {
+            JsonObject woolObject = woolElement.getAsJsonObject();
 
-            String name = monumentJson.get("name").getAsString();
-            Region region = match.getModule(RegionManagerModule.class).getRegion(match, monumentJson.get("region"));
-            List<MatchTeam> teams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), monumentJson.get("teams"));
-            String woolColor = Strings.getTechnicalName(monumentJson.get("woolcolor").getAsString()); //TODO 1.13 Temp fix
-            ChatColor color = ChatColor.valueOf(Strings.getTechnicalName(monumentJson.get("color").getAsString()));
+            String name = woolObject.get("name").getAsString();
+            Region region = match.getModule(RegionManagerModule.class).getRegion(match, woolObject.get("region"));
+            List<MatchTeam> teams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), woolObject.get("teams"));
+            String woolColor = Strings.getTechnicalName(woolObject.get("woolcolor").getAsString()); //TODO 1.13 Temp fix
+            ChatColor color = ChatColor.valueOf(Strings.getTechnicalName(woolObject.get("color").getAsString()));
             for (MatchTeam matchTeam : teams) {
                 wools.add(new WoolObjective(name, Material.valueOf(woolColor.toUpperCase() + "_WOOL"), matchTeam, region, color));
             }
