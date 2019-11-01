@@ -63,13 +63,13 @@ public class KillstreakDeserializer implements JsonDeserializer<Killstreak> {
                         }
                     }
                     Set<Color> fadeColors = new HashSet<>();
-                    if (fireworkObj.has("fade_colors")) {
-                        for (JsonElement elem : fireworkObj.getAsJsonArray("fade_colors")) {
+                    if (fireworkObj.has("fadeColors")) {
+                        for (JsonElement elem : fireworkObj.getAsJsonArray("fadeColors")) {
                             fadeColors.add(Color.fromRGB(elem.getAsInt()));
                         }
                     }
                     int fireworkLifetime = fireworkObj.has("lifetime") ? fireworkObj.get("lifetime").getAsInt() : 0;
-                    Location locationOffset = fireworkObj.has("location_offset") ? Parser.convertLocation(match.getWorld(), fireworkObj.get("location_offset")) : new Location(match.getWorld(), 0.0, 0.0, 0.0);
+                    Location locationOffset = fireworkObj.has("locationOffset") ? Parser.convertLocation(match.getWorld(), fireworkObj.get("locationOffset")) : new Location(match.getWorld(), 0.0, 0.0, 0.0);
                     killstreakActions.add(new FireworkKillstreakAction(locationOffset, FireworkEffect.builder().with(FireworkEffect.Type.valueOf(fireworkType)).trail(shouldTrail).flicker(shouldFlicker).withColor(fireworkColors).withFade(fadeColors).build(), fireworkLifetime));
                 }
             }
