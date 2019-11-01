@@ -2,9 +2,9 @@ package network.warzone.tgm.gametype;
 
 import network.warzone.tgm.match.MatchManifest;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.infection.InfectionModule;
+import network.warzone.tgm.modules.gametypes.infection.InfectionModule;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,11 +14,7 @@ public class InfectionManifest extends MatchManifest {
 
     @Override
     public List<MatchModule> allocateGameModules() {
-        return new ArrayList<MatchModule>(){
-            {
-                add(new InfectionModule());
-            }
-        };
+        return Collections.singletonList(new InfectionModule());
     }
 
 }

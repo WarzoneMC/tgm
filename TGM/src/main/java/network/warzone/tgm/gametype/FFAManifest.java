@@ -2,7 +2,7 @@ package network.warzone.tgm.gametype;
 
 import network.warzone.tgm.match.MatchManifest;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.ffa.FFAModule;
+import network.warzone.tgm.modules.gametypes.ffa.FFAModule;
 
 import java.util.ArrayList;
 import java.util.List;

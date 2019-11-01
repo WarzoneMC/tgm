@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.dtm;
+package network.warzone.tgm.modules.gametypes.dtm;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

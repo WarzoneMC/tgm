@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.koth;
+package network.warzone.tgm.modules.gametypes.koth;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

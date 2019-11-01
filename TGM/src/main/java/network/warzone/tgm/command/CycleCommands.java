@@ -18,7 +18,7 @@ import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
-import network.warzone.tgm.modules.ffa.FFAModule;
+import network.warzone.tgm.modules.gametypes.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -357,14 +357,14 @@ public class CycleCommands {
         GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
         MatchStatus matchStatus = matchManager.getMatch().getMatchStatus();
         if (cmd.argsLength() == 0) {
-            if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
+            if (gameType.equals(GameType.BLITZ) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
                 if (!matchStatus.equals(MatchStatus.PRE)) {
                     sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
                     return;
                 }
             }
             if (teamManager.getTeam((Player) sender).isSpectator() || matchStatus.equals(MatchStatus.PRE)) {
-                if (gameType.equals(GameType.Infected)) {
+                if (gameType.equals(GameType.INFECTION)) {
                     if (matchStatus.equals(MatchStatus.MID) || matchStatus.equals(MatchStatus.POST)) {
                         MatchTeam team = teamManager.getTeamById("infected");
                         attemptJoinTeam((Player) sender, team, true);
@@ -388,7 +388,7 @@ public class CycleCommands {
                 return;
             }
 
-            if (gameType.equals(GameType.Infected)) {
+            if (gameType.equals(GameType.INFECTION)) {
                 if (matchStatus.equals(MatchStatus.POST)) {
                     if (!matchTeam.isSpectator()) {
                         sender.sendMessage(ChatColor.RED + "The game has already ended.");
@@ -406,7 +406,7 @@ public class CycleCommands {
                         return;
                     }
                 }
-            } else if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
+            } else if (gameType.equals(GameType.BLITZ) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
                 if (!matchStatus.equals(MatchStatus.PRE)) {
                     sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
                     return;

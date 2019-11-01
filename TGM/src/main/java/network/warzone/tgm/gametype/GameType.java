@@ -8,14 +8,16 @@ import lombok.Getter;
  */
 @AllArgsConstructor @Getter
 public enum GameType {
-    TDM("TDM", TDMManifest.class),
+
+    TDM("Team Death Match", TDMManifest.class),
     KOTH("King of the Hill", KOTHManifest.class),
     DTM("Destroy the Monument", DTMManifest.class),
     CTW("Capture the Wool", CTWManifest.class),
-    Infected("Infection", InfectionManifest.class),
-    Blitz("Blitz", BlitzManifest.class),
-    FFA("FFA", FFAManifest.class);
+    INFECTION("Infection", InfectionManifest.class),
+    BLITZ("Blitz", BlitzManifest.class),
+    FFA("Free for All", FFAManifest.class);
 
     private String name;
     private Class manifest;
+
 }

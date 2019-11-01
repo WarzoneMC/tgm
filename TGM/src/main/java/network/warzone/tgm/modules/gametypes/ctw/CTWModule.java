@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.ctw;
+package network.warzone.tgm.modules.gametypes.ctw;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.tdm;
+package network.warzone.tgm.modules.gametypes.tdm;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;

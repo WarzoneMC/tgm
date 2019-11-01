@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.koth;
+package network.warzone.tgm.modules.gametypes.koth;
 
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.controlpoint.ControlPointDefinition;

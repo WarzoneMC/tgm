@@ -21,7 +21,6 @@ import org.bukkit.GameMode;
 import org.bukkit.GameRule;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 @Getter
@@ -75,7 +74,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             playerContext.getPlayer().setAllowFlight(true);
             playerContext.getPlayer().setFlying(true);
             playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
-            if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
+            if (!matchTeam.isSpectator() && !gameType.equals(GameType.INFECTION)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
         if (gameClassModule != null) {
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
