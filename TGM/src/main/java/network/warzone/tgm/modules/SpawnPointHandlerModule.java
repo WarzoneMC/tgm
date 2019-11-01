@@ -18,6 +18,7 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.GameRule;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -25,12 +26,14 @@ import org.bukkit.util.Vector;
 
 @Getter
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
+    private Match match;
     private TeamManagerModule teamManagerModule;
     private SpectatorModule spectatorModule;
     private GameClassModule gameClassModule;
 
     @Override
     public void load(Match match) {
+        this.match = match;
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
         gameClassModule = TGM.get().getModule(GameClassModule.class);
@@ -40,11 +43,11 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     public void onTeamChange(TeamChangeEvent event) {
         if (event.isCancelled()) return;
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
-            spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
+            spawnPlayer(event.getPlayerContext(), event.getTeam(), true, true);
         }
         //player is joining the server
         else if (event.getOldTeam() == null) {
-            spawnPlayer(event.getPlayerContext(), event.getTeam(), true);
+            spawnPlayer(event.getPlayerContext(), event.getTeam(), true, true);
         }
         //player is swapping teams pre/post match.
         else {
@@ -57,11 +60,12 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
 
-        spawnPlayer(playerContext, matchTeam, true);
+        spawnPlayer(playerContext, matchTeam, true, false);
     }
 
-    public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport) {
-        Players.reset(playerContext.getPlayer(), true);
+    public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport, boolean firstSpawn) {
+        boolean reset = firstSpawn || !match.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
+        Players.reset(playerContext.getPlayer(), true, !reset);
 
         if (teleport) {
             MatchManager matchManager = TGM.get().getMatchManager();
@@ -70,30 +74,39 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             playerContext.getPlayer().setVelocity(new Vector(0, 0, 0));
             playerContext.getPlayer().setAllowFlight(true);
             playerContext.getPlayer().setFlying(true);
-            playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            playerContext.getPlayer().teleport(getTeamSpawn(matchTeam).getLocation());
             if (!matchTeam.isSpectator() && !gameType.equals(GameType.Infected)) playerContext.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
-
         if (gameClassModule != null) {
-            if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
-            if (matchTeam.isSpectator()) {
-                spectatorModule.applySpectatorKit(playerContext);
-            } else {
-                gameClassModule.performSwitch(playerContext.getPlayer());
-                GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
-                if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
-                playerContext.getPlayer().updateInventory();
-            }
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
+                if (matchTeam.isSpectator()) {
+                    spectatorModule.applySpectatorKit(playerContext);
+                } else {
+                    if (reset) {
+                        gameClassModule.performSwitch(playerContext.getPlayer());
+                        GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
+                        if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
+                        playerContext.getPlayer().updateInventory();
+                    }
+                }
+                playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
+            }, 1L);
         } else
-            playerContext.getPlayer().setFlying(false);
-            playerContext.getPlayer().setAllowFlight(false);
+            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
+                playerContext.getPlayer().setFlying(false);
+                playerContext.getPlayer().setAllowFlight(false);
 
-            if (matchTeam.isSpectator()) {
-                spectatorModule.applySpectatorKit(playerContext);
-            } else {
-                matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-                playerContext.getPlayer().updateInventory();
-            }
+                if (matchTeam.isSpectator()) {
+                    spectatorModule.applySpectatorKit(playerContext);
+                } else {
+                    if (reset) {
+                        matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                        playerContext.getPlayer().updateInventory();
+                    }
+                }
+                playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
+            }, 1L);
     }
 
     @Override
@@ -101,7 +114,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (!matchTeam.isSpectator()) {
                 for (PlayerContext player : matchTeam.getMembers()) {
-                    spawnPlayer(player, matchTeam, true);
+                    spawnPlayer(player, matchTeam, true, true);
                 }
             }
         }

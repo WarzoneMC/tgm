@@ -105,7 +105,7 @@ public class MatchManager {
 
         // Transport all players to the new world so we can unload the old one.
         Bukkit.getOnlinePlayers().forEach(player ->
-                player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
+                player.teleport(world.getSpawnLocation()));
 
         //create and load the match.
         Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
@@ -120,7 +120,7 @@ public class MatchManager {
         //if a match is currently running, unload it.
         if (oldMatch != null) {
             oldMatch.getWorld().getPlayers().forEach(player ->
-                    player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
+                    player.teleport(world.getSpawnLocation()));
 
             TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
 

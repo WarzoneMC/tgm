@@ -76,6 +76,9 @@ public class RegionManagerModule extends MatchModule {
                             regionJson.has("direction") ? HemisphereRegion.parseHemisphereDirection(regionJson.get("direction")) : HemisphereRegion.HemisphereFace.NEGATIVE_Z
                     );
                     break;
+                case "meta":
+                    region = new MetaRegion(regionJson.getAsJsonArray("regions"));
+                    break;
                 case "cuboid":
                 default:
                     region = new CuboidRegion(

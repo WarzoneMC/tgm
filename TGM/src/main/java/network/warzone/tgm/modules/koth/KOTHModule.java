@@ -127,25 +127,21 @@ public class KOTHModule extends MatchModule implements Listener {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
-        int i;
-        for (i = 0; i < controlPoints.size(); i++) {
-            ControlPoint controlPoint = controlPoints.get(i);
-
-            controlPointScoreboardLines.put(controlPoint.getDefinition(), i);
-            simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), i);
+        int j = 2;
+        for (ControlPoint controlPoint : controlPoints) {
+            controlPointScoreboardLines.put(controlPoint.getDefinition(), j);
+            simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), j);
+            j++;
         }
+        simpleScoreboard.add(" ", j);
 
-        i++;
-        simpleScoreboard.add(" ", i);
-
-        i++;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
 
-            simpleScoreboard.add(getTeamScoreLine(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i);
+            j++;
 
-            i++;
+            simpleScoreboard.add(getTeamScoreLine(matchTeam), j);
+            teamScoreboardLines.put(matchTeam, j);
         }
     }
 

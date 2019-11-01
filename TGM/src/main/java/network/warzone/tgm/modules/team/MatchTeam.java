@@ -24,6 +24,7 @@ public class MatchTeam {
     private final boolean spectator;
     @Setter private int max;
     @Setter private int min;
+    private boolean friendlyFire;
     private final List<PlayerContext> members = new ArrayList<>();
 
     private final List<Kit> kits = new ArrayList<>();

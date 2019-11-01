@@ -7,6 +7,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.death.DeathInfo;
+import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.respawn.RespawnRule;
@@ -30,6 +31,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -58,6 +61,8 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     private int length;
 
+    private MatchTeam humans;
+
     private final RespawnRule defaultRespawnRule = new RespawnRule(null, 3000, true, true, false);
 
     @Override
@@ -67,7 +72,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         teamManager = match.getModule(TeamManagerModule.class);
         deathModule = match.getModule(DeathModule.class);
         this.match = match;
-
+        this.humans = teamManager.getTeamById("humans");
         TimeModule time = TGM.get().getModule(TimeModule.class);
         time.setTimeLimitService(this::getWinningTeam);
         time.getTimeSubscribers().add(this);
@@ -76,6 +81,37 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         this.timeScoreboardValue = length + ":00";
         this.scoreboardManagerController = TGM.get().getModule(ScoreboardManagerModule.class);
         TGM.get().getModule(RespawnModule.class).setDefaultRule(defaultRespawnRule);
+        TGM.get().getModule(DeathMessageModule.class).getDeathMessages().clear();
+        TGM.get().getModule(DeathMessageModule.class).setDefaultDeathMessage(
+                (d) -> {
+                    if (d.killer != null) {
+                        if (d.killerTeam != humans)
+                            DeathMessageModule.broadcastDeathMessage(d.player, d.killer, "%s%s &7has been infected by %s%s",
+                                d.playerTeam.getColor(),
+                                    d.player.getName(),
+                                    d.killerTeam.getColor(),
+                                    d.killer.getName()
+                            );
+                        else
+                            DeathMessageModule.broadcastDeathMessage(d.player, d.killer, "%s%s &7has been slain by %s%s",
+                                    d.playerTeam.getColor(),
+                                    d.player.getName(),
+                                    d.killerTeam.getColor(),
+                                    d.killer.getName());
+                    } else {
+                        if (d.playerTeam != humans)
+                            DeathMessageModule.broadcastDeathMessage(d.player, null, "%s%s &7wasted away to the environment",
+                                    d.playerTeam.getColor(),
+                                    d.player.getName());
+                        else
+                            DeathMessageModule.broadcastDeathMessage(d.player, null, "%s%s &7has been taken by the environment",
+                                    d.playerTeam.getColor(),
+                                    d.player.getName());
+                    }
+                    return true;
+                }
+        );
+
     }
 
 
@@ -100,7 +136,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     public void processSecond(int elapsed) {
         int diff = (length * 60) - elapsed;
-        if(diff < 0) diff = 0;
+        if (diff < 0) diff = 0;
         timeScoreboardValue = ChatColor.WHITE + "Time left: " + ChatColor.AQUA + Strings.formatTime(diff);
         for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
     }
@@ -117,13 +153,13 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
 
     private void refreshScoreboard(SimpleScoreboard board) {
-        if(board == null) return;
+        if (board == null) return;
         teamScoreboardLines.forEach((i, s) -> board.add(s, i));
         refreshOnlyDynamicScoreboard(board);
     }
 
     private void refreshOnlyDynamicScoreboard(SimpleScoreboard board) {
-        if(board == null) return;
+        if (board == null) return;
         teamAliveScoreboardLines.forEach((id, i) -> board.add(
                 "  " + ChatColor.YELLOW + teamManager.getTeamById(id).getMembers().size() + ChatColor.WHITE + " alive", i));
         board.add(timeScoreboardValue, timeScoreboardLine);
@@ -139,10 +175,10 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     private void defaultScoreboard() {
         teamScoreboardLines.clear();
         teamAliveScoreboardLines.clear();
-        int positionOnScoreboard = 0;
+        int positionOnScoreboard = 1;
         int spaceCount = 1;
-        for(MatchTeam team : teamManager.getTeams()) {
-            if(team.isSpectator()) continue;
+        for (MatchTeam team : teamManager.getTeams()) {
+            if (team.isSpectator()) continue;
             teamScoreboardLines.put(positionOnScoreboard, StringUtils.repeat(" ", spaceCount++));
             positionOnScoreboard++;
             teamAliveScoreboardLines.put(team.getId(), positionOnScoreboard);
@@ -161,56 +197,12 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     public void onDeath(TGMPlayerDeathEvent event) {
         DeathInfo deathInfo = deathModule.getPlayer(event.getVictim());
 
-        Player victim = deathInfo.player;
-
-        MatchTeam humans = teamManager.getTeamById("humans");
-        MatchTeam killerTeam = deathInfo.killerTeam;
         MatchTeam playerTeam = deathInfo.playerTeam;
 
         // Check if the player who died is a human.
         if (playerTeam.equals(humans)) {
-            // Check if a player killed them.
-            if (deathInfo.killer != null) {
-                // Get the killer.
-                Player killer = deathInfo.killer;
-
-                broadcastMessage(String.format("%s%s &7has been infected by %s%s",
-                        playerTeam.getColor(),
-                        victim.getName(),
-                        killerTeam.getColor(),
-                        killer.getName()));
-            } else {
-                broadcastMessage(String.format(
-                        "%s%s &7has been taken by the environment",
-                        playerTeam.getColor(),
-                        victim.getName()
-                ));
-            }
-
             // Infect the player
             infect(deathInfo.player);
-        } else {
-            // Assume an infected died.
-
-            // Check if a player killed them
-            if (deathInfo.killer != null) {
-                // Get the killer.
-                Player killer = deathInfo.killer;
-
-                broadcastMessage(String.format(
-                        "%s%s &7has been slain by %s%s",
-                        playerTeam.getColor(),
-                        victim.getName(),
-                        killerTeam.getColor(),
-                        killer.getName()
-                ));
-            } else {
-                broadcastMessage(String.format(
-                        "%s%s &7wasted away to the environment",
-                        playerTeam.getColor(),
-                        victim.getName()
-                ));
-            }
         }
     }
 
@@ -234,7 +226,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
         if (event.isCancelled()) return;
-        if(defaultScoreboardLoaded) {
+        if (defaultScoreboardLoaded) {
             for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
         }
         if (teamManager.getTeamById("humans").getMembers().size() == 0 && match.getMatchStatus().equals(MatchStatus.MID)) {
@@ -251,6 +243,15 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
+        handleQuit(event);
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        handleQuit(event);
+    }
+
+    private void handleQuit(PlayerEvent event) {
         if (teamManager.getTeamById("infected").getMembers().size() == 0 && match.getMatchStatus().equals(MatchStatus.MID)) {
             PlayerContext player = teamManager.getTeamById("humans").getMembers().get(teamManager.getTeamById("humans").getMembers().size() - 1);
             broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));

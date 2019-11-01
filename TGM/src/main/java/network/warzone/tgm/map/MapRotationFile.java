@@ -47,7 +47,7 @@ public class MapRotationFile implements MapRotation {
             List<String> lines = Files.readLines(rotationFile, Charset.defaultCharset());
             for (String line : lines) {
                 for (MapContainer mapContainer : mapLibrary.getMaps()) {
-                    if (mapContainer.getMapInfo().getName().equalsIgnoreCase(line)) {
+                    if (mapContainer.getMapInfo().getName().equalsIgnoreCase(line.trim())) {
                         rotation.add(mapContainer);
                     }
                 }

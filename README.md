@@ -2,7 +2,7 @@
 [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://warz.one/discord)
 
-# Warzone
+# TGM
 Team Oriented Minecraft PVP Suite
 
 ## Project Goals

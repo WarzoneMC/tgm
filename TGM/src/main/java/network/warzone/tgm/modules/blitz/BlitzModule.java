@@ -10,6 +10,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.respawn.RespawnModule;
+import network.warzone.tgm.modules.respawn.RespawnRule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
@@ -26,6 +27,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -51,6 +54,8 @@ public class BlitzModule extends MatchModule implements Listener {
     private String actionbar = "";
 
     private Match match;
+
+    private final RespawnRule respawnRule = new RespawnRule(null, 3000, false, false, false);
 
     @Override
     public void load(Match match) {
@@ -78,6 +83,7 @@ public class BlitzModule extends MatchModule implements Listener {
         }
 
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getBiggestTeam);
+        TGM.get().getModule(RespawnModule.class).setDefaultRule(respawnRule);
         TGM.get().getModule(RespawnModule.class).addRespawnService(this::isAlive);
     }
 
@@ -114,7 +120,7 @@ public class BlitzModule extends MatchModule implements Listener {
         livesDisplayTaskId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (teamManagerModule.getTeam(player).isSpectator()) return;
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName()))));
+                player.sendActionBar(ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())));
             }
         }, 2L, 2L).getTaskId();
     }
@@ -126,7 +132,7 @@ public class BlitzModule extends MatchModule implements Listener {
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
         simpleScoreboard.setTitle(ChatColor.AQUA + "Players");
 
-        int i = 0;
+        int i = 2;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam, getAlivePlayers(matchTeam).size()), i);
@@ -167,7 +173,7 @@ public class BlitzModule extends MatchModule implements Listener {
         if (getLives(player) <= 0) {
 
             if (player.getLocation().getY() < 0) {
-                player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation());
             }
 
             MatchTeam team = teamManagerModule.getTeam(player);
@@ -178,7 +184,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
         } else {
             showLives(player);
-            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+            player.teleport(teamManagerModule.getTeam(player).getSpawnPoints().get(0).getLocation());
         }
     }
 
@@ -194,6 +200,15 @@ public class BlitzModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuit(PlayerQuitEvent event) {
+        handleQuit(event);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onKick(PlayerKickEvent event) {
+        handleQuit(event);
+    }
+
+    private void handleQuit(PlayerEvent event) {
         if ((teamManagerModule.getTeam(event.getPlayer()) != null && teamManagerModule.getTeam(event.getPlayer()).isSpectator())) return;
         updateScoreboardTeamLine(teamManagerModule.getTeam(event.getPlayer()), getAlivePlayers(teamManagerModule.getTeam(event.getPlayer())).size() - 1);
 
@@ -251,7 +266,7 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     private List<PlayerContext> getAlivePlayers(MatchTeam matchTeam) {
-        return matchTeam.getMembers().stream().filter(playerContext -> playerContext.getPlayer().getGameMode() != GameMode.SPECTATOR || isAlive(playerContext.getPlayer())).collect(Collectors.toList());
+        return matchTeam.getMembers().stream().filter(playerContext -> isAlive(playerContext.getPlayer())).collect(Collectors.toList());
     }
 
 }

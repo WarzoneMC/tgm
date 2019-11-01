@@ -14,4 +14,5 @@ public class ParsedTeam {
     private ChatColor teamColor;
     private int max;
     private int min;
+    private boolean friendlyFire;
 }
