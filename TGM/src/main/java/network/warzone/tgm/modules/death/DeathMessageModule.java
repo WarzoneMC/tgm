@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.itemstack.ItemUtils;
 import org.bukkit.Bukkit;
@@ -16,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -57,7 +55,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
     public static void broadcastDeathMessage(Player dead, Player killer, String message, Object... args) {
         message = String.format(message, args);
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
     }
 

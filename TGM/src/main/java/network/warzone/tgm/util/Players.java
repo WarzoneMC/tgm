@@ -1,10 +1,8 @@
 package network.warzone.tgm.util;
 
-import net.minecraft.server.v1_14_R1.EntityPlayer;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -61,14 +59,9 @@ public class Players {
 
         player.updateInventory();
     }
+
     public static int getPing(Player player) {
-        int ping = -1;
-        try {
-            EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            ping = entityPlayer.ping;
-        } catch (IllegalArgumentException | SecurityException e) {
-            e.printStackTrace();
-        }
-        return ping;
+        return player.spigot().getPing();
     }
+
 }

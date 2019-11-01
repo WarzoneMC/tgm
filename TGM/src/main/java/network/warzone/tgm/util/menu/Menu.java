@@ -20,6 +20,7 @@ public abstract class Menu implements Listener {
 
     @Getter private Inventory inventory;
     private String realTitle;
+
     private HashMap<Integer, MenuAction> actions = new HashMap<>();
 
     public Menu(String name, int slots) {
@@ -38,8 +39,8 @@ public abstract class Menu implements Listener {
             event.setCancelled(true);
             Player player = (Player) event.getWhoClicked();
 
-            if (actions.containsKey(event.getSlot())) {
-                actions.get(event.getSlot()).run(player, event);
+            if (this.actions.containsKey(event.getSlot())) {
+                this.actions.get(event.getSlot()).run(player, event);
             }
         }
     }

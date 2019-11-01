@@ -48,23 +48,23 @@ public class KillstreakDeserializer implements JsonDeserializer<Killstreak> {
             }});
         }
 
-        if(streakJson.has("actions")) {
+        if (streakJson.has("actions")) {
             JsonObject actionObj = streakJson.get("actions").getAsJsonObject();
-            if(actionObj.has("fireworks")) {
-                for(JsonElement jsonElem : actionObj.getAsJsonArray("fireworks")) {
+            if (actionObj.has("fireworks")) {
+                for (JsonElement jsonElem : actionObj.getAsJsonArray("fireworks")) {
                     JsonObject fireworkObj = jsonElem.getAsJsonObject();
                     String fireworkType = fireworkObj.has("type") ? Strings.getTechnicalName(fireworkObj.get("type").getAsString()) : "BALL";
                     boolean shouldTrail = fireworkObj.has("trail") && fireworkObj.get("trail").getAsBoolean();
                     boolean shouldFlicker = fireworkObj.has("flicker") && fireworkObj.get("flicker").getAsBoolean();
                     Set<Color> fireworkColors = new HashSet<>();
-                    if(fireworkObj.has("colors")) {
-                        for(JsonElement elem : fireworkObj.getAsJsonArray("colors")) {
+                    if (fireworkObj.has("colors")) {
+                        for (JsonElement elem : fireworkObj.getAsJsonArray("colors")) {
                             fireworkColors.add(Color.fromRGB(elem.getAsInt()));
                         }
                     }
                     Set<Color> fadeColors = new HashSet<>();
-                    if(fireworkObj.has("fade_colors")) {
-                        for(JsonElement elem : fireworkObj.getAsJsonArray("fade_colors")) {
+                    if (fireworkObj.has("fade_colors")) {
+                        for (JsonElement elem : fireworkObj.getAsJsonArray("fade_colors")) {
                             fadeColors.add(Color.fromRGB(elem.getAsInt()));
                         }
                     }
@@ -73,16 +73,16 @@ public class KillstreakDeserializer implements JsonDeserializer<Killstreak> {
                     killstreakActions.add(new FireworkKillstreakAction(locationOffset, FireworkEffect.builder().with(FireworkEffect.Type.valueOf(fireworkType)).trail(shouldTrail).flicker(shouldFlicker).withColor(fireworkColors).withFade(fadeColors).build(), fireworkLifetime));
                 }
             }
-            if(actionObj.has("items")) {
+            if (actionObj.has("items")) {
                 Set<ItemStack> items = new HashSet<>();
-                for(JsonElement jsonElem : actionObj.getAsJsonArray("items")) {
+                for (JsonElement jsonElem : actionObj.getAsJsonArray("items")) {
                     if (!jsonElem.isJsonObject()) continue;
                     JsonObject itemJson = jsonElem.getAsJsonObject();
                     items.add(ItemDeserializer.parse(itemJson));
                 }
                 killstreakActions.add(new ItemKillstreakAction(items));
             }
-            if(actionObj.has("sounds")) {
+            if (actionObj.has("sounds")) {
                 for(JsonElement jsonElem : actionObj.getAsJsonArray("sounds")) {
                     JsonObject soundObj = jsonElem.getAsJsonObject();
                     Sound theSound = Sound.valueOf(soundObj.get("sound").getAsString().toUpperCase().replace(".", "_"));
@@ -92,7 +92,7 @@ public class KillstreakDeserializer implements JsonDeserializer<Killstreak> {
                     killstreakActions.add(new SoundKillstreakAction(theSound, soundTarget, volume, pitch));
                 }
             }
-            if(actionObj.has("effects")) {
+            if (actionObj.has("effects")) {
                 Set<PotionEffect> potionEffects = new HashSet<>();
                 for(JsonElement jsonElem : actionObj.getAsJsonArray("effects")) {
                     if (!jsonElem.isJsonObject()) continue;
