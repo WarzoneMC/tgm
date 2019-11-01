@@ -56,6 +56,8 @@ Here's a basic example of what map configuration files look like:
  
 4. Start the server. 
    - Additionally, if you would like stats to be saved, you need to set up the API [here](https://github.com/WarzoneMC/api) and enable the API feature in the `plugins/TGM/config.yml` file.
+
+5. (Optional) Install WorldEdit for added telelport tool functionallity
  
 ## Developer Tips
 
