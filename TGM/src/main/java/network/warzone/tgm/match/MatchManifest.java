@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.chat.ChatModule;
+import network.warzone.tgm.modules.countdown.CountdownManagerModule;
 import network.warzone.tgm.modules.countdown.CycleCountdown;
 import network.warzone.tgm.modules.countdown.StartCountdown;
 import network.warzone.tgm.modules.damage.DamageControlModule;
@@ -66,8 +67,7 @@ public abstract class MatchManifest {
         modules.add(new ScoreboardManagerModule());
         modules.add(new RegionManagerModule());
         modules.add(new TaskedModuleManager());
-        modules.add(new StartCountdown());
-        modules.add(new CycleCountdown());
+        modules.add(new CountdownManagerModule());
         modules.add(new KitLoaderModule());
         modules.add(new DeathModule());
         modules.add(new DeathMessageModule());

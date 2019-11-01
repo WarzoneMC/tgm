@@ -12,6 +12,10 @@ import org.bukkit.boss.BossBar;
 public class CycleCountdown extends BossBarCountdown {
     public static int START_TIME = 20;
 
+    public CycleCountdown() {
+        this.bossBar = initBossBar();
+    }
+
     @Override
     public void load(Match match) {
 

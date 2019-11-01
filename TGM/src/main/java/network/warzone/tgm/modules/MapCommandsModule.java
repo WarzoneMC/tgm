@@ -1,25 +1,32 @@
 package network.warzone.tgm.modules;
 
+import com.google.gson.JsonElement;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 
+import java.util.ArrayList;
+import java.util.List;
+
+// TODO: Make a better event actions module
 public class MapCommandsModule extends MatchModule {
 
     private Match match;
-    private String startCommand;
+    private List<String> startCommands = new ArrayList<>();
 
     @Override
     public void enable() {
-        if (this.startCommand != null)
-            TGM.get().getServer().dispatchCommand(TGM.get().getServer().getConsoleSender(), this.startCommand);
+        if (this.startCommands != null)
+            startCommands.forEach(c -> TGM.get().getServer().dispatchCommand(TGM.get().getServer().getConsoleSender(), c));
     }
 
     @Override
     public void load(Match match) {
-        this.match = match;
-
-        if (match.getMapContainer().getMapInfo().getJsonObject().has("startCommand"))
-            this.startCommand = match.getMapContainer().getMapInfo().getJsonObject().get("startCommand").getAsString();
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("startCommands")) {
+            for (JsonElement jsonElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("startCommands")) {
+                if (jsonElement.isJsonPrimitive()) continue;
+                this.startCommands.add(jsonElement.getAsString());
+            }
+        }
     }
 }
