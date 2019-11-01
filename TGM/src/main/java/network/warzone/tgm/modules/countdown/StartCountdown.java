@@ -19,6 +19,10 @@ public class StartCountdown extends BossBarCountdown {
 
     @Getter private TeamManagerModule teamManagerModule;
 
+    public StartCountdown() {
+        this.bossBar = initBossBar();
+    }
+
     @Override
     public void load(Match match) {
         teamManagerModule = match.getModule(TeamManagerModule.class);
