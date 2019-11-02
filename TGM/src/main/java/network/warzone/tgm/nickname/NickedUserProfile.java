@@ -6,12 +6,13 @@ import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NickedUserProfile extends UserProfile {
 
     private NickedUserProfile(ObjectId id, String name, String nameLower, String uuid, long initialJoinDate, long lastOnlineDate, List<String> ips, List<String> ranks, List<Rank> ranksLoaded, int wins, int losses, int kills, int deaths, int wool_destroys, List<Punishment> punishments, boolean isNew) {
-        super(id, name, nameLower, uuid, initialJoinDate, lastOnlineDate, ips, ranks, ranksLoaded, wins, losses, kills, deaths, wool_destroys, punishments, isNew);
+        super(id, name, nameLower, uuid, initialJoinDate, lastOnlineDate, ips, ranks, ranksLoaded, wins, losses, kills, deaths, wool_destroys, punishments, new ArrayList<>(), null, isNew);
     }
 
     @Override

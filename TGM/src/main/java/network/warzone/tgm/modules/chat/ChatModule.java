@@ -14,6 +14,7 @@ import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.warzoneapi.models.Chat;
 import network.warzone.warzoneapi.models.Punishment;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -103,9 +104,23 @@ public class ChatModule extends MatchModule implements Listener {
 
         if (channel == ChatChannel.ALL) {
             MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-            event.setFormat((TGM.get().getModule(StatsModule.class).isStatsDisabled() ? "" : playerContext.getLevelString() + " ") +
-                    prefix + matchTeam.getColor() + event.getPlayer().getName() + ChatColor.WHITE + ": " + event.getMessage().replaceAll("%", "%%"));
+            UserProfile userProfile = playerContext.getUserProfile();
+            String prefix = userProfile.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', userProfile.getPrefix().trim()) + " " : "";
+            StringBuilder format = new StringBuilder();
+            if (!TGM.get().getModule(StatsModule.class).isStatsDisabled()) format.append(playerContext.getLevelString()).append(" ");
+            format.append(prefix)
+                    .append(matchTeam.getColor())
+                    .append(event.getPlayer().getName());
+            if (!playerContext.isNicked() && userProfile.getActiveTag() != null && !userProfile.getActiveTag().equals(""))
+                format.append(ChatColor.GRAY)
+                        .append(" [")
+                        .append(ChatColor.translateAlternateColorCodes('&', userProfile.getActiveTag()))
+                        .append(ChatColor.GRAY)
+                        .append("]");
+            format.append(ChatColor.WHITE)
+                    .append(": ")
+                    .append(event.getMessage().replaceAll("%", "%%"));
+            event.setFormat(format.toString());
         }
     }
 
