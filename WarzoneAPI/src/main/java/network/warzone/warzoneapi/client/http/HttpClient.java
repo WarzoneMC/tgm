@@ -338,6 +338,7 @@ public class HttpClient implements TeamClient {
     public PlayerAltsResponse getAlts(String name) {
         try {
             HttpResponse<PlayerAltsResponse> response = Unirest.get(config.getBaseUrl() + "/mc/player/alts/" + name)
+                    .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .asObject(PlayerAltsResponse.class);
