@@ -1,7 +1,6 @@
 package network.warzone.tgm.modules.knockback;
 
 import network.warzone.tgm.match.MatchModule;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

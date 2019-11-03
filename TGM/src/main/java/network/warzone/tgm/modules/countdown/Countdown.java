@@ -1,11 +1,11 @@
 package network.warzone.tgm.modules.countdown;
 
+import lombok.Getter;
+import lombok.Setter;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.tasked.TaskedModule;
-import lombok.Getter;
-import lombok.Setter;
 
 @ModuleData(load = ModuleLoadTime.LATER)
 @Getter @Setter

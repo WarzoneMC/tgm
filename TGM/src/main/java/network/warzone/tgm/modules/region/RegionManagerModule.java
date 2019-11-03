@@ -2,12 +2,12 @@ package network.warzone.tgm.modules.region;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.util.Parser;
-import lombok.Getter;
 import org.bukkit.Location;
 
 import java.util.HashMap;

@@ -8,7 +8,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
     private List<ScheduledGeneratorUpgrade> scheduledGeneratorUpgrades;

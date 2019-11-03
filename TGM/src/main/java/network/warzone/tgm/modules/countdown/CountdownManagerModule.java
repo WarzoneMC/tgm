@@ -15,7 +15,10 @@ import network.warzone.tgm.util.Strings;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jorge on 10/20/2019

@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules.scoreboard;
 
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.ModuleData;
@@ -9,7 +10,6 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;

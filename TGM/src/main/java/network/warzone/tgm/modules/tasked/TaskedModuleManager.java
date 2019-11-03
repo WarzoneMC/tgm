@@ -3,7 +3,6 @@ package network.warzone.tgm.modules.tasked;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.launchpad.LaunchPadModule;
 import org.bukkit.Bukkit;
 
 import java.util.Collection;

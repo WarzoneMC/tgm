@@ -1,11 +1,8 @@
 package network.warzone.tgm.nickname;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.mojang.util.UUIDTypeAdapter;
 import lombok.Getter;
 import net.minecraft.server.v1_14_R1.*;
 import network.warzone.tgm.TGM;
@@ -23,7 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;

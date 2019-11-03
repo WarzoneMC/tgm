@@ -1,8 +1,8 @@
 package network.warzone.tgm.map;
 
 import com.google.common.io.Files;
-import network.warzone.tgm.TGM;
 import lombok.Getter;
+import network.warzone.tgm.TGM;
 
 import java.io.File;
 import java.io.IOException;

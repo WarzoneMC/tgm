@@ -27,7 +27,6 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.menu.ClassMenu;
-import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.TagsMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.PlayerTagsUpdateRequest;

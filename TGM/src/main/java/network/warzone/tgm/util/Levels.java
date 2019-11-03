@@ -1,7 +1,7 @@
 package network.warzone.tgm.util;
 
-import network.warzone.warzoneapi.models.UserProfile;
 import network.warzone.tgm.TGM;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.entity.Player;
 
 /**

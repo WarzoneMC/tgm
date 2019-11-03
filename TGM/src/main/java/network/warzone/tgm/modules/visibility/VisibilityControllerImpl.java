@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules.visibility;
 
-import network.warzone.tgm.modules.SpectatorModule;
 import lombok.AllArgsConstructor;
+import network.warzone.tgm.modules.SpectatorModule;
 import org.bukkit.entity.Player;
 
 /**

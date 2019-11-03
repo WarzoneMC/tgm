@@ -1,11 +1,11 @@
 package network.warzone.tgm.modules.team;
 
-import network.warzone.tgm.map.SpawnPoint;
-import network.warzone.tgm.modules.kit.Kit;
-import network.warzone.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import network.warzone.tgm.map.SpawnPoint;
+import network.warzone.tgm.modules.kit.Kit;
+import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
