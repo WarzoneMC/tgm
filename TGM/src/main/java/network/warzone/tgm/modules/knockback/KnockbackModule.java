@@ -43,7 +43,7 @@ public class KnockbackModule extends MatchModule implements Listener {
         Vector normalVelocity = a.getVelocity();
         if (e.isOnGround()) normalVelocity.setY(0.3);
         else normalVelocity.setY(0);
-        e.setVelocity(normalVelocity.normalize().multiply(0.55f));
+        e.setVelocity(normalVelocity.normalize().multiply(0.2f));
     }
 
     private void applyMeleeKnockback(LivingEntity attacker, LivingEntity victim) {
