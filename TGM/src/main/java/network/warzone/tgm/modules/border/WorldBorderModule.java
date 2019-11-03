@@ -31,6 +31,18 @@ public class WorldBorderModule extends MatchModule {
         this.worldBorder = world.getWorldBorder();
 
         if (borderJson.has("center")) this.worldBorder.setCenter(Parser.convertLocation(world, borderJson.get("center")));
+        if (borderJson.has("damage")) {
+            if (borderJson.getAsJsonObject("damage").has("amount"))
+                this.worldBorder.setDamageAmount(borderJson.getAsJsonObject("damage").get("amount").getAsDouble());
+            if (borderJson.getAsJsonObject("damage").has("buffer"))
+                this.worldBorder.setDamageBuffer(borderJson.getAsJsonObject("damage").get("buffer").getAsDouble());
+        }
+        if (borderJson.has("warning")) {
+            if (borderJson.getAsJsonObject("warning").has("distance"))
+                this.worldBorder.setWarningDistance(borderJson.getAsJsonObject("warning").get("distance").getAsInt());
+            if (borderJson.getAsJsonObject("warning").has("time"))
+                this.worldBorder.setWarningTime(borderJson.getAsJsonObject("warning").get("time").getAsInt());
+        }
         this.worldBorder.setSize(this.startingSize);
     }
 
