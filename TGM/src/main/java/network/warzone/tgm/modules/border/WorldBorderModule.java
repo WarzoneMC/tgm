@@ -18,9 +18,12 @@ public class WorldBorderModule extends MatchModule {
 
     private WorldBorder worldBorder;
 
+    private boolean enable = false;
+
     @Override
     public void load(Match match) {
         if (!match.getMapContainer().getMapInfo().getJsonObject().has("border")) return;
+        enable = true;
         JsonObject borderJson = match.getMapContainer().getMapInfo().getJsonObject().get("border").getAsJsonObject();
         if (borderJson.has("startingSize")) this.startingSize = borderJson.get("startingSize").getAsInt();
         if (borderJson.has("delay")) this.delay = borderJson.get("delay").getAsInt();
@@ -48,6 +51,6 @@ public class WorldBorderModule extends MatchModule {
 
     @Override
     public void enable() {
-        this.worldBorder.setSize(this.endSize, this.delay);
+        if (enable) this.worldBorder.setSize(this.endSize, this.delay);
     }
 }
