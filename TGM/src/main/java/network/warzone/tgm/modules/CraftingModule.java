@@ -53,7 +53,7 @@ public class CraftingModule extends MatchModule implements Listener {
             }
         }
         if (removeAll) Bukkit.clearRecipes();
-        else removeRecipes();
+        else if (!this.removedRecipes.isEmpty()) removeRecipes();
     }
 
     @Override
@@ -63,19 +63,11 @@ public class CraftingModule extends MatchModule implements Listener {
 
     private void removeRecipes() {
         List<Recipe> backup = new ArrayList<>();
-        for (Material material : this.removedRecipes) {
-            ItemStack item = new ItemStack(material);
-            Iterator<Recipe> iterator = Bukkit.getServer().recipeIterator();
-
-            while (iterator.hasNext()) {
-                Recipe recipe = iterator.next();
-                ItemStack result = recipe.getResult();
-                if (!result.isSimilar(item)) {
-                    backup.add(recipe);
-                }
-            }
+        for (Iterator<Recipe> it = Bukkit.recipeIterator(); it.hasNext();) {
+            Recipe recipe = it.next();
+            if (this.removedRecipes.contains(recipe.getResult().getType())) continue;
+            backup.add(recipe);
         }
-
         Bukkit.getServer().clearRecipes();
         for (Recipe r : backup)
             Bukkit.getServer().addRecipe(r);
