@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class MatchTeam {
     private final String id;
     @Setter private String alias;
     private ChatColor color;
+    private GameMode gamemode;
     private final boolean spectator;
     @Setter private int max;
     @Setter private int min;
