@@ -20,6 +20,7 @@ public class Rank {
     private String name;
     private int priority;
     private String prefix;
+    private String display;
     private List<String> permissions;
     private boolean staff;
     @SerializedName("default")
@@ -29,6 +30,7 @@ public class Rank {
         this.name = rank.name;
         this.priority = rank.priority;
         this.prefix = rank.prefix;
+        this.display = rank.display;
         this.permissions = rank.permissions;
         this.staff = rank.staff;
         this.def = rank.def;

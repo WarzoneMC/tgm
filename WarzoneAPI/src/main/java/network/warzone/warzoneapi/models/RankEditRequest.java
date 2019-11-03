@@ -23,6 +23,12 @@ public class RankEditRequest {
                 return value;
             }
         },
+        DISPLAY(){
+            @Override
+            public String parseValue(String value) {
+                return value;
+            }
+        },
         PRIORITY() {
             @Override
             public Integer parseValue(String value) {
