@@ -225,7 +225,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"end"}, desc = "End the match.", anyFlags = true, flags = "f")
+    @Command(aliases = {"end", "finish"}, desc = "End the match.", anyFlags = true, flags = "f")
     @CommandPermissions({"tgm.end"})
     public static void end(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
