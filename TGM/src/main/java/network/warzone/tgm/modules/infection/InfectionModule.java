@@ -19,6 +19,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.time.TimeSubscriber;
+import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
@@ -62,6 +63,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     private int length;
 
     private MatchTeam humans;
+    private MatchTeam infected;
 
     private final RespawnRule defaultRespawnRule = new RespawnRule(null, 3000, true, true, false);
 
@@ -73,6 +75,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         deathModule = match.getModule(DeathModule.class);
         this.match = match;
         this.humans = teamManager.getTeamById("humans");
+        this.infected = teamManager.getTeamById("infected");
         TimeModule time = TGM.get().getModule(TimeModule.class);
         time.setTimeLimitService(this::getWinningTeam);
         time.getTimeSubscribers().add(this);
@@ -117,11 +120,11 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     @Override
     public void enable() {
-        int players = teamManager.getTeamById("humans").getMembers().size();
-        int zombies = ((int) (players * (5 / 100.0F)) == 0 ? 1 : (int) (players * (5 / 100.0F))) - teamManager.getTeamById("infected").getMembers().size();
+        int players = this.humans.getMembers().size();
+        int zombies = ((int) (players * (5 / 100.0F)) == 0 ? 1 : (int) (players * (5 / 100.0F))) - this.infected.getMembers().size();
         if (zombies > 0 && players != 1) {
             for (int i = 0; i < zombies; i++) {
-                PlayerContext player = teamManager.getTeamById("humans").getMembers().get(new Random().nextInt(teamManager.getTeamById("humans").getMembers().size()));
+                PlayerContext player = this.humans.getMembers().get(new Random().nextInt(this.humans.getMembers().size()));
                 broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
 
                 infect(player.getPlayer());
@@ -172,6 +175,20 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         refreshScoreboard(event.getSimpleScoreboard());
     }
 
+
+    @EventHandler(ignoreCancelled = true)
+    public void onJoinAttempt(PlayerJoinTeamAttemptEvent event) {
+        if (this.match.getMatchStatus().equals(MatchStatus.PRE)) {
+            if (event.isAutoJoin()) {
+                event.setTeam(humans);
+            }
+        } else {
+            if (!event.isAutoJoin() && !event.getTeam().isSpectator()) {
+                event.getPlayerContext().getPlayer().sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
+            }
+        }
+    }
+
     private void defaultScoreboard() {
         teamScoreboardLines.clear();
         teamAliveScoreboardLines.clear();
@@ -208,7 +225,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     @EventHandler
     public void onRespawn(TGMPlayerRespawnEvent event) {
-        if (teamManager.getTeam(event.getPlayer()).getId().equalsIgnoreCase("infected")) {
+        if (teamManager.getTeam(event.getPlayer()).equals(this.infected)) {
             event.getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 10000, 1, true, false)));
         }
         event.getPlayer().setGameMode(GameMode.ADVENTURE);

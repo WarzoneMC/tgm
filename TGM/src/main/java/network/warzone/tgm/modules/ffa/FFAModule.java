@@ -14,6 +14,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
@@ -102,6 +103,15 @@ public class FFAModule extends MatchModule implements Listener {
         Team team = scoreboardManagerModule.getScoreboard(context.getPlayer()).getScoreboard().getTeam(this.playersTeam.getId());
         Objects.requireNonNull(team);
         team.setAllowFriendlyFire(true);
+    }
+
+
+    @EventHandler(ignoreCancelled = true)
+    public void onJoinAttempt(PlayerJoinTeamAttemptEvent event) {
+        if (!this.match.getMatchStatus().equals(MatchStatus.PRE) && this.blitzMode) {
+            event.getPlayerContext().getPlayer().sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this mode.");
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler

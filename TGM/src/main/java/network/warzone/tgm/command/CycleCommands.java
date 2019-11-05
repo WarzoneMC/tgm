@@ -23,6 +23,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
@@ -357,68 +358,20 @@ public class CycleCommands {
             return;
         }
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
-        MatchManager matchManager = TGM.get().getMatchManager();
-        GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
-        MatchStatus matchStatus = matchManager.getMatch().getMatchStatus();
-        if (cmd.argsLength() == 0) {
-            if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
-                if (!matchStatus.equals(MatchStatus.PRE)) {
-                    sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
-                    return;
-                }
-            }
-            if (teamManager.getTeam((Player) sender).isSpectator() || matchStatus.equals(MatchStatus.PRE)) {
-                if (gameType.equals(GameType.Infected)) {
-                    if (matchStatus.equals(MatchStatus.MID) || matchStatus.equals(MatchStatus.POST)) {
-                        MatchTeam team = teamManager.getTeamById("infected");
-                        attemptJoinTeam((Player) sender, team, true);
-                        return;
-                    }
-
-                    MatchTeam team = teamManager.getTeamById("humans");
-                    attemptJoinTeam((Player) sender, team, true);
-                    return;
-                }
-                MatchTeam matchTeam = teamManager.getSmallestTeam();
-                attemptJoinTeam((Player) sender, matchTeam, true);
-            } else {
-                sender.sendMessage(ChatColor.RED + "You have already chosen a team.");
-            }
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
+        MatchTeam oldTeam = teamManager.getTeam(playerContext.getPlayer());
+        MatchTeam team;
+        boolean autoJoin = true;
+        if (cmd.argsLength() > 0) {
+            autoJoin = false;
+            team = teamManager.getTeamFromInput(cmd.getRemainingString(0));
         } else {
-            MatchTeam matchTeam = teamManager.getTeamFromInput(cmd.getJoinedStrings(0));
-
-            if (matchTeam == null) {
-                sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
-                return;
-            }
-
-            if (gameType.equals(GameType.Infected)) {
-                if (matchStatus.equals(MatchStatus.POST)) {
-                    if (!matchTeam.isSpectator()) {
-                        sender.sendMessage(ChatColor.RED + "The game has already ended.");
-                        return;
-                    } else {
-                        attemptJoinTeam((Player) sender, matchTeam, false);
-                        return;
-                    }
-                } else if (matchStatus.equals(MatchStatus.MID)) {
-                    if (!matchTeam.isSpectator()) {
-                        sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
-                        return;
-                    } else {
-                        attemptJoinTeam((Player) sender, matchTeam, false);
-                        return;
-                    }
-                }
-            } else if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
-                if (!matchStatus.equals(MatchStatus.PRE)) {
-                    sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
-                    return;
-                }
-            }
-
-            attemptJoinTeam((Player) sender, matchTeam, false);
+            team = teamManager.getSmallestTeam();
         }
+        PlayerJoinTeamAttemptEvent event = new PlayerJoinTeamAttemptEvent(playerContext, oldTeam, team, autoJoin, false);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+        attemptJoinTeam(playerContext.getPlayer(), event.getTeam(), autoJoin);
     }
 
     @Command(aliases = {"killstreak", "ks"}, desc = "See your current killstreak")

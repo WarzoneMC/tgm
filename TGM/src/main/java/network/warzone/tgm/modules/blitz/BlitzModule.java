@@ -16,6 +16,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
@@ -137,6 +138,14 @@ public class BlitzModule extends MatchModule implements Listener {
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
                 simpleScoreboard.add(matchTeam.getColor() + " ", i++);
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onJoinAttempt(PlayerJoinTeamAttemptEvent event) {
+        if (!this.match.getMatchStatus().equals(MatchStatus.PRE)) {
+            event.getPlayerContext().getPlayer().sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this mode.");
+            event.setCancelled(true);
         }
     }
 
