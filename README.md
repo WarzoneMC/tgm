@@ -64,3 +64,7 @@ Here's a basic example of what map configuration files look like:
 1. We use [Lombok](https://projectlombok.org/). Make sure you have the Lombok plugin installed on your preferred IDE.
 
 2. We use maven. Like any other maven project, run `mvn clean install` in the top-level folder to generate the required libraries.
+
+## Documentation
+
+In order to use this plugin for its intended purpose, you must configure maps compatiable with its native gamemodes. To view a list of modules you may use through this plugin and its gamemodes, view our Documentation repository [here](https://github.com/WarzoneMC/Docs). As you develop your own fork of this plugin, we recommend forking our Docs and adding onto them as a base to keep track of your own developed features.
