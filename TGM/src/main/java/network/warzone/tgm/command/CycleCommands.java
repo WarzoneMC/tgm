@@ -818,23 +818,25 @@ public class CycleCommands {
                     return;
                 }
                 String target = cmd.getString(1);
-                GetPlayerByNameResponse playerByNameResponse = TGM.get().getTeamClient().player(target);
-                UserProfile profile = playerByNameResponse.getUser();
-                if (profile == null) {
-                    sender.sendMessage(ChatColor.RED + "Player not found.");
-                    return;
-                }
-                if (profile.getTags() != null && !profile.getTags().isEmpty()) {
-                    sender.sendMessage(ChatColor.BLUE + playerByNameResponse.getUser().getName() + "'s tags:");
-                    for (String tag : profile.getTags()) {
-                        if (tag.equals(profile.getActiveTag()))
-                            sender.sendMessage(ChatColor.GREEN + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
-                        else
-                            sender.sendMessage(ChatColor.GRAY + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    GetPlayerByNameResponse playerByNameResponse = TGM.get().getTeamClient().player(target);
+                    UserProfile profile = playerByNameResponse.getUser();
+                    if (profile == null) {
+                        sender.sendMessage(ChatColor.RED + "Player not found.");
+                        return;
                     }
-                } else {
-                    sender.sendMessage(ChatColor.YELLOW + "User has no tags.");
-                }
+                    if (profile.getTags() != null && !profile.getTags().isEmpty()) {
+                        sender.sendMessage(ChatColor.BLUE + playerByNameResponse.getUser().getName() + "'s tags:");
+                        for (String tag : profile.getTags()) {
+                            if (tag.equals(profile.getActiveTag()))
+                                sender.sendMessage(ChatColor.GREEN + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
+                            else
+                                sender.sendMessage(ChatColor.GRAY + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
+                        }
+                    } else {
+                        sender.sendMessage(ChatColor.YELLOW + "User has no tags.");
+                    }
+                });
             } else {
                 List<String> subcmds = new ArrayList<>();
                 if (sender.hasPermission("tgm.tags.set")) subcmds.add("set");
