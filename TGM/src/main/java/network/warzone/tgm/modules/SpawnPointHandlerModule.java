@@ -97,11 +97,10 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
-                } else {
-                    if (reset) {
-                        matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
-                        playerContext.getPlayer().updateInventory();
-                    }
+                }
+                if (reset) {
+                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                    playerContext.getPlayer().updateInventory();
                 }
                 playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
             }, 1L);

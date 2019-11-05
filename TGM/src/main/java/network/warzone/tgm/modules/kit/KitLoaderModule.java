@@ -49,8 +49,9 @@ public class KitLoaderModule extends MatchModule {
                 List<MatchTeam> teams = new ArrayList<>();
                 TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
                 if (kitJson.has("teams")) {
-                    for (Object o : kitJson.getAsJsonArray("teams")) {
-                        MatchTeam matchTeam = teamManagerModule.getTeamById(((JsonPrimitive) o).getAsString());
+                    for (JsonElement jsonElement : kitJson.getAsJsonArray("teams")) {
+                        if (!jsonElement.isJsonPrimitive()) continue;
+                        MatchTeam matchTeam = teamManagerModule.getTeamById(jsonElement.getAsString());
                         if (matchTeam != null) {
                             teams.add(matchTeam);
                         }
@@ -64,13 +65,14 @@ public class KitLoaderModule extends MatchModule {
                     }
                 }
 
-                //TODO Change this with new kit module
                 List<KitNode> nodes = new ArrayList<>();
-                for (JsonElement nodeElement : kitJson.getAsJsonArray("items")) {
-                    try {
-                        nodes.addAll(itemParser.parse(nodeElement.getAsJsonObject()));
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                if (kitJson.has("items")) {
+                    for (JsonElement nodeElement : kitJson.getAsJsonArray("items")) {
+                        try {
+                            nodes.addAll(itemParser.parse(nodeElement.getAsJsonObject()));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
