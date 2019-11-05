@@ -58,10 +58,6 @@ public class DeathModule extends MatchModule implements Listener {
     public void onEntityDamage(EntityDamageEvent event) {
         if (event.getEntity() instanceof Player) {
             Player p = (Player) event.getEntity();
-            if (isDead(p)) {
-                event.setDamage(0);
-                return;
-            }
             DeathInfo deathInfo = getPlayer((Player) event.getEntity());
 
             deathInfo.playerName = deathInfo.player.getName();
@@ -69,44 +65,30 @@ public class DeathModule extends MatchModule implements Listener {
             deathInfo.playerLocation = deathInfo.player.getLocation();
             deathInfo.cause = event.getCause();
 
+            if (event instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent byEntityEvent = (EntityDamageByEntityEvent) event;
+                Player damager = null;
+
+                if (byEntityEvent.getDamager() instanceof Player) damager = (Player) byEntityEvent.getDamager();
+                else if (byEntityEvent.getDamager() instanceof Projectile) {
+                    Projectile projectile = (Projectile) byEntityEvent.getDamager();
+                    if (projectile.getShooter() instanceof Player) damager = (Player) projectile.getShooter();
+                }
+
+                if (damager != null && teamManagerModule.getTeam(damager).isSpectator()) return;
+
+                deathInfo.killer = damager;
+                deathInfo.item = determineItemFromDamager(byEntityEvent.getDamager(), damager);
+
+                deathInfo.killerName = damager == null ? null : damager.getName();
+                deathInfo.stampKill = damager == null ? -1 : System.currentTimeMillis();
+                deathInfo.killerTeam = damager == null ? null : teamManagerModule.getTeam(damager);
+                deathInfo.killerLocation = damager == null ? null : damager.getLocation();
+            }
+
             if (p.getHealth() - event.getFinalDamage() <= 0 || event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
-                onDeath(p);
                 event.setDamage(0);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onDamage(EntityDamageByEntityEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player p = (Player) event.getEntity();
-            if (isDead(p)) {
-                event.setDamage(0);
-                return;
-            }
-            DeathInfo deathInfo = getPlayer((Player) event.getEntity());
-
-            Player damager = null;
-
-            if (event.getDamager() instanceof Player) damager = (Player) event.getDamager();
-            else if (event.getDamager() instanceof Projectile) {
-                Projectile projectile = (Projectile) event.getDamager();
-                if (projectile.getShooter() instanceof Player) damager = (Player) projectile.getShooter();
-            }
-
-            if (damager != null && teamManagerModule.getTeam(damager).isSpectator()) return;
-
-            deathInfo.killer = damager;
-            deathInfo.item = determineItemFromDamager(event.getDamager(), damager);
-
-            deathInfo.killerName = damager == null ? null : damager.getName();
-            deathInfo.stampKill = damager == null ? -1 : System.currentTimeMillis();
-            deathInfo.killerTeam = damager == null ? null : teamManagerModule.getTeam(damager);
-            deathInfo.killerLocation = damager == null ? null : damager.getLocation();
-
-            if (p.getHealth() - event.getFinalDamage() <= 0) {
-                onDeath(p);
-                event.setDamage(0);
+                onDeath(p, deathInfo);
             }
         }
     }
@@ -130,11 +112,11 @@ public class DeathModule extends MatchModule implements Listener {
         return players.get(playerUUID);
     }
 
-    private void onDeath(Player player) {
-        DeathInfo deathInfo = getPlayer(player);
-        if(deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
+    private void onDeath(Player player, DeathInfo deathInfo) {
+        if (deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
         setDead(player);
         Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(deathInfo.player, deathInfo.playerLocation, deathInfo.killer, deathInfo.cause, deathInfo.item, Arrays.stream(player.getInventory().getContents()).filter(Objects::nonNull).collect(Collectors.toList())));
+        deathInfo.killer = null;
     }
 
     @EventHandler
