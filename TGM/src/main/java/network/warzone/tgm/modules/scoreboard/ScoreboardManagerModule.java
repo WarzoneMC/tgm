@@ -89,6 +89,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     private SimpleScoreboard initScoreboard(PlayerContext playerContext) {
         SimpleScoreboard simpleScoreboard = new SimpleScoreboard(ChatColor.AQUA + "Objectives");
+        simpleScoreboard.add(" ", 1);
 
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             registerScoreboardTeam(simpleScoreboard, matchTeam, playerContext);
