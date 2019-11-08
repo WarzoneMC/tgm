@@ -241,6 +241,9 @@ public class SpectatorModule extends MatchModule implements Listener {
         if (isSpectating(event.getPlayer())) {
             event.setCancelled(true);
         }
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST && event.getPlayer().getGameMode() == GameMode.CREATIVE) {
+            event.setCancelled(false);
+        }
     }
 
     @EventHandler

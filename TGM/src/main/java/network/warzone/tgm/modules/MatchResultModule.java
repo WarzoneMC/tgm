@@ -43,7 +43,7 @@ public class MatchResultModule extends MatchModule implements Listener {
             if (spectators.containsPlayer(player)) {
                 player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
             } else {
-                player.setGameMode(GameMode.ADVENTURE);
+                player.setGameMode(GameMode.CREATIVE);
                 player.setAllowFlight(true);
                 player.setVelocity(player.getVelocity().setY(1.0)); // Weeee!
                 player.setFlying(true);
