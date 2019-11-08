@@ -238,7 +238,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
-        if (isSpectating(event.getPlayer())) {
+        if (teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
             event.setCancelled(true);
         }
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST && event.getPlayer().getGameMode() == GameMode.CREATIVE) {
@@ -283,7 +283,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (isSpectating(event.getPlayer())) {
+        if (teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
             event.setCancelled(true);
             if (event.getItem() == null) return;
             if (event.getItem().isSimilar(teamSelectionItem)) {
