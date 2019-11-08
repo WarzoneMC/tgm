@@ -52,3 +52,6 @@ server:
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
+  # If players will be placed in to creative after te game is ended
+  # Any player is creative mode may break blocks during post game
+  post-block-break: false
