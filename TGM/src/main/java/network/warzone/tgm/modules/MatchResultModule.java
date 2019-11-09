@@ -40,10 +40,12 @@ public class MatchResultModule extends MatchModule implements Listener {
 
             Location location = player.getLocation().clone().add(0.0, 100.0, 0.0);
 
+            Bukkit.broadcastMessage(TGM.get().getConfig().getConfigurationSection("server").getBoolean("post-block-break") + "horse");
+
             if (spectators.containsPlayer(player)) {
                 player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
             } else {
-                if (TGM.get().getConfig().getBoolean("post-block-break") && event.getPlayer().hasPermission("tgm.post.break")) {
+                if (TGM.get().getConfig().getBoolean("post-block-break") && player.hasPermission("tgm.post.break")) {
                     player.setGameMode(GameMode.CREATIVE);
                 } else {
                     player.setGameMode(GameMode.ADVENTURE);
