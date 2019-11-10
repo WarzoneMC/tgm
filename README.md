@@ -64,3 +64,7 @@ Here's a basic example of what map configuration files look like:
 1. We use [Lombok](https://projectlombok.org/). Make sure you have the Lombok plugin installed on your preferred IDE.
 
 2. We use maven. Like any other maven project, run `mvn clean install` in the top-level folder to generate the required libraries.
+
+## Documentation
+
+This plugin takes advantage of a ``map.json`` required by every map to configure the gamemode and to document the coordinates needed by the gamemode to function.  To learn more about the available gamemodes in the plugin, how to configure a map.json, and what features are currently offered through this file, we recommend checking out our Documentation repository located [here](https://github.com/Warzone/Docs). If you need any additional examples on how to format the JSON's, consider checking out our Maps repository as well located [here](https://github.com/Warzone/Maps).
