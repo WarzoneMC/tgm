@@ -437,7 +437,7 @@ public class CycleCommands {
 
             killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(player.getUniqueId().toString());
 
-            if (killstreak == -1) {
+            if (killstreak == 0) {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4" + player.getName() + " &cisn't on a kill streak."));
                 return;
             }
