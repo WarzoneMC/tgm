@@ -53,5 +53,5 @@ server:
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
   # If players will be placed in to creative after the game is ended
-  # Any player is creative mode may break blocks during post game
+  # Any player in creative mode may break blocks during post game
   post-block-break: false
