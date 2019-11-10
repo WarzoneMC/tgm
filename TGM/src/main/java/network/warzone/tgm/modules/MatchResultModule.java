@@ -43,8 +43,8 @@ public class MatchResultModule extends MatchModule implements Listener {
             if (spectators.containsPlayer(player)) {
                 player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
             } else {
-                if (TGM.get().getConfig().getConfigurationSection("server").getBoolean("post-block-break") && player.hasPermission("tgm.post.break")) {
-                    player.setGameMode(GameMode.CREATIVE);
+                if (TGM.get().getConfig().getConfigurationSection("map").getBoolean("post-block-break") && player.hasPermission("tgm.post.break")) {
+                    player.setGameMode(GameMode.SURVIVAL);
                 } else {
                     player.setGameMode(GameMode.ADVENTURE);
                 }
