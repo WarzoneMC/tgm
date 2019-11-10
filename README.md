@@ -67,4 +67,4 @@ Here's a basic example of what map configuration files look like:
 
 ## Documentation
 
-In order to use this plugin for its intended purpose, you must configure maps compatiable with its native gamemodes. To view a list of modules you may use through this plugin and its gamemodes, view our Documentation repository [here](https://github.com/WarzoneMC/Docs). As you develop your own fork of this plugin, we recommend forking our Docs and adding onto them as a base to keep track of your own developed features.
+This plugin takes advantage of a ``map.json`` required by every map to configure the gamemode and to document the coordinates needed by the gamemode to function.  To learn more about the available gamemodes in the plugin, how to configure a map.json, and what features are currently offered through this file, we recommend checking out our Documentation repository located [here](https://github.com/Warzone/Docs). If you need any additional examples on how to format the JSON's, consider checking out our Maps repository as well located [here](https://github.com/Warzone/Maps).
