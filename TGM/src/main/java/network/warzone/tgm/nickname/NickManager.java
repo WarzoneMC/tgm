@@ -13,6 +13,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.visibility.VisibilityController;
 import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.HashMaps;
 import network.warzone.warzoneapi.models.MojangProfile;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.Skin;
@@ -59,6 +60,15 @@ public class NickManager {
 
             queuedNicks.add(new QueuedNick(newName, skin, player));
         });
+    }
+
+    public String getOriginalName(String username) {
+        if (nickNames.containsValue(username)) {
+            UUID uuid = HashMaps.reverseGetFirst(username, nickNames);
+            return originalNames.get(uuid);
+        } else {
+            return username;
+        }
     }
 
     public Optional<QueuedNick> getQueuedNick(Player player) {

@@ -6,7 +6,9 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
+import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.TimeUnitPair;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.ConfirmMenu;
@@ -472,7 +474,8 @@ public class PunishCommands {
                     if (response.isKickable()) {
                         kickPlayer(response.getPunishment(), response.getName());
                     }
-                    broadcastPunishment(response.getName(), response.getIp(), punisher.getName().replace("CONSOLE", "Console"), verb, timeUnitPair, reason, time, broadcast);
+
+                    broadcastPunishment(response.getName(), response.getIp(), TGM.get().getNickManager().getOriginalName(punisher.getName()).replace("CONSOLE", "Console"), verb, timeUnitPair, reason, time, broadcast);
                     Player target;
                     if (response.getName() != null && (target = Bukkit.getPlayer(response.getName())) != null) {
                         TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addPunishment(response.getPunishment());
