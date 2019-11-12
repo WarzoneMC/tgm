@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class NickCommands {
 
-    @Command(aliases = {"nicks"}, desc = "View all nicked players")
+    @Command(aliases = {"nicks"}, desc = "View all online nicked players")
     @CommandPermissions({"tgm.command.whois"})
     public static void nicks(CommandContext cmd, CommandSender sender) {
         HashMap<UUID, String> originalNames = TGM.get().getNickManager().getOriginalNames();
@@ -36,13 +36,15 @@ public class NickCommands {
         StringBuilder message = new StringBuilder(ChatColor.YELLOW + "Nicked Players:");
 
         originalNames.forEach((uuid, originalName) -> {
-            message.append("\n")
+            if !(Bukkit.getPlayer(nickNames.get(uuid))) {
+                message.append("\n")
                     .append(ChatColor.DARK_PURPLE)
                     .append(originalName)
                     .append(ChatColor.GRAY)
                     .append(" is nicked as ")
                     .append(ChatColor.LIGHT_PURPLE)
                     .append(nickNames.get(uuid));
+            }
         });
 
         sender.sendMessage(message.toString());
