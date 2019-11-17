@@ -81,97 +81,108 @@ public class ApiManager implements Listener {
     @EventHandler
     public void onMatchResult(MatchResultEvent event) {
         if (isStatsDisabled()) return;
-
-        List<String> winners = new ArrayList<>();
-        if (event.getWinningTeam() != null) {
-            for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
-                winners.add(playerContext.getUserProfile().getId().toString());
-                playerContext.getUserProfile().addWin();
-                Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP()));
+        try {
+            List<String> winners = new ArrayList<>();
+            if (event.getWinningTeam() != null) {
+                for (PlayerContext playerContext : event.getWinningTeam().getMembers()) {
+                    winners.add(playerContext.getUserProfile().getId().toString());
+                    playerContext.getUserProfile().addWin();
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WIN, playerContext.getUserProfile().getXP()));
+                }
             }
-        }
 
-        List<String> losers = new ArrayList<>();
-        for (MatchTeam matchTeam : event.getLosingTeams()) {
-            for (PlayerContext playerContext : matchTeam.getMembers()) {
-                losers.add(playerContext.getUserProfile().getId().toString());
-                playerContext.getUserProfile().addLoss();
-                Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP()));
+            List<String> losers = new ArrayList<>();
+            for (MatchTeam matchTeam : event.getLosingTeams()) {
+                for (PlayerContext playerContext : matchTeam.getMembers()) {
+                    losers.add(playerContext.getUserProfile().getId().toString());
+                    playerContext.getUserProfile().addLoss();
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_LOSS, playerContext.getUserProfile().getXP()));
+                }
             }
-        }
 
-        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-        List<TeamMapping> teamMappings = new ArrayList<>();
-        for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
-            if (matchTeam.isSpectator()) continue;
+            TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+            List<TeamMapping> teamMappings = new ArrayList<>();
+            for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
+                if (matchTeam.isSpectator()) continue;
 
-            for (PlayerContext playerContext : matchTeam.getMembers()) {
-                teamMappings.add(new TeamMapping(matchTeam.getId(), playerContext.getUserProfile().getId().toString()));
+                for (PlayerContext playerContext : matchTeam.getMembers()) {
+                    teamMappings.add(new TeamMapping(matchTeam.getId(), playerContext.getUserProfile().getId().toString()));
+                }
             }
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                MatchFinishPacket matchFinishPacket = new MatchFinishPacket(
+                        matchInProgress.getId(),
+                        matchInProgress.getMap(),
+                        event.getMatch().getStartedTime(),
+                        event.getMatch().getFinishedTime(),
+                        TGM.get().getModule(ChatModule.class).getChatLog(),
+                        winners,
+                        losers,
+                        event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,
+                        teamMappings);
+                TGM.get().getTeamClient().finishMatch(matchFinishPacket);
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            MatchFinishPacket matchFinishPacket = new MatchFinishPacket(
-                    matchInProgress.getId(),
-                    matchInProgress.getMap(),
-                    event.getMatch().getStartedTime(),
-                    event.getMatch().getFinishedTime(),
-                    TGM.get().getModule(ChatModule.class).getChatLog(),
-                    winners,
-                    losers,
-                    event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,
-                    teamMappings);
-            TGM.get().getTeamClient().finishMatch(matchFinishPacket);
-        });
 
     }
 
     @EventHandler
     public void onMatchLoad(MatchLoadEvent event) {
         if (isStatsDisabled()) return;
-        deathModule = event.getMatch().getModule(DeathModule.class);
+        try {
+            deathModule = event.getMatch().getModule(DeathModule.class);
 
-        MapInfo mapInfo = event.getMatch().getMapContainer().getMapInfo();
-        List<Team> teams = new ArrayList<>();
-        for (ParsedTeam parsedTeam : mapInfo.getTeams()) {
-            teams.add(new Team(parsedTeam.getId(), parsedTeam.getAlias(), parsedTeam.getTeamColor().name(), parsedTeam.getMin(), parsedTeam.getMax()));
+            MapInfo mapInfo = event.getMatch().getMapContainer().getMapInfo();
+            List<Team> teams = new ArrayList<>();
+            for (ParsedTeam parsedTeam : mapInfo.getTeams()) {
+                teams.add(new Team(parsedTeam.getId(), parsedTeam.getAlias(), parsedTeam.getTeamColor().name(), parsedTeam.getMin(), parsedTeam.getMax()));
+            }
+
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                MapLoadResponse mapLoadResponse = TGM.get().getTeamClient().loadmap(new Map(mapInfo.getName(), mapInfo.getVersion(), mapInfo.getAuthors(), mapInfo.getGametype().toString(), teams));
+                Bukkit.getLogger().info("Received load map response. Id: " + mapLoadResponse.getMap() + " [" + mapLoadResponse.isInserted() + "]");
+                matchInProgress = TGM.get().getTeamClient().loadMatch(new MatchLoadRequest(mapLoadResponse.getMap()));
+                Bukkit.getLogger().info("Match successfully loaded [" + matchInProgress.getMap() + "]");
+            });
+
+            teams.clear();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            MapLoadResponse mapLoadResponse = TGM.get().getTeamClient().loadmap(new Map(mapInfo.getName(), mapInfo.getVersion(), mapInfo.getAuthors(), mapInfo.getGametype().toString(), teams));
-            Bukkit.getLogger().info("Received load map response. Id: " + mapLoadResponse.getMap() + " [" + mapLoadResponse.isInserted() + "]");
-            matchInProgress = TGM.get().getTeamClient().loadMatch(new MatchLoadRequest(mapLoadResponse.getMap()));
-            Bukkit.getLogger().info("Match successfully loaded [" + matchInProgress.getMap() + "]");
-        });
-
-        teams.clear();
     }
 
     @EventHandler
     public void onKill(TGMPlayerDeathEvent event) {
         if (isStatsDisabled()) return;
-        DeathInfo deathInfo = deathModule.getPlayer(event.getVictim());
+        try {
+            DeathInfo deathInfo = deathModule.getPlayer(event.getVictim());
 
-        PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(deathInfo.player);
+            PlayerContext killed = TGM.get().getPlayerManager().getPlayerContext(deathInfo.player);
 
-        killed.getUserProfile().addDeath();
+            killed.getUserProfile().addDeath();
 
-        String playerItem = deathInfo.player.getInventory().getItemInMainHand().getType().toString();
-        String killerItem = deathInfo.item == null ? "" : deathInfo.item.getType().toString();
-        String killerId = null;
+            String playerItem = deathInfo.player.getInventory().getItemInMainHand().getType().toString();
+            String killerItem = deathInfo.item == null ? "" : deathInfo.item.getType().toString();
+            String killerId = null;
 
-        if (deathInfo.killer != null) {
-            PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(deathInfo.killer);
-            if (context == null) return;
-            context.getUserProfile().addKill();
-            Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, UserProfile.XP_PER_KILL, context.getUserProfile().getXP() - UserProfile.XP_PER_KILL, context.getUserProfile().getXP()));
+            if (deathInfo.killer != null) {
+                PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(deathInfo.killer);
+                if (context == null) return;
+                context.getUserProfile().addKill();
+                Bukkit.getPluginManager().callEvent(new PlayerXPEvent(context, UserProfile.XP_PER_KILL, context.getUserProfile().getXP() - UserProfile.XP_PER_KILL, context.getUserProfile().getXP()));
 
-            killerId = context.getUserProfile().getId().toString();
+                killerId = context.getUserProfile().getId().toString();
+            }
+
+            Death death = new Death(killed.getUserProfile().getId().toString(), killerId, playerItem,
+                    killerItem, matchInProgress.getMap(), matchInProgress.getId());
+
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        Death death = new Death(killed.getUserProfile().getId().toString(), killerId, playerItem,
-                killerItem, matchInProgress.getMap(), matchInProgress.getId());
-
-        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().addKill(death));
     }
 
     public boolean isStatsDisabled() {

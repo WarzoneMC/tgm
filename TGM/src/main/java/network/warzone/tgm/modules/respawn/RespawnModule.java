@@ -155,7 +155,7 @@ public class RespawnModule extends MatchModule implements Listener {
         List<Player> toRemove = new ArrayList<>();
         for (Player spectator : spectators) {
             if (!shouldRespawn(spectator)) continue;
-            int timeLeft = (spectatorTime.get(spectator.getUniqueId()));
+            int timeLeft = spectatorTime.getOrDefault(spectator.getUniqueId(), getDefaultRule().getDelay());
             if (timeLeft <= 0) {
                 spectator.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "RESPAWN",
                         ChatColor.GRAY + "Punch to respawn", 0, 20, 0);
