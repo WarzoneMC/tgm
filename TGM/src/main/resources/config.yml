@@ -28,6 +28,9 @@ chat:
     # Default: "&cChat is currently disabled."
     muted: "&cChat is currently disabled."
 map:
+  # If players will be placed in to survival after the game is ended
+  # Any player in survival mode may break blocks during post game
+  post-block-break: false
   # Retrieve map author names from the Mojang API using the UUIDs specified in the map.json.
   # Recommended for production use only.
   # Default: false
