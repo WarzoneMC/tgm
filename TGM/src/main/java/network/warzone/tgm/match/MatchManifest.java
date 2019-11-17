@@ -69,6 +69,7 @@ public abstract class MatchManifest {
         modules.add(new KitLoaderModule());
         modules.add(new DeathModule());
         modules.add(new DeathMessageModule());
+        modules.add(new BuildHeightLimitModule());
         modules.add(new FilterManagerModule());
         modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
