@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.points;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -9,7 +10,6 @@ import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

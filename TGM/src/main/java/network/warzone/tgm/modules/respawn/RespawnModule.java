@@ -1,6 +1,5 @@
 package network.warzone.tgm.modules.respawn;
 
-import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent;
 import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -66,11 +65,12 @@ public class RespawnModule extends MatchModule implements Listener {
                 JsonArray rules = respawnSettings.get("rules").getAsJsonArray();
                 for (JsonElement element : rules) {
                     JsonObject rule = element.getAsJsonObject();
-                    List<MatchTeam> matchTeams = Parser.getTeamsFromElement(teamManagerModule, rule.get("teams"));
+                    List<MatchTeam> matchTeams = new ArrayList<>();
                     int delay = defaultRule.getDelay();
                     boolean freeze = defaultRule.isFreeze();
                     boolean blindness = defaultRule.isBlindness();
                     boolean confirm = defaultRule.isConfirm();
+                    if (rule.has("teams")) matchTeams = Parser.getTeamsFromElement(teamManagerModule, rule.get("teams"));;
                     if (rule.has("delay")) delay = rule.get("delay").getAsInt();
                     if (rule.has("freeze")) freeze = rule.get("freeze").getAsBoolean();
                     if (rule.has("blindness")) blindness = rule.get("blindness").getAsBoolean();
@@ -155,7 +155,7 @@ public class RespawnModule extends MatchModule implements Listener {
         List<Player> toRemove = new ArrayList<>();
         for (Player spectator : spectators) {
             if (!shouldRespawn(spectator)) continue;
-            int timeLeft = (spectatorTime.get(spectator.getUniqueId()));
+            int timeLeft = spectatorTime.getOrDefault(spectator.getUniqueId(), getDefaultRule().getDelay());
             if (timeLeft <= 0) {
                 spectator.sendTitle(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "RESPAWN",
                         ChatColor.GRAY + "Punch to respawn", 0, 20, 0);
@@ -184,9 +184,9 @@ public class RespawnModule extends MatchModule implements Listener {
 
             if (event.getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
                 if (event.getKiller() != null) {
-                    player.teleport(event.getKiller().getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    player.teleport(event.getKiller().getLocation());
                 } else {
-                    player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    player.teleport(teamManagerModule.getSpectators().getSpawnPoints().get(0).getLocation());
                 }
             }
 
@@ -224,7 +224,7 @@ public class RespawnModule extends MatchModule implements Listener {
 
     private RespawnRule getRule(MatchTeam team) {
         for (RespawnRule rule : respawnRules) {
-            if (rule.getTeams().contains(team)) {
+            if (rule.getTeams().isEmpty() || rule.getTeams().contains(team)) {
                 return rule;
             }
         }

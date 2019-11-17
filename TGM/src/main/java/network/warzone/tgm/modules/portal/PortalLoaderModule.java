@@ -10,10 +10,7 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
-import network.warzone.tgm.util.Strings;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.List;

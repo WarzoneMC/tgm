@@ -4,7 +4,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.HoverEvent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.nickname.ProfileCache;
 import network.warzone.tgm.util.Players;

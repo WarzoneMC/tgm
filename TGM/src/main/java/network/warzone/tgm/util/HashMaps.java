@@ -1,6 +1,8 @@
 package network.warzone.tgm.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class HashMaps {
 

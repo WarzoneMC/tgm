@@ -15,9 +15,7 @@ import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.chat.ChatChannel;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.chat.ChatModule;
-import network.warzone.tgm.modules.countdown.Countdown;
-import network.warzone.tgm.modules.countdown.CycleCountdown;
-import network.warzone.tgm.modules.countdown.StartCountdown;
+import network.warzone.tgm.modules.countdown.*;
 import network.warzone.tgm.modules.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
@@ -25,21 +23,28 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.menu.ClassMenu;
+import network.warzone.tgm.util.menu.TagsMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
+import network.warzone.warzoneapi.models.PlayerTagsUpdateRequest;
+import network.warzone.warzoneapi.models.PlayerTagsUpdateResponse;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CycleCommands {
@@ -50,17 +55,16 @@ public class CycleCommands {
         String typeString = "";
 
         try {
-             if (cmd.argsLength() == 1) {
-                 if (cmd.getString(0).matches("[0-9]+")) {
-                     index = cmd.getInteger(0);
-                 } else {
-                     typeString = cmd.getString(0);
-                 }
-             }
-             else if (cmd.argsLength() == 2) {
-                 typeString = cmd.getString(0);
-                 index = cmd.getInteger(1);
-             }
+            if (cmd.argsLength() == 1) {
+                if (cmd.getString(0).matches("[0-9]+")) {
+                    index = cmd.getInteger(0);
+                } else {
+                    typeString = cmd.getString(0);
+                }
+            } else if (cmd.argsLength() == 2) {
+                typeString = cmd.getString(0);
+                index = cmd.getInteger(1);
+            }
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.RED + "Number expected.");
             return;
@@ -102,7 +106,8 @@ public class CycleCommands {
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
-        } catch (IndexOutOfBoundsException ignored) {}
+        } catch (IndexOutOfBoundsException ignored) {
+        }
     }
 
     @Command(aliases = {"findmaps"}, desc = "Find the maps that are on Warzone, although not necessarily in the rotation.", min = 1, usage = "<map name> [page]")
@@ -119,7 +124,7 @@ public class CycleCommands {
         }
 
         if (foundMaps.size() == 0) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cNo maps with the name &4" + cmd.getString(0) + "&c were found."));
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cNo maps with the name &4" + cmd.getString(0) + "&c were found."));
             return;
         }
 
@@ -147,7 +152,8 @@ public class CycleCommands {
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
-        } catch (IndexOutOfBoundsException ignored) {}
+        } catch (IndexOutOfBoundsException ignored) {
+        }
     }
 
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
@@ -177,7 +183,8 @@ public class CycleCommands {
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
-        } catch (IndexOutOfBoundsException ignored) { }
+        } catch (IndexOutOfBoundsException ignored) {
+        }
     }
 
     @Command(aliases = {"cycle"}, desc = "Cycle to a new map.")
@@ -214,14 +221,15 @@ public class CycleCommands {
                 }
             }
             boolean soloStart = Bukkit.getOnlinePlayers().size() <= 1;
-            if(!soloStart) sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
+            if (!soloStart)
+                sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
             TGM.get().getModule(StartCountdown.class).start((soloStart) ? 0 : time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
     }
 
-    @Command(aliases = {"end"}, desc = "End the match.", anyFlags = true, flags = "f")
+    @Command(aliases = {"end", "finish"}, desc = "End the match.", anyFlags = true, flags = "f")
     @CommandPermissions({"tgm.end"})
     public static void end(CommandContext cmd, CommandSender sender) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
@@ -235,7 +243,7 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
-              sender.sendMessage(ChatColor.GREEN + "Ending match...");
+                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 if (cmd.hasFlag('f')) {
                     TGM.get().getMatchManager().endMatch(null);
                 } else {
@@ -266,7 +274,7 @@ public class CycleCommands {
                     found = mapContainer;
                 }
             }
-            
+
             if (found == null) {
                 for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
                     if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
@@ -289,7 +297,7 @@ public class CycleCommands {
 
     @Command(aliases = {"classes"}, desc = "Class menu.")
     public static void classes(CommandContext cmd, CommandSender sender) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
@@ -305,7 +313,7 @@ public class CycleCommands {
     @SuppressWarnings("unchecked")
     @Command(aliases = {"class"}, desc = "Choose a class.", min = 1, usage = "<kit name>")
     public static void classCommand(CommandContext cmd, CommandSender sender) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
@@ -345,7 +353,7 @@ public class CycleCommands {
             gameClassModule.addSwitchClassRequest(player, chosenClassString);
         }
     }
-    
+
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
@@ -353,90 +361,62 @@ public class CycleCommands {
             return;
         }
         TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
-        MatchManager matchManager = TGM.get().getMatchManager();
-        GameType gameType = matchManager.getMatch().getMapContainer().getMapInfo().getGametype();
-        MatchStatus matchStatus = matchManager.getMatch().getMatchStatus();
-        if (cmd.argsLength() == 0) {
-            if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
-                if (!matchStatus.equals(MatchStatus.PRE)) {
-                    sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
-                    return;
-                }
-            }
-            if (teamManager.getTeam((Player) sender).isSpectator() || matchStatus.equals(MatchStatus.PRE)) {
-                if (gameType.equals(GameType.Infected)) {
-                    if (matchStatus.equals(MatchStatus.MID) || matchStatus.equals(MatchStatus.POST)) {
-                        MatchTeam team = teamManager.getTeamById("infected");
-                        attemptJoinTeam((Player) sender, team, true);
-                        return;
-                    }
-
-                    MatchTeam team = teamManager.getTeamById("humans");
-                    attemptJoinTeam((Player) sender, team, true);
-                    return;
-                }
-                MatchTeam matchTeam = teamManager.getSmallestTeam();
-                attemptJoinTeam((Player) sender, matchTeam, true);
-            } else {
-                sender.sendMessage(ChatColor.RED + "You have already chosen a team.");
-            }
+        PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
+        MatchTeam oldTeam = teamManager.getTeam(playerContext.getPlayer());
+        MatchTeam team;
+        boolean autoJoin = true;
+        if (cmd.argsLength() > 0) {
+            autoJoin = false;
+            team = teamManager.getTeamFromInput(cmd.getRemainingString(0));
         } else {
-            MatchTeam matchTeam = teamManager.getTeamFromInput(cmd.getJoinedStrings(0));
+            team = teamManager.getSmallestTeam();
+        }
+        PlayerJoinTeamAttemptEvent event = new PlayerJoinTeamAttemptEvent(playerContext, oldTeam, team, autoJoin, false);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
+        attemptJoinTeam(playerContext.getPlayer(), event.getTeam(), autoJoin);
+    }
 
-            if (matchTeam == null) {
-                sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
+    @Command(aliases = {"killstreak", "ks"}, max = 1, usage = "[player]", desc = "See your current killstreak")
+    public static void killstreak(CommandContext cmd, CommandSender sender) {
+        boolean otherPlayer;
+        Player player;
+        int killstreak;
+
+        if (cmd.argsLength() == 1) {
+            otherPlayer = true;
+            player = Bukkit.getPlayer(cmd.getString(0));
+
+            if (player == null) {
+                sender.sendMessage(ChatColor.RED + "Player not found.");
                 return;
             }
 
-            if (gameType.equals(GameType.Infected)) {
-                if (matchStatus.equals(MatchStatus.POST)) {
-                    if (!matchTeam.isSpectator()) {
-                        sender.sendMessage(ChatColor.RED + "The game has already ended.");
-                        return;
-                    } else {
-                        attemptJoinTeam((Player) sender, matchTeam, false);
-                        return;
-                    }
-                } else if (matchStatus.equals(MatchStatus.MID)) {
-                    if (!matchTeam.isSpectator()) {
-                        sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
-                        return;
-                    } else {
-                        attemptJoinTeam((Player) sender, matchTeam, false);
-                        return;
-                    }
-                }
-            } else if (gameType.equals(GameType.Blitz) || gameType.equals(GameType.FFA) && TGM.get().getModule(FFAModule.class).isBlitzMode()) {
-                if (!matchStatus.equals(MatchStatus.PRE)) {
-                    sender.sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
-                    return;
-                }
+            killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(player.getUniqueId().toString());
+
+            if (killstreak == 0) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4" + player.getName() + " &cisn't on a kill streak."));
+                return;
             }
-
-            attemptJoinTeam((Player) sender, matchTeam, false);
-        }
-    }
-
-    @Command(aliases = {"killstreak", "ks"}, desc = "See your current killstreak")
-    public static void killstreak(CommandContext cmd, CommandSender sender) {
-        if (!(sender instanceof Player)) {
+        } else if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
+        } else {
+            otherPlayer = false;
+            player = (Player) sender;
+            killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(player.getUniqueId().toString());
         }
-        Player player = (Player) sender;
-        String playerUUID = player.getUniqueId().toString();
 
         MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
-        int killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(playerUUID);
 
         if (matchTeam != null) {
-            if (killstreak == 0 || matchTeam.isSpectator()) {
-                sender.sendMessage(ChatColor.RED + "You aren't on a killstreak.");
+            if (killstreak < 1 || matchTeam.isSpectator()) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', (otherPlayer ? "&4" + player.getName() + " &cisn't on a kill streak." : "&cYou aren't on a kill streak.")));
             } else {
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou're on a kill streak of &2" + killstreak + "&a kill" + (killstreak == 1 ? "" : "s") + "."));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', (otherPlayer ? "&2" + player.getName() + " &ais " : "&aYou're ") + "on a kill streak of &2" + killstreak + "&a kill" + (killstreak == 1 ? "" : "s") + "."));
             }
         } else {
-            player.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
+            sender.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
         }
     }
 
@@ -545,27 +525,27 @@ public class CycleCommands {
 
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
         if (cmd.argsLength() == 0) {
-          player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
-          return;
+            player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
+            return;
         }
 
         String channelName = cmd.getString(0).toUpperCase();
         ChatChannel channel = ChatChannel.byName(channelName);
         if (channel == null) {
-          player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
-          player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatChannel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
-          return;
+            player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
+            player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatChannel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
+            return;
         }
 
         if (!channel.hasPermission(player)) {
-          player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
-          return;
+            player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
+            return;
         }
 
         ChatModule.getChannels().put(player.getUniqueId().toString(), channel);
@@ -589,7 +569,7 @@ public class CycleCommands {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
         sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors().stream().map(Strings::getAuthorUsername).collect(Collectors.joining(", "))));
     }
-    
+
     @Command(aliases = {"map"}, desc = "View the map info for the current map")
     public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
@@ -618,7 +598,7 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
                 return;
             }
-            
+
             TimeModule timeModule = TGM.get().getModule(TimeModule.class);
             if (cmd.getString(1).equalsIgnoreCase("on") || cmd.getString(1).equalsIgnoreCase("true")) {
                 timeModule.setTimeLimited(true);
@@ -669,12 +649,12 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage="(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
+    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage = "(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
     public static void leaderboard(CommandContext cmd, CommandSender sender) {
         if (!TGM.get().getConfig().getBoolean("api.stats.enabled") || !TGM.get().getConfig().getBoolean("api.enabled")) {
             sender.sendMessage(ChatColor.RED + "Stat tracking is disabled");
         } else {
-            if (!cmd.getString(0).equalsIgnoreCase("kills"))  {
+            if (!cmd.getString(0).equalsIgnoreCase("kills")) {
                 sender.sendMessage(ChatColor.RED + "Invalid stat: " + cmd.getString(0));
             } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
                 Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
@@ -701,6 +681,261 @@ public class CycleCommands {
         }
     }
 
+    @Command(aliases = {"tag", "tags"}, desc = "Manage your tags.")
+    public static void tags(final CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() == 0) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.RED + "Only players may open the tags GUI.");
+                return;
+            }
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
+            TagsMenu tagsMenu = new TagsMenu(ChatColor.UNDERLINE + "Your tags", 9 * 6, playerContext);
+            tagsMenu.open((Player) sender);
+        }
+        else {
+            if (cmd.getString(0).equalsIgnoreCase("set")) {
+                if (cmd.argsLength() < 2) {
+                    if (sender.hasPermission("tgm.tags.set"))
+                        sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " set <tag> [player]");
+                    else
+                        sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " set <tag>");
+                    return;
+                }
+                if (cmd.argsLength() < 3 && !(sender instanceof Player)) {
+                    sender.sendMessage(ChatColor.RED + "You must include a player.");
+                    return;
+                }
+                String tag;
+                if (cmd.getString(1).equals("-")) tag = null;
+                else tag = cmd.getString(1);
+                String target;
+                if (sender.hasPermission("tgm.tags.set") && cmd.argsLength() >= 3)
+                    target = cmd.getString(2);
+                else
+                    target = sender.getName();
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                   PlayerTagsUpdateResponse response = TGM.get().getTeamClient().updateTag(target, tag, PlayerTagsUpdateRequest.Action.SET);
+
+                   if (!response.isError()) {
+                       String finalTag = tag == null ? ChatColor.GRAY + "" + ChatColor.ITALIC + "none" : ChatColor.translateAlternateColorCodes('&', response.getActiveTag());
+                       Player player = Bukkit.getPlayer(target);
+                       if (player != null) {
+                           TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().saveTags(response);
+                           if (player.getName().equalsIgnoreCase(sender.getName()))
+                               sender.sendMessage(ChatColor.GREEN + "Set your active tag to " + finalTag);
+                           else
+                               sender.sendMessage(ChatColor.GREEN + "Set " + player.getName() + "'s active tag to " + finalTag);
+                       } else {
+                           sender.sendMessage(ChatColor.GREEN + "Set " + target + "'s active tag to " + finalTag);
+                       }
+                   } else {
+                       sender.sendMessage(ChatColor.RED + response.getMessage());
+                   }
+                });
+            } else if (cmd.getString(0).equalsIgnoreCase("add")) {
+                if (!sender.hasPermission("tgm.tags.add")) {
+                    sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+                    return;
+                }
+                if (cmd.argsLength() < 3) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " add <tag> <player>");
+                    return;
+                }
+                String tag = cmd.getString(1);
+                String target = cmd.getString(2);
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    PlayerTagsUpdateResponse response = TGM.get().getTeamClient().updateTag(target, tag, PlayerTagsUpdateRequest.Action.ADD);
+
+                    if (!response.isError()) {
+                        Player player = Bukkit.getPlayer(target);
+                        if (player != null) {
+                            TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().saveTags(response);
+                            sender.sendMessage(ChatColor.GREEN + "Added tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' to " + player.getName() + "'s profile");
+                        } else {
+                            sender.sendMessage(ChatColor.GREEN + "Added tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' to " + target + "'s profile");
+                        }
+                    } else {
+                        sender.sendMessage(ChatColor.RED + response.getMessage());
+                    }
+                });
+            } else if (cmd.getString(0).equalsIgnoreCase("remove")) {
+                if (!sender.hasPermission("tgm.tags.remove")) {
+                    sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+                    return;
+                }
+                if (cmd.argsLength() < 3) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " remove <tag> <player>");
+                    return;
+                }
+                String tag = cmd.getString(1);
+                String target = cmd.getString(2);
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    PlayerTagsUpdateResponse response = TGM.get().getTeamClient().updateTag(target, tag, PlayerTagsUpdateRequest.Action.REMOVE);
+
+                    if (!response.isError()) {
+                        Player player = Bukkit.getPlayer(target);
+                        if (player != null) {
+                            TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().saveTags(response);
+                            sender.sendMessage(ChatColor.GREEN + "Removed tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' from " + player.getName() + "'s profile");
+                        } else {
+                            sender.sendMessage(ChatColor.GREEN + "Removed tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' from " + target + "'s profile");
+                        }
+                    } else {
+                        sender.sendMessage(ChatColor.RED + response.getMessage());
+                    }
+                });
+            } else if (cmd.getString(0).equalsIgnoreCase("list")) {
+                if (!sender.hasPermission("tgm.tags.list")) {
+                    sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+                    return;
+                }
+                if (cmd.argsLength() < 2) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " list <player>");
+                    return;
+                }
+                String target = cmd.getString(1);
+                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                    GetPlayerByNameResponse playerByNameResponse = TGM.get().getTeamClient().player(target);
+                    UserProfile profile = playerByNameResponse.getUser();
+                    if (profile == null) {
+                        sender.sendMessage(ChatColor.RED + "Player not found.");
+                        return;
+                    }
+                    if (profile.getTags() != null && !profile.getTags().isEmpty()) {
+                        sender.sendMessage(ChatColor.BLUE + playerByNameResponse.getUser().getName() + "'s tags:");
+                        for (String tag : profile.getTags()) {
+                            if (tag.equals(profile.getActiveTag()))
+                                sender.sendMessage(ChatColor.GREEN + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
+                            else
+                                sender.sendMessage(ChatColor.GRAY + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
+                        }
+                    } else {
+                        sender.sendMessage(ChatColor.YELLOW + "User has no tags.");
+                    }
+                });
+            } else {
+                List<String> subcmds = new ArrayList<>();
+                if (sender.hasPermission("tgm.tags.set")) subcmds.add("set");
+                if (sender.hasPermission("tgm.tags.add")) subcmds.add("add");
+                if (sender.hasPermission("tgm.tags.remove")) subcmds.add("remove");
+                if (sender.hasPermission("tgm.tags.list")) subcmds.add("list");
+                if (subcmds.isEmpty())
+                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " [set]");
+                else
+                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " <" + String.join("|", subcmds) + ">");
+            }
+        }
+    }
+
+    @Command(aliases = {"countdown", "cd"}, desc = "Manage custom countdowns", usage = "<list|start|create|edit|cancel>", min = 1)
+    public static void countdown(CommandContext cmd, CommandSender sender) throws CommandNumberFormatException {
+        CountdownManagerModule countdownManagerModule = TGM.get().getModule(CountdownManagerModule.class);
+        if (cmd.getString(0).equalsIgnoreCase("list")) {
+            Map<String, CustomCountdown> countdowns = countdownManagerModule.getCustomCountdowns();
+            if (countdowns.size() > 0) {
+                sender.sendMessage(ChatColor.GREEN + "Registered countdowns:");
+                countdowns.forEach((id, cd) -> sender.sendMessage(" - " + id));
+            } else {
+                sender.sendMessage(ChatColor.RED + "There are no registered countdowns.");
+            }
+        }
+        else if (cmd.getString(0).equalsIgnoreCase("start")) {
+            if (cmd.argsLength() <= 1) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " start (id)");
+                return;
+            }
+            CustomCountdown countdown = countdownManagerModule.getCountdown(cmd.getString(1));
+            if (countdown == null) {
+                sender.sendMessage(ChatColor.RED + "Unknown countdown.");
+                return;
+            }
+            if (cmd.argsLength() <= 2) countdown.start();
+            else countdown.start(cmd.getInteger(2));
+            if (sender instanceof Player) sender.sendMessage(ChatColor.GREEN + "Countdown started.");
+        } else if (cmd.getString(0).equalsIgnoreCase("create")) {
+            if (cmd.argsLength() <= 3) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " create <id> <time> <title> [color] [style] [visible] [invert] [teams] [onFinish]");
+                return;
+            }
+            String id = cmd.getString(1);
+            int time = cmd.getInteger(2);
+            String title = cmd.getString(3);
+            BarColor color = cmd.argsLength() > 4 ? BarColor.valueOf(Strings.getTechnicalName(cmd.getString(4))) : BarColor.PURPLE;
+            BarStyle style = cmd.argsLength() > 5 ? BarStyle.valueOf(Strings.getTechnicalName(cmd.getString(5))) : BarStyle.SOLID;
+            boolean visible = cmd.argsLength() <= 6 || Boolean.parseBoolean(cmd.getString(6));
+            boolean invert = cmd.argsLength() > 7 && Boolean.parseBoolean(cmd.getString(7));
+            List<MatchTeam> teams = cmd.argsLength() > 8 ?
+                    Arrays.stream(cmd.getString(8).split(",")).map(t -> TGM.get().getModule(TeamManagerModule.class).getTeamById(t)).collect(Collectors.toList()) :
+                    new ArrayList<>();
+            List<String> onFinish = cmd.argsLength() > 9 ?
+                    Arrays.asList(cmd.getString(9).split(",")) :
+                    new ArrayList<>();
+            countdownManagerModule.addCountdown(id, new CustomCountdown(time, title, color, style, visible, invert, teams, onFinish));
+            sender.sendMessage(ChatColor.GREEN + "Created new countdown.");
+        } else if (cmd.getString(0).equalsIgnoreCase("edit")) {
+            if (cmd.argsLength() < 3) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <id> <time|title|color|style|visible|invert|teams|onFinish> <value>");
+                return;
+            }
+            String id = cmd.getString(1);
+            CustomCountdown countdown = countdownManagerModule.getCountdown(id);
+            switch (cmd.getString(2)) {
+                case "time":
+                    countdown.setTime(cmd.getInteger(3));
+                    break;
+                case "title":
+                    countdown.setTitle(cmd.getRemainingString(3));
+                    break;
+                case "color":
+                    countdown.setColor(BarColor.valueOf(Strings.getTechnicalName(cmd.getRemainingString(3))));
+                    break;
+                case "style":
+                    countdown.setStyle(BarStyle.valueOf(Strings.getTechnicalName(cmd.getRemainingString(3))));
+                    break;
+                case "visible":
+                    countdown.setVisible(Boolean.parseBoolean(cmd.getString(3)));
+                    break;
+                case "invert":
+                    countdown.setInvert(Boolean.parseBoolean(cmd.getString(3)));
+                    break;
+                case "teams":
+                    if (cmd.getRemainingString(3).equalsIgnoreCase("-")) {
+                        countdown.setTeams(new ArrayList<>());
+                        break;
+                    }
+                    TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+                    countdown.setTeams(Arrays.stream(cmd.getRemainingString(3).split(";")).map(teamManagerModule::getTeamFromInput).collect(Collectors.toList()));
+                    break;
+                case "onFinish":
+                    if (cmd.getRemainingString(3).equalsIgnoreCase("-")) {
+                        countdown.setOnFinish(new ArrayList<>());
+                        break;
+                    }
+                    countdown.setOnFinish(Arrays.asList(cmd.getRemainingString(3).split(";")));
+                    break;
+                default:
+                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <id> <time|title|color|style|visible|invert|teams|onFinish> [value]");
+                    return;
+            }
+            sender.sendMessage(ChatColor.GREEN + "Updated countdown.");
+        } else if (cmd.getString(0).equalsIgnoreCase("cancel")) {
+            if (cmd.argsLength() < 2) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " cancel <id>");
+                return;
+            }
+            String id = cmd.getString(1);
+            CustomCountdown countdown = countdownManagerModule.getCountdown(id);
+            if (countdown == null) {
+                sender.sendMessage(ChatColor.RED + "Countdown not found!");
+                return;
+            }
+            countdown.cancel();
+            sender.sendMessage(ChatColor.YELLOW + "Countdown cancelled.");
+        } else {
+            sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " <list|start|create|edit|cancel>");
+        }
+    }
+
     public static void viewStats(CommandSender sender, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
@@ -712,7 +947,7 @@ public class CycleCommands {
                 }
                 UserProfile up = response.getUser();
                 sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + up.getName());
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " + ChatColor.AQUA + up.getName());
                 sender.sendMessage("");
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + up.getLevel());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + up.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(up.getLevel() + 1) + " (approx.)");
@@ -733,7 +968,7 @@ public class CycleCommands {
         UserProfile profile = getNickedStats ? targetUser.getUserProfile() : targetUser.getUserProfile(true);
         String levelString = getNickedStats ? targetUser.getLevelString() : targetUser.getLevelString(true);
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + (target.equalsIgnoreCase(targetUser.getOriginalName()) ? targetUser.getOriginalName() : targetUser.getDisplayName()));
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " + ChatColor.AQUA + (target.equalsIgnoreCase(targetUser.getOriginalName()) ? targetUser.getOriginalName() : targetUser.getDisplayName()));
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + levelString.replace("[", "").replace("]", ""));
         sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + profile.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(profile.getLevel() + 1) + " (approx.)");

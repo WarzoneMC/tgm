@@ -1,8 +1,8 @@
 package network.warzone.tgm.util;
 
 import network.warzone.tgm.match.Match;
+import network.warzone.tgm.modules.countdown.Countdown;
 import network.warzone.tgm.modules.time.TimeModule;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -33,6 +33,13 @@ public class Placeholders {
         placeholders.put("mapName", match.getMapContainer().getMapInfo().getName());
         placeholders.put("mapGametype", match.getMapContainer().getMapInfo().getGametype().name());
         placeholders.put("mapGametypeName", match.getMapContainer().getMapInfo().getGametype().getName());
+    }
+
+    public static void addPlaceholders(Map<String, String> placeholders, Countdown countdown) {
+        placeholders.put("countdownTime", String.valueOf(countdown.getTimeMaxSeconds()));
+        placeholders.put("countdownTimeFormatted", Strings.formatTime(countdown.getTimeMaxSeconds()));
+        placeholders.put("countdownTimeLeft", String.valueOf(countdown.getTimeLeftSeconds()));
+        placeholders.put("countdownTimeLeftFormatted", Strings.formatTime(countdown.getTimeLeftSeconds()));
     }
 
 }

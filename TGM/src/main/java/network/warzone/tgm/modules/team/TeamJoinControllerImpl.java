@@ -1,8 +1,8 @@
 package network.warzone.tgm.modules.team;
 
-import network.warzone.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.user.PlayerContext;
 
 @AllArgsConstructor
 public class TeamJoinControllerImpl implements TeamJoinController {

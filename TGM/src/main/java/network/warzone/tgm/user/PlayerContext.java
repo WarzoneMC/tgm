@@ -1,7 +1,6 @@
 package network.warzone.tgm.user;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.util.Ranks;

@@ -2,13 +2,13 @@ package network.warzone.tgm.modules.filter.type;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.filter.FilterResult;
 import network.warzone.tgm.modules.filter.evaluate.FilterEvaluator;
 import network.warzone.tgm.modules.region.Region;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import org.bukkit.Location;
 import org.bukkit.block.Block;

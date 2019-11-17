@@ -1,13 +1,11 @@
 package network.warzone.tgm.modules;
 
 import network.warzone.tgm.match.MatchModule;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.util.Vector;
 
 /**
  * Reverts 1.9's damage values to those of 1.8

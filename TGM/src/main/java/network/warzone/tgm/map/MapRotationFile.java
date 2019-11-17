@@ -1,8 +1,8 @@
 package network.warzone.tgm.map;
 
 import com.google.common.io.Files;
-import network.warzone.tgm.TGM;
 import lombok.Getter;
+import network.warzone.tgm.TGM;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class MapRotationFile implements MapRotation {
             List<String> lines = Files.readLines(rotationFile, Charset.defaultCharset());
             for (String line : lines) {
                 for (MapContainer mapContainer : mapLibrary.getMaps()) {
-                    if (mapContainer.getMapInfo().getName().equalsIgnoreCase(line)) {
+                    if (mapContainer.getMapInfo().getName().equalsIgnoreCase(line.trim())) {
                         rotation.add(mapContainer);
                     }
                 }

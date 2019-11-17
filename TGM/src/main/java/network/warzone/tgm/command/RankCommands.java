@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 2/23/2018.
@@ -105,6 +106,7 @@ public class RankCommands {
                         sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + rank.getId().toString());
                         sender.sendMessage(ChatColor.GRAY + "Name: " + ChatColor.RESET + rank.getName());
                         sender.sendMessage(ChatColor.GRAY + "Prefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', rank.getPrefix()));
+                        sender.sendMessage(ChatColor.GRAY + "Display: " + ChatColor.RESET + rank.getDisplay());
                         sender.sendMessage(ChatColor.GRAY + "Priority: " + ChatColor.RESET + rank.getPriority());
                         sender.sendMessage(ChatColor.GRAY + "Staff: " + ChatColor.RESET + rank.isStaff());
                         sender.sendMessage(ChatColor.GRAY + "Default: " + ChatColor.RESET + rank.isDef());
@@ -112,10 +114,10 @@ public class RankCommands {
                         for (String permission : rank.getPermissions()) {
                             sender.spigot().sendMessage(permissionToTextComponent(rank.getName(), permission));
                         }
-                        break;
+                        return;
                     }
-                    sender.sendMessage(ChatColor.RED + "Rank not found.");
                 }
+                sender.sendMessage(ChatColor.RED + "Rank not found.");
             });
 
         } else if (cmd.getString(0).equalsIgnoreCase("create")) {
@@ -165,7 +167,7 @@ public class RankCommands {
         } else if (cmd.getString(0).equalsIgnoreCase("edit")) {
 
             if (cmd.argsLength() < 4) {
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <name> <prefix|staff|priority|permissions|default> <value>");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <name> <" + Arrays.stream(RankEditRequest.EditableField.values()).map(field -> field.name().toLowerCase()).collect(Collectors.joining("|")) + "> <value>");
                 return;
             }
             String name = cmd.getString(1);
@@ -226,6 +228,7 @@ public class RankCommands {
                 new TextComponent(ChatColor.GRAY + "ID: " + ChatColor.RESET + rank.getId().toString()),
                 new TextComponent(ChatColor.GRAY + "\nName: " + ChatColor.RESET + rank.getName()),
                 new TextComponent(ChatColor.GRAY + "\nPrefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', prefix)),
+                new TextComponent(ChatColor.GRAY + "\nDisplay: " + ChatColor.RESET + rank.getDisplay()),
                 new TextComponent(ChatColor.GRAY + "\nPriority: " + ChatColor.RESET + rank.getPriority()),
                 new TextComponent(ChatColor.GRAY + "\nStaff: " + ChatColor.RESET + rank.isStaff()),
                 new TextComponent(ChatColor.GRAY + "\nDefault: " + ChatColor.RESET + rank.isDef()),

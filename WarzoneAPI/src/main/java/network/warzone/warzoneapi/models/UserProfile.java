@@ -40,6 +40,8 @@ public class UserProfile {
     private int wool_destroys;
 
     private List<Punishment> punishments;
+    private List<String> tags;
+    private String activeTag;
 
     @SerializedName("new")
     private boolean isNew;
@@ -178,6 +180,11 @@ public class UserProfile {
             return highest;
         }
         else return null;
+    }
+
+    public void saveTags(PlayerTagsUpdateResponse response) {
+        setTags(response.getTags());
+        setActiveTag(response.getActiveTag());
     }
 
     public static int getRequiredXP(int level) {

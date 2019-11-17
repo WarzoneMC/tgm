@@ -57,6 +57,8 @@ public interface TeamClient {
 
     PlayerAltsResponse getAlts(String name);
 
+    PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action);
+
     KillsLeaderboardResponse getKillsLeaderboard();
 
     MojangProfile getMojangProfile(UUID uuid);

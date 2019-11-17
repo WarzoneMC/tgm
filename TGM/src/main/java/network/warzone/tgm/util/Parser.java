@@ -71,15 +71,7 @@ public class Parser {
     public static List<MatchTeam> getTeamsFromElement(TeamManagerModule teamManagerModule, JsonElement element) {
         List<MatchTeam> teams = new ArrayList<>();
 
-        if (element.isJsonPrimitive()) {
-            if (element.getAsString().equalsIgnoreCase("all")) {
-                for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
-                    if (!matchTeam.isSpectator()) {
-                        teams.add(matchTeam);
-                    }
-                }
-            }
-        } else {
+        if (element.isJsonArray()) {
             for (JsonElement jsonElement : element.getAsJsonArray()) {
                 MatchTeam matchTeam = teamManagerModule.getTeamById(jsonElement.getAsString());
                 if (matchTeam != null) {

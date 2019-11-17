@@ -2,6 +2,8 @@ package network.warzone.tgm.modules.filter.type;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
@@ -10,8 +12,6 @@ import network.warzone.tgm.modules.filter.evaluate.FilterEvaluator;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
 import org.bukkit.Location;

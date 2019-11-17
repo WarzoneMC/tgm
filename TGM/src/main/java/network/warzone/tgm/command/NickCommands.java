@@ -7,7 +7,6 @@ import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.chat.ChatConstant;
-import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.NickedUserProfile;
 import network.warzone.tgm.util.HashMaps;
 import network.warzone.warzoneapi.models.Rank;
@@ -17,7 +16,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;

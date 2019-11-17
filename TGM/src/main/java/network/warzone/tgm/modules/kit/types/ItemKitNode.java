@@ -1,10 +1,10 @@
 package network.warzone.tgm.modules.kit.types;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import network.warzone.tgm.modules.kit.KitNode;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.util.ColorConverter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;

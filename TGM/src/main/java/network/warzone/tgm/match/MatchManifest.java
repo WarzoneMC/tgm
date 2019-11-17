@@ -4,24 +4,23 @@ import com.google.gson.JsonObject;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
 import network.warzone.tgm.modules.chat.ChatModule;
-import network.warzone.tgm.modules.countdown.CycleCountdown;
-import network.warzone.tgm.modules.countdown.StartCountdown;
+import network.warzone.tgm.modules.countdown.CountdownManagerModule;
 import network.warzone.tgm.modules.damage.DamageControlModule;
 import network.warzone.tgm.modules.damage.FireworkDamageModule;
 import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
-import network.warzone.tgm.modules.launchpad.LaunchPadLoaderModule;
-import network.warzone.tgm.modules.launchpad.LaunchPadModule;
-import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
+import network.warzone.tgm.modules.generator.GeneratorModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.knockback.KnockbackModule;
+import network.warzone.tgm.modules.launchpad.LaunchPadLoaderModule;
 import network.warzone.tgm.modules.points.PointsModule;
 import network.warzone.tgm.modules.portal.PortalLoaderModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.reports.ReportsModule;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.screens.ScreenManagerModule;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
@@ -55,6 +54,7 @@ public abstract class MatchManifest {
 
         modules.add(new TeamJoinNotificationsModule());
         modules.add(new SpectatorModule());
+        modules.add(new InventoryPreviewModule());
         modules.add(new SpawnPointHandlerModule());
         modules.add(new SpawnPointLoaderModule());
         modules.add(new TeamManagerModule());
@@ -66,11 +66,11 @@ public abstract class MatchManifest {
         modules.add(new ScoreboardManagerModule());
         modules.add(new RegionManagerModule());
         modules.add(new TaskedModuleManager());
-        modules.add(new StartCountdown());
-        modules.add(new CycleCountdown());
+        modules.add(new CountdownManagerModule());
         modules.add(new KitLoaderModule());
         modules.add(new DeathModule());
         modules.add(new DeathMessageModule());
+        modules.add(new BuildHeightLimitModule());
         modules.add(new FilterManagerModule());
         modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
@@ -95,6 +95,7 @@ public abstract class MatchManifest {
         modules.add(new CraftingModule());
 
         if (GameClassModule.isUsingClasses(mapJson)) modules.add(new GameClassModule());
+        if (GeneratorModule.hasGenerators(mapJson)) modules.add(new GeneratorModule());
 
         return modules;
     }

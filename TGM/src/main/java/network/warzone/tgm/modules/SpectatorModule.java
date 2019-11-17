@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -238,8 +239,21 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
-        if (isSpectating(event.getPlayer())) {
+        if (teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
             event.setCancelled(true);
+        }
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST && event.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+            event.setCancelled(false);
+        }
+    }
+
+    @EventHandler
+    public void onBlockDamage(BlockDamageEvent event) {
+        if (teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
+            event.setCancelled(true);
+        }
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.POST && event.getPlayer().getGameMode() == GameMode.SURVIVAL) {
+            event.setInstaBreak(true);
         }
     }
 
@@ -280,7 +294,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (isSpectating(event.getPlayer())) {
+        if (teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
             event.setCancelled(true);
             if (event.getItem() == null) return;
             if (event.getItem().isSimilar(teamSelectionItem)) {
@@ -308,7 +322,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                     ChatColor teamColor = entry.getValue();
                     teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
                             (clicker, clickEvent) -> {
-                        if (player.isOnline()) clicker.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        if (player.isOnline()) clicker.teleport(player.getLocation());
                     });
                     i++;
                     if (i >= size) break;

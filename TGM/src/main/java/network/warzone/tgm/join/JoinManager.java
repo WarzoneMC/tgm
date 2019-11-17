@@ -10,12 +10,12 @@ import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.QueuedNick;
-import network.warzone.warzoneapi.models.Skin;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.PlayerLogin;
 import network.warzone.warzoneapi.models.Punishment;
+import network.warzone.warzoneapi.models.Skin;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -24,7 +24,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
-import org.bukkit.event.world.WorldInitEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -209,11 +208,6 @@ public class JoinManager implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " left.");
-        handleQuit(event.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onKick(PlayerKickEvent event) {
         handleQuit(event.getPlayer());
     }
 

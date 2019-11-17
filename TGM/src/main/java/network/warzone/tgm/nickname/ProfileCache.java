@@ -18,6 +18,7 @@ public class ProfileCache extends ArrayList<MojangProfile> {
 
     @Override
     public boolean add(MojangProfile mojangProfile) {
+        if (mojangProfile.getCode() != 0) return false;
         if (!contains(mojangProfile.getUuid())) super.add(mojangProfile);
         return true;
     }

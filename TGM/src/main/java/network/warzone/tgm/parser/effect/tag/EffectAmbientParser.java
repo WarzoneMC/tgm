@@ -9,6 +9,6 @@ public class EffectAmbientParser implements EffectTagParser<Boolean> {
 
     @Override
     public Boolean parse(JsonObject object) {
-        return !object.has("duration") || object.get("duration").getAsBoolean();
+        return !object.has("ambient") || object.get("ambient").getAsBoolean();
     }
 }

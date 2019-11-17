@@ -13,7 +13,7 @@ public enum SlotType {
 
     @Getter private int slot;
 
-    private SlotType(int slot) {
+    SlotType(int slot) {
         this.slot = slot;
     }
 }

@@ -1,10 +1,10 @@
 api:
-  # Toggle data linking to an API instance. https://github.com/WarzoneMC/API
+  # Toggle data linking to an API instance. https://github.com/Warzone/API
   # Default: false
   enabled: false
   # URL that points to the API instance.
   # Must not end in / .
-  url: https://api.warz.one
+  url: https://api.warzone.network
   # Authentication token to enable data linking between API instance and server
   auth: secret
   stats:
@@ -28,6 +28,9 @@ chat:
     # Default: "&cChat is currently disabled."
     muted: "&cChat is currently disabled."
 map:
+  # If players will be placed in to survival after the game is ended
+  # Any player in survival mode may break blocks during post game
+  post-block-break: false
   # Retrieve map author names from the Mojang API using the UUIDs specified in the map.json.
   # Recommended for production use only.
   # Default: false
@@ -48,7 +51,7 @@ server:
   # Message displayed on the last line of the scoreboards. Color codes accepted.
   ip: "your.server.ip"
   # Store link displayed when a player tries to join a specific team.
-  store: "https://tgmwarzone.tebex.io/"
+  store: "https://warz.one/store"
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"

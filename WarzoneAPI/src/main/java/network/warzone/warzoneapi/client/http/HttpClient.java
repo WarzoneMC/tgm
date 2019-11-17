@@ -338,9 +338,26 @@ public class HttpClient implements TeamClient {
     public PlayerAltsResponse getAlts(String name) {
         try {
             HttpResponse<PlayerAltsResponse> response = Unirest.get(config.getBaseUrl() + "/mc/player/alts/" + name)
+                    .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
                     .asObject(PlayerAltsResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action) {
+        try {
+            HttpResponse<PlayerTagsUpdateResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/" + username + "/tags/" + action.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(new PlayerTagsUpdateRequest(tag))
+                    .asObject(PlayerTagsUpdateResponse.class);
             return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
