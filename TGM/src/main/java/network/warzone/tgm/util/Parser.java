@@ -68,21 +68,6 @@ public class Parser {
         }
     }
 
-    public static List<MatchTeam> getTeamsFromElement(TeamManagerModule teamManagerModule, JsonElement element) {
-        List<MatchTeam> teams = new ArrayList<>();
-
-        if (element.isJsonArray()) {
-            for (JsonElement jsonElement : element.getAsJsonArray()) {
-                MatchTeam matchTeam = teamManagerModule.getTeamById(jsonElement.getAsString());
-                if (matchTeam != null) {
-                    teams.add(matchTeam);
-                }
-            }
-        }
-
-        return teams;
-    }
-
     /**
      * returns null if all materials are allowed
      */

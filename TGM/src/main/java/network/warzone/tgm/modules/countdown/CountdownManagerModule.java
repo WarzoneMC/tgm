@@ -67,7 +67,7 @@ public class CountdownManagerModule extends MatchModule {
             List<String> onFinish = new ArrayList<>();
             if (countdownObj.has("color")) color = BarColor.valueOf(Strings.getTechnicalName(countdownObj.get("color").getAsString()));
             if (countdownObj.has("style")) style = BarStyle.valueOf(Strings.getTechnicalName(countdownObj.get("style").getAsString()));
-            if (countdownObj.has("teams")) teams.addAll(Parser.getTeamsFromElement(teamManagerModule, countdownObj.get("teams")));
+            if (countdownObj.has("teams")) teams.addAll(teamManagerModule.getTeams(countdownObj.get("teams").getAsJsonArray()));
             if (countdownObj.has("onFinish")) {
                 for (JsonElement cmdElement : countdownObj.getAsJsonArray("onFinish")) {
                     if (!cmdElement.isJsonPrimitive()) continue;

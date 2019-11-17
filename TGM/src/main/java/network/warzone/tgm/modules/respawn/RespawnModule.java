@@ -70,7 +70,7 @@ public class RespawnModule extends MatchModule implements Listener {
                     boolean freeze = defaultRule.isFreeze();
                     boolean blindness = defaultRule.isBlindness();
                     boolean confirm = defaultRule.isConfirm();
-                    if (rule.has("teams")) matchTeams = Parser.getTeamsFromElement(teamManagerModule, rule.get("teams"));;
+                    if (rule.has("teams")) matchTeams = teamManagerModule.getTeams(rule.get("teams").getAsJsonArray());
                     if (rule.has("delay")) delay = rule.get("delay").getAsInt();
                     if (rule.has("freeze")) freeze = rule.get("freeze").getAsBoolean();
                     if (rule.has("blindness")) blindness = rule.get("blindness").getAsBoolean();

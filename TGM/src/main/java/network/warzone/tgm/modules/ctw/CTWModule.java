@@ -47,16 +47,21 @@ public class CTWModule extends MatchModule implements Listener {
 
     private boolean compactLayout = false;
 
+    private TeamManagerModule teamManagerModule;
+    private ScoreboardManagerModule scoreboardManagerModule;
+
     @Override
     public void load(Match match) {
         JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("ctw").getAsJsonObject();
+        this.teamManagerModule = match.getModule(TeamManagerModule.class);
+        this.scoreboardManagerModule = match.getModule(ScoreboardManagerModule.class);
 
         for (JsonElement woolElement : dtmJson.getAsJsonArray("wools")) {
             JsonObject woolObject = woolElement.getAsJsonObject();
 
             String name = woolObject.get("name").getAsString();
             Region region = match.getModule(RegionManagerModule.class).getRegion(match, woolObject.get("region"));
-            List<MatchTeam> teams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), woolObject.get("teams"));
+            List<MatchTeam> teams = this.teamManagerModule.getTeams(woolObject.get("teams").getAsJsonArray());
             String woolColor = Strings.getTechnicalName(woolObject.get("woolcolor").getAsString()); //TODO 1.13 Temp fix
             ChatColor color = ChatColor.valueOf(Strings.getTechnicalName(woolObject.get("color").getAsString()));
             for (MatchTeam matchTeam : teams) {
@@ -65,8 +70,6 @@ public class CTWModule extends MatchModule implements Listener {
 
             teams.clear();
         }
-
-        TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
 
         //wool services
         for (WoolObjective woolObjective : wools) {
@@ -129,7 +132,7 @@ public class CTWModule extends MatchModule implements Listener {
         ItemRemoveModule module = TGM.get().getModule(ItemRemoveModule.class);
 
         //load wools
-        for (WoolObjective woolObjective : wools) {
+        for (WoolObjective woolObjective : this.wools) {
             woolObjective.load();
             if (module != null) module.add(woolObjective.getBlock());
         }
@@ -141,7 +144,7 @@ public class CTWModule extends MatchModule implements Listener {
     private MatchTeam getWinningTeam() {
         Map<MatchTeam, Integer> teamScores = new HashMap<>();
         Map.Entry<MatchTeam, Integer> highest = null;
-        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+        for (MatchTeam matchTeam : this.teamManagerModule.getTeams()) {
             if (matchTeam.isSpectator()) continue;
             int score = 0;
             for (WoolObjective woolObjective : this.wools) {
@@ -177,7 +180,7 @@ public class CTWModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
-        List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
+        List<MatchTeam> teams = this.teamManagerModule.getTeams();
         int spaceCount = 1;
         int i = 2;
         if (!compactLayout) {
@@ -245,13 +248,13 @@ public class CTWModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamUpdate(TeamUpdateEvent event) {
-        Set<String> teamIds = teamScoreboardLines.keySet();
-        Set<MatchTeam> teams = teamIds.stream().map(id -> TGM.get().getModule(TeamManagerModule.class).getTeamById(id)).collect(Collectors.toSet());
+        Set<String> teamIds = this.teamScoreboardLines.keySet();
+        Set<MatchTeam> teams = teamIds.stream().map(id -> this.teamManagerModule.getTeamById(id)).collect(Collectors.toSet());
 
         for (MatchTeam matchTeam : teams) {
             if (event.getMatchTeam() == matchTeam) {
-                int i = teamScoreboardLines.get(matchTeam.getId());
-                for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+                int i = this.teamScoreboardLines.get(matchTeam.getId());
+                for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
                     simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                     simpleScoreboard.update();
                 }
@@ -260,18 +263,17 @@ public class CTWModule extends MatchModule implements Listener {
     }
 
     private void updateOnScoreboard(WoolObjective woolObjective) {
-        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
-        if (!compactLayout) {
-            for (int i : woolScoreboardLines.get(woolObjective)) {
-                for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
+        if (!this.compactLayout) {
+            for (int i : this.woolScoreboardLines.get(woolObjective)) {
+                for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
                     simpleScoreboard.add(getScoreboardString(woolObjective), i);
                     simpleScoreboard.update();
                 }
             }
         } else {
             List<WoolObjective> woolObjectives = getTeamWoolObjectives(woolObjective.getOwner());
-            for (int i : woolScoreboardLines.get(woolObjective)) {
-                for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
+            for (int i : this.woolScoreboardLines.get(woolObjective)) {
+                for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
                     simpleScoreboard.add(getScoreboardString(woolObjectives), i);
                     simpleScoreboard.update();
                 }
@@ -311,13 +313,13 @@ public class CTWModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
-        for (WoolObjective woolObjective : wools) {
+        for (WoolObjective woolObjective : this.wools) {
             woolObjective.unload();
         }
 
-        wools.clear();
-        woolScoreboardLines.clear();
-        teamScoreboardLines.clear();
+        this.wools.clear();
+        this.woolScoreboardLines.clear();
+        this.teamScoreboardLines.clear();
     }
 
     private List<WoolObjective> getTeamWoolObjectives(MatchTeam matchTeam) {

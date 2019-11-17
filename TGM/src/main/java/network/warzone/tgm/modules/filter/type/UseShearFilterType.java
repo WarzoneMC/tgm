@@ -60,7 +60,7 @@ public class UseShearFilterType implements FilterType, Listener {
     }
 
     public static UseShearFilterType parse(Match match, JsonObject jsonObject) {
-        List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
+        List<MatchTeam> matchTeams = match.getModule(TeamManagerModule.class).getTeams(jsonObject.get("teams").getAsJsonArray());
         List<Region> regions = new ArrayList<>();
 
         for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
