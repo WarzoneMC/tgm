@@ -22,6 +22,7 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
+import network.warzone.tgm.modules.screens.ScreenManagerModule;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
@@ -73,6 +74,7 @@ public abstract class MatchManifest {
         modules.add(new FilterManagerModule());
         modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
+        modules.add(new ScreenManagerModule());
         modules.add(new PointsModule());
         modules.add(new LegacyDamageModule());
         modules.add(new EntityDamageModule());

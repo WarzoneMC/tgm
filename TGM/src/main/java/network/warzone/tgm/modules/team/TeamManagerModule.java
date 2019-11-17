@@ -1,5 +1,8 @@
 package network.warzone.tgm.modules.team;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
@@ -207,5 +210,15 @@ public class TeamManagerModule extends MatchModule implements Listener {
             }
         }
         return amount;
+    }
+
+    public List<MatchTeam> getTeams(JsonArray jsonArray) {
+        List<MatchTeam> teams = new ArrayList<>();
+        for (JsonElement e : jsonArray) {
+            if (!e.isJsonPrimitive()) continue;
+            MatchTeam team = getTeamFromInput(e.getAsString());
+            if (team != null) teams.add(team);
+        }
+        return teams;
     }
 }

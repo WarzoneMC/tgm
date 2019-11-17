@@ -8,6 +8,7 @@ import network.warzone.tgm.parser.item.meta.ItemMetaParserType;
 import network.warzone.tgm.parser.item.tag.ItemAmountParser;
 import network.warzone.tgm.parser.item.tag.ItemMaterialParser;
 import network.warzone.tgm.parser.item.tag.ItemTagParser;
+import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -58,25 +59,27 @@ public class ItemDeserializer implements JsonDeserializer<ItemStack> {
         extraParsers.remove(itemMetaParser);
     }
 
-    public static ItemStack parse(JsonObject jsonObject) {
-        Material material = materialParser.parse(jsonObject);
-        int amount = amountParser.parse(jsonObject);
-        ItemStack itemStack = ItemFactory.createItem(material, amount);
-        ItemMeta meta = itemStack.getItemMeta();
-        for (ItemMetaParser itemMetaParser : metaParsers.values()) {
-            itemMetaParser.parse(itemStack, meta, jsonObject);
+    public static ItemStack parse(JsonElement jsonElement) {
+        if (jsonElement.isJsonPrimitive()) {
+            Material material = Material.valueOf(Strings.getTechnicalName(jsonElement.getAsString()));
+            if (material == null) return null;
+            return ItemFactory.createItem(material);
+        } else {
+            Material material = materialParser.parse(jsonElement.getAsJsonObject());
+            int amount = amountParser.parse(jsonElement.getAsJsonObject());
+            ItemStack itemStack = ItemFactory.createItem(material, amount);
+            ItemMeta meta = itemStack.getItemMeta();
+            for (ItemMetaParser itemMetaParser : metaParsers.values()) {
+                itemMetaParser.parse(itemStack, meta, jsonElement.getAsJsonObject());
+            }
+            itemStack.setItemMeta(meta);
+            return itemStack;
         }
-        for (ItemMetaParser extraParser : extraParsers) {
-            extraParser.parse(itemStack, meta, jsonObject);
-        }
-        itemStack.setItemMeta(meta);
-        return itemStack;
     }
 
     @Override
     public ItemStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        assert json.isJsonObject() : "JSON element is not a valid object for item deserializing.";
-        return parse(json.getAsJsonObject());
+        return parse(json);
     }
 
 }

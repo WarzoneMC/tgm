@@ -127,11 +127,7 @@ public class LaunchPadModule extends MatchModule implements TaskedModule, Listen
         if (jsonObject.has("directional")) directional = jsonObject.get("directional").getAsBoolean();
         if (jsonObject.has("teams")) {
             TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-            for (JsonElement e : jsonObject.getAsJsonArray("teams")) {
-                if (!e.isJsonPrimitive()) continue;
-                MatchTeam team = teamManagerModule.getTeamFromInput(e.getAsString());
-                if (team != null) teams.add(team);
-            }
+            teams.addAll(teamManagerModule.getTeams(jsonObject.getAsJsonArray("teams")));
         }
         return new LaunchPadModule(region, delay, motion, directional, teams);
     }
