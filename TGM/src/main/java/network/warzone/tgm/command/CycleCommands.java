@@ -55,17 +55,16 @@ public class CycleCommands {
         String typeString = "";
 
         try {
-             if (cmd.argsLength() == 1) {
-                 if (cmd.getString(0).matches("[0-9]+")) {
-                     index = cmd.getInteger(0);
-                 } else {
-                     typeString = cmd.getString(0);
-                 }
-             }
-             else if (cmd.argsLength() == 2) {
-                 typeString = cmd.getString(0);
-                 index = cmd.getInteger(1);
-             }
+            if (cmd.argsLength() == 1) {
+                if (cmd.getString(0).matches("[0-9]+")) {
+                    index = cmd.getInteger(0);
+                } else {
+                    typeString = cmd.getString(0);
+                }
+            } else if (cmd.argsLength() == 2) {
+                typeString = cmd.getString(0);
+                index = cmd.getInteger(1);
+            }
         } catch (NumberFormatException e) {
             sender.sendMessage(ChatColor.RED + "Number expected.");
             return;
@@ -107,7 +106,8 @@ public class CycleCommands {
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
-        } catch (IndexOutOfBoundsException ignored) {}
+        } catch (IndexOutOfBoundsException ignored) {
+        }
     }
 
     @Command(aliases = {"findmaps"}, desc = "Find the maps that are on Warzone, although not necessarily in the rotation.", min = 1, usage = "<map name> [page]")
@@ -124,7 +124,7 @@ public class CycleCommands {
         }
 
         if (foundMaps.size() == 0) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',"&cNo maps with the name &4" + cmd.getString(0) + "&c were found."));
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cNo maps with the name &4" + cmd.getString(0) + "&c were found."));
             return;
         }
 
@@ -152,7 +152,8 @@ public class CycleCommands {
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
-        } catch (IndexOutOfBoundsException ignored) {}
+        } catch (IndexOutOfBoundsException ignored) {
+        }
     }
 
     @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
@@ -182,7 +183,8 @@ public class CycleCommands {
                 TextComponent message = mapToTextComponent(position, map.getMapInfo());
                 sender.spigot().sendMessage(message);
             }
-        } catch (IndexOutOfBoundsException ignored) { }
+        } catch (IndexOutOfBoundsException ignored) {
+        }
     }
 
     @Command(aliases = {"cycle"}, desc = "Cycle to a new map.")
@@ -219,7 +221,8 @@ public class CycleCommands {
                 }
             }
             boolean soloStart = Bukkit.getOnlinePlayers().size() <= 1;
-            if(!soloStart) sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
+            if (!soloStart)
+                sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
             TGM.get().getModule(StartCountdown.class).start((soloStart) ? 0 : time);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
@@ -240,7 +243,7 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
-              sender.sendMessage(ChatColor.GREEN + "Ending match...");
+                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 if (cmd.hasFlag('f')) {
                     TGM.get().getMatchManager().endMatch(null);
                 } else {
@@ -271,7 +274,7 @@ public class CycleCommands {
                     found = mapContainer;
                 }
             }
-            
+
             if (found == null) {
                 for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
                     if (mapContainer.getMapInfo().getName().toLowerCase().startsWith(cmd.getJoinedStrings(0).toLowerCase())) {
@@ -294,7 +297,7 @@ public class CycleCommands {
 
     @Command(aliases = {"classes"}, desc = "Class menu.")
     public static void classes(CommandContext cmd, CommandSender sender) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
@@ -310,7 +313,7 @@ public class CycleCommands {
     @SuppressWarnings("unchecked")
     @Command(aliases = {"class"}, desc = "Choose a class.", min = 1, usage = "<kit name>")
     public static void classCommand(CommandContext cmd, CommandSender sender) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
@@ -350,7 +353,7 @@ public class CycleCommands {
             gameClassModule.addSwitchClassRequest(player, chosenClassString);
         }
     }
-    
+
     @Command(aliases = {"join", "play"}, desc = "Join a team.")
     public static void join(CommandContext cmd, CommandSender sender) {
         if (!(sender instanceof Player)) {
@@ -374,26 +377,46 @@ public class CycleCommands {
         attemptJoinTeam(playerContext.getPlayer(), event.getTeam(), autoJoin);
     }
 
-    @Command(aliases = {"killstreak", "ks"}, desc = "See your current killstreak")
+    @Command(aliases = {"killstreak", "ks"}, max = 1, usage = "[player]", desc = "See your current killstreak")
     public static void killstreak(CommandContext cmd, CommandSender sender) {
-        if (!(sender instanceof Player)) {
+        boolean otherPlayer;
+        Player player;
+        int killstreak;
+
+        if (cmd.argsLength() == 1) {
+            otherPlayer = true;
+            player = Bukkit.getPlayer(cmd.getString(0));
+
+            if (player == null) {
+                sender.sendMessage(ChatColor.RED + "Player not found.");
+                return;
+            }
+
+            killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(player.getUniqueId().toString());
+
+            if (killstreak == 0) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4" + player.getName() + " &cisn't on a kill streak."));
+                return;
+            }
+        } else if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
+        } else {
+            otherPlayer = false;
+            player = (Player) sender;
+            killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(player.getUniqueId().toString());
         }
-        Player player = (Player) sender;
-        String playerUUID = player.getUniqueId().toString();
 
         MatchTeam matchTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(player);
-        int killstreak = TGM.get().getModule(KillstreakModule.class).getKillstreak(playerUUID);
 
         if (matchTeam != null) {
-            if (killstreak == 0 || matchTeam.isSpectator()) {
-                sender.sendMessage(ChatColor.RED + "You aren't on a killstreak.");
+            if (killstreak < 1 || matchTeam.isSpectator()) {
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', (otherPlayer ? "&4" + player.getName() + " &cisn't on a kill streak." : "&cYou aren't on a kill streak.")));
             } else {
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aYou're on a kill streak of &2" + killstreak + "&a kill" + (killstreak == 1 ? "" : "s") + "."));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', (otherPlayer ? "&2" + player.getName() + " &ais " : "&aYou're ") + "on a kill streak of &2" + killstreak + "&a kill" + (killstreak == 1 ? "" : "s") + "."));
             }
         } else {
-            player.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
+            sender.sendMessage(ChatColor.RED + "Something went wrong. Try again later.");
         }
     }
 
@@ -502,27 +525,27 @@ public class CycleCommands {
 
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
     public static void channel(CommandContext cmd, CommandSender sender) {
-        if(!(sender instanceof Player)) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
             return;
         }
         Player player = (Player) sender;
         if (cmd.argsLength() == 0) {
-          player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
-          return;
+            player.sendMessage(ColorConverter.filterString("&cUsage: /channel (name)"));
+            return;
         }
 
         String channelName = cmd.getString(0).toUpperCase();
         ChatChannel channel = ChatChannel.byName(channelName);
         if (channel == null) {
-          player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
-          player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatChannel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
-          return;
+            player.sendMessage(ColorConverter.filterString("&cInvalid channel: " + channelName));
+            player.sendMessage(ColorConverter.filterString("&cChannels: ( " + StringUtils.join(Arrays.stream(ChatChannel.values()).filter(ch -> ch.hasPermission(player)).collect(Collectors.toList()), " | ")) + " )");
+            return;
         }
 
         if (!channel.hasPermission(player)) {
-          player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
-          return;
+            player.sendMessage(ColorConverter.filterString("&cError: Insufficient permissions."));
+            return;
         }
 
         ChatModule.getChannels().put(player.getUniqueId().toString(), channel);
@@ -546,7 +569,7 @@ public class CycleCommands {
         MapInfo info = TGM.get().getMatchManager().getNextMap().getMapInfo();
         sender.sendMessage(ChatColor.GRAY + "Next Map: " + ChatColor.YELLOW + info.getName() + ChatColor.GRAY + " by " + ChatColor.YELLOW + String.join(", ", info.getAuthors().stream().map(Strings::getAuthorUsername).collect(Collectors.joining(", "))));
     }
-    
+
     @Command(aliases = {"map"}, desc = "View the map info for the current map")
     public static void map(CommandContext cmd, CommandSender sender) {
         MapInfo info = TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo();
@@ -575,7 +598,7 @@ public class CycleCommands {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " limit <seconds>");
                 return;
             }
-            
+
             TimeModule timeModule = TGM.get().getModule(TimeModule.class);
             if (cmd.getString(1).equalsIgnoreCase("on") || cmd.getString(1).equalsIgnoreCase("true")) {
                 timeModule.setTimeLimited(true);
@@ -626,12 +649,12 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage="(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
+    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage = "(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
     public static void leaderboard(CommandContext cmd, CommandSender sender) {
         if (!TGM.get().getConfig().getBoolean("api.stats.enabled") || !TGM.get().getConfig().getBoolean("api.enabled")) {
             sender.sendMessage(ChatColor.RED + "Stat tracking is disabled");
         } else {
-            if (!cmd.getString(0).equalsIgnoreCase("kills"))  {
+            if (!cmd.getString(0).equalsIgnoreCase("kills")) {
                 sender.sendMessage(ChatColor.RED + "Invalid stat: " + cmd.getString(0));
             } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
                 Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
@@ -924,7 +947,7 @@ public class CycleCommands {
                 }
                 UserProfile up = response.getUser();
                 sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-                sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + up.getName());
+                sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " + ChatColor.AQUA + up.getName());
                 sender.sendMessage("");
                 sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + up.getLevel());
                 sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + up.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(up.getLevel() + 1) + " (approx.)");
@@ -945,7 +968,7 @@ public class CycleCommands {
         UserProfile profile = getNickedStats ? targetUser.getUserProfile() : targetUser.getUserProfile(true);
         String levelString = getNickedStats ? targetUser.getLevelString() : targetUser.getLevelString(true);
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
-        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " +  ChatColor.AQUA + (target.equalsIgnoreCase(targetUser.getOriginalName()) ? targetUser.getOriginalName() : targetUser.getDisplayName()));
+        sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " + ChatColor.AQUA + (target.equalsIgnoreCase(targetUser.getOriginalName()) ? targetUser.getOriginalName() : targetUser.getDisplayName()));
         sender.sendMessage("");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Level: " + levelString.replace("[", "").replace("]", ""));
         sender.sendMessage(ChatColor.DARK_AQUA + "   XP: " + ChatColor.AQUA + profile.getXP() + "/" + ChatColor.DARK_AQUA + UserProfile.getRequiredXP(profile.getLevel() + 1) + " (approx.)");

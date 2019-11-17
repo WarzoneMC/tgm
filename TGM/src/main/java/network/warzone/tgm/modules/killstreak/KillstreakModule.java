@@ -97,11 +97,7 @@ public class KillstreakModule extends MatchModule implements Listener {
     }
 
     public int getKillstreak(String uuid) {
-        if (!players.containsKey(uuid) || players.get(uuid) == null) {
-            return 0;
-        }
-
-        return players.get(uuid);
+        return players.getOrDefault(uuid, 0);
     }
 
     public void unload() {
