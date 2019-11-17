@@ -43,6 +43,9 @@ public class NickCommands {
                     .append(" is nicked as ")
                     .append(ChatColor.LIGHT_PURPLE)
                     .append(nickNames.get(uuid));
+            if (Bukkit.getPlayer(uuid) == null) message.append(" ")
+                    .append(ChatColor.GRAY)
+                    .append("[OFFLINE]");
         });
 
         sender.sendMessage(message.toString());
