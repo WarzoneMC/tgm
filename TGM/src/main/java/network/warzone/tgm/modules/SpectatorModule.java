@@ -41,6 +41,7 @@ import java.util.*;
 @ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class SpectatorModule extends MatchModule implements Listener {
 
+    private Match match;
     private TeamManagerModule teamManagerModule;
 
     private MatchTeam spectators;
@@ -73,8 +74,9 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
+        this.match = match;
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
-        this.respawnModule = TGM.get().getModule(RespawnModule.class);
+        this.respawnModule = match.getModule(RespawnModule.class);
         this.spectators = teamManagerModule.getSpectators();
 
         /**
@@ -295,7 +297,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
+        if (match.getMatchStatus() == MatchStatus.PRE || teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
             event.setCancelled(true);
             if (event.getItem() == null) return;
             if (event.getItem().isSimilar(teamSelectionItem)) {
