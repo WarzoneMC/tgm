@@ -248,5 +248,8 @@ public class ColorConverter {
         return DyeColor.WHITE;
     }
 
+    public static String format(String message) {
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
 
 }

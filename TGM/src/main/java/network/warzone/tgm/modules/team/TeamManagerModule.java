@@ -213,6 +213,7 @@ public class TeamManagerModule extends MatchModule implements Listener {
     }
 
     public List<MatchTeam> getTeams(JsonArray jsonArray) {
+        if (jsonArray == null) return new ArrayList<>();
         List<MatchTeam> teams = new ArrayList<>();
         for (JsonElement e : jsonArray) {
             if (!e.isJsonPrimitive()) continue;

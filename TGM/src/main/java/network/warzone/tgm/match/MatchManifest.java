@@ -53,11 +53,11 @@ public abstract class MatchManifest {
         List<MatchModule> modules = new ArrayList<>();
 
         modules.add(new TeamJoinNotificationsModule());
+        modules.add(new TeamManagerModule());
         modules.add(new SpectatorModule());
         modules.add(new InventoryPreviewModule());
         modules.add(new SpawnPointHandlerModule());
         modules.add(new SpawnPointLoaderModule());
-        modules.add(new TeamManagerModule());
         modules.add(new VisibilityModule());
         modules.add(new TimeModule());
         modules.add(new TabListModule());

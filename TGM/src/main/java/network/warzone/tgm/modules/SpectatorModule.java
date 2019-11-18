@@ -56,6 +56,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     private final Map<UUID, Long> lastMovement = new HashMap<>();
 
+    private RespawnModule respawnModule;
+
     public SpectatorModule() {
         this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
 
@@ -71,8 +73,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teamManagerModule = match.getModule(TeamManagerModule.class);
-
+        this.teamManagerModule = match.getModule(TeamManagerModule.class);
+        this.respawnModule = TGM.get().getModule(RespawnModule.class);
         this.spectators = teamManagerModule.getSpectators();
 
         /**
@@ -188,8 +190,7 @@ public class SpectatorModule extends MatchModule implements Listener {
      */
     public boolean isSpectating(Player player) {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
-        RespawnModule respawnModule = TGM.get().getModule(RespawnModule.class);
-        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player) || respawnModule != null && respawnModule.isSpectating(player);
+        return matchStatus != MatchStatus.MID || spectators.containsPlayer(player) || respawnModule != null && respawnModule.isDead(player);
     }
 
     @EventHandler

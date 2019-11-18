@@ -37,6 +37,7 @@ public class Players {
         player.setLevel(0);
         player.setWalkSpeed(0.2F);
         player.setFlySpeed(0.1F);
+        player.setRemainingAir(300);
 
         player.setInvulnerable(false);
         player.setCanPickupItems(true);

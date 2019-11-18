@@ -1,6 +1,7 @@
 package network.warzone.tgm.player.event;
 
 import lombok.Getter;
+import network.warzone.tgm.modules.death.DeathInfo;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -24,10 +25,11 @@ public class TGMPlayerDeathEvent extends Event {
     private ItemStack murderWeapon;
 
     private List<ItemStack> drops;
+    private DeathInfo deathInfo;
 
     private boolean cancelled = false;
 
-    public TGMPlayerDeathEvent(Player victim, Location deathLocation, Player killer, EntityDamageEvent.DamageCause cause, ItemStack murderWeapon, List<ItemStack> drops) {
+    public TGMPlayerDeathEvent(Player victim, Location deathLocation, Player killer, EntityDamageEvent.DamageCause cause, ItemStack murderWeapon, List<ItemStack> drops, DeathInfo deathInfo) {
         super(false);
 
         this.victim = victim;
@@ -36,6 +38,7 @@ public class TGMPlayerDeathEvent extends Event {
         this.cause = cause;
         this.murderWeapon = murderWeapon;
         this.drops = drops;
+        this.deathInfo = deathInfo;
     }
 
     public HandlerList getHandlers() {
