@@ -118,7 +118,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     }
 
     public SpawnPoint getTeamSpawn(MatchTeam matchTeam) {
-        int i = (int) (Math.random() * (matchTeam.getSpawnPoints().size() - 1));
+        int i = (int) (Math.random() * (matchTeam.getSpawnPoints().size()));
         return matchTeam.getSpawnPoints().get(i);
     }
 }
