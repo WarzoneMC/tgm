@@ -240,6 +240,14 @@ public class SpectatorModule extends MatchModule implements Listener {
         }
     }
 
+
+    @EventHandler
+    public void onManipulateArmorStand(PlayerArmorStandManipulateEvent event) {
+        if (isSpectating(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         if (teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
