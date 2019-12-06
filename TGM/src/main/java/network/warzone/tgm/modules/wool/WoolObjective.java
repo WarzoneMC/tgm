@@ -3,6 +3,7 @@ package network.warzone.tgm.modules.wool;
 import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -40,6 +41,7 @@ public class WoolObjective implements Listener {
     private final String name;
 
     private final Material block;
+    private final Match match;
     private final MatchTeam owner;
     private final Region podium; //where players place wool to complete objective.
     private final ChatColor color;
@@ -52,6 +54,7 @@ public class WoolObjective implements Listener {
     public WoolObjective(String name, Material block, MatchTeam owner, Region podium, ChatColor color) {
         this.name = name;
         this.block = block;
+        this.match = TGM.get().getMatchManager().getMatch();
         this.owner = owner;
         this.podium = podium;
         this.color = color;
@@ -117,7 +120,7 @@ public class WoolObjective implements Listener {
     }
 
     private void handleWoolPickup(Player player) {
-        if (completed) return;
+        if (match.getMatchStatus() != MatchStatus.MID || completed) return;
 
         if (!owner.containsPlayer(player)) {
             return;
