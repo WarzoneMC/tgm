@@ -827,7 +827,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"countdown", "cd"} desc = "Manage custom countdowns", usage = "<list|start|create|edit|cancel>", min = 1)
+    @Command(aliases = {"countdown", "cd"}, desc = "Manage custom countdowns", usage = "<list|start|create|edit|cancel>", min = 1)
     @CommandPermissions({"tgm.countdown"})
     public static void countdown(CommandContext cmd, CommandSender sender) throws CommandNumberFormatException {
         CountdownManagerModule countdownManagerModule = TGM.get().getModule(CountdownManagerModule.class);
