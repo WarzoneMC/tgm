@@ -17,9 +17,9 @@ import java.util.List;
 public class UserProfile {
 
     public static final int XP_PER_KILL = 2,
-                            XP_PER_WIN = 10,
-                            XP_PER_LOSS = 5,
-                            XP_PER_WOOL_BREAK = 3;
+                            XP_PER_WIN = 7,
+                            XP_PER_LOSS = 3,
+                            XP_PER_WOOL_BREAK = 5;
 
     @SerializedName("_id")
     private ObjectId id;
