@@ -4,7 +4,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
-import net.minecraft.server.v1_14_R1.*;
+import net.minecraft.server.v1_15_R1.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
@@ -19,7 +19,7 @@ import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
@@ -256,8 +256,8 @@ public class NickManager {
 
         PacketPlayOutPlayerInfo addSelfPacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
         entityPlayer.playerConnection.sendPacket(addSelfPacket);
-        PacketPlayOutRespawn respawn = new PacketPlayOutRespawn(DimensionManager.OVERWORLD, WorldType.getType(Objects.requireNonNull(toExclude.getWorld().getWorldType()).getName()), EnumGamemode.getById(toExclude.getGameMode().getValue()));
-        entityPlayer.playerConnection.sendPacket(respawn);
+//        PacketPlayOutRespawn respawn = new PacketPlayOutRespawn(DimensionManager.OVERWORLD, WorldType.getType(Objects.requireNonNull(toExclude.getWorld().getWorldType()).getName()), EnumGamemode.getById(toExclude.getGameMode().getValue()));
+        toExclude.spigot().respawn();
         PacketPlayOutEntityTeleport playerTP = new PacketPlayOutEntityTeleport(entityPlayer);
         try {
             Field field = PacketPlayOutEntityTeleport.class.getDeclaredField("a");
