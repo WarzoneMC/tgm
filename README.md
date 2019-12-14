@@ -1,4 +1,4 @@
-# TGM - Team Game Manager [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM) ![Minecraft Version](https://img.shields.io/badge/supports%20MC%20versions-1.13%20--%201.14.4-brightgreen.svg) [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://warz.one/discord)
+# TGM - Team Game Manager [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM) ![Minecraft Version](https://img.shields.io/badge/supports%20MC%20versions-1.15-brightgreen.svg) [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://warz.one/discord)
 Team Oriented Minecraft PVP Suite
 
 ## Project Goals
