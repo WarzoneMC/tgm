@@ -21,6 +21,7 @@ import network.warzone.tgm.modules.GameRuleModule;
 import network.warzone.tgm.modules.killstreak.Killstreak;
 import network.warzone.tgm.modules.killstreak.KillstreakDeserializer;
 import network.warzone.tgm.nickname.NickManager;
+import network.warzone.tgm.parser.banner.BannerPatternsDeserializer;
 import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.parser.item.ItemDeserializer;
 import network.warzone.tgm.player.PlayerManager;
@@ -31,6 +32,7 @@ import network.warzone.warzoneapi.client.http.HttpClientConfig;
 import network.warzone.warzoneapi.client.offline.OfflineClient;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.banner.Pattern;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -89,6 +91,7 @@ public class TGM extends JavaPlugin {
                 // Bukkit
                 .registerTypeAdapter(ItemStack.class, new ItemDeserializer())
                 .registerTypeAdapter(PotionEffect.class, new EffectDeserializer())
+                .registerTypeAdapter(Pattern[].class, new BannerPatternsDeserializer())
 
                 .create();
 
