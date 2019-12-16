@@ -91,7 +91,6 @@ public class TGM extends JavaPlugin {
                 // Bukkit
                 .registerTypeAdapter(ItemStack.class, new ItemDeserializer())
                 .registerTypeAdapter(PotionEffect.class, new EffectDeserializer())
-                .registerTypeAdapter(Pattern[].class, new BannerPatternsDeserializer())
 
                 .create();
 

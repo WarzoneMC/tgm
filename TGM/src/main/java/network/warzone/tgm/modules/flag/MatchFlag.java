@@ -23,11 +23,15 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Rotatable;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
@@ -62,6 +66,22 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         placeFlag();
     }
 
+    public Material generateMaterial() {
+        return Material.valueOf(Strings.getTechnicalName(bannerType) + "_BANNER");
+    }
+
+    public ItemStack generateBannerItem() {
+        ItemStack bannerItem = new ItemStack(generateMaterial());
+        ItemMeta itemMeta = bannerItem.getItemMeta();
+        if (itemMeta instanceof BannerMeta) {
+            BannerMeta bannerMeta = (BannerMeta) itemMeta;
+            bannerMeta.setPatterns(bannerPatterns);
+            bannerItem.setItemMeta(bannerMeta);
+        }
+        bannerItem.addEnchantment(Enchantment.BINDING_CURSE, 2);
+        return bannerItem;
+    }
+
     private void refreshFlag() {
         this.flagHolder = null;
         placeFlag();
@@ -69,7 +89,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
     private void placeFlag() {
         Block block = location.getBlock();
-        block.setType(Material.valueOf(Strings.getTechnicalName(bannerType) + "_BANNER"), false);
+        block.setType(generateMaterial(), false);
 
         final BlockState state = block.getState();
         if(state instanceof Banner) {
