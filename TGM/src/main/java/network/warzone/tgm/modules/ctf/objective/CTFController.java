@@ -58,6 +58,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     @Override
     public void capture(MatchFlag flag, Player capturer) {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
+        capturer.removePotionEffect(PotionEffectType.SLOW);
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
         Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.GRAY
                 + " captured " + flag.getTeam().getColor() + flag.getTeam().getAlias()
