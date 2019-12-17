@@ -3,14 +3,20 @@ package network.warzone.tgm.modules.base;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import network.warzone.tgm.modules.region.Region;
+import network.warzone.tgm.modules.respawn.RespawnModule;
+import network.warzone.tgm.modules.team.MatchTeam;
+import network.warzone.tgm.modules.team.TeamManagerModule;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -23,15 +29,21 @@ import java.util.Map;
  * Created by yikes on 12/15/2019
  */
 public class MatchBase implements Listener {
-    private Location baseLocation;
+    private Region baseRegion;
+    private MatchTeam team;
     private Match match;
+    private TeamManagerModule teamManagerModule;
     private List<PlayerRedeemable> playerRedeemables = new ArrayList<>();
     private List<ItemRedeemable> itemRedeemables = new ArrayList<>();
     private Map<Item, BukkitTask> itemTasks = new HashMap<>();
 
-    public MatchBase(Location baseLocation, List<? extends Redeemable> redeemables) {
-        this.baseLocation = baseLocation;
+    private RespawnModule respawnModule;
+
+    public MatchBase(Region baseRegion, MatchTeam team, List<? extends Redeemable> redeemables) {
+        this.baseRegion = baseRegion;
+        this.team = team;
         this.match = TGM.get().getMatchManager().getMatch();
+        this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         for (Redeemable redeemable : redeemables) {
             if (redeemable instanceof PlayerRedeemable) {
                 playerRedeemables.add((PlayerRedeemable) redeemable);
@@ -39,7 +51,28 @@ public class MatchBase implements Listener {
                 itemRedeemables.add((ItemRedeemable) redeemable);
             }
         }
+        this.respawnModule = TGM.get().getModule(RespawnModule.class);
         TGM.registerEvents(this);
+    }
+
+    // Filters are wack. Do not allow build or break in the base region
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (!baseRegion.contains(event.getBlock().getLocation())) return;
+        event.getPlayer().sendMessage(ChatColor.RED + "You cannot break near a capture base!");
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (!baseRegion.contains(event.getBlock().getLocation())) return;
+        event.getPlayer().sendMessage(ChatColor.RED + "You cannot build near a capture base!");
+        event.setCancelled(true);
+    }
+
+
+    private boolean isOnBaseTeam(Player player) {
+        return teamManagerModule.getTeam(player).equals(team);
     }
 
     private List<PlayerRedeemable> hasPlayerRedeemables(Player player) {
@@ -50,7 +83,7 @@ public class MatchBase implements Listener {
         return eligibleRedeemables;
     }
 
-    private List<ItemRedeemable> applicableItemRedeemables(Item item) {
+    private List<ItemRedeemable> applicableItemRedeemables(ItemStack item) {
         List<ItemRedeemable> eligibleRedeemables = new ArrayList<>();
         for (ItemRedeemable itemRedeemable : itemRedeemables) {
             if (itemRedeemable.matchesRedeemable(item)) eligibleRedeemables.add(itemRedeemable);
@@ -61,41 +94,17 @@ public class MatchBase implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (match.getMatchStatus() != MatchStatus.MID ||
-            playerRedeemables == null ||
-            playerRedeemables.size() == 0 ||
-            event.getFrom().distanceSquared(baseLocation) > 1) return;
+            (playerRedeemables == null && itemRedeemables == null) ||
+            (playerRedeemables.size() == 0 && itemRedeemables.size() == 0) ||
+            respawnModule.isDead(event.getPlayer()) ||
+            !isOnBaseTeam(event.getPlayer()) ||
+            !baseRegion.contains(event.getFrom())) return;
         else {
             List<PlayerRedeemable> eligiblePlayerRedeemables = hasPlayerRedeemables(event.getPlayer());
-            if (eligiblePlayerRedeemables.size() == 0) return;
+            List<ItemRedeemable> eligibleItemRedeemables = applicableItemRedeemables(event.getPlayer().getActiveItem());
+            if (eligiblePlayerRedeemables.size() == 0 && eligibleItemRedeemables.size() == 0) return;
             redeemPlayerRedeemables(eligiblePlayerRedeemables, event.getPlayer());
-        }
-    }
-
-    @EventHandler
-    public void onDrop(PlayerDropItemEvent event) {
-        if (match.getMatchStatus() != MatchStatus.MID ||
-            itemRedeemables == null ||
-            itemRedeemables.size() == 0 ||
-            event.getPlayer().getLocation().distanceSquared(baseLocation) > 25) return;
-        else {
-            List<ItemRedeemable> eligibleItemRedeemables = applicableItemRedeemables(event.getItemDrop());
-            if (eligibleItemRedeemables.size() == 0) return;
-            Player playerInQuestion = event.getPlayer();
-            Item itemInQuestion = event.getItemDrop();
-            itemTasks.put(itemInQuestion, Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-                if (itemInQuestion.isDead()) {
-                    itemTasks.get(itemInQuestion).cancel();
-                    itemTasks.remove(itemInQuestion);
-                } else if (itemInQuestion.getVelocity().getY() == 0 && itemInQuestion.isOnGround()) {
-                    if (itemInQuestion.getLocation().distanceSquared(baseLocation) <= 1) {
-                        itemInQuestion.remove();
-                        redeemItemRedeemables(eligibleItemRedeemables, playerInQuestion);
-                    } else {
-                        itemTasks.get(itemInQuestion).cancel();
-                        itemTasks.remove(itemInQuestion);
-                    }
-                }
-            }, 2L, 2L));
+            redeemItemRedeemables(eligibleItemRedeemables, event.getPlayer());
         }
     }
 

@@ -4,6 +4,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.ctf.CTFModule;
 import network.warzone.tgm.modules.flag.MatchFlag;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
+import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.time.TimeLimitService;
@@ -46,12 +47,14 @@ public class CTFTimeController extends CTFController implements TimeLimitService
     public void pickup(MatchFlag flag, Player stealer) {
         super.pickup(flag, stealer);
         currentFlagHolders.add(flag.getTeam());
+        updateAllScoreboards(getFormattedTime());
     }
 
     @Override
     public void drop(MatchFlag flag, Player stealer, Player attacker) {
         super.drop(flag, stealer, attacker);
         currentFlagHolders.remove(flag.getTeam());
+        updateAllScoreboards(getFormattedTime());
     }
 
     @Override
@@ -91,31 +94,39 @@ public class CTFTimeController extends CTFController implements TimeLimitService
     }
 
     private void updateScoreboard(SimpleScoreboard scoreboard, String formattedRemainingTime) {
-        int spaceCount = 0;
-        int positionOnScoreboard = 0;
+        scoreboard.removeAll(ScoreboardManagerModule.getReservedExclusions());
+        int spaceCount = 1;
+        int positionOnScoreboard = 1;
+        scoreboard.add("Time: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
+        for (MatchTeam team : teamManagerModule.getTeams()) {
+            if (team.isSpectator()) continue;
+            scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
+            scoreboard.add(ChatColor.LIGHT_PURPLE.toString() + getTeamPoints(team) + " points", ++positionOnScoreboard);
+            scoreboard.add(team.getColor() + team.getAlias(), ++positionOnScoreboard);
+        }
         scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
+        boolean addedAnyFlags = false;
         for (MatchFlag flag : allFlags) {
             if (flag.getFlagHolder() == null) continue;
+            if (!addedAnyFlags) addedAnyFlags = true;
             MatchTeam team = teamManagerModule.getTeam(flag.getFlagHolder());
             scoreboard.add(flag.getTeam().getColor() +
                     CTFModule.RIGHT_ARROW + " " + team.getColor() + flag.getFlagHolder().getName(), ++positionOnScoreboard);
         }
-        scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
-        for (MatchTeam team : teamManagerModule.getTeams()) {
-            if (team.isSpectator()) continue;
-            scoreboard.add(team.getColor() + team.getAlias(), ++positionOnScoreboard);
-            scoreboard.add(ChatColor.LIGHT_PURPLE.toString() + getTeamPoints(team) + " points", ++positionOnScoreboard);
-            scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
+        if (addedAnyFlags) scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
+        scoreboard.update();
+    }
+
+    private void updateAllScoreboards(String remainingTime) {
+        for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
+            updateScoreboard(simpleScoreboard, remainingTime);
         }
-        scoreboard.add("Time: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
     }
 
     @Override
     public void processSecond(int elapsed) {
         String remainingTime = getFormattedTime(elapsed);
-        for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
-            updateScoreboard(simpleScoreboard, remainingTime);
-        }
+        updateAllScoreboards(remainingTime);
     }
 
     private String getFormattedTime() {

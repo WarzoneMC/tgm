@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -33,6 +35,14 @@ import java.util.UUID;
 public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     private HashMap<UUID, SimpleScoreboard> scoreboards = new HashMap<>();
+    @Getter private static Set<Integer> reservedExclusions;
+
+    static {
+        reservedExclusions = new HashSet<>();
+        // Server IP lines
+        reservedExclusions.add(1);
+        reservedExclusions.add(0);
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {

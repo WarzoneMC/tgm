@@ -1,6 +1,5 @@
 package network.warzone.tgm.modules.base;
 
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,8 +15,8 @@ public abstract class ItemRedeemable extends Redeemable {
      * @param item Item in question
      * @return The answer
      */
-    public boolean matchesRedeemable(Item item) {
-        return item.getItemStack().isSimilar(redeemableItem);
+    public boolean matchesRedeemable(ItemStack item) {
+        return item.isSimilar(redeemableItem);
     }
 
 

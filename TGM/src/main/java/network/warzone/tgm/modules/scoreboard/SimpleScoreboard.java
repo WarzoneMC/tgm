@@ -49,6 +49,13 @@ public class SimpleScoreboard {
         scores.put(text, score);
     }
 
+    public void removeAll(Set<Integer> exclusions) {
+        for (Map.Entry<String, Integer> score : scores.entrySet()) {
+            if (exclusions.contains(score.getValue())) continue;
+            remove(score.getValue());
+        }
+    }
+
     public boolean remove(Integer score, String text) {
         return remove(score, text, true);
     }

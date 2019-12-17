@@ -6,6 +6,9 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.base.PlayerRedeemable;
+import network.warzone.tgm.modules.region.CuboidRegion;
+import network.warzone.tgm.modules.region.Region;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -13,6 +16,7 @@ import network.warzone.tgm.parser.banner.BannerPatternsDeserializer;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,7 +30,10 @@ import org.bukkit.block.data.Rotatable;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
@@ -47,8 +54,11 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private MatchTeam team;
     private Player flagHolder;
 
+    private Region protectiveRegion;
+
     private Match match;
     private TeamManagerModule teamManagerModule;
+    private RespawnModule respawnModule;
 
     public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team) {
 
@@ -61,9 +71,38 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
         this.match = TGM.get().getMatchManager().getMatch();
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+        this.respawnModule = TGM.get().getModule(RespawnModule.class);
 
         TGM.registerEvents(this);
+
+        if (bannerType.contains("WALL")) {
+            this.protectiveRegion = new CuboidRegion(
+                    location.clone().subtract(1, 2, 1),
+                    location.clone().add(1, 1, 1)
+            );
+        } else {
+            this.protectiveRegion = new CuboidRegion(
+                    location.clone().subtract(1, 1, 1),
+                    location.clone().add(1, 2, 1)
+            );
+        }
+
         placeFlag();
+    }
+
+    // Filters are wack. Do not allow build or break in the base region
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (!protectiveRegion.contains(event.getBlock().getLocation())) return;
+        event.getPlayer().sendMessage(ChatColor.RED + "You cannot break near a flag area!");
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        if (!protectiveRegion.contains(event.getBlock().getLocation())) return;
+        event.getPlayer().sendMessage(ChatColor.RED + "You cannot build near a flag area!");
+        event.setCancelled(true);
     }
 
     public Material generateMaterial() {
@@ -78,7 +117,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             bannerMeta.setPatterns(bannerPatterns);
             bannerItem.setItemMeta(bannerMeta);
         }
-        bannerItem.addEnchantment(Enchantment.BINDING_CURSE, 2);
+        bannerItem.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 1);
         return bannerItem;
     }
 
@@ -115,7 +154,9 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     public void onMove(PlayerMoveEvent event) {
         if (flagHolder != null) return;
         MatchTeam playerTeam = teamManagerModule.getTeam(event.getPlayer());
-        if (!passesGeneralConditions(playerTeam) || playerTeam.equals(team)) return;
+        if (respawnModule.isDead(event.getPlayer()) ||
+            !passesGeneralConditions(playerTeam) ||
+            playerTeam.equals(team)) return;
         else if (event.getFrom().distanceSquared(location) > 1) return;
 
         this.flagHolder = event.getPlayer();
@@ -146,6 +187,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     }
 
     public void unload() {
+        flagHolder = null;
         TGM.unregisterEvents(this);
     }
 

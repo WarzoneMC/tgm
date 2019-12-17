@@ -45,6 +45,8 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     @Override
     public void drop(MatchFlag flag, Player stealer, Player attacker) {
         MatchTeam team = teamManagerModule.getTeam(stealer);
+        if (team == null) team = teamManagerModule.getSpectators();
+        if (team == null) return;
         Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.GRAY
                 + " dropped " + flag.getTeam().getColor() + flag.getTeam().getAlias()
                 + ChatColor.GRAY + "'s flag");
@@ -53,7 +55,10 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     @Override
     public void capture(MatchFlag flag, Player capturer) {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
-        Bukkit.broadcastMessage("gg a flag was captured by " + capturer.getName());
+        MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
+        Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.GRAY
+                + " captured " + flag.getTeam().getColor() + flag.getTeam().getAlias()
+                + ChatColor.GRAY + "'s flag");
     }
 
     public void unload() {

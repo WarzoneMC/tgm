@@ -9,14 +9,14 @@ import network.warzone.tgm.modules.ItemRemoveModule;
 import network.warzone.tgm.modules.base.MatchBase;
 import network.warzone.tgm.modules.ctf.objective.*;
 import network.warzone.tgm.modules.flag.MatchFlag;
+import network.warzone.tgm.modules.region.Region;
+import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
-import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.itemstack.ItemUtils;
-import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -45,8 +45,9 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
         if (objective == CTFObjective.TIME) {
             TimeModule timeModule = TGM.get().getModule(TimeModule.class);
             int timeLimit = optionObject.get("time").getAsInt();
+            timeModule.setTimeLimited(true);
             timeModule.setTimeLimit(timeLimit);
-            this.controller = new CTFTimeController(this, matchFlags,  timeLimit);
+            this.controller = new CTFTimeController(this, matchFlags, timeLimit);
             timeModule.setTimeLimitService((TimeLimitService) this.controller);
         } else if (objective == CTFObjective.AMOUNT) {
             int captureAmount = optionObject.get("captures").getAsInt();
@@ -65,17 +66,18 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
 
         // If Objective is amount, bases are required for flags to be captured
         if (objective == CTFObjective.AMOUNT) {
+            RegionManagerModule regionManagerModule = TGM.get().getModule(RegionManagerModule.class);
             TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
             for (JsonElement element : ctfJson.get("bases").getAsJsonArray()) {
                 JsonObject baseObject = element.getAsJsonObject();
-                Location baseLocation = Parser.convertLocation(world, baseObject.get("location"));
+                Region baseRegion = regionManagerModule.getRegion(match, baseObject.get("region"));
                 MatchTeam matchTeam = teamManagerModule.getTeamById(baseObject.get("team").getAsString());
                 List<MatchFlag> flags = new ArrayList<>();
                 for (MatchFlag flag : matchFlags) {
                     if (flag.getTeam().equals(matchTeam)) continue;
                     flags.add(flag);
                 }
-                matchBases.add(new MatchBase(baseLocation, flags));
+                matchBases.add(new MatchBase(baseRegion, matchTeam, flags));
             }
         }
     }
