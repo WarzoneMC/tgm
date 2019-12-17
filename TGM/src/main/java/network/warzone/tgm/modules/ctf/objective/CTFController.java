@@ -12,6 +12,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -36,6 +38,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     @Override
     public void pickup(MatchFlag flag, Player stealer) {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
+        stealer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1000000, 2, true, false), true);
         MatchTeam team = teamManagerModule.getTeam(stealer);
         Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.GRAY
                 + " stole " + flag.getTeam().getColor() + flag.getTeam().getAlias()

@@ -35,7 +35,6 @@ public class MatchBase implements Listener {
     private TeamManagerModule teamManagerModule;
     private List<PlayerRedeemable> playerRedeemables = new ArrayList<>();
     private List<ItemRedeemable> itemRedeemables = new ArrayList<>();
-    private Map<Item, BukkitTask> itemTasks = new HashMap<>();
 
     private RespawnModule respawnModule;
 
@@ -117,8 +116,6 @@ public class MatchBase implements Listener {
     }
 
     public void unload() {
-        for (BukkitTask task : itemTasks.values()) task.cancel();
-        itemTasks = null;
         playerRedeemables = null;
         itemRedeemables = null;
         TGM.unregisterEvents(this);
