@@ -59,4 +59,9 @@ public class MatchTeam {
         this.spawnPoints.add(spawnPoint);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof MatchTeam)) return false;
+        return ((MatchTeam) other).getId().equals(id);
+    }
 }
