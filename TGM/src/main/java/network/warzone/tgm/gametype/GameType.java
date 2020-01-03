@@ -14,7 +14,8 @@ public enum GameType {
     CTW("Capture the Wool", CTWManifest.class),
     Infected("Infection", InfectionManifest.class),
     Blitz("Blitz", BlitzManifest.class),
-    FFA("FFA", FFAManifest.class);
+    FFA("FFA", FFAManifest.class),
+    CTF("CTF", CTFManifest.class);
 
     private String name;
     private Class manifest;

@@ -3,10 +3,22 @@ package network.warzone.tgm.util.itemstack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by luke on 11/15/15.
  */
 public class ItemUtils {
+    private static Set<Material> bannerMaterials = new HashSet<>();
+
+    static {
+        for (Material material : Material.values()) {
+            if (material.name().contains("_BANNER") && !material.name().contains("LEGACY"))
+                bannerMaterials.add(material);
+        }
+    }
+
     public static boolean compare(ItemStack i1, ItemStack i2) {
         if (i1 != null && i2 != null) {
             if (i1.getItemMeta() != null && i2.getItemMeta() != null) {
@@ -41,5 +53,9 @@ public class ItemUtils {
             stringBuilder.append(word);
         }
         return stringBuilder.toString().trim();
+    }
+
+    public static Set<Material> allBannerTypes() {
+        return bannerMaterials;
     }
 }

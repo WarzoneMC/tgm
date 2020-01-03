@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +29,10 @@ public class ItemRemoveModule extends MatchModule implements Listener {
 
     public void add(Material material) {
         this.removed.add(material);
+    }
+
+    public void addAll(Collection<Material> materials) {
+        removed.addAll(materials);
     }
 
     public void remove(Material material) {

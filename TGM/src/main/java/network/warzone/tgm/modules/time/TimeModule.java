@@ -22,7 +22,7 @@ public class TimeModule extends MatchModule {
     private List<TimeSubscriber> timeSubscribers = new ArrayList<>();
 
     @Setter private boolean timeLimited = false;
-    @Setter private int timeLimit = 20*60; // Default
+    @Setter private int timeLimit = 20*60; // Default (20 minutes)
     private MatchTeam defaultWinner = null;
     //@Getter private List<TimeLimitService> services = new ArrayList<>();
     @Setter private TimeLimitService timeLimitService;
@@ -94,6 +94,9 @@ public class TimeModule extends MatchModule {
         broadcasts.clear();
     }
 
+    /**
+     * @return Time elapsed in seconds
+     */
     public double getTimeElapsed() {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.MID) {
