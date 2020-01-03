@@ -16,12 +16,14 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class ItemRemoveModule extends MatchModule implements Listener {
 
-    private final List<Material> removed = new ArrayList<>();
+    private final Set<Material> removed = new HashSet<>();
 
     private boolean removeAll = false;
 
