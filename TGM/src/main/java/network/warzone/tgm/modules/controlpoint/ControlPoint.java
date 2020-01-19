@@ -6,6 +6,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionSave;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -103,6 +104,7 @@ public class ControlPoint implements Listener {
     public void enable() {
         HashMap<MatchTeam, Integer> holding = new HashMap<>();
 
+        RespawnModule respawnModule = TGM.get().getModule(RespawnModule.class);
         runnableId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             holding.clear();
 
@@ -110,6 +112,7 @@ public class ControlPoint implements Listener {
                 if (matchTeam.isSpectator()) continue;
 
                 for (Player player : playersOnPoint) {
+                    if (respawnModule.isDead(player)) continue; // Don't allow players in respawn
                     if (matchTeam.containsPlayer(player)) {
                         holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                     }
