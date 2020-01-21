@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.kit.classes.abilities;
 
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,9 +23,11 @@ public class PhoenixAbility extends Ability {
 
     public Map<FallingBlock, BukkitTask> tasks = new HashMap<>();
     private Queue<BukkitTask> tempPrimaryTasks = new ConcurrentLinkedQueue<>();
+    private RespawnModule respawnModule;
 
     public PhoenixAbility() {
         super("Fire Breath", 20 * 15, Material.BLAZE_POWDER, ChatColor.GOLD.toString() + ChatColor.BOLD + "FIRE BREATH");
+        respawnModule = TGM.get().getModule(RespawnModule.class);
     }
 
     @Override
@@ -52,7 +55,7 @@ public class PhoenixAbility extends Ability {
     }
 
     private void createFire(Player player, Vector velocity, MatchTeam team) {
-        if (tempPrimaryTasks == null || tempPrimaryTasks.poll() == null) return;
+        if (tempPrimaryTasks == null || tempPrimaryTasks.poll() == null || respawnModule.isDead(player)) return;
         final FallingBlock fallingBlock = player.getWorld().spawnFallingBlock(player.getLocation().clone().add(0, 0.4, 0), Material.FIRE.createBlockData());
         fallingBlock.setVelocity(velocity);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SAND_FALL, 1, 1);
