@@ -14,11 +14,14 @@ import org.bukkit.util.Vector;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class PhoenixAbility extends Ability {
 
     public Map<FallingBlock, BukkitTask> tasks = new HashMap<>();
+    private Queue<BukkitTask> tempPrimaryTasks = new ConcurrentLinkedQueue<>();
 
     public PhoenixAbility() {
         super("Fire Breath", 20 * 15, Material.BLAZE_POWDER, ChatColor.GOLD.toString() + ChatColor.BOLD + "FIRE BREATH");
@@ -31,7 +34,9 @@ public class PhoenixAbility extends Ability {
         ThreadLocalRandom rand = ThreadLocalRandom.current();
 
         for (int i = 0; i < 20; i++) {
-            Bukkit.getScheduler().runTaskLater(TGM.get(), () -> createFire(player, player.getLocation().getDirection().multiply(new Vector(rand.nextDouble(0.8, 1.2), rand.nextDouble(0.8, 1.2), rand.nextDouble(0.8, 1.2))), team), i * 2L);
+            tempPrimaryTasks.add(
+                Bukkit.getScheduler().runTaskLater(TGM.get(), () -> createFire(player, player.getLocation().getDirection().multiply(new Vector(rand.nextDouble(0.8, 1.2), rand.nextDouble(0.8, 1.2), rand.nextDouble(0.8, 1.2))), team), i * 2L)
+            );
         }
 
         super.putOnCooldown(player);
@@ -47,6 +52,7 @@ public class PhoenixAbility extends Ability {
     }
 
     private void createFire(Player player, Vector velocity, MatchTeam team) {
+        if (tempPrimaryTasks == null || tempPrimaryTasks.poll() == null) return;
         final FallingBlock fallingBlock = player.getWorld().spawnFallingBlock(player.getLocation().clone().add(0, 0.4, 0), Material.FIRE.createBlockData());
         fallingBlock.setVelocity(velocity);
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_SAND_FALL, 1, 1);
@@ -79,6 +85,8 @@ public class PhoenixAbility extends Ability {
     @Override
     public void terminate() {
         super.terminate();
+        for (BukkitTask bukkitTask : tempPrimaryTasks) bukkitTask.cancel();
+        tempPrimaryTasks = null;
         for (BukkitTask bukkitTask : tasks.values()) bukkitTask.cancel();
         tasks = null;
     }
