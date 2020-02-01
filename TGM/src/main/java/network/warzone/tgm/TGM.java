@@ -17,6 +17,7 @@ import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.MapInfoDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.metrics.Metrics;
 import network.warzone.tgm.modules.GameRuleModule;
 import network.warzone.tgm.modules.killstreak.Killstreak;
 import network.warzone.tgm.modules.killstreak.KillstreakDeserializer;
@@ -83,6 +84,10 @@ public class TGM extends JavaPlugin {
         this.startupTime = new Date().getTime();
         FileConfiguration fileConfiguration = getConfig();
         saveDefaultConfig();
+
+        if (fileConfiguration.contains("plugin_id")) {
+            Metrics metrics = new Metrics(this, fileConfiguration.getInt("plugin_id"));
+        }
 
         gson = new GsonBuilder()
                 // TGM
