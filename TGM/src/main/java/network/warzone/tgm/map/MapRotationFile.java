@@ -43,6 +43,13 @@ public class MapRotationFile implements MapRotation {
     @Override
     public void refresh() {
         rotation.clear();
+
+        if (!rotationFile.exists()) {
+            rotation.addAll(mapLibrary.getMaps());
+            this.current = 0;
+            return;
+        }
+
         try {
             List<String> lines = Files.readLines(rotationFile, Charset.defaultCharset());
             for (String line : lines) {
