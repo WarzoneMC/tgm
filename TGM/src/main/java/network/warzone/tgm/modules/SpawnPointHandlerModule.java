@@ -53,7 +53,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onRespawn(TGMPlayerRespawnEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
