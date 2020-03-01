@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
+import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,10 +22,20 @@ import org.bukkit.potion.PotionEffectType;
 public class MatchResultModule extends MatchModule implements Listener {
 
     private Match match;
+    private TeamManagerModule teamManagerModule;
 
     @Override
     public void load(Match match) {
         this.match = match;
+        this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onRespawn(TGMPlayerRespawnEvent event) {
+        if (TGM.get().getMatchManager().getMatch().getMatchStatus() != MatchStatus.POST) return;
+        if (this.teamManagerModule.getTeam(event.getPlayer()).isSpectator()) return;
+        applyPostPlayer(event.getPlayer());
+        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -43,15 +54,7 @@ public class MatchResultModule extends MatchModule implements Listener {
             if (spectators.containsPlayer(player)) {
                 player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
             } else {
-                if (TGM.get().getConfig().getBoolean("map.post-block-break", false) && player.hasPermission("tgm.post.break")) {
-                    player.setGameMode(GameMode.SURVIVAL);
-                } else {
-                    player.setGameMode(GameMode.ADVENTURE);
-                }
-                player.setAllowFlight(true);
-                player.setVelocity(player.getVelocity().setY(1.0)); // Weeee!
-                player.setFlying(true);
-                player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 5, true, false), true);
+                applyPostPlayer(player);
 
                 if (event.getWinningTeam() == null) {
                     player.sendTitle("", ChatColor.YELLOW + "The result was a tie!", 10, 40, 10);
@@ -82,6 +85,18 @@ public class MatchResultModule extends MatchModule implements Listener {
         }
         MapRotation rotation = TGM.get().getMatchManager().getMapRotation();
         rotation.saveRotationPosition(rotation.getCurrent() + 1);
+    }
+
+    private void applyPostPlayer(Player player) {
+        if (TGM.get().getConfig().getBoolean("map.post-block-break", false) && player.hasPermission("tgm.post.break")) {
+            player.setGameMode(GameMode.SURVIVAL);
+        } else {
+            player.setGameMode(GameMode.ADVENTURE);
+        }
+        player.setAllowFlight(true);
+        player.setVelocity(player.getVelocity().setY(1.0)); // Weeee!
+        player.setFlying(true);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 5, true, false), true);
     }
 
     @EventHandler(priority = EventPriority.LOW)
