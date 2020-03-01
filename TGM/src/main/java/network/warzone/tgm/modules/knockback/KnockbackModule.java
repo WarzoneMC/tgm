@@ -45,10 +45,6 @@ public class KnockbackModule extends MatchModule implements Listener {
         Vector arrowVelocity = a.getVelocity();
         float f3 = (float) Math.sqrt(arrowVelocity.getX() * arrowVelocity.getX() + arrowVelocity.getZ() * arrowVelocity.getZ());
         nmsHuman.h(arrowVelocity.getX() * (double) a.getKnockbackStrength() * 0.6000000238418579D / (double) f3, 0.1D, arrowVelocity.getZ() * (double) a.getKnockbackStrength() * 0.6000000238418579D / (double) f3);
-//        Vector normalVelocity = a.getVelocity();
-//        if (e.isOnGround()) normalVelocity.setY(0.3);
-//        else normalVelocity.setY(0);
-//        e.setVelocity(normalVelocity.normalize().multiply(0.2f));
     }
 
     private void applyMeleeKnockback(LivingEntity attacker, LivingEntity victim) {
