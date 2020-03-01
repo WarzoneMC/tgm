@@ -81,13 +81,14 @@ public class DeathMessageModule extends MatchModule implements Listener {
                             d.playerName,
                             d.killerTeam.getColor(),
                             d.killerName,
-                            (d.cause.equals(DamageCause.ENTITY_ATTACK) ? ItemUtils.itemToString(d.item) : "the environment")
+                            ItemUtils.itemToString(d.item)
 
                     );
                     return true;
                 }
         ));
         put(DamageCause.ENTITY_SWEEP_ATTACK, get(DamageCause.ENTITY_ATTACK));
+        put(DamageCause.CUSTOM, get(DamageCause.ENTITY_ATTACK));
         put(DamageCause.FALL, Arrays.asList(
                 (d) -> {
                     if (d.killer != null) return false;

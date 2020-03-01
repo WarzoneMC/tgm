@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules;
+package network.warzone.tgm.modules.damage;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
