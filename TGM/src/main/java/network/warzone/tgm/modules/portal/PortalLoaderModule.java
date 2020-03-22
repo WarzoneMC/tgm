@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
+import network.warzone.tgm.util.Strings;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
@@ -23,6 +24,10 @@ public class PortalLoaderModule extends MatchModule {
             for (JsonElement portalElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("portals")) {
                 JsonObject json = portalElement.getAsJsonObject();
 
+                PortalModule.Type type = PortalModule.Type.ABSOLUTE;
+                if (json.has("type")) {
+                    type = PortalModule.Type.valueOf(Strings.getTechnicalName(json.get("type").getAsString()));
+                }
                 Region from = TGM.get().getModule(RegionManagerModule.class).getRegion(match, json.get("from"));
                 Location to = Parser.convertLocation(match.getWorld(), json.get("to"));
 
@@ -38,7 +43,7 @@ public class PortalLoaderModule extends MatchModule {
                     sound = json.get("sound").getAsBoolean();
                 }
 
-                PortalModule portalModule = new PortalModule(from, to, teams, sound);
+                PortalModule portalModule = new PortalModule(type, from, to, teams, sound);
                 match.getModules().add(portalModule);
                 TGM.registerEvents(portalModule);
             }
