@@ -44,7 +44,7 @@ public class ItemKeepModule extends MatchModule implements Listener {
                     }
                     items.add(Material.valueOf(Strings.getTechnicalName(jsonElement.getAsString())));
                 } catch (Exception e) {
-                    TGM.get().getPlayerManager().broadcastToAdmins(ChatColor.RED + "[JSON] Unknown material in itemremove module: \"" + jsonElement.getAsString() + "\"");
+                    TGM.get().getPlayerManager().broadcastToAdmins(ChatColor.RED + "[JSON] Unknown material in itemkeep module: \"" + jsonElement.getAsString() + "\"");
                 }
             }
         }
