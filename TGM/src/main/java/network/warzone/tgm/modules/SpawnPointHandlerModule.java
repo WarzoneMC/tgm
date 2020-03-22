@@ -89,7 +89,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                     }
                 }
                 playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
-            }, 1L);
+            }, 1L);  // Delay by 1 tick to prevent missing armor points bug
         } else
             Bukkit.getScheduler().runTaskLater(TGM.get(), () -> {
                 playerContext.getPlayer().setFlying(false);
@@ -103,7 +103,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                     playerContext.getPlayer().updateInventory();
                 }
                 playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
-            }, 1L);
+            }, 1L); // Delay by 1 tick to prevent missing armor points bug
     }
 
     @Override

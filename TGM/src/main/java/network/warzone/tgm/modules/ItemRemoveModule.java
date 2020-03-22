@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Removes item entities that match a material type on spawn.
+ */
 public class ItemRemoveModule extends MatchModule implements Listener {
 
     private final Set<Material> removed = new HashSet<>();

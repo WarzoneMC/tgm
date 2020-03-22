@@ -3,6 +3,7 @@ package network.warzone.tgm.modules.death;
 import lombok.NoArgsConstructor;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
@@ -13,6 +14,7 @@ import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -56,6 +58,10 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
+        if (this.match.getMatchStatus() == MatchStatus.POST) {
+            event.setCancelled(true);
+            return;
+        }
         if (event.getEntity() instanceof Player) {
             if (this.dead.containsKey(event.getEntity().getUniqueId())) {
                 event.setCancelled(true);
@@ -131,7 +137,7 @@ public class DeathModule extends MatchModule implements Listener {
         deathInfo.killer = null;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
         if (match.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) return;
         for (ItemStack stack : event.getDrops()) {
