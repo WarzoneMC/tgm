@@ -15,6 +15,7 @@ import java.util.List;
 public class MapInfo {
     private String name;
     private String version;
+    private String objective;
     private List<Author> authors;
     private GameType gametype;
     private List<ParsedTeam> teams;
