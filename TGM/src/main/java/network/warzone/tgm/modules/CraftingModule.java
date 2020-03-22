@@ -158,4 +158,11 @@ public class CraftingModule extends MatchModule implements Listener {
         return null;
     }
 
+    public void addRemovedRecipe(Material material) {
+        if (!this.removedRecipes.contains(material)) {
+            this.removedRecipes.add(material);
+            this.removeRecipes();
+        }
+    }
+
 }
