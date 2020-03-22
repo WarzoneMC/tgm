@@ -180,11 +180,14 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     public void onJoinAttempt(PlayerJoinTeamAttemptEvent event) {
         if (this.match.getMatchStatus().equals(MatchStatus.PRE)) {
             if (event.isAutoJoin()) {
-                event.setTeam(humans);
+                event.setTeam(this.humans);
             }
         } else {
-            if (!event.isAutoJoin() && !event.getTeam().isSpectator()) {
+            if (event.isAutoJoin()) {
+                event.setTeam(this.infected);
+            } else if (!event.getTeam().isSpectator() && event.getTeam() != this.infected) {
                 event.getPlayerContext().getPlayer().sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this gamemode.");
+                event.setCancelled(true);
             }
         }
     }
