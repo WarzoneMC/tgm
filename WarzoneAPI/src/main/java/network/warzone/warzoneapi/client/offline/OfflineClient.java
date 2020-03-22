@@ -137,7 +137,7 @@ public class OfflineClient implements TeamClient {
 
     @Override
     public PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action) {
-        return new PlayerTagsUpdateResponse(false, "", new ArrayList<>(), null);
+        return new PlayerTagsUpdateResponse(false, "", "", new ArrayList<>(), null);
     }
 
     @Override
