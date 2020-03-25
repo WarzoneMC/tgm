@@ -134,7 +134,7 @@ public class CTWModule extends MatchModule implements Listener {
         //load wools
         for (WoolObjective woolObjective : this.wools) {
             woolObjective.load();
-            if (module != null) module.add(woolObjective.getBlock());
+            if (module != null) module.add(new ItemRemoveModule.ItemRemoveInfo(woolObjective.getBlock()).setPreventingItemSpawn(false));
         }
 
         if (this.wools.size() > 6) this.compactLayout = true;
