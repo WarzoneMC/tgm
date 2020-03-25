@@ -68,6 +68,7 @@ public class FilterManagerModule extends MatchModule {
         else if (type.equals("blockexplode"))   filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
         else if (type.equals("blockplace"))     filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
         else if (type.equals("blockbreak"))     filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));
+        else if (type.equals("voidbuild"))      filterTypes.add(VoidBuildFilterType.parse(match, jsonObject));
 
         return filterTypes;
     }
