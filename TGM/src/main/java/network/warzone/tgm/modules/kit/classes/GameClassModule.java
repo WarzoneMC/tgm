@@ -229,6 +229,7 @@ public class GameClassModule extends MatchModule implements Listener {
 
     @SuppressWarnings("unchecked")
     public <T extends GameClass> T getGameClass(Class<T> clazz) {
+        if (gameClassSet == null) return null;
         for(GameClass gameClass : gameClassSet) {
             if (clazz.isInstance(gameClass)) return ((T) gameClass);
         }
