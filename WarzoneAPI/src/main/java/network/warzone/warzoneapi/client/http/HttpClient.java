@@ -176,17 +176,17 @@ public class HttpClient implements TeamClient {
     }
 
     @Override
-    public KillsLeaderboardResponse getKillsLeaderboard() {
+    public LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion) {
         try {
-            HttpResponse<KillsLeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/kills?limit=10")
+            HttpResponse<LeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/" + leaderboardCriterion.name().toLowerCase() + "?limit=10")
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
-                    .asObject(KillsLeaderboardResponse.class);
+                    .asObject(LeaderboardResponse.class);
             System.out.println(response.getBody());
             return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
-            return new KillsLeaderboardResponse();
+            return new LeaderboardResponse();
         }
     }
 

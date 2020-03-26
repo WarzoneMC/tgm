@@ -118,7 +118,7 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public KillsLeaderboardResponse getKillsLeaderboard() { return new KillsLeaderboardResponse(); }
+    public LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion) { return new LeaderboardResponse(); }
 
     @Override
     public RevertPunishmentResponse revertPunishment(String id) {

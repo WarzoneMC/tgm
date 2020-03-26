@@ -27,6 +27,7 @@ import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.menu.ClassMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
+import network.warzone.warzoneapi.models.LeaderboardCriterion;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -644,22 +645,28 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage = "(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
+    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage = "(type)", min = 1, max = 1, desc = "List the top 10 players on the server")
     public static void leaderboard(CommandContext cmd, CommandSender sender) {
         if (!TGM.get().getConfig().getBoolean("api.stats.enabled") || !TGM.get().getConfig().getBoolean("api.enabled")) {
             sender.sendMessage(ChatColor.RED + "Stat tracking is disabled");
         } else {
-            if (!cmd.getString(0).equalsIgnoreCase("kills")) {
-                sender.sendMessage(ChatColor.RED + "Invalid stat: " + cmd.getString(0));
-            } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                    int place = 0;
-                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
-                    for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
-                        sender.sendMessage(profileToTextComponent(player, ++place).getText());
-                    }
-                });
+            LeaderboardCriterion criterion;
+            try {
+                criterion = LeaderboardCriterion.valueOf(Strings.getTechnicalName(cmd.getString(0)));
+            } catch (IllegalArgumentException e) {
+                List<String> criteria = Arrays.stream(LeaderboardCriterion.values())
+                        .map(c -> c.name().toLowerCase())
+                        .collect(Collectors.toList());
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " <" + String.join("|", criteria) + ">");
+                return;
             }
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                int place = 0;
+                sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (" + criterion.getDisplay() + ")");
+                for (UserProfile player : TGM.get().getTeamClient().getLeaderboard(criterion)) {
+                    sender.sendMessage(profileToTextComponent(player, ++place, criterion).getText());
+                }
+            });
         }
     }
 
@@ -859,8 +866,13 @@ public class CycleCommands {
         TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam, ignoreFull);
     }
 
-    private static TextComponent profileToTextComponent(UserProfile profile, int place) {
-        TextComponent main = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&7" + place + "." + " &b" + profile.getName() + " &7(&9" + profile.getKills() + " kills&7)"));
+    private static TextComponent profileToTextComponent(UserProfile profile, int place, LeaderboardCriterion criterion) {
+        TextComponent main = new TextComponent(
+                ChatColor.translateAlternateColorCodes('&', "&7" + place + "." + " &b" +
+                        profile.getName() + " &7(&9" + criterion.extract(profile) + " " +
+                        criterion.getDisplay() + "&7)"
+                )
+        );
         main.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
                 new TextComponent(ChatColor.AQUA + "Level: " + ChatColor.RESET + profile.getLevel()),
                 new TextComponent("\n"),
