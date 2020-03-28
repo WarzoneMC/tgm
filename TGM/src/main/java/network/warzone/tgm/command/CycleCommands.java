@@ -364,6 +364,10 @@ public class CycleCommands {
         if (cmd.argsLength() > 0) {
             autoJoin = false;
             team = teamManager.getTeamFromInput(cmd.getRemainingString(0));
+            if (team == null) {
+                sender.sendMessage(ChatColor.RED + "Unknown team: " + cmd.getRemainingString(0));
+                return;
+            }
         } else {
             team = teamManager.getSmallestTeam();
         }
@@ -846,7 +850,9 @@ public class CycleCommands {
     }
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin, boolean ignoreFull) {
-        if (!ignoreFull && autoJoin && !player.hasPermission("tgm.pickteam") && !TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator()) {
+        TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
+        MatchTeam currentTeam = teamManager.getTeam(player);
+        if (!ignoreFull && !currentTeam.isSpectator() && !matchTeam.isSpectator()) {
             player.sendMessage(ChatColor.RED + "You are already in a team.");
             return;
         }
@@ -859,11 +865,20 @@ public class CycleCommands {
             if (!player.hasPermission("tgm.pickteam")) {
                 player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team!\nPurchase a rank at " + TGM.get().getConfig().getString("server.store"));
                 return;
+            } else if (!player.hasPermission("tgm.pickteam.bypass") &&
+                    (!TGM.get().getApiManager().isStatsDisabled() || !TGM.get().getConfig().getBoolean("map.team-picking-conditions.ignore-untracked"))) {
+                if (getPlayerCount() < TGM.get().getConfig().getInt("map.team-picking-conditions.min-players")) {
+                    player.sendMessage(ChatColor.RED + "There are not enough players in the server for you to be able to pick your team.");
+                    return;
+                } else if (!enoughPlayers(TGM.get().getConfig().getInt("map.team-picking-conditions.min-playing"))) {
+                    player.sendMessage(ChatColor.RED + "There are not enough players already playing for you to be able to pick your team.");
+                    return;
+                }
             }
         }
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam, ignoreFull);
+        teamManager.joinTeam(playerContext, matchTeam, ignoreFull);
     }
 
     private static TextComponent profileToTextComponent(UserProfile profile, int place, LeaderboardCriterion criterion) {
@@ -904,5 +919,17 @@ public class CycleCommands {
                 .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + mapInfo.getGametype().toString()).append("\n")
                 .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapInfo.getVersion()).create()));
         return message;
+    }
+
+    private static int getPlayerCount() {
+        return Bukkit.getOnlinePlayers().size();
+    }
+
+    private static boolean enoughPlayers(int min) {
+        for (MatchTeam team : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+            if (team.isSpectator()) continue;
+            if (team.getMembers().size() < min) return false;
+        }
+        return true;
     }
 }

@@ -41,6 +41,20 @@ map:
   # Map repository location.
   sources:
   - Maps
+  # Set of conditions for players with the necessary permissions to be able to pick a team.
+  # To bypass these conditions use the permission node 'tgm.pickteam.bypass'.
+  team-picking-conditions:
+    # Minimum amount of players in the server to be able to pick a team.
+    # Set 0 to disable.
+    # Default: 0
+    min-players: 0
+    # Minimum amount of players per team to be able to pick a team.
+    # Set 0 to disable.
+    # Default: 3
+    min-playing: 3
+    # Skip conditions if API is not enabled or on maps where stat tracking has been disabled.
+    # Default: true
+    ignore-untracked: true
 server:
   # Display name for the server object served by the API.
   # Default: Warzone
