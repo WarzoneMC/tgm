@@ -13,6 +13,7 @@ public class PlayerTagsUpdateResponse {
 
     private boolean error;
     private String message;
+    private String player;
     private List<String> tags;
     private String activeTag;
 

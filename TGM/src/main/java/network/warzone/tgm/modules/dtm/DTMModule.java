@@ -6,6 +6,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.modules.CraftingModule;
 import network.warzone.tgm.modules.monument.Monument;
 import network.warzone.tgm.modules.monument.MonumentService;
 import network.warzone.tgm.modules.region.Region;
@@ -61,6 +62,15 @@ public class DTMModule extends MatchModule implements Listener {
             int health = monumentJson.get("health").getAsInt();
 
             this.monuments.add(new Monument(name, teams, region, materials, health, health));
+            if (materials == null) {
+                continue;
+            }
+            for (Material material : materials) {
+                if (material.name().contains("WOOL")) {
+                    match.getModule(CraftingModule.class).addRemovedRecipe(Material.SHEARS);
+                    break;
+                }
+            }
         }
 
 

@@ -39,6 +39,8 @@ public class ItemDeserializer implements JsonDeserializer<ItemStack> {
         put(ItemMetaParserType.POTION,       ItemMetaParserType.POTION.newDefaultInstance());
         put(ItemMetaParserType.BOOK,         ItemMetaParserType.BOOK.newDefaultInstance());
         put(ItemMetaParserType.COLOR,        ItemMetaParserType.COLOR.newDefaultInstance());
+        put(ItemMetaParserType.CAN_PLACE_ON, ItemMetaParserType.CAN_PLACE_ON.newDefaultInstance());
+        put(ItemMetaParserType.CAN_DESTROY,  ItemMetaParserType.CAN_DESTROY.newDefaultInstance());
     }};
 
     private static List<ItemMetaParser> extraParsers = new ArrayList<>();

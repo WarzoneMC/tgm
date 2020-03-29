@@ -3,6 +3,7 @@ package network.warzone.tgm.modules;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.join.MatchJoinEvent;
+import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -401,7 +402,9 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onMatchJoin(MatchJoinEvent event) {
-        lastMovement.put(event.getPlayerContext().getPlayer().getUniqueId(), System.currentTimeMillis());
+        Player player = event.getPlayerContext().getPlayer();
+        lastMovement.put(player.getUniqueId(), System.currentTimeMillis());
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> this.printObjective(player), 10L);
     }
 
     @EventHandler
@@ -431,5 +434,38 @@ public class SpectatorModule extends MatchModule implements Listener {
         Bukkit.getScheduler().cancelTask(afkTimerRunnable);
         lastMovement.clear();
         teamSelectionMenu.disable();
+    }
+
+    public void printObjective(Player player) {
+        MapInfo mapInfo = this.match.getMapContainer().getMapInfo();
+        String objective;
+        if (mapInfo.getObjective() != null) {
+            objective = mapInfo.getObjective();
+        } else {
+            objective = mapInfo.getGametype().getObjective();
+        }
+        if (objective != null && !objective.isEmpty()) {
+            String[] lines = objective.split("\n");
+            String gamemode = mapInfo.getGametype().getName();
+            player.sendMessage(
+                    ChatColor.BLUE.toString() +
+                            ChatColor.BOLD +
+                            "---------- " +
+                            ChatColor.WHITE +
+                            ChatColor.BOLD +
+                            gamemode +
+                            ChatColor.BLUE.toString() +
+                            ChatColor.BOLD +
+                            " ----------"
+            );
+            for (String line : lines) {
+                player.sendMessage(ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', line));
+            }
+            StringBuilder footer = new StringBuilder(ChatColor.BLUE.toString() + ChatColor.BOLD);
+            for (int i = 0; i < gamemode.length() + 20; i++) {
+                footer.append("-");
+            }
+            player.sendMessage(footer.toString());
+        }
     }
 }

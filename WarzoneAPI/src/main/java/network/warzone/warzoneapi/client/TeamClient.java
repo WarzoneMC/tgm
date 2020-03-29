@@ -59,7 +59,7 @@ public interface TeamClient {
 
     PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action);
 
-    KillsLeaderboardResponse getKillsLeaderboard();
+    LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion);
 
     MojangProfile getMojangProfile(UUID uuid);
 

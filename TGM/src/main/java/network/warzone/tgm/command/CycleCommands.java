@@ -10,13 +10,11 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.map.MapInfo;
-import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.chat.ChatChannel;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.countdown.*;
-import network.warzone.tgm.modules.ffa.FFAModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -28,10 +26,8 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.menu.ClassMenu;
-import network.warzone.tgm.util.menu.TagsMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
-import network.warzone.warzoneapi.models.PlayerTagsUpdateRequest;
-import network.warzone.warzoneapi.models.PlayerTagsUpdateResponse;
+import network.warzone.warzoneapi.models.LeaderboardCriterion;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -368,6 +364,10 @@ public class CycleCommands {
         if (cmd.argsLength() > 0) {
             autoJoin = false;
             team = teamManager.getTeamFromInput(cmd.getRemainingString(0));
+            if (team == null) {
+                sender.sendMessage(ChatColor.RED + "Unknown team: " + cmd.getRemainingString(0));
+                return;
+            }
         } else {
             team = teamManager.getSmallestTeam();
         }
@@ -649,22 +649,28 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage = "(kills)", min = 1, max = 1, desc = "List the top 10 players on the server")
+    @Command(aliases = {"leaderboard", "lb", "lboard"}, usage = "(type)", min = 1, max = 1, desc = "List the top 10 players on the server")
     public static void leaderboard(CommandContext cmd, CommandSender sender) {
         if (!TGM.get().getConfig().getBoolean("api.stats.enabled") || !TGM.get().getConfig().getBoolean("api.enabled")) {
             sender.sendMessage(ChatColor.RED + "Stat tracking is disabled");
         } else {
-            if (!cmd.getString(0).equalsIgnoreCase("kills")) {
-                sender.sendMessage(ChatColor.RED + "Invalid stat: " + cmd.getString(0));
-            } else if (cmd.getString(0).equalsIgnoreCase("kills")) {
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                    int place = 0;
-                    sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (kills)");
-                    for (UserProfile player : TGM.get().getTeamClient().getKillsLeaderboard()) {
-                        sender.sendMessage(profileToTextComponent(player, ++place).getText());
-                    }
-                });
+            LeaderboardCriterion criterion;
+            try {
+                criterion = LeaderboardCriterion.valueOf(Strings.getTechnicalName(cmd.getString(0)));
+            } catch (IllegalArgumentException e) {
+                List<String> criteria = Arrays.stream(LeaderboardCriterion.values())
+                        .map(c -> c.name().toLowerCase())
+                        .collect(Collectors.toList());
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " <" + String.join("|", criteria) + ">");
+                return;
             }
+            Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+                int place = 0;
+                sender.sendMessage(ChatColor.DARK_AQUA + "Top 10 players (" + criterion.getDisplay() + ")");
+                for (UserProfile player : TGM.get().getTeamClient().getLeaderboard(criterion)) {
+                    sender.sendMessage(profileToTextComponent(player, ++place, criterion).getText());
+                }
+            });
         }
     }
 
@@ -678,152 +684,6 @@ public class CycleCommands {
             viewStats(sender, sender.getName());
         } else {
             viewStats(sender, cmd.getString(0));
-        }
-    }
-
-    @Command(aliases = {"tag", "tags"}, desc = "Manage your tags.")
-    public static void tags(final CommandContext cmd, CommandSender sender) {
-        if (cmd.argsLength() == 0) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "Only players may open the tags GUI.");
-                return;
-            }
-            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
-            TagsMenu tagsMenu = new TagsMenu(ChatColor.UNDERLINE + "Your tags", 9 * 6, playerContext);
-            tagsMenu.open((Player) sender);
-        }
-        else {
-            if (cmd.getString(0).equalsIgnoreCase("set")) {
-                if (cmd.argsLength() < 2) {
-                    if (sender.hasPermission("tgm.tags.set"))
-                        sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " set <tag> [player]");
-                    else
-                        sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " set <tag>");
-                    return;
-                }
-                if (cmd.argsLength() < 3 && !(sender instanceof Player)) {
-                    sender.sendMessage(ChatColor.RED + "You must include a player.");
-                    return;
-                }
-                String tag;
-                if (cmd.getString(1).equals("-")) tag = null;
-                else tag = cmd.getString(1);
-                String target;
-                if (sender.hasPermission("tgm.tags.set") && cmd.argsLength() >= 3)
-                    target = cmd.getString(2);
-                else
-                    target = sender.getName();
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                   PlayerTagsUpdateResponse response = TGM.get().getTeamClient().updateTag(target, tag, PlayerTagsUpdateRequest.Action.SET);
-
-                   if (!response.isError()) {
-                       String finalTag = tag == null ? ChatColor.GRAY + "" + ChatColor.ITALIC + "none" : ChatColor.translateAlternateColorCodes('&', response.getActiveTag());
-                       Player player = Bukkit.getPlayer(target);
-                       if (player != null) {
-                           TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().saveTags(response);
-                           if (player.getName().equalsIgnoreCase(sender.getName()))
-                               sender.sendMessage(ChatColor.GREEN + "Set your active tag to " + finalTag);
-                           else
-                               sender.sendMessage(ChatColor.GREEN + "Set " + player.getName() + "'s active tag to " + finalTag);
-                       } else {
-                           sender.sendMessage(ChatColor.GREEN + "Set " + target + "'s active tag to " + finalTag);
-                       }
-                   } else {
-                       sender.sendMessage(ChatColor.RED + response.getMessage());
-                   }
-                });
-            } else if (cmd.getString(0).equalsIgnoreCase("add")) {
-                if (!sender.hasPermission("tgm.tags.add")) {
-                    sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
-                    return;
-                }
-                if (cmd.argsLength() < 3) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " add <tag> <player>");
-                    return;
-                }
-                String tag = cmd.getString(1);
-                String target = cmd.getString(2);
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                    PlayerTagsUpdateResponse response = TGM.get().getTeamClient().updateTag(target, tag, PlayerTagsUpdateRequest.Action.ADD);
-
-                    if (!response.isError()) {
-                        Player player = Bukkit.getPlayer(target);
-                        if (player != null) {
-                            TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().saveTags(response);
-                            sender.sendMessage(ChatColor.GREEN + "Added tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' to " + player.getName() + "'s profile");
-                        } else {
-                            sender.sendMessage(ChatColor.GREEN + "Added tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' to " + target + "'s profile");
-                        }
-                    } else {
-                        sender.sendMessage(ChatColor.RED + response.getMessage());
-                    }
-                });
-            } else if (cmd.getString(0).equalsIgnoreCase("remove")) {
-                if (!sender.hasPermission("tgm.tags.remove")) {
-                    sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
-                    return;
-                }
-                if (cmd.argsLength() < 3) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " remove <tag> <player>");
-                    return;
-                }
-                String tag = cmd.getString(1);
-                String target = cmd.getString(2);
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                    PlayerTagsUpdateResponse response = TGM.get().getTeamClient().updateTag(target, tag, PlayerTagsUpdateRequest.Action.REMOVE);
-
-                    if (!response.isError()) {
-                        Player player = Bukkit.getPlayer(target);
-                        if (player != null) {
-                            TGM.get().getPlayerManager().getPlayerContext(player).getUserProfile().saveTags(response);
-                            sender.sendMessage(ChatColor.GREEN + "Removed tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' from " + player.getName() + "'s profile");
-                        } else {
-                            sender.sendMessage(ChatColor.GREEN + "Removed tag '" + ChatColor.translateAlternateColorCodes('&', tag) + ChatColor.GREEN + "' from " + target + "'s profile");
-                        }
-                    } else {
-                        sender.sendMessage(ChatColor.RED + response.getMessage());
-                    }
-                });
-            } else if (cmd.getString(0).equalsIgnoreCase("list")) {
-                if (!sender.hasPermission("tgm.tags.list")) {
-                    sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
-                    return;
-                }
-                if (cmd.argsLength() < 2) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " list <player>");
-                    return;
-                }
-                String target = cmd.getString(1);
-                Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-                    GetPlayerByNameResponse playerByNameResponse = TGM.get().getTeamClient().player(target);
-                    UserProfile profile = playerByNameResponse.getUser();
-                    if (profile == null) {
-                        sender.sendMessage(ChatColor.RED + "Player not found.");
-                        return;
-                    }
-                    if (profile.getTags() != null && !profile.getTags().isEmpty()) {
-                        sender.sendMessage(ChatColor.BLUE + playerByNameResponse.getUser().getName() + "'s tags:");
-                        for (String tag : profile.getTags()) {
-                            if (tag.equals(profile.getActiveTag()))
-                                sender.sendMessage(ChatColor.GREEN + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
-                            else
-                                sender.sendMessage(ChatColor.GRAY + "- " + ChatColor.GRAY + ChatColor.translateAlternateColorCodes('&', tag));
-                        }
-                    } else {
-                        sender.sendMessage(ChatColor.YELLOW + "User has no tags.");
-                    }
-                });
-            } else {
-                List<String> subcmds = new ArrayList<>();
-                if (sender.hasPermission("tgm.tags.set")) subcmds.add("set");
-                if (sender.hasPermission("tgm.tags.add")) subcmds.add("add");
-                if (sender.hasPermission("tgm.tags.remove")) subcmds.add("remove");
-                if (sender.hasPermission("tgm.tags.list")) subcmds.add("list");
-                if (subcmds.isEmpty())
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " [set]");
-                else
-                    sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " <" + String.join("|", subcmds) + ">");
-            }
         }
     }
 
@@ -990,7 +850,9 @@ public class CycleCommands {
     }
 
     public static void attemptJoinTeam(Player player, MatchTeam matchTeam, boolean autoJoin, boolean ignoreFull) {
-        if (!ignoreFull && autoJoin && !player.hasPermission("tgm.pickteam") && !TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator()) {
+        TeamManagerModule teamManager = TGM.get().getModule(TeamManagerModule.class);
+        MatchTeam currentTeam = teamManager.getTeam(player);
+        if (!ignoreFull && !currentTeam.isSpectator() && !matchTeam.isSpectator()) {
             player.sendMessage(ChatColor.RED + "You are already in a team.");
             return;
         }
@@ -1003,15 +865,29 @@ public class CycleCommands {
             if (!player.hasPermission("tgm.pickteam")) {
                 player.sendMessage(ChatColor.LIGHT_PURPLE + "Only premium users can pick their team!\nPurchase a rank at " + TGM.get().getConfig().getString("server.store"));
                 return;
+            } else if (!player.hasPermission("tgm.pickteam.bypass") &&
+                    (!TGM.get().getApiManager().isStatsDisabled() || !TGM.get().getConfig().getBoolean("map.team-picking-conditions.ignore-untracked"))) {
+                if (getPlayerCount() < TGM.get().getConfig().getInt("map.team-picking-conditions.min-players")) {
+                    player.sendMessage(ChatColor.RED + "There are not enough players in the server for you to be able to pick your team.");
+                    return;
+                } else if (!enoughPlayers(TGM.get().getConfig().getInt("map.team-picking-conditions.min-playing"))) {
+                    player.sendMessage(ChatColor.RED + "There are not enough players already playing for you to be able to pick your team.");
+                    return;
+                }
             }
         }
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        TGM.get().getModule(TeamManagerModule.class).joinTeam(playerContext, matchTeam, ignoreFull);
+        teamManager.joinTeam(playerContext, matchTeam, ignoreFull);
     }
 
-    private static TextComponent profileToTextComponent(UserProfile profile, int place) {
-        TextComponent main = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&7" + place + "." + " &b" + profile.getName() + " &7(&9" + profile.getKills() + " kills&7)"));
+    private static TextComponent profileToTextComponent(UserProfile profile, int place, LeaderboardCriterion criterion) {
+        TextComponent main = new TextComponent(
+                ChatColor.translateAlternateColorCodes('&', "&7" + place + "." + " &b" +
+                        profile.getName() + " &7(&9" + criterion.extract(profile) + " " +
+                        criterion.getDisplay() + "&7)"
+                )
+        );
         main.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
                 new TextComponent(ChatColor.AQUA + "Level: " + ChatColor.RESET + profile.getLevel()),
                 new TextComponent("\n"),
@@ -1043,5 +919,17 @@ public class CycleCommands {
                 .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + mapInfo.getGametype().toString()).append("\n")
                 .append(ChatColor.GRAY + "Version: ").append(ChatColor.YELLOW + mapInfo.getVersion()).create()));
         return message;
+    }
+
+    private static int getPlayerCount() {
+        return Bukkit.getOnlinePlayers().size();
+    }
+
+    private static boolean enoughPlayers(int min) {
+        for (MatchTeam team : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+            if (team.isSpectator()) continue;
+            if (team.getMembers().size() < min) return false;
+        }
+        return true;
     }
 }

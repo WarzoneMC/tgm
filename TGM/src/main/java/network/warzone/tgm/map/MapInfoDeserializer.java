@@ -24,6 +24,7 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
         JsonObject json = jsonElement.getAsJsonObject();
         String name = json.get("name").getAsString();
         String version = json.get("version").getAsString();
+        String objective = json.has("objective") ? json.get("objective").getAsString() : null;
         List<Author> authors = new ArrayList<>();
         for (JsonElement authorJson : json.getAsJsonArray("authors")) {
             if (authorJson.isJsonPrimitive()) {
@@ -65,7 +66,7 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
             parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamGamemode, teamMax, teamMin, friendlyFire));
         }
 
-        return new MapInfo(name, version, authors, gameType, parsedTeams, json);
+        return new MapInfo(name, version, objective, authors, gameType, parsedTeams, json);
     }
 
 }

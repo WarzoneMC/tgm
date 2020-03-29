@@ -21,7 +21,9 @@ public enum ItemMetaParserType {
     SKULL_OWNER(ItemSkullOwnerParser.class),
     POTION(ItemPotionParser.class),
     BOOK(ItemBookParser.class),
-    COLOR(ItemColorParser.class);
+    COLOR(ItemColorParser.class),
+    CAN_PLACE_ON(ItemCanPlaceOnParser.class),
+    CAN_DESTROY(ItemCanDestroyParser.class);
 
     private Class<? extends ItemMetaParser> defaultParser;
 
