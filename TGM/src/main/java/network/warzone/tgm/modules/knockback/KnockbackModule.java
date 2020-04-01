@@ -2,6 +2,8 @@ package network.warzone.tgm.modules.knockback;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.match.MatchModule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,17 +11,16 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import java.text.NumberFormat;
@@ -37,22 +38,51 @@ public class KnockbackModule extends MatchModule implements Listener {
     private Random random = new Random();
 
     // https://gist.github.com/YoungOG/e3265d98661957abece71594b70d6a01
-    // Using suppliers for debugging (Hot Swap)
-    private static final Supplier<Double> knockBackFriction = () -> 2.0D;
-    private static final Supplier<Double> knockBackHorizontal = () -> 0.35D;
-    private static final Supplier<Double> knockBackVertical = () -> 0.35D;
-    private static final Supplier<Double> knockBackVerticalLimit = () -> 0.4D;
-    private static final Supplier<Double> knockBackExtraHorizontal = () -> 0.425D;
-    private static final Supplier<Double> knockBackExtraVertical = () -> 0.085D * 0; // This KOHI value is too high
+    
+    private static boolean enabled = false;
+    
+    private static double knockBackFriction;
+    private static double knockBackHorizontal;
+    private static double knockBackVertical;
+    private static double knockBackVerticalLimit;
+    private static double knockBackExtraHorizontal;
+    private static double knockBackExtraVertical;
 
-    private static final Supplier<Double> knockBackBowScale = () -> 0.15D;
-    private static final Supplier<Double> knockBackPunchMultiplier = () -> 1D;
+    // Not currently working
+    private static double knockBackBowScale = 0.15D;
+    private static double knockBackPunchMultiplier = 1D;
 
+    static {
+        loadValues();
+    }
+    
+    private static void loadValues() {
+        enabled = TGM.get().getConfig().getBoolean("custom-knockback.enabled");
+        knockBackFriction = TGM.get().getConfig().getDouble("custom-knockback.friction");
+        knockBackHorizontal = TGM.get().getConfig().getDouble("custom-knockback.horizontal");
+        knockBackVertical = TGM.get().getConfig().getDouble("custom-knockback.vertical");
+        knockBackVerticalLimit = TGM.get().getConfig().getDouble("custom-knockback.vertical-limit");
+        knockBackExtraHorizontal = TGM.get().getConfig().getDouble("custom-knockback.horizontal-extra");
+        knockBackExtraVertical = TGM.get().getConfig().getDouble("custom-knockback.vertical-extra");
+    }
+    
     private Map<Player, EntityDamageByEntityContext> queued = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        if (!enabled) {
+            // Default to previous knockback code until optimal values are fully figured out
+            if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getDamager() instanceof LivingEntity) {
+                meleeKnockback((LivingEntity) event.getDamager(), player);
+            } else if (event.getDamager() instanceof Arrow) {
+                Arrow arrow = (Arrow) event.getDamager();
+                event.setDamage(event.getDamage() / 1.75);
+                bowKnockback(arrow, player);
+            }
+            return;
+        }
         if (event.getDamager() instanceof Arrow) return; // TODO: Apply custom bow knockback
         this.queued.put((Player) event.getEntity(), new EntityDamageByEntityContext(
                 event,
@@ -68,12 +98,26 @@ public class KnockbackModule extends MatchModule implements Listener {
             if (context.getEvent().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK && context.getEvent().getDamager() instanceof LivingEntity) {
                 applyMeleeKnockback(event, context.getEvent().getDamager(), context.isSprinting());
             }
-            else if (context.getEvent().getDamager() instanceof Arrow) {
-                /* Not working */
-//                applyBowKnockback(event, (Arrow) context.getEvent().getDamager());
+            else if (false && context.getEvent().getDamager() instanceof Arrow) { // Disabled (not working)
+                applyBowKnockback(event, (Arrow) context.getEvent().getDamager());
             }
             this.queued.remove(event.getPlayer());
         }
+    }
+
+    @EventHandler
+    public void onArrowsShoot(ProjectileLaunchEvent e) {
+        Projectile projectile = e.getEntity();
+        ProjectileSource shooter = projectile.getShooter();
+        if (shooter instanceof Player) {
+            Player player = (Player) shooter;
+            projectile.setVelocity(player.getLocation().getDirection().clone().normalize().multiply(projectile.getVelocity().length()));
+        }
+    }
+
+    @EventHandler
+    public void onConfigReload(TGMConfigReloadEvent event) {
+        loadValues();
     }
 
     // TODO: Fix weird arrow direction issue
@@ -86,9 +130,9 @@ public class KnockbackModule extends MatchModule implements Listener {
                 Vector arrowVelocity = arrow.getVelocity().clone();
                 double f1 = Math.sqrt(arrowVelocity.getX() * arrowVelocity.getX() + arrowVelocity.getZ() * arrowVelocity.getZ());
                 if (f1 > 0) {
-                    arrowVelocity.setX(arrowVelocity.getX() * (1 + punch * knockBackPunchMultiplier.get()) * knockBackBowScale.get() / f1);
-                    arrowVelocity.setY(knockBackExtraVertical.get());
-                    arrowVelocity.setZ(arrowVelocity.getZ() * (1 + punch * knockBackPunchMultiplier.get()) * knockBackBowScale.get() / f1);
+                    arrowVelocity.setX(arrowVelocity.getX() * (1 + punch * knockBackPunchMultiplier) * knockBackBowScale / f1);
+                    arrowVelocity.setY(knockBackExtraVertical);
+                    arrowVelocity.setZ(arrowVelocity.getZ() * (1 + punch * knockBackPunchMultiplier) * knockBackBowScale / f1);
                     velocity.add(arrowVelocity);
                 }
                 event.setVelocity(velocity);
@@ -114,14 +158,11 @@ public class KnockbackModule extends MatchModule implements Listener {
                     }
                 }
                 Vector kb = new Vector(
-                        -Math.sin(yaw * PI / 180.0F) * (kbStrength) * knockBackExtraHorizontal.get(),
-                        event.getPlayer().isOnGround() ? knockBackExtraVertical.get() + vertical : 0,
-                        Math.cos(yaw * PI / 180.0F) * (kbStrength) * knockBackExtraHorizontal.get()
+                        -Math.sin(yaw * PI / 180.0F) * (kbStrength) * knockBackExtraHorizontal,
+                        event.getPlayer().isOnGround() ? knockBackExtraVertical + vertical : 0,
+                        Math.cos(yaw * PI / 180.0F) * (kbStrength) * knockBackExtraHorizontal
                 );
                 velocity.add(kb);
-                Bukkit.broadcastMessage(ChatColor.RED.toString() + NumberFormat.getInstance().format(velocity.getX()) + " " +
-                        ChatColor.GREEN + NumberFormat.getInstance().format(velocity.getY()) + " " +
-                        ChatColor.BLUE + NumberFormat.getInstance().format(velocity.getZ()));
                 event.setVelocity(velocity);
             }
         } catch (Exception ignored) {
@@ -138,16 +179,16 @@ public class KnockbackModule extends MatchModule implements Listener {
         }
         double magnitude = Math.sqrt(d0 * d0 + d1 * d1);
 
-        velocity.setX(velocity.getX() / knockBackFriction.get());
-        velocity.setY(velocity.getY() / knockBackFriction.get());
-        velocity.setZ(velocity.getZ() / knockBackFriction.get());
+        velocity.setX(velocity.getX() / knockBackFriction);
+        velocity.setY(velocity.getY() / knockBackFriction);
+        velocity.setZ(velocity.getZ() / knockBackFriction);
 
-        velocity.setX(velocity.getX() - d0 / magnitude * knockBackHorizontal.get());
-        velocity.setY(velocity.getY() + knockBackVertical.get());
-        velocity.setZ(velocity.getZ() - d1 / magnitude * knockBackHorizontal.get());
+        velocity.setX(velocity.getX() - d0 / magnitude * knockBackHorizontal);
+        velocity.setY(velocity.getY() + knockBackVertical);
+        velocity.setZ(velocity.getZ() - d1 / magnitude * knockBackHorizontal);
 
-        if (velocity.getY() > knockBackVerticalLimit.get()) {
-            velocity.setY(knockBackVerticalLimit.get());
+        if (velocity.getY() > knockBackVerticalLimit) {
+            velocity.setY(knockBackVerticalLimit);
         }
         return velocity;
     }
@@ -181,6 +222,20 @@ public class KnockbackModule extends MatchModule implements Listener {
         if (f1) value *= scalar;
         if (f2) value *= multiplyScalar1;
         return attributeInstance.getBaseValue() + value;
+    }
+
+    @Deprecated
+    private void meleeKnockback(LivingEntity attacker, LivingEntity victim) {
+        Vector kb = attacker.getLocation().clone().getDirection().setY(victim.isOnGround() ? 0.4 : 0).normalize().multiply(0.25f);
+        victim.setVelocity(kb);
+    }
+
+    @Deprecated
+    private void bowKnockback(Arrow a, Entity e) {
+        Vector normalVelocity = a.getVelocity();
+        if (e.isOnGround()) normalVelocity.setY(0.3);
+        else normalVelocity.setY(0);
+        e.setVelocity(normalVelocity.normalize().multiply(0.2f));
     }
 
     @AllArgsConstructor @Getter

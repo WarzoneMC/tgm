@@ -7,6 +7,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.map.MapInfo;
@@ -646,6 +647,7 @@ public class CycleCommands {
         } else if (cmd.getString(0).equalsIgnoreCase("reload")) {
             TGM.get().reloadConfig();
             sender.sendMessage(ChatColor.GREEN + "Reloaded configuration!");
+            Bukkit.getPluginManager().callEvent(new TGMConfigReloadEvent());
         }
     }
 

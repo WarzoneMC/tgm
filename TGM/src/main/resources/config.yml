@@ -69,3 +69,12 @@ server:
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
+# Configurable knockback values.
+custom-knockback:
+  enabled: false
+  friction: 2.1
+  horizontal: 0.325
+  vertical: 0.325
+  vertical-limit: 0.39
+  horizontal-extra: 0.5
+  vertical-extra: 0.1
