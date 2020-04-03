@@ -26,7 +26,7 @@ public class BuildHeightLimitModule extends MatchModule implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getBlock().getY() >= this.limit) {
+        if (event.getBlock().getY() > this.limit) {
             event.getPlayer().sendMessage(ChatColor.RED + "You have reached the build height limit.");
             event.setCancelled(true);
         }
@@ -34,7 +34,7 @@ public class BuildHeightLimitModule extends MatchModule implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getY() >= this.limit) {
+        if (event.getBlock().getY() > this.limit) {
             event.getPlayer().sendMessage(ChatColor.RED + "You have reached the build height limit.");
             event.setCancelled(true);
         }
