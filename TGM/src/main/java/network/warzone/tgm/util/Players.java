@@ -1,5 +1,6 @@
 package network.warzone.tgm.util;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -63,6 +64,10 @@ public class Players {
 
     public static int getPing(Player player) {
         return player.spigot().getPing();
+    }
+
+    public static void sendMessage(Player player, String message, Object... objects) {
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', String.format(message, objects)));
     }
 
 }
