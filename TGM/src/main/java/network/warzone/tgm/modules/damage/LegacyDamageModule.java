@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.damage;
 
 import network.warzone.tgm.match.MatchModule;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -37,6 +38,8 @@ public class LegacyDamageModule extends MatchModule implements Listener {
                     event.setDamage(event.getDamage() - 0.75D + 1.25D);
                     break;
             }
+        } else if (event.getDamager() instanceof Arrow) {
+            event.setDamage(event.getDamage() / 1.5);
         }
     }
 }
