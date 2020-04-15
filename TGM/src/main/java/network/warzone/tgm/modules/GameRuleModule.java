@@ -31,6 +31,7 @@ public class GameRuleModule extends MatchModule {
 
     public static void setGameRuleDefaults(World world) {
         world.setGameRule(GameRule.KEEP_INVENTORY, false);
+        world.setGameRule(GameRule.DO_FIRE_TICK, false);
         world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
         world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
         world.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
