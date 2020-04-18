@@ -39,7 +39,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
                     break;
             }
         } else if (event.getDamager() instanceof Arrow) {
-            event.setDamage(event.getDamage() / 1.5);
+            event.setDamage(event.getDamage() / 1.3);
         }
     }
 }
