@@ -65,13 +65,11 @@ Here's a basic example of what map configuration files look like:
 
 2. Compile BuildTools by downloading and running the jar from [here](https://hub.spigotmc.org/jenkins/job/BuildTools). Make sure you include the `-compile craftbukkit` flag when compiling it, otherwise you might receive errors when later compiling the plugin.
 
-3. Make sure you Maven installed and run `mvn clean install` in the top-level folder to generate the required libraries. You can then download the jar from the `target` folder 
+3. Make sure you Maven installed and run `mvn clean install` in the top-level folder to generate the required libraries. You can then download the jar from the `target` folder.
 
 ## Developer Tips
 
 1. We use [Lombok](https://projectlombok.org/). Make sure you have the Lombok plugin installed on your preferred IDE.
-
-2. We use maven. Like any other maven project, run `mvn clean install` in the top-level folder to generate the required libraries.
 
 ## Documentation
 
