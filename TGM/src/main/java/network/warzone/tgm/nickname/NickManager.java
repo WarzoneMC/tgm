@@ -80,7 +80,7 @@ public class NickManager {
         setSkin(player, newName, null);
     }
 
-    public void reset(Player player, boolean kick) throws NoSuchFieldException, IllegalAccessException, UnirestException {
+    public void reset(Player player, boolean kick) throws NoSuchFieldException, IllegalAccessException {
         if (kick) {
             originalNames.remove(player.getUniqueId());
             nickNames.remove(player.getUniqueId());
