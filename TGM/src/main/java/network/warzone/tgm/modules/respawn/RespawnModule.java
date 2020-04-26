@@ -140,7 +140,7 @@ public class RespawnModule extends MatchModule implements Listener {
             }
             player.setAllowFlight(true);
             player.setFlying(true);
-            player.setGameMode(GameMode.SPECTATOR);
+            player.setGameMode(GameMode.CREATIVE);
             player.setVelocity(new Vector());
             if (deathInfo.killer != null) {
                 player.teleport(deathInfo.killerLocation);
