@@ -1,14 +1,21 @@
 package network.warzone.tgm.join;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchPostLoadEvent;
+import network.warzone.tgm.modules.chat.ChatConstant;
+import network.warzone.tgm.modules.chat.ChatModule;
+import network.warzone.tgm.nickname.NickManager;
+import network.warzone.tgm.nickname.QueuedNick;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.PlayerLogin;
 import network.warzone.warzoneapi.models.Punishment;
+import network.warzone.warzoneapi.models.Skin;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -16,12 +23,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by luke on 4/27/17.
@@ -29,24 +34,15 @@ import java.util.*;
 @Getter
 public class JoinManager implements Listener {
 
-    private Set<QueuedJoin> queuedJoins = new HashSet<>();
+    private Collection<QueuedJoin> queuedJoins = new ConcurrentLinkedQueue<>();
     private Set<LoginService> loginServices = new HashSet<>();
- 
+
     public JoinManager() {
         TGM.registerEvents(this);
 
-        Set<QueuedJoin> toRemove = new HashSet<>();
-
         //empty queued joins when the connection didn't follow through for an unknown reason.
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), () -> {
-            for (QueuedJoin queuedJoin : queuedJoins) {
-                if (System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000) {
-                    toRemove.add(queuedJoin);
-                }
-            }
-
-            queuedJoins.removeAll(toRemove);
-            toRemove.clear();
+        Bukkit.getScheduler().runTaskTimerAsynchronously(TGM.get(), () -> {
+            queuedJoins.removeIf(queuedJoin -> System.currentTimeMillis() - queuedJoin.getTime() > 10 * 1000);
         }, 20 * 10L, 20 * 10L);
     }
 
@@ -58,9 +54,10 @@ public class JoinManager implements Listener {
         getLoginServices().add(loginService);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), event.getUniqueId().toString(), event.getAddress().getHostAddress()));
+        UUID uuid = event.getUniqueId();
+        UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), uuid.toString(), event.getAddress().getHostAddress()));
 
         Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + userProfile.getRanks().size() + " (loaded/total)");
 
@@ -70,20 +67,21 @@ public class JoinManager implements Listener {
             event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                    + ChatColor.AQUA + "Appeal at https://discord.io/Warzone\n"
+                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
                     + ChatColor.GRAY + "ID: " + punishment.getId().toString()
             );
-            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
+            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
             return;
         }
         //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
 
-        queuedJoins.add(new QueuedJoin(event.getUniqueId(), userProfile, System.currentTimeMillis()));
+        queuedJoins.add(new QueuedJoin(uuid, userProfile, System.currentTimeMillis()));
     }
 
     @EventHandler
     public void onLogin(PlayerLoginEvent event) {
-        QueuedJoin queuedJoin = getQueuedUserProfile(event.getPlayer());
+        UUID uuid = event.getPlayer().getUniqueId();
+        QueuedJoin queuedJoin = getQueuedUserProfile(uuid);
         if (queuedJoin == null) {
             event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
             event.setKickMessage(ChatColor.RED + "Unable to load user profile. Please try again.");
@@ -94,35 +92,109 @@ public class JoinManager implements Listener {
         TGM.get().getPlayerManager().addPlayer(playerContext);
 
         Ranks.createAttachment(event.getPlayer());
-        playerContext.getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
+        playerContext.getUserProfile(true).getRanksLoaded().forEach(rank -> Ranks.addPermissions(event.getPlayer(), rank.getPermissions()));
 
         loginServices.forEach(loginService -> loginService.login(playerContext));
         queuedJoins.remove(queuedJoin);
     }
 
-    private QueuedJoin getQueuedUserProfile(Player player) {
-        for (QueuedJoin queuedJoin : queuedJoins) {
-            if (player.getUniqueId().equals(queuedJoin.getUuid())) {
-                return queuedJoin;
-            }
-        }
-        return null;
+    private QueuedJoin getQueuedUserProfile(UUID uuid) {
+        return queuedJoins.stream().filter(queuedJoin -> uuid.equals(queuedJoin.getUuid())).findFirst().orElse(null);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         Bukkit.getPluginManager().callEvent(new MatchJoinEvent(playerContext));
-        String joinMsg;
-        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && !playerContext.getUserProfile().getRanksLoaded().isEmpty()){
-            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-            joinMsg = ChatColor.GOLD + prefix + event.getPlayer().getName() + ChatColor.GOLD + " joined.";
-            Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
+
+        Player p = playerContext.getPlayer();
+        NickManager nickManager = TGM.get().getNickManager();
+        // Check if a player is nicked as your name.
+        if (nickManager.getNickNames().containsValue(p.getName())) {
+            // Get UUID for player currently with the nickname.
+            UUID uuid = HashMaps.reverseGetFirst(p.getName(), nickManager.getNickNames());
+
+            // Get the player by the UUID.
+            Player player = Bukkit.getPlayer(uuid);
+
+            // Check if the user is online
+            if (player != null && player.isOnline()) {
+                player.sendMessage(ChatColor.RED + "Your name must be reset because the player has joined!");
+                try {
+                    nickManager.reset(player, false);
+                } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
+                    p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
+                }
+            }
         }
-        else joinMsg = ChatColor.GRAY + event.getPlayer().getName() + " joined.";
+
+        String name = nickManager.getNickNames().get(p.getUniqueId());
+        Skin skin = nickManager.getSkins().get(p.getUniqueId());
+
+        // Get the optional queued nick for the player.
+        Optional<QueuedNick> optionalQueuedNick = nickManager.getQueuedNick(p);
+
+        // Check if the the queued nick is present.
+        if (optionalQueuedNick.isPresent()) {
+            // Get the queued nick.
+            QueuedNick queuedNick = optionalQueuedNick.get();
+
+            name = queuedNick.getName();
+            skin = queuedNick.getSkin();
+
+            // Remove the queued nick.
+            nickManager.getQueuedNicks().remove(queuedNick);
+        }
+
+        // Check if a player is nicked as the queued nick.
+        if (nickManager.getNickNames().containsValue(name)) {
+            // Get UUID for player currently with the nickname.
+            UUID uuid = HashMaps.reverseGetFirst(name, nickManager.getNickNames());
+
+            // Get the player by the UUID.
+            Player player = Bukkit.getPlayer(uuid);
+
+            // Check if the player is online.
+            if (player != null && !uuid.equals(p.getUniqueId()) && player.isOnline()) {
+                p.sendMessage(ChatColor.RED + "Could not apply the queued nick. The player is already online!");
+                try {
+                    nickManager.reset(p, false);
+                } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
+                    p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
+                }
+                // Invalidate the nick.
+                name = null;
+                skin = null;
+            }
+        }
+
+        if (name != null) {
+            try {
+                nickManager.setName(p, name);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
+        }
+        if(skin != null) {
+            nickManager.setSkin(p, skin);
+        }
+
+        String joinMsg;
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && playerContext.getUserProfile().getPrefix() != null) {
+            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            joinMsg = ChatColor.GOLD + prefix + playerContext.getDisplayName() + ChatColor.GOLD + " joined.";
+            Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
+        } else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";
 
         if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
         event.setJoinMessage(joinMsg);
+    }
+
+    //TODO: Persistent modules
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onChat(AsyncPlayerChatEvent event) {
+        event.setFormat("");
+        if (event.isCancelled()) return;
+        event.setCancelled(TGM.get().getModule(ChatModule.class) == null);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

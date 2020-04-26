@@ -1,3 +1,6 @@
 name: TGM
+description: Team Game Manager
 main: network.warzone.tgm.TGM
-version: ${project.version}
+version: ${project.version}-${git.commit.id.abbrev}
+website: https://github.com/Warzone/TGM
+api-version: 1.13

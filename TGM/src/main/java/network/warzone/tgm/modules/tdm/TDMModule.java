@@ -12,16 +12,15 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 9/4/2017.
@@ -34,7 +33,7 @@ public class TDMModule extends MatchModule implements Listener {
     private TeamManagerModule teamManager;
     private TDMObjective tdmObjective = TDMObjective.KILLS;
 
-    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private final HashMap<String, Integer> teamScoreboardLines = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -44,15 +43,14 @@ public class TDMModule extends MatchModule implements Listener {
         if (match.getMapContainer().getMapInfo().getJsonObject().has("tdm")) {
             JsonObject tdmJson = match.getMapContainer().getMapInfo().getJsonObject().get("tdm").getAsJsonObject();
             if (tdmJson.has("objective")) {
-                TDMObjective objective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
-                if (objective != null) tdmObjective = objective;
+                tdmObjective = TDMObjective.valueOf(tdmJson.get("objective").getAsString().toUpperCase());
             }
         }
 
         pointsModule = TGM.get().getModule(PointsModule.class);
         pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
 
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getHighestPointsTeam());
+        TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getHighestPointsTeam);
     }
 
     @Override
@@ -61,8 +59,8 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     private MatchTeam getHighestPointsTeam() {
-        Map.Entry<MatchTeam, Integer> highest = null;
-        for (Map.Entry<MatchTeam, Integer> entry : pointsModule.getPoints().entrySet()) {
+        Map.Entry<String, Integer> highest = null;
+        for (Map.Entry<String, Integer> entry : pointsModule.getPoints().entrySet()) {
             if (highest == null) {
                 highest = entry;
                 continue;
@@ -72,10 +70,10 @@ public class TDMModule extends MatchModule implements Listener {
             }
         }
         if (highest != null) {
-            final Map.Entry<MatchTeam, Integer> entry = highest;
-            int amount = pointsModule.getPoints().entrySet().stream().filter(en -> entry.getValue() == en.getValue()).collect(Collectors.toList()).size();
+            final Map.Entry<String, Integer> entry = highest;
+            long amount = pointsModule.getPoints().entrySet().stream().filter(en -> entry.getValue().equals(en.getValue())).count();
             if (amount > 1) return null;
-            else return entry.getKey();
+            else return TGM.get().getModule(TeamManagerModule.class).getTeamById(entry.getKey());
         }
         return null;
     }
@@ -86,11 +84,11 @@ public class TDMModule extends MatchModule implements Listener {
 
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
-        int i = 0;
+        int i = 2;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i++);
+            teamScoreboardLines.put(matchTeam.getId(), i++);
             simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i++);
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
                 simpleScoreboard.add(matchTeam.getColor() + " ", i++);
@@ -99,17 +97,17 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        return "  " + ChatColor.RESET + pointsModule.getPoints(matchTeam) + ChatColor.GRAY + "/" + pointsModule.getTarget(matchTeam) + ChatColor.RESET + " Kills";
+        return "  " + ChatColor.RESET + pointsModule.getPoints(matchTeam) + ChatColor.GRAY + "/" + pointsModule.getTarget(matchTeam) + ChatColor.WHITE + " Kills";
     }
 
-    public void incrementPoints(MatchTeam matchTeam, int amount) {
+    private void incrementPoints(MatchTeam matchTeam, int amount) {
         pointsModule.incrementPoints(matchTeam, amount);
         updateScoreboardTeamLine(matchTeam);
     }
 
-    public void updateScoreboardTeamLine(MatchTeam matchTeam) {
+    private void updateScoreboardTeamLine(MatchTeam matchTeam) {
         for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
-            int line = teamScoreboardLines.get(matchTeam);
+            int line = teamScoreboardLines.get(matchTeam.getId());
             simpleScoreboard.remove(line);
             simpleScoreboard.add(getTeamScoreLine(matchTeam), line);
             simpleScoreboard.update();
@@ -117,9 +115,9 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    public void onDeath(TGMPlayerDeathEvent event) {
         if (tdmObjective.equals(TDMObjective.DEATHS)) {
-            MatchTeam team = teamManager.getTeam(event.getEntity());
+            MatchTeam team = teamManager.getTeam(event.getVictim());
             for (MatchTeam matchTeam : teamManager.getTeams()) {
                 if (!matchTeam.equals(team) && !matchTeam.isSpectator()) {
                     incrementPoints(matchTeam, 1);
@@ -128,11 +126,11 @@ public class TDMModule extends MatchModule implements Listener {
             return;
         }
 
-        if (event.getEntity().getKiller() == null || !(event.getEntity().getKiller() instanceof Player)) {
+        if (event.getKiller() == null) {
             return;
         }
 
-        Player killer = event.getEntity().getKiller();
+        Player killer = event.getKiller();
         MatchTeam team = teamManager.getTeam(killer);
         incrementPoints(team, 1);
     }

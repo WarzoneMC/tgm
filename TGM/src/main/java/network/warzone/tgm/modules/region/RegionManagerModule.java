@@ -2,12 +2,12 @@ package network.warzone.tgm.modules.region;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.util.Parser;
-import lombok.Getter;
 import org.bukkit.Location;
 
 import java.util.HashMap;
@@ -19,9 +19,10 @@ public class RegionManagerModule extends MatchModule {
 
     @Override
     public void load(Match match) {
-        regions.put("global", new CuboidRegion(match.getWorld(),
+        regions.put("global", new CuboidRegion(
                 new Location(match.getWorld(), Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE),
-                new Location(match.getWorld(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)));
+                new Location(match.getWorld(), Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE))
+        );
 
         if (match.getMapContainer().getMapInfo().getJsonObject().has("regions")) {
             for (JsonElement regionElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("regions")) {
@@ -47,7 +48,7 @@ public class RegionManagerModule extends MatchModule {
             return regions.get(jsonElement.getAsString());
         } else {
             JsonObject regionJson = jsonElement.getAsJsonObject();
-            Region region = null;
+            Region region;
             String type = "cuboid";
 
             if (regionJson.has("type")) {
@@ -62,17 +63,32 @@ public class RegionManagerModule extends MatchModule {
                             regionJson.get("height").getAsDouble()
                     );
                     break;
+                case "sphere":
+                    region = new SphereRegion(
+                            Parser.convertLocation(match.getWorld(), regionJson.get("center")),
+                            regionJson.get("radius").getAsDouble()
+                    );
+                    break;
+                case "hemisphere":
+                    region = new HemisphereRegion(
+                            Parser.convertLocation(match.getWorld(), regionJson.get("center")),
+                            regionJson.get("radius").getAsDouble(),
+                            regionJson.has("direction") ? HemisphereRegion.parseHemisphereDirection(regionJson.get("direction")) : HemisphereRegion.HemisphereFace.NEGATIVE_Z
+                    );
+                    break;
+                case "meta":
+                    region = new MetaRegion(regionJson.getAsJsonArray("regions"));
+                    break;
                 case "cuboid":
                 default:
                     region = new CuboidRegion(
-                            match.getWorld(),
                             Parser.convertLocation(match.getWorld(), regionJson.get("min")),
                             Parser.convertLocation(match.getWorld(), regionJson.get("max"))
                     );
                     break;
             }
 
-            if (region != null && regionJson.has("id")) {
+            if (regionJson.has("id")) {
                 regions.put(regionJson.get("id").getAsString(), region);
             }
 

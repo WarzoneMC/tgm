@@ -16,25 +16,31 @@ public class RankEditRequest {
 
     private Object value;
 
-    public static enum EditableField {
+    public enum EditableField {
         PREFIX(){
             @Override
             public String parseValue(String value) {
-                return (String) value;
+                return value;
+            }
+        },
+        DISPLAY(){
+            @Override
+            public String parseValue(String value) {
+                return value;
             }
         },
         PRIORITY() {
             @Override
             public Integer parseValue(String value) {
-                return Integer.parseInt((String) value);
+                return Integer.parseInt(value);
             }
         },
         PERMISSIONS(){
             @Override
             public List<String> parseValue(String value) {
                 List<String> list = new ArrayList<>();
-                if (value instanceof String) {
-                    String[] args = ((String) value).split(" ");
+                if (value != null) {
+                    String[] args = value.split(" ");
                     list = Arrays.asList(args);
                 }
                 return list;
@@ -43,7 +49,13 @@ public class RankEditRequest {
         STAFF(){
             @Override
             public Boolean parseValue(String value) {
-                return Boolean.valueOf((String) value);
+                return Boolean.valueOf(value);
+            }
+        },
+        DEFAULT(){
+            @Override
+            public Boolean parseValue(String value) {
+                return Boolean.valueOf(value);
             }
         };
 

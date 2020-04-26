@@ -1,13 +1,83 @@
 api:
+  # Toggle data linking to an API instance. https://github.com/Warzone/API
+  # Default: false
   enabled: false
-  url: api.team.gg
+  # URL that points to the API instance.
+  # Must not end in / .
+  url: https://api.warzone.network
+  # Authentication token to enable data linking between API instance and server
   auth: secret
   stats:
+    # Toggle user statistics linking. Does not affect match and server data linking.
+    # Default: true
     enabled: true
-rotation: maps/rotation.txt
+# Location of the map rotation file.
+# Default: Maps/rotation.txt
+rotation: Maps/rotation.txt
+
+chat:
+  # Allow players to talk in chat. Can be toggled in-game with the `/chat mute` command and can be bypassed with the tgm.chat.bypass permission node.
+  # Default: true
+  enabled: true
+  # Add a hover event for chat messages that displays the player statistics.
+  # Might cause unwanted behavior if other chat-related plugins are present.
+  # Default: true
+  stats-hover: true
+  messages:
+    # Message that will be displayed to players when the chat is muted if they do not have permission to bypass the chat mute.
+    # Default: "&cChat is currently disabled."
+    muted: "&cChat is currently disabled."
 map:
+  # If players will be placed in to survival after the game is ended
+  # Any player in survival mode may break blocks during post game
+  post-block-break: false
+  # Retrieve map author names from the Mojang API using the UUIDs specified in the map.json.
+  # Recommended for production use only.
+  # Default: false
+  get-names: false
+  # Store the game matches in the `matches` folder found in the server root directory.
+  # Default: false
+  save-matches: false
+  # Map repository location.
   sources:
-  - maps
+  - Maps
+  # Set of conditions for players with the necessary permissions to be able to pick a team.
+  # To bypass these conditions use the permission node 'tgm.pickteam.bypass'.
+  team-picking-conditions:
+    # Minimum amount of players in the server to be able to pick a team.
+    # Set 0 to disable.
+    # Default: 0
+    min-players: 0
+    # Minimum amount of players per team to be able to pick a team.
+    # Set 0 to disable.
+    # Default: 3
+    min-playing: 3
+    # Skip conditions if API is not enabled or on maps where stat tracking has been disabled.
+    # Default: true
+    ignore-untracked: true
 server:
+  # Display name for the server object served by the API.
+  # Default: Warzone
   name: "Warzone"
+  # ID for the server object served by the API.
+  # Default: Warzone
   id: "warzone"
+  # Message displayed on the last line of the scoreboards. Color codes accepted.
+  ip: "your.server.ip"
+  # Store link displayed when a player tries to join a specific team.
+  store: "https://warz.one/store"
+  # Text displayed after the match time on the tablist header.
+  # Default: &f&lWARZONE
+  tablist-name: "&f&lWARZONE"
+# Configurable knockback values.
+custom-knockback:
+  enabled: true
+  friction: 2.1
+  horizontal: 0.425
+  vertical: 0.25
+  vertical-limit: 0.39
+  horizontal-extra: 0.5
+  vertical-extra: 0.1
+  bow-base: 0.345
+  bow-vertical: 0.35
+  punch-multiplier: 1

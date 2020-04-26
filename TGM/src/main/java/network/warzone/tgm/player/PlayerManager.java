@@ -6,7 +6,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 /**
  * Created by luke on 4/28/17.
@@ -16,6 +19,10 @@ public class PlayerManager {
     @Getter Collection<PlayerContext> players = new ConcurrentLinkedQueue<>();
 
     public void addPlayer(PlayerContext playerContext) {
+        List<PlayerContext> toRemove = players.stream()
+                .filter(p -> !Bukkit.getOnlinePlayers().contains(p.getPlayer()))
+                .collect(Collectors.toList());
+        this.players.removeAll(toRemove);
         this.players.add(playerContext);
     }
 
@@ -27,6 +34,24 @@ public class PlayerManager {
         for (PlayerContext playerContext : players) {
             if (playerContext.getPlayer() == player) {
                 return playerContext;
+            }
+        }
+        return null;
+    }
+
+    public PlayerContext getPlayerContext(UUID uuid) {
+        for (PlayerContext context : players) {
+            if (context.getPlayer().getUniqueId().equals(uuid)) {
+                return context;
+            }
+        }
+        return null;
+    }
+
+    public PlayerContext getPlayerContext(String uuid) {
+        for (PlayerContext context : players) {
+            if (context.getPlayer().getUniqueId().toString().equals(uuid)) {
+                return context;
             }
         }
         return null;

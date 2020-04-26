@@ -30,7 +30,7 @@ public class Ranks {
     }
 
     public static void addPermissions(Player player, List<String> permissions) {
-        permissions.stream().forEach(permission -> addPermission(player, permission));
+        permissions.forEach(permission -> addPermission(player, permission));
     }
 
     public static void addPermission(Player player, String permission) {
@@ -40,7 +40,7 @@ public class Ranks {
     }
 
     public static void removePermissions(Player player, List<String> permissions) {
-        permissions.stream().forEach(permission -> removePermission(player, permission));
+        permissions.forEach(permission -> removePermission(player, permission));
     }
 
     public static void removePermission(Player player, String permission) {
@@ -50,9 +50,7 @@ public class Ranks {
     }
 
     public static void removeAttachment(Player player) {
-        if (attachments.containsKey(player.getUniqueId())) {
-            attachments.remove(player.getUniqueId());
-        }
+        attachments.remove(player.getUniqueId());
     }
 
 }

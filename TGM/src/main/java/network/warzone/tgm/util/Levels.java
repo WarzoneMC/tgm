@@ -1,7 +1,7 @@
 package network.warzone.tgm.util;
 
-import network.warzone.warzoneapi.models.UserProfile;
 import network.warzone.tgm.TGM;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.entity.Player;
 
 /**
@@ -47,7 +47,7 @@ public class Levels {
      *
      * Returns the total XP needed to get to the specified level.
      *
-     * @param level target level
+     * @param l target level
      *
      */
     public static int getXPRequiredForLevel(int l) {

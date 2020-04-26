@@ -12,8 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.List;
-
 /**
  * Created by Jorge on 4/16/2018.
  */
@@ -43,6 +41,7 @@ public class BroadcastEventTrigger implements Listener{
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamJoin(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (event.getOldTeam() == null || event.getTeam().isSpectator()) return;
         trigger(event.getPlayerContext().getPlayer(), "onTeamJoin");
     }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.modules.CraftingModule;
 import network.warzone.tgm.modules.monument.Monument;
 import network.warzone.tgm.modules.monument.MonumentService;
 import network.warzone.tgm.modules.region.Region;
@@ -24,17 +25,14 @@ import network.warzone.tgm.util.FireworkUtil;
 import network.warzone.tgm.util.Parser;
 import network.warzone.warzoneapi.models.DestroyWoolRequest;
 import network.warzone.warzoneapi.models.UserProfile;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -42,10 +40,16 @@ public class DTMModule extends MatchModule implements Listener {
 
     @Getter private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
-    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private final HashMap<String, Integer> teamScoreboardLines = new HashMap<>();
+
+    private TeamManagerModule teamManagerModule;
+    private ScoreboardManagerModule scoreboardManagerModule;
 
     @Override
     public void load(Match match) {
+        this.teamManagerModule = match.getModule(TeamManagerModule.class);
+        this.scoreboardManagerModule = match.getModule(ScoreboardManagerModule.class);
+
         JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("dtm").getAsJsonObject();
 
         for (JsonElement monumentElement : dtmJson.getAsJsonArray("monuments")) {
@@ -53,17 +57,25 @@ public class DTMModule extends MatchModule implements Listener {
 
             String name = monumentJson.get("name").getAsString();
             Region region = match.getModule(RegionManagerModule.class).getRegion(match, monumentJson.get("region"));
-            List<MatchTeam> teams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), monumentJson.get("teams"));
+            List<MatchTeam> teams = match.getModule(TeamManagerModule.class).getTeams(monumentJson.get("teams").getAsJsonArray());
             List<Material> materials = Parser.getMaterialsFromElement(monumentJson.get("materials"));
             int health = monumentJson.get("health").getAsInt();
 
-            monuments.add(new Monument(name, teams, region, materials, health, health));
+            this.monuments.add(new Monument(name, teams, region, materials, health, health));
+            if (materials == null) {
+                continue;
+            }
+            for (Material material : materials) {
+                if (material.name().contains("WOOL")) {
+                    match.getModule(CraftingModule.class).addRemovedRecipe(Material.SHEARS);
+                    break;
+                }
+            }
         }
 
-        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
 
         //monument services
-        for (Monument monument : monuments) {
+        for (Monument monument : this.monuments) {
             String unformattedName = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&' , (monument.getName())));
 
             monument.addService(new MonumentService() {
@@ -83,7 +95,7 @@ public class DTMModule extends MatchModule implements Listener {
                     //}
 
                     for (PlayerContext playerContext : monument.getOwners().get(0).getMembers()) {
-                        playerContext.getPlayer().playSound(monument.getRegion().getCenter(), Sound.ENTITY_IRONGOLEM_ATTACK, SoundCategory.MASTER, 1000, 1);
+                        playerContext.getPlayer().playSound(monument.getRegion().getCenter(), Sound.ENTITY_IRON_GOLEM_ATTACK, SoundCategory.MASTER, 1000, 1);
                     }
 
                     if (TGM.get().getApiManager().isStatsDisabled()) return;
@@ -121,7 +133,7 @@ public class DTMModule extends MatchModule implements Listener {
         }
 
         //load monuments
-        for (Monument monument : monuments) {
+        for (Monument monument : this.monuments) {
             monument.load();
         }
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getHighestHealthTeam);
@@ -148,25 +160,25 @@ public class DTMModule extends MatchModule implements Listener {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
         int spaceCount = 1;
-        int i = 0;
+        int i = 2;
         for (MatchTeam matchTeam : teams) {
             if(matchTeam.isSpectator()) continue;
 
-            for (Monument monument : monuments) {
+            for (Monument monument : this.monuments) {
                 if (monument.getOwners().contains(matchTeam)) {
-                    if (monumentScoreboardLines.containsKey(monument)) {
-                        monumentScoreboardLines.get(monument).add(i);
+                    if (this.monumentScoreboardLines.containsKey(monument)) {
+                        this.monumentScoreboardLines.get(monument).add(i);
                     } else {
                         List<Integer> list = new ArrayList<>();
                         list.add(i);
-                        monumentScoreboardLines.put(monument, list);
+                        this.monumentScoreboardLines.put(monument, list);
                     }
 
                     event.getSimpleScoreboard().add(getScoreboardString(monument), i++);
                 }
             }
             event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i++);
+            this.teamScoreboardLines.put(matchTeam.getId(), i++);
 
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
                 event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
@@ -176,11 +188,14 @@ public class DTMModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamUpdate(TeamUpdateEvent event) {
-        for (MatchTeam matchTeam : teamScoreboardLines.keySet()) {
-            if (event.getMatchTeam() == matchTeam) {
-                int i = teamScoreboardLines.get(matchTeam);
+        Set<String> teamIds = this.teamScoreboardLines.keySet();
+        Set<MatchTeam> matchTeams = teamIds.stream().map(teamManagerModule::getTeamById).collect(Collectors.toSet());
 
-                for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+        for (MatchTeam matchTeam : matchTeams) {
+            if (event.getMatchTeam() == matchTeam) {
+                int i = this.teamScoreboardLines.get(matchTeam.getId());
+
+                for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
                     simpleScoreboard.remove(i);
                     simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                     simpleScoreboard.update();
@@ -190,10 +205,8 @@ public class DTMModule extends MatchModule implements Listener {
     }
 
     private void updateOnScoreboard(Monument monument) {
-        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
-
-        for (int i : monumentScoreboardLines.get(monument)) {
-            for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
+        for (int i : this.monumentScoreboardLines.get(monument)) {
+            for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
                 simpleScoreboard.remove(i);
                 simpleScoreboard.add(getScoreboardString(monument), i);
                 simpleScoreboard.update();
@@ -203,7 +216,7 @@ public class DTMModule extends MatchModule implements Listener {
 
     private MatchTeam getHighestHealthTeam() {
         Map<MatchTeam, Integer> teams = new HashMap<>(); // team, health
-        for (Monument monument : monuments) {
+        for (Monument monument : this.monuments) {
             for (MatchTeam team : monument.getOwners()) {
                 teams.put(team, teams.getOrDefault(team, 0) + monument.getHealth());
             }
@@ -222,7 +235,7 @@ public class DTMModule extends MatchModule implements Listener {
 
         if (highest != null) {
             final MatchTeam team = highest;
-            int amount = teams.entrySet().stream().filter(entry -> teams.get(team) == entry.getValue()).collect(Collectors.toList()).size();
+            long amount = teams.entrySet().stream().filter(entry -> teams.get(team).equals( entry.getValue())).count();
             if (amount > 1) return null;
             else return team;
         }
@@ -245,13 +258,13 @@ public class DTMModule extends MatchModule implements Listener {
                 return "  " + ChatColor.RED.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
             }
         } else {
-            return "  " + ChatColor.STRIKETHROUGH + monument.getName();
+            return ChatColor.WHITE + "  " + ChatColor.STRIKETHROUGH + monument.getName();
         }
     }
 
-    public List<Monument> getAliveMonuments(MatchTeam matchTeam) {
+    private List<Monument> getAliveMonuments(MatchTeam matchTeam) {
         List<Monument> alive = new ArrayList<>();
-        for (Monument monument : monuments) {
+        for (Monument monument : this.monuments) {
             if (monument.isAlive() && monument.getOwners().contains(matchTeam)) {
                 alive.add(monument);
             }
@@ -261,8 +274,8 @@ public class DTMModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
-        monuments.forEach(Monument::unload);
+        this.monuments.forEach(Monument::unload);
 
-        monuments.clear();
+        this.monuments.clear();
     }
 }

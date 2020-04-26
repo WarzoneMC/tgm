@@ -2,22 +2,13 @@ package network.warzone.tgm.modules.filter;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.filter.evaluate.AllowFilterEvaluator;
 import network.warzone.tgm.modules.filter.evaluate.DenyFilterEvaluator;
 import network.warzone.tgm.modules.filter.evaluate.FilterEvaluator;
-import network.warzone.tgm.modules.filter.type.BlockExplodeFilterType;
-import network.warzone.tgm.modules.filter.type.BuildFilterType;
-import network.warzone.tgm.modules.filter.type.EnterFilterType;
-import network.warzone.tgm.modules.filter.type.FilterType;
-import network.warzone.tgm.modules.region.Region;
-import network.warzone.tgm.modules.region.RegionManagerModule;
-import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.util.Parser;
+import network.warzone.tgm.modules.filter.type.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -27,9 +18,16 @@ import java.util.List;
 public class FilterManagerModule extends MatchModule {
 
     private List<FilterType> filterTypes = new ArrayList<>();
-
+    
+    private Match match;
+    
     @Override
     public void load(Match match) {
+        this.match = match;
+    }
+
+    @Override
+    public void enable() {
         if (match.getMapContainer().getMapInfo().getJsonObject().has("filters")) {
             for (JsonElement filterElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("filters")) {
                 JsonObject filterJson = filterElement.getAsJsonObject();
@@ -44,7 +42,7 @@ public class FilterManagerModule extends MatchModule {
     }
 
     @Override
-    public void unload() {
+    public void disable() {
         for (FilterType filterType : filterTypes) {
             if (filterType instanceof Listener) {
                 HandlerList.unregisterAll((Listener) filterType);
@@ -56,55 +54,26 @@ public class FilterManagerModule extends MatchModule {
     private List<FilterType> initFilter(Match match, JsonObject jsonObject) {
         List<FilterType> filterTypes = new ArrayList<>();
 
-        String type = jsonObject.get("type").getAsString().toLowerCase();
+        String type = jsonObject.get("type").getAsString()
+                .replace(" ", "")
+                .replace("_", "")
+                .replace("-", "")
+                .toLowerCase();
 
-        if (type.equals("build")) {
-            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-            List<Region> regions = new ArrayList<>();
-
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-
-            filterTypes.add(new BuildFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("enter")) {
-            List<MatchTeam> matchTeams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), jsonObject.get("teams"));
-            List<Region> regions = new ArrayList<>();
-
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            String message = ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString());
-
-            filterTypes.add(new EnterFilterType(matchTeams, regions, filterEvaluator, message));
-        } else if (type.equals("block-explode")) {
-            List<Region> regions = new ArrayList<>();
-            for (JsonElement regionElement : jsonObject.getAsJsonArray("regions")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, regionElement);
-                if (region != null) {
-                    regions.add(region);
-                }
-            }
-
-            FilterEvaluator filterEvaluator = initEvaluator(match, jsonObject);
-            filterTypes.add(new BlockExplodeFilterType(regions, filterEvaluator));
-        }
+        if (type.equals("build"))               filterTypes.add(BuildFilterType.parse(match, jsonObject));
+        else if (type.equals("enter"))          filterTypes.add(EnterFilterType.parse(match, jsonObject));
+        else if (type.equals("usebow"))         filterTypes.add(UseBowFilterType.parse(match, jsonObject));
+        else if (type.equals("useshear"))       filterTypes.add(UseShearFilterType.parse(match, jsonObject));
+        else if (type.equals("leave"))          filterTypes.add(LeaveFilterType.parse(match, jsonObject));
+        else if (type.equals("blockexplode"))   filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
+        else if (type.equals("blockplace"))     filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
+        else if (type.equals("blockbreak"))     filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));
+        else if (type.equals("voidbuild"))      filterTypes.add(VoidBuildFilterType.parse(match, jsonObject));
 
         return filterTypes;
     }
 
-    private FilterEvaluator initEvaluator(Match match, JsonObject parent) {
+    public static FilterEvaluator initEvaluator(Match match, JsonObject parent) {
         switch (parent.get("evaluate").getAsString()) {
             case "allow":
                 return new AllowFilterEvaluator();

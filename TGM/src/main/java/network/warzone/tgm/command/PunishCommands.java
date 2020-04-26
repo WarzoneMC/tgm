@@ -1,25 +1,33 @@
 package network.warzone.tgm.command;
 
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
+import com.sk89q.minecraft.util.commands.*;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.chat.ChatConstant;
+import network.warzone.tgm.modules.reports.Report;
+import network.warzone.tgm.modules.reports.ReportsModule;
+import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.HashMaps;
+import network.warzone.tgm.util.Players;
+import network.warzone.tgm.util.TimeUnitPair;
+import network.warzone.tgm.util.itemstack.ItemFactory;
+import network.warzone.tgm.util.menu.ConfirmMenu;
+import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class PunishCommands {
 
@@ -30,14 +38,66 @@ public class PunishCommands {
         return IP_PATTERN.matcher(ip).matches();
     }
 
+    @Command(aliases = {"punish", "pun", "pg", "pgui"}, desc = "Punishment interface", usage = "(reload | <players>)", flags = "s")
+    public static void punish(CommandContext cmd, CommandSender sender) throws CommandPermissionsException {
+        if (cmd.argsLength() == 1) {
+            if (cmd.getString(0).equalsIgnoreCase("reload")) {
+                if (!sender.hasPermission("tgm.punish.preset.reload")) {
+                    throw new CommandPermissionsException();
+                }
+                PunishMenu.getPresetsMenu().load();
+                sender.sendMessage(ChatColor.YELLOW + "Reloaded punishment presets.");
+                return;
+            }
+        }
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (!player.hasPermission("tgm.punish.ban-ip") &&
+                    !player.hasPermission("tgm.punish.ban") &&
+                    !player.hasPermission("tgm.punish.kick") &&
+                    !player.hasPermission("tgm.punish.mute") &&
+                    !player.hasPermission("tgm.punish.warn")) {
+                throw new CommandPermissionsException();
+            }
+            if (cmd.argsLength() >= 1) {
+                String[] players = cmd.getRemainingString(0).split(" ");
+                PunishMenu.PunishConfig config = PunishMenu.getConfig(player.getUniqueId());
+                if (!cmd.hasFlag('s') || !player.hasPermission("tgm.punish.confirm.skip")) {
+                    ItemStack configItem = config.toItem();
+                    String[] lore = new String[players.length + 2];
+                    lore[0] = "";
+                    lore[1] = ChatColor.GRAY + "Players:";
+                    for (int i = 0; i < players.length; i++) lore[i + 2] = ChatColor.GRAY + "- " + ChatColor.WHITE + players[i];
+                    ItemFactory.appendLore(configItem, lore);
+                    new ConfirmMenu(player, ChatColor.UNDERLINE + "Confirm bulk punish", configItem,
+                            (p, e) -> {
+                                Arrays.stream(players).forEach(username -> PunishMenu.issuePunishment(username, player, config));
+                                p.closeInventory();
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
+                            }, (p, e) -> {
+                                p.closeInventory();
+                                p.sendMessage(ChatColor.RED + "Bulk punish cancelled.");
+                    }).open(player);
+                    return;
+                }
+                Arrays.stream(players).forEach(username -> PunishMenu.issuePunishment(username, player, config));
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 2.0f);
+                return;
+            }
+            PunishMenu.openNew(player);
+        } else {
+            throw new CommandPermissionsException();
+        }
+    }
+
     @Command(aliases = {"ban-ip", "banip"}, desc = "IP Ban a rulebreaker", min = 2, usage = "(name|ip) (length) (reason...)", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.punish.ban-ip"})
     public static void banIP(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
-        TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
+        TimeUnitPair timeUnitPair = TimeUnitPair.parse(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -59,9 +119,9 @@ public class PunishCommands {
     public static void ban(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
-        TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
+        TimeUnitPair timeUnitPair = TimeUnitPair.parse(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -74,7 +134,11 @@ public class PunishCommands {
     @CommandPermissions({"tgm.punish.kick"})
     public static void kick(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
-
+        Player player = Bukkit.getPlayer(name);
+        if (player == null) {
+            sender.sendMessage(ChatColor.RED + "Player not found: " + name);
+            return;
+        }
         String reason = cmd.argsLength() > 1 ? cmd.getRemainingString(1) : "Inappropriate Behavior";
 
         issuePunishment("kick", name, sender, "kicked", new TimeUnitPair(1, ChronoUnit.MILLIS), reason, false, !cmd.hasFlag('s'));
@@ -85,9 +149,9 @@ public class PunishCommands {
     public static void mute(CommandContext cmd, CommandSender sender) {
         String name = cmd.getString(0);
 
-        TimeUnitPair timeUnitPair = parseLength(cmd.getString(1));
+        TimeUnitPair timeUnitPair = TimeUnitPair.parse(cmd.getString(1));
         if (timeUnitPair == null) {
-            sender.sendMessage(ChatColor.RED + "Invalid duration");
+            sender.sendMessage(ChatColor.RED + "Invalid duration. Should be: 1m, 1h, 1d, etc.");
             return;
         }
 
@@ -135,46 +199,80 @@ public class PunishCommands {
         });
     }
 
-    @Command(aliases = {"lookup", "lu"}, desc = "Get player info", min = 1, max = 1, usage = "(name|ip)")
+    @Command(aliases = {"lookup", "lu"}, desc = "Get player info", min = 1, max = 1, usage = "(name)")
     @CommandPermissions({"tgm.lookup"})
     public static void lookup(CommandContext cmd, CommandSender sender) {
         String filter = cmd.getString(0);
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            PlayerInfoResponse playerInfoResponse = TGM.get().getTeamClient().getPlayerInfo(new PlayerInfoRequest(isIP(filter) ? null : filter, isIP(filter) ? filter : null));
+            PlayerInfoResponse playerInfoResponse = TGM.get().getTeamClient().getPlayerInfo(new PlayerInfoRequest(filter, null));
             if (playerInfoResponse.isError()) {
                 sender.sendMessage(ChatColor.RED + playerInfoResponse.getMessage());
             } else {
                 sender.sendMessage(ChatColor.YELLOW + "Info for " + playerInfoResponse.getQueryFilter() + ":");
-                if (isIP(playerInfoResponse.getQueryFilter())) {
-                    sender.sendMessage(ChatColor.GRAY + "Users " + ChatColor.RESET + "(" + playerInfoResponse.getUsers().size() + ")" + ChatColor.GRAY + ":");
-                    for (UserProfile profile : playerInfoResponse.getUsers()) {
-                        sender.spigot().sendMessage(new ComponentBuilder(ChatColor.GRAY + " - " + ChatColor.RESET + profile.getName()).event(
-                                new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
-                                        ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
+                if (playerInfoResponse.getUsers().isEmpty()) return;
+                UserProfile profile = playerInfoResponse.getUsers().get(0);
+                sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
+                        "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
+                        "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
+                        "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
+                        "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString()
+                );
+            }
+        });
+    }
+
+    @Command(aliases = {"lookupip", "luip"}, desc = "Get IP info", min = 1, max = 1, usage = "(ip)")
+    @CommandPermissions({"tgm.lookup"})
+    public static void lookupip(CommandContext cmd, CommandSender sender) {
+        String filter = cmd.getString(0);
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            PlayerInfoResponse playerInfoResponse = TGM.get().getTeamClient().getPlayerInfo(new PlayerInfoRequest(null, filter));
+            if (playerInfoResponse.isError()) {
+                sender.sendMessage(ChatColor.RED + playerInfoResponse.getMessage());
+            } else {
+                sender.sendMessage(ChatColor.YELLOW + "Info for IP " + playerInfoResponse.getQueryFilter() + ":");
+                sender.sendMessage(ChatColor.GRAY + "Users " + ChatColor.RESET + "(" + playerInfoResponse.getUsers().size() + ")" + ChatColor.GRAY + ":");
+                for (UserProfile profile : playerInfoResponse.getUsers()) {
+                    sender.spigot().sendMessage(new ComponentBuilder(ChatColor.GRAY + " - " + ChatColor.RESET + profile.getName()).event(
+                            new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(
+                                    ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
                                             "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
                                             "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
                                             "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
-                                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
-                                            "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1)
-                                ).create())).event(
-                                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lookup " + profile.getName())
-                        ).create());
-                    }
-                } else {
-                    if (playerInfoResponse.getUsers().isEmpty()) return;
-                    UserProfile profile = playerInfoResponse.getUsers().get(0);
-                    sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + profile.getId() +
-                            "\n" + ChatColor.GRAY + "UUID: " + ChatColor.RESET + profile.getUuid() +
-                            "\n" + ChatColor.GRAY + "Name: " + ChatColor.RESET + profile.getName() +
-                            "\n" + ChatColor.GRAY + "First join: " + ChatColor.RESET + new Date(profile.getInitialJoinDate()).toString() +
-                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString() +
-                            "\n" + ChatColor.GRAY + "Last IP: " + ChatColor.RESET + profile.getIps().get(profile.getIps().size() - 1) +
-                            "\n" + ChatColor.GRAY + "IPs: [" + ChatColor.RESET + String.join(ChatColor.GRAY + ", " + ChatColor.RESET, profile.getIps()) + ChatColor.GRAY + "]");
+                                            "\n" + ChatColor.GRAY + "Last online: " + ChatColor.RESET + new Date(profile.getLastOnlineDate()).toString()
+                            ).create())).event(
+                            new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lookup " + profile.getName())
+                    ).create());
                 }
             }
         });
     }
 
+    @Command(aliases = "alts", desc = "Lookup alts of a user", min = 1, max = 1, usage = "(name)")
+    @CommandPermissions("tgm.lookup")
+    public static void alts(CommandContext cmd, CommandSender sender) {
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            PlayerAltsResponse response = TGM.get().getTeamClient().getAlts(cmd.getString(0));
+            if (response == null) {
+                sender.sendMessage(ChatColor.RED + "Something went wrong");
+            } else if (response.isError()) {
+                sender.sendMessage(ChatColor.RED + response.getMessage());
+            } else {
+                if (response.getUsers().isEmpty()) {
+                    sender.sendMessage(ChatColor.GREEN + response.getLookupUser().getName() + " has no known alts.");
+                    return;
+                }
+                String name = response.getLookupUser().getName();
+                List<String> alts = new ArrayList<>(Arrays.asList(
+                        "",
+                        ChatColor.AQUA + name + (name.endsWith("s") ? "'" : "'s") + " known alts:"
+                ));
+                alts.addAll(response.getUsers().stream().map(user -> ChatColor.GRAY + " - " + ChatColor.WHITE + user.getName()).collect(Collectors.toList()));
+                alts.add(" ");
+                sender.sendMessage(alts.toArray(new String[0]));
+            }
+        });
+    }
 
     @Command(aliases = "revert", desc = "Revert a punishment", min = 1, max = 1, usage = "(id)")
     @CommandPermissions({"tgm.punish.revert"})
@@ -182,7 +280,7 @@ public class PunishCommands {
         String id = cmd.getString(0);
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             RevertPunishmentResponse revertPunishmentResponse = TGM.get().getTeamClient().revertPunishment(id);
-            if (revertPunishmentResponse.isNotFound()) {
+            if (revertPunishmentResponse == null || revertPunishmentResponse.isNotFound()) {
                 sender.sendMessage(ChatColor.RED + "Punishment not found.");
             } else {
                 java.util.Map<ObjectId, String> userMappings = new HashMap<>();
@@ -205,6 +303,7 @@ public class PunishCommands {
                             punishment.setReverted(true);
                         }
                     });
+                    sender.sendMessage(ChatColor.GREEN + "Punishment reverted.");
                 } else {
                     sender.sendMessage(ChatColor.RED + "Punishment was already reverted.");
                 }
@@ -212,21 +311,149 @@ public class PunishCommands {
         });
     }
 
-    @Command(aliases = {"sc", "staffchat", "staffc"}, desc = "Staff chat", min = 1, usage = "(message)")
-    @CommandPermissions({"tgm.staffchat"})
-    public static void staffchat(CommandContext cmd, CommandSender sender) {
-        String prefix;
-        if (sender instanceof Player) {
-            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
-            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
-        } else {
-            prefix = "";
+    @Command(aliases = {"chat"}, desc = "Control chat settings", min = 1, usage = "(mute|clear)")
+    @CommandPermissions({"tgm.chat.control"})
+    public static void chat(CommandContext cmd, CommandSender sender) {
+        String action = cmd.getString(0);
+        if (action.equalsIgnoreCase("mute")) {
+            if (TGM.get().getConfig().getBoolean("chat.enabled")) {
+                TGM.get().getConfig().set("chat.enabled", false);
+                TGM.get().saveConfig();
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
+            } else {
+                TGM.get().getConfig().set("chat.enabled", true);
+                TGM.get().saveConfig();
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
+            }
+        } else if (action.equalsIgnoreCase("clear")) {
+            for (int i = 0; i < 100; i++) {
+                Bukkit.broadcastMessage("\n");
+            }
+            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
         }
-        String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + sender.getName() + ": " + ChatColor.RESET + cmd.getRemainingString(0);
+    }
+
+    @Command(aliases = {"report"}, desc = "Report a player", min = 2, usage = "(name) (reason...)")
+    public static void report(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatConstant.ERROR_COMMAND_PLAYERS_ONLY.toString());
+            return;
+        }
+
+        Player reporter = (Player) sender;
+        Player reported = Bukkit.getPlayer(cmd.getString(0));
+
+        if (reported == null) {
+            reporter.sendMessage(ChatColor.RED + "Player not found!");
+            return;
+        }
+
+        if (reported.getName().equals(reporter.getName())) {
+            reporter.sendMessage(ChatColor.RED + "You can't report yourself!");
+            return;
+        }
+
+        if (ReportsModule.cooldown(reporter.getUniqueId().toString())) {
+            reporter.sendMessage(ChatColor.RED + "Please wait until reporting again!");
+            return;
+        }
+
+        int amount = ReportsModule.getAmount(reported.getUniqueId().toString()) + 1;
+
+        Report report = new Report()
+                .setReporter(reporter.getName())
+                .setReported(reported.getName())
+                .setReason(cmd.getJoinedStrings(1))
+                .setTimestamp(System.currentTimeMillis())
+                .setAmount(amount);
+
+        ReportsModule.addReport(report);
+        ReportsModule.setAmount(reported.getUniqueId().toString(), amount);
+        ReportsModule.setCooldown(reporter.getUniqueId().toString(), report.getTimestamp());
+
+        PlayerContext reportedContext = TGM.get().getPlayerManager().getPlayerContext(reported.getUniqueId());
+        StringBuilder reportedNameBuilder = new StringBuilder(reported.getName());
+
+        if (reportedContext.isNicked()) {
+            reportedNameBuilder.append(" ").append("&8(&a").append(reportedContext.getOriginalName()).append("&8)");
+        }
+
+        String reportedName = reportedNameBuilder.toString();
+
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
+            if (player.hasPermission("tgm.reports")) {
+                TextComponent message = new TextComponent(ChatColor.translateAlternateColorCodes('&',
+                        "&4[REPORT]&8 [" + amount + "] &5" + reporter.getName() + " &7reported &d" +
+                                reportedName + " &7for &r" + cmd.getJoinedStrings(1)));
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp " + report.getReported()));
+                player.spigot().sendMessage(message);
+            }
         }
-        Bukkit.getConsoleSender().sendMessage(result);
+
+        reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff.");
+    }
+
+    @Command(aliases = {"reports"}, desc = "View reports", max = 1, usage = "[page]")
+    @CommandPermissions({"tgm.reports"})
+    public static void reports(CommandContext cmd, CommandSender sender) throws CommandException {
+        if (cmd.argsLength() == 1 && cmd.getString(0).equalsIgnoreCase("clear")) {
+            ReportsModule.clear();
+            sender.sendMessage(ChatColor.GREEN + "Cleared all reports.");
+            return;
+        }
+
+        int index;
+
+        try {
+            index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
+        } catch (NumberFormatException e) {
+            sender.sendMessage(org.bukkit.ChatColor.RED + "Number expected.");
+            return;
+        }
+
+        List<Report> reports = ReportsModule.getReports();
+
+        if (reports.size() == 0) {
+            sender.sendMessage(ChatColor.RED + "No reports found.");
+            return;
+        }
+
+        int pageSize = 9;
+
+        int pagesRemainder = reports.size() % pageSize;
+        int pagesDivisible = reports.size() / pageSize;
+        int pages = pagesDivisible;
+
+        if (pagesRemainder >= 1) {
+            pages = pagesDivisible + 1;
+        }
+
+        if ((index > pages) || (index <= 0)) {
+            index = 1;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+        sender.sendMessage(ChatColor.YELLOW + "Reports (" + index + "/" + pages + "): ");
+        try {
+            for (int i = 0; i < pageSize; i++) {
+                int position = pageSize * (index - 1) + i;
+                Report report = reports.get(reports.size() - position - 1); // List new reports first
+
+                String reported = ChatColor.translateAlternateColorCodes('&', "&8[" + report.getAmount() + "] &5" + report.getReported() + "&7 - &f" + report.getReason() + "&7 (" + report.getAgo() + " ago)");
+
+                Date date = new Date();
+                date.setTime(report.getTimestamp());
+
+                TextComponent message = new TextComponent(reported);
+                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp " + report.getReported()));
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + reported).append("\n\n")
+                        .append(org.bukkit.ChatColor.GRAY + "Date/Time: ").append(dateFormat.format(date)).append("\n")
+                        .append(org.bukkit.ChatColor.GRAY + "Reporter: ").append(report.getReporter()).create()));
+
+                sender.spigot().sendMessage(message);
+            }
+        } catch (IndexOutOfBoundsException ignored) {}
     }
 
     private static void issuePunishment(String type, String name, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
@@ -252,7 +479,8 @@ public class PunishCommands {
                     if (response.isKickable()) {
                         kickPlayer(response.getPunishment(), response.getName());
                     }
-                    broadcastPunishment(response.getName(), response.getIp(), punisher.getName().replace("CONSOLE", "Console"), verb, timeUnitPair, reason, time, broadcast);
+
+                    broadcastPunishment(response.getName(), response.getIp(), TGM.get().getNickManager().getOriginalName(punisher.getName()).replace("CONSOLE", "Console"), verb, timeUnitPair, reason, time, broadcast);
                     Player target;
                     if (response.getName() != null && (target = Bukkit.getPlayer(response.getName())) != null) {
                         TGM.get().getPlayerManager().getPlayerContext(target).getUserProfile().addPunishment(response.getPunishment());
@@ -262,70 +490,37 @@ public class PunishCommands {
         });
     }
 
-    private static void broadcastPunishment(String name, String ip, String punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean everyone) {
-        ChatColor punisherColor = ChatColor.DARK_PURPLE;
-        ChatColor punishedColor = ChatColor.LIGHT_PURPLE;
-        ChatColor durationColor = ChatColor.LIGHT_PURPLE;
-        if (name != null) {
-            if (time) {
-                if (everyone) Bukkit.broadcastMessage(punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                        " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
-                        " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
-                else {
-                    Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list") || player.getName().equalsIgnoreCase(name)).forEach(player -> player.sendMessage(ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                            " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY  +
-                            " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason)));
+    private static boolean kickPlayer(Punishment punishment, String name) {
+        if (punishment.getType().equalsIgnoreCase("ban")) {
+            String reason = ChatColor.RED + "You have been banned from the server. Reason:\n"
+                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
+                    + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
+                    (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
+                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                    + ChatColor.GRAY + "ID: " + punishment.getId().toString();
+            if (punishment.isIp_ban()) {
+                boolean found = false;
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (Objects.requireNonNull(player.getAddress()).getHostString().equals(punishment.getIp())) {
+                        player.kickPlayer(reason);
+                        found = true;
+                    }
                 }
-            } else {
-                if (everyone) Bukkit.broadcastMessage(punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                        " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason));
-                else {
-                    Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list") || player.getName().equalsIgnoreCase(name)).forEach(player -> player.sendMessage(ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + name + ChatColor.GRAY +
-                            " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason)));
-                }
+                if (found) return true;
+            }
+            Player player;
+            if ((player = Bukkit.getPlayer(name)) != null) {
+                player.kickPlayer(reason);
+                return true;
             }
         } else {
-            if (time) {
-                String result = ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + ip + ChatColor.GRAY +
-                        " for " + durationColor + timeUnitPair.getTimeWord() + ChatColor.GRAY +
-                        " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason);
-                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list")).forEach(player -> player.sendMessage(result));
-                Bukkit.getConsoleSender().sendMessage(result);
-            } else {
-                String result = ChatColor.GRAY + "[SILENT] " + punisherColor + punisher + ChatColor.GRAY + " " + verb + " " + punishedColor + ip + ChatColor.GRAY +
-                        " for " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', reason);
-                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission("tgm.punish.list")).forEach(player -> player.sendMessage(result));
-                Bukkit.getConsoleSender().sendMessage(result);
+            Player player = Bukkit.getPlayer(name);
+            if (player != null) {
+                player.kickPlayer(ChatColor.RED + "You have been kicked from the server. Reason:\n" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()));
+                return true;
             }
         }
-    }
-
-    private static void kickPlayer(Punishment punishment, String name) {
-            if (punishment.getType().toLowerCase().equals("ban")) {
-                if (punishment.isIp_ban()) {
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        if (player.getAddress().getHostString().equals(punishment.getIp())) {
-                            player.kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
-                                            + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
-                                            + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
-                                            (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                                            + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
-                                            + ChatColor.GRAY + "ID: " + punishment.getId().toString());
-                        }
-                    }
-                } else {
-                    if (Bukkit.getPlayer(name) != null)
-                        Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been banned from the server. Reason:\n"
-                                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
-                                    + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
-                                    (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
-                                    + ChatColor.GRAY + "ID: " + punishment.getId().toString());
-                }
-            } else {
-                Bukkit.getPlayer(name).kickPlayer(ChatColor.RED + "You have been kicked from the server. Reason:\n" + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()));
-            }
-
+        return false;
     }
 
     private static TextComponent punishmentToTextComponent(Punishment punishment, String punished, String punisher, boolean revertOption) {
@@ -339,7 +534,7 @@ public class PunishCommands {
                 new TextComponent(ChatColor.GRAY + "\nType: "           + ChatColor.RESET + punishment.getType().toUpperCase()),
                 new TextComponent(ChatColor.GRAY + "\nPunished IP: "    + ChatColor.RESET + punishment.getIp()),
                 new TextComponent(ChatColor.GRAY + "\nIP Punishment: "  + ChatColor.RESET + punishment.isIp_ban()),
-                new TextComponent(ChatColor.GRAY + "\nIsssued by: "     + ChatColor.RESET + punisher),
+                new TextComponent(ChatColor.GRAY + "\nIssued by: "      + ChatColor.RESET + punisher),
                 new TextComponent(ChatColor.GRAY + "\nReverted: "       + ChatColor.RESET + punishment.isReverted()),
                 new TextComponent(ChatColor.GRAY + "\nIssued: "         + ChatColor.RESET + new Date(punishment.getIssued()).toString()),
                 new TextComponent(ChatColor.GRAY + "\nExpires: "        + ChatColor.RESET + (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never")),
@@ -347,72 +542,123 @@ public class PunishCommands {
                 (revertOption && !punishment.isReverted() ? "\n\n" + ChatColor.YELLOW + "Click to revert" : ""))
         }));
 
-        if (revertOption && !punishment.isReverted()) textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/revert " + punishment.getId().toString()));
+        if (revertOption && !punishment.isReverted()) textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/revert " + punishment.getId().toString()));
         return textComponent;
     }
 
-    private static TimeUnitPair parseLength(String s) {
-        if (s.equalsIgnoreCase("permanent") ||
-                s.equalsIgnoreCase("perm") ||
-                s.equalsIgnoreCase("p") ||
-                s.equalsIgnoreCase("forever") ||
-                s.equalsIgnoreCase("f") ||
-                s.equalsIgnoreCase("-1")) return new TimeUnitPair(1, ChronoUnit.FOREVER);
-        ChronoUnit timeUnit = ChronoUnit.SECONDS;
+    private static final ChatColor punisherColor = ChatColor.DARK_PURPLE;
+    private static final ChatColor punishedColor = ChatColor.LIGHT_PURPLE;
+    private static final ChatColor durationColor = ChatColor.LIGHT_PURPLE;
 
-        String time = "";
-        String unit = "";
-        boolean digitsDone = false;
-        for (int i = 0; i < s.length(); i++) {
-            if (!digitsDone && Character.isDigit(s.charAt(i))) {
-                time += s.charAt(i);
-            } else if (!Character.isDigit(s.charAt(i))) {
-                digitsDone = true;
-                unit += s.charAt(i);
+    private static void broadcastPunishment(String name, String ip, String punisher, String action, TimeUnitPair timeUnitPair, String reason, boolean timed, boolean everyone) {
+        TGM.get().getLogger().info(String.format("new-punishment {name=%s, ip=%s, punisher=%s, action=%s, timeUnitPair=%s, reason=%s, timed=%b, public=%s}",
+                name, ip, punisher, action, timeUnitPair.toString(), reason, timed, everyone));
+        if (name != null) {
+            if (timed) {
+                if (everyone) { // Timed & Public
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.hasPermission("tgm.punish.list")) {
+                            Players.sendMessage(p, "%s%s&7 has been &c%s&7 by %s%s&7 for %s%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    punisherColor, punisher,
+                                    durationColor, timeUnitPair,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        } else {
+                            Players.sendMessage(p, "%s%s&7 has been &c%s&7 for %s%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    durationColor, timeUnitPair,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        }
+                    }
+                } else { // Timed & Silent
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.hasPermission("tgm.punish.list")) {
+                            Players.sendMessage(p, "&7[SILENT] %s%s&7 has been &c%s&7 by %s%s&7 for %s%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    punisherColor, punisher,
+                                    durationColor, timeUnitPair,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        } else if (p.getName().equalsIgnoreCase(name)) {
+                            Players.sendMessage(p, "%s%s&7 has been &c%s&7 for %s%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    durationColor, timeUnitPair,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        }
+                    }
+                }
             } else {
-                break;
-            }
-        }
-        timeUnit = getTimeUnit(unit);
-        return new TimeUnitPair(Integer.valueOf(time), timeUnit);
-    }
-
-    private static ChronoUnit getTimeUnit(String s) {
-        for (ChronoUnit timeUnit : ChronoUnit.values()) {
-            if (timeUnit == ChronoUnit.NANOS || timeUnit == ChronoUnit.MICROS || timeUnit == ChronoUnit.MILLIS) continue;
-            if (timeUnit.name().toLowerCase().startsWith(s.toLowerCase())) {
-                return timeUnit;
-            }
-        }
-         return ChronoUnit.SECONDS;
-    }
-
-    @AllArgsConstructor @Getter
-    public static class TimeUnitPair {
-
-        private int value;
-        private ChronoUnit timeUnit;
-
-        public String getTimeWord() {
-            if (timeUnit == ChronoUnit.FOREVER || toMilliseconds() == -1) return "permanent";
-            if (value == 1) {
-                if (timeUnit == ChronoUnit.MILLENNIA) return value + " millenium";
-                if (timeUnit == ChronoUnit.CENTURIES) return value + " century";
-                if (timeUnit.name().toLowerCase().endsWith("s")) {
-                    return value + " " + timeUnit.name().substring(0, timeUnit.name().length() - 1).toLowerCase().replace("_", " ");
+                if (everyone) { // Non-timed & Public
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.hasPermission("tgm.punish.list")) {
+                            Players.sendMessage(p, "%s%s&7 has been &c%s&7 by %s%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    punisherColor, punisher,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        } else {
+                            Players.sendMessage(p, "%s%s&7 has been &c%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        }
+                    }
+                } else { // Non-timed & Silent
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.hasPermission("tgm.punish.list")) {
+                            Players.sendMessage(p, "&7[SILENT] %s%s&7 has been &c%s&7 by %s%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    punisherColor, punisher,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        } else if (p.getName().equalsIgnoreCase(name)) {
+                            Players.sendMessage(p, "%s%s&7 has been &c%s&7 for &r%s",
+                                    punishedColor, name,
+                                    action,
+                                    ChatColor.translateAlternateColorCodes('&', reason)
+                            );
+                        }
+                    }
                 }
             }
-            return value + " " + timeUnit.name().toLowerCase().replace("_", " ");
-        }
-
-        public long toMilliseconds() {
-            if (timeUnit == ChronoUnit.FOREVER) {
-                return -1;
+        } else { // IP Ban, no need to broadcast publicly.
+            if (timed) { // Timed & Silent
+                String result = String.format("&7[SILENT] %s%s&7 has been &c%s&7 by %s%s&7 for %s%s&7 for &r%s",
+                        punishedColor, ip,
+                        action,
+                        punisherColor, punisher,
+                        durationColor, timeUnitPair,
+                        ChatColor.translateAlternateColorCodes('&', reason)
+                );
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.hasPermission("tgm.punish.list")) {
+                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', result));
+                    }
+                }
+            } else { // Non-timed & Silent
+                String result = String.format("&7[SILENT] %s%s&7 has &c%s&7 %s%s&7 for &r%s",
+                        punisherColor, punisher,
+                        action,
+                        punishedColor, ip,
+                        ChatColor.translateAlternateColorCodes('&', reason)
+                );
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (p.hasPermission("tgm.punish.list")) {
+                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', result));
+                    }
+                }
             }
-            if (value <= 0) return -1;
-            return timeUnit.getDuration().getSeconds() * value * 1000;
         }
-
     }
 
 }

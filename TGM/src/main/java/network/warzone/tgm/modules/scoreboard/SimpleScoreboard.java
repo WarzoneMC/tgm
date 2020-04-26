@@ -40,12 +40,20 @@ public class SimpleScoreboard {
 
     public void add(String text, Integer score) {
         text = ChatColor.translateAlternateColorCodes('&', text);
+        while (scores.containsKey(text)) text += ChatColor.RESET;
 
         if (remove(score, text, false) || !scores.containsValue(score)) {
             updated.add(text);
         }
 
         scores.put(text, score);
+    }
+
+    public void removeAll(Set<Integer> exclusions) {
+        for (Map.Entry<String, Integer> score : scores.entrySet()) {
+            if (exclusions.contains(score.getValue())) continue;
+            remove(score.getValue());
+        }
     }
 
     public boolean remove(Integer score, String text) {

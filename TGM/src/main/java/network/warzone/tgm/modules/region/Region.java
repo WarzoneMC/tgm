@@ -8,7 +8,13 @@ import java.util.List;
 public interface Region {
     boolean contains(Location location);
 
+    boolean contains(Block block);
+
     Location getCenter();
 
     List<Block> getBlocks();
+
+    Location getMin();
+
+    Location getMax();
 }

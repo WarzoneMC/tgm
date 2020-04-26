@@ -72,8 +72,8 @@ public class KOTHModule extends MatchModule implements Listener {
     }
 
     private MatchTeam getHighestPointsTeam() {
-        Map.Entry<MatchTeam, Integer> highest = null;
-        for (Map.Entry<MatchTeam, Integer> entry : pointsModule.getPoints().entrySet()) {
+        Map.Entry<String, Integer> highest = null;
+        for (Map.Entry<String, Integer> entry : pointsModule.getPoints().entrySet()) {
             if (highest == null) {
                 highest = entry;
                 continue;
@@ -83,10 +83,10 @@ public class KOTHModule extends MatchModule implements Listener {
             }
         }
         if (highest != null) {
-            final Map.Entry<MatchTeam, Integer> entry = highest;
+            final Map.Entry<String, Integer> entry = highest;
             int amount = pointsModule.getPoints().entrySet().stream().filter(en -> entry.getValue() == en.getValue()).collect(Collectors.toList()).size();
             if (amount > 1) return null;
-            else return entry.getKey();
+            else return TGM.get().getModule(TeamManagerModule.class).getTeamById(entry.getKey());
         }
         return null;
     }
@@ -127,25 +127,21 @@ public class KOTHModule extends MatchModule implements Listener {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
 
-        int i;
-        for (i = 0; i < controlPoints.size(); i++) {
-            ControlPoint controlPoint = controlPoints.get(i);
-
-            controlPointScoreboardLines.put(controlPoint.getDefinition(), i);
-            simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), i);
+        int j = 2;
+        for (ControlPoint controlPoint : controlPoints) {
+            controlPointScoreboardLines.put(controlPoint.getDefinition(), j);
+            simpleScoreboard.add(getControlPointScoreboardLine(controlPoint), j);
+            j++;
         }
+        simpleScoreboard.add(" ", j);
 
-        i++;
-        simpleScoreboard.add(" ", i);
-
-        i++;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;
 
-            simpleScoreboard.add(getTeamScoreLine(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i);
+            j++;
 
-            i++;
+            simpleScoreboard.add(getTeamScoreLine(matchTeam), j);
+            teamScoreboardLines.put(matchTeam, j);
         }
     }
 

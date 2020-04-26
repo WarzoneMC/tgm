@@ -3,10 +3,10 @@ package network.warzone.tgm.map;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.tgm.util.Parser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import network.warzone.tgm.util.Parser;
 import org.bukkit.Location;
 import org.bukkit.World;
 

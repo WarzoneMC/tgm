@@ -8,11 +8,9 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,17 +44,8 @@ public class MatchManager {
     public void endMatch(MatchTeam winningTeam) {
         List<MatchTeam> losers = new ArrayList<>();
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-            if (!matchTeam.isSpectator()) {
-                matchTeam.getMembers().forEach(playerContext -> {
-                    playerContext.getPlayer().setGameMode(GameMode.ADVENTURE);
-                    playerContext.getPlayer().setAllowFlight(true);
-                    playerContext.getPlayer().setVelocity(playerContext.getPlayer().getVelocity().setY(1.0)); // Weeee!
-                    playerContext.getPlayer().setFlying(true);
-                });
-
-                if (matchTeam != winningTeam) {
-                    losers.add(matchTeam);
-                }
+            if (!matchTeam.isSpectator() && matchTeam != winningTeam) {
+                losers.add(matchTeam);
             }
         }
         match.disable();
@@ -86,10 +75,13 @@ public class MatchManager {
         //create the new world under a random uuid in the matches folder.
         WorldCreator worldCreator = new WorldCreator("matches/" + matchUuid.toString());
         worldCreator.generator(new NullChunkGenerator());
-        //worldCreator.environment(World.Environment.NETHER);
+        worldCreator.generateStructures(false);
+
         World world = worldCreator.createWorld();
         world.setAutoSave(false);
-
+        world.setKeepSpawnInMemory(false);
+        world.setTicksPerAnimalSpawns(0);
+        world.setTicksPerMonsterSpawns(0);
         /**
          * Initialize a match manifest based on the map's gametype.
          * The match manifest will handle which match modules should
@@ -109,7 +101,7 @@ public class MatchManager {
 
         // Transport all players to the new world so we can unload the old one.
         Bukkit.getOnlinePlayers().forEach(player ->
-                player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
+                player.teleport(world.getSpawnLocation()));
 
         //create and load the match.
         Match createdMatch = new Match(matchUuid, matchManifest, world, mapContainer);
@@ -124,17 +116,20 @@ public class MatchManager {
         //if a match is currently running, unload it.
         if (oldMatch != null) {
             oldMatch.getWorld().getPlayers().forEach(player ->
-                    player.teleport(world.getSpawnLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN));
-            Bukkit.unloadWorld(oldMatch.getWorld(), false);
+                    player.teleport(world.getSpawnLocation()));
 
-            Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
-                try {
-                    TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
-                    FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }, 80L); // 4 seconds
+            TGM.get().getLogger().info("Unloading match: " + oldMatch.getUuid().toString() + " (File: " + oldMatch.getWorld().getWorldFolder().getPath() + ")");
+
+            boolean save = TGM.get().getConfig().getBoolean("map.save-matches", false);
+            Bukkit.unloadWorld(oldMatch.getWorld(), save);
+            if (!save)
+                Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
+                    try {
+                        FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }, 80L); // 4 seconds
         }
     }
 

@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules;
 
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -8,8 +9,6 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.util.Strings;
-import network.warzone.tgm.util.TitleAPI;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -28,7 +27,7 @@ public class TabListModule extends MatchModule implements Listener {
 
         refreshAllTabs();
 
-        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), this::refreshAllTabs, 20L, 20L);
+        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), this::refreshAllTabs, 10L, 10L);
     }
 
     @Override
@@ -53,7 +52,7 @@ public class TabListModule extends MatchModule implements Listener {
 
         String header = ChatColor.WHITE + ChatColor.BOLD.toString() + TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().toString() +
                         ChatColor.DARK_GRAY + " - " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed()) +
-                        ChatColor.DARK_GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + "WARZONE";
+                        ChatColor.DARK_GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + ChatColor.translateAlternateColorCodes('&', TGM.get().getConfig().getString("server.tablist-name") == null ? "&f&lWARZONE" : TGM.get().getConfig().getString("server.tablist-name"));
 
         String footer = "";
         for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
@@ -64,7 +63,7 @@ public class TabListModule extends MatchModule implements Listener {
         footer += ChatColor.AQUA + "Spectators: " + ChatColor.WHITE + TGM.get().getModule(TeamManagerModule.class).getSpectators().getMembers().size();
 
 
-        TitleAPI.sendTabTitle(player, header, footer);
+        player.setPlayerListHeaderFooter(header, footer);
     }
     private void refreshAllTabs() {
         for (Player player : Bukkit.getOnlinePlayers()) {

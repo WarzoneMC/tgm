@@ -2,7 +2,8 @@ package network.warzone.warzoneapi.client;
 
 import network.warzone.warzoneapi.models.*;
 
-import java.util.List;
+
+import java.util.UUID;
 
 /**
  * Created by luke on 4/27/17.
@@ -14,6 +15,8 @@ public interface TeamClient {
      * server up-to-date in the database.
      */
     void heartbeat(Heartbeat heartbeat);
+
+    GetPlayerByNameResponse player(String name);
 
     /**
      * Called when a player logs into the server.
@@ -51,5 +54,15 @@ public interface TeamClient {
     RevertPunishmentResponse revertPunishment(String id);
 
     PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest);
+
+    PlayerAltsResponse getAlts(String name);
+
+    PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action);
+
+    LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion);
+
+    MojangProfile getMojangProfile(UUID uuid);
+
+    MojangProfile getMojangProfile(String username);
 
 }

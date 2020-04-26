@@ -10,4 +10,7 @@ public interface MapRotation {
     MapContainer getNext();
     void refresh();
     List<MapContainer> getMaps();
+    int getCurrent();
+    int loadRotationPosition();
+    void saveRotationPosition(int index);
 }

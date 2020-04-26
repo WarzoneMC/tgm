@@ -4,7 +4,6 @@ import com.google.gson.stream.JsonReader;
 import network.warzone.tgm.TGM;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,8 @@ public class MapLoaderImpl implements MapLoader {
     public List<MapContainer> loadMaps(File folder) {
         List<MapContainer> maps = new ArrayList<>();
 
-        for (File child : folder.listFiles()) {
+        File[] children = folder.listFiles();
+        if (children != null) for (File child : children) {
             if (child.isDirectory()) {
                 if (isMapFolder(child)) {
                     File mapJsonFile = new File(child, "map.json");
@@ -26,7 +26,8 @@ public class MapLoaderImpl implements MapLoader {
                         JsonReader reader = new JsonReader(new FileReader(mapJsonFile));
                         MapInfo mapInfo = TGM.get().getGson().fromJson(reader, MapInfo.class);
                         maps.add(new MapContainer(child, mapInfo));
-                    } catch (FileNotFoundException e) {
+                    } catch (Exception e) {
+                        TGM.get().getLogger().warning("Failed to load map " + child.getName());
                         e.printStackTrace();
                     }
                 } else {

@@ -6,25 +6,23 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionSave;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Blocks;
 import network.warzone.tgm.util.ColorConverter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.util.BlockVector;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -56,6 +54,8 @@ public class ControlPoint implements Listener {
     private int progress = 0;
     private MatchTeam progressingTowardsTeam = null;
 
+    private boolean initialCapture = true;
+
     private int runnableId = -1;
 
     public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
@@ -81,12 +81,18 @@ public class ControlPoint implements Listener {
     }
 
     @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent event) {
+        handlePlayerMove(event.getPlayer(), event.getTo());
+    }
+
+    @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         handlePlayerMove(event.getPlayer(), event.getTo());
     }
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         this.playersOnPoint.remove(event.getPlayerContext().getPlayer());
     }
 
@@ -95,62 +101,60 @@ public class ControlPoint implements Listener {
         this.playersOnPoint.remove(event.getPlayer());
     }
 
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
-        this.playersOnPoint.remove(event.getPlayer());
-    }
-
     public void enable() {
-        runnableId = Bukkit.getScheduler().scheduleSyncRepeatingTask(TGM.get(), new Runnable() {
-            @Override
-            public void run() {
-                HashMap<MatchTeam, Integer> holding = new HashMap<>();
-                for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-                    if(matchTeam.isSpectator()) continue;
+        HashMap<MatchTeam, Integer> holding = new HashMap<>();
 
-                    for (Player player : playersOnPoint) {
-                        if (matchTeam.containsPlayer(player)) {
-                            holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
-                        }
-                    }
-                }
+        RespawnModule respawnModule = TGM.get().getModule(RespawnModule.class);
+        runnableId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+            holding.clear();
 
-                MatchTeam most = null;
-                int mostCount = 0;
-                for (MatchTeam matchTeam : holding.keySet()) {
-                    if (most == null) {
-                        most = matchTeam;
-                    } else {
-                        if (holding.get(matchTeam) == holding.get(most)) {
-                            mostCount++;
-                        } else if (holding.get(matchTeam) > holding.get(most)) {
-                            most = matchTeam;
-                            mostCount = 0;
-                        }
-                    }
-                }
+            for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+                if (matchTeam.isSpectator()) continue;
 
-                if (most != null && mostCount == 0) {
-                    handleCap(most);
-                } else {
-                    if (controller != null) {
-                        controlPointService.holding(controller);
+                for (Player player : playersOnPoint) {
+                    if (respawnModule.isDead(player)) continue; // Don't allow players in respawn
+                    if (matchTeam.containsPlayer(player)) {
+                        holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                     }
                 }
             }
-        }, TICK_RATE, TICK_RATE);
+
+            MatchTeam most = null;
+            int mostCount = 0;
+            for (MatchTeam matchTeam : holding.keySet()) {
+                if (most == null) {
+                    most = matchTeam;
+                } else {
+                    if (holding.get(matchTeam).equals(holding.get(most))) {
+                        mostCount++;
+                    } else if (holding.get(matchTeam) > holding.get(most)) {
+                        most = matchTeam;
+                        mostCount = 0;
+                    }
+                }
+            }
+
+            if (most != null && mostCount == 0) {
+                handleCap(most);
+            } else {
+                if (controller != null) {
+                    controlPointService.holding(controller);
+                }
+            }
+        }, TICK_RATE, TICK_RATE).getTaskId();
 
         TGM.registerEvents(this);
     }
 
     private void handleCap(MatchTeam matchTeam) {
+        boolean isInitial = initialCapture;
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
             progress++;
             controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
         } else {
             if (matchTeam == progressingTowardsTeam) {
-                if(progress < definition.getMaxProgress()) {
+                if (progress < definition.getMaxProgress()) {
                     progress++; //don't go over the max cap number.
                     controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
                 }
@@ -170,6 +174,7 @@ public class ControlPoint implements Listener {
                 if (controller == null) {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
+                    if (initialCapture) initialCapture = false;
                 } else {
                     controlPointService.holding(matchTeam);
                 }
@@ -180,37 +185,28 @@ public class ControlPoint implements Listener {
             }
         }
 
-        renderBlocks(matchTeam);
+        renderBlocks(matchTeam, isInitial);
     }
 
     public int getPercent() {
         return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
-    private void renderBlocks(MatchTeam matchTeam) {
-        byte color1 = progressingTowardsTeam != null ? ColorConverter.convertChatColorToDyeColor(progressingTowardsTeam.getColor()).getWoolData() : -1;
-        byte color2 = controller != null && matchTeam == controller ? ColorConverter.convertChatColorToDyeColor(controller.getColor()).getWoolData() : -1;
+    private void renderBlocks(MatchTeam matchTeam, boolean isInitial) {
+        ChatColor color1 = progressingTowardsTeam.getColor();
+        ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : (isInitial ? ChatColor.RESET : ChatColor.WHITE);
         Location center = region.getCenter();
         double x = center.getX();
         double z = center.getZ();
         double percent = Math.toRadians(getPercent() * 3.6);
-        for(Block block : region.getBlocks()) {
-            if(!Blocks.isVisualMaterial(block.getType())) continue;
+        for (Block block : region.getBlocks()) {
+            if (!Blocks.isVisualMaterial(block.getType())) continue;
             double dx = block.getX() - x;
             double dz = block.getZ() - z;
             double angle = Math.atan2(dz, dx);
-            if(angle < 0) angle += 2 * Math.PI;
-            byte color = angle < percent ? color1 : color2;
-            if (color == -1) {
-                Pair<Material,Byte> oldBlock = regionSave.getBlockAt(new BlockVector(block.getLocation().toVector()));
-                if (oldBlock.getLeft().equals(block.getType())) color = oldBlock.getRight();
-            }
-            if (color != -1) {
-                block.setData(color);
-//                Bukkit.broadcastMessage("set to " + color);
-            } else {
-//                Bukkit.broadcastMessage("color = -1");
-            }
+            if (angle < 0) angle += 2 * Math.PI;
+            ChatColor color = angle < percent ? color1 : color2;
+            if (color != ChatColor.RESET) block.setType(ColorConverter.convertChatColorToColoredBlock(block.getType(), color));
         }
     }
 
@@ -219,5 +215,6 @@ public class ControlPoint implements Listener {
         HandlerList.unregisterAll(this);
 
         playersOnPoint.clear();
+        regionSave.clear();
     }
 }

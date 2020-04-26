@@ -1,13 +1,13 @@
 package network.warzone.tgm.modules.koth;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.controlpoint.ControlPointDefinition;
 import network.warzone.tgm.modules.controlpoint.ControlPointService;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;

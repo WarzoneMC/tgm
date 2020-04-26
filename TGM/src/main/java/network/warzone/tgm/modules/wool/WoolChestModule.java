@@ -6,7 +6,6 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
@@ -18,14 +17,13 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Wool;
 
 import java.util.HashMap;
 
 @Getter
 public class WoolChestModule extends MatchModule implements Listener {
 
-    private final HashMap<InventoryHolder, DyeColor> woolChests = new HashMap<>();
+    private final HashMap<InventoryHolder, ItemStack> woolChests = new HashMap<>();
 
     private int runnableId = -1;
 
@@ -45,27 +43,26 @@ public class WoolChestModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onOpen(InventoryOpenEvent event) {
-        //if (event.getInventory().getType() == InventoryType.CHEST) {
-            BlockState state = event.getInventory().getLocation().getBlock().getState();
+        if (event.getInventory().getLocation() == null) return;
+        BlockState state = event.getInventory().getLocation().getBlock().getState();
 
-            if (state instanceof Chest) {
-                Chest chest = (Chest) event.getInventory().getLocation().getBlock().getState();
+        if (state instanceof Chest) {
+            Chest chest = (Chest) event.getInventory().getLocation().getBlock().getState();
 
-                if (!isWoolChest(chest)) {
-                    registerInventory(event.getInventory());
-                }
-            } else if (state instanceof DoubleChest) {
-                DoubleChest chest = (DoubleChest) event.getInventory().getLocation().getBlock().getState();
-
-                if (!isWoolChest(chest.getRightSide())) {
-                    registerInventory(chest.getRightSide().getInventory());
-                }
-
-                if (!isWoolChest(chest.getLeftSide())) {
-                    registerInventory(chest.getLeftSide().getInventory());
-                }
+            if (!isWoolChest(chest)) {
+                registerInventory(event.getInventory());
             }
-        //}
+        } else if (state instanceof DoubleChest) {
+            DoubleChest chest = (DoubleChest) event.getInventory().getLocation().getBlock().getState();
+
+            if (!isWoolChest(chest.getRightSide())) {
+                registerInventory(chest.getRightSide().getInventory());
+            }
+
+            if (!isWoolChest(chest.getLeftSide())) {
+                registerInventory(chest.getLeftSide().getInventory());
+            }
+        }
     }
 
     @EventHandler
@@ -95,21 +92,18 @@ public class WoolChestModule extends MatchModule implements Listener {
         return woolChests.getOrDefault(holder, null) != null;
     }
 
-    private void fillInventoryWithWool(Inventory inventory, DyeColor dyeColor) {
-        Wool wool = new Wool(dyeColor);
-
+    private void fillInventoryWithWool(Inventory inventory, ItemStack woolFiller) {
         for (int i = 0; i < inventory.getSize(); i++) {
-            inventory.setItem(i, new ItemStack(wool.getItemType(), 1, (short) 0, wool.getData()));
+            inventory.setItem(i, woolFiller);
         }
     }
 
     private void registerInventory(Inventory inventory) {
         for (ItemStack itemStack : inventory.getContents()) {
-            if (itemStack != null && itemStack.getType() != null &&
-                    itemStack.getType() == Material.WOOL) {
-                DyeColor dyeColor = ((Wool) itemStack.getData()).getColor();
-                woolChests.put(inventory.getHolder(), dyeColor);
-                fillInventoryWithWool(inventory, dyeColor);
+            if (itemStack != null && itemStack.getData() != null &&
+                    itemStack.getType().name().contains("WOOL")) {
+                woolChests.put(inventory.getHolder(), itemStack);
+                fillInventoryWithWool(inventory, itemStack);
                 return;
             }
         }

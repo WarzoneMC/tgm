@@ -15,6 +15,7 @@ public class Heartbeat {
 
     private final String name;
     private final String id;
+    private final String motd;
     private Set<String> players; //object ids
     private Set<String> playerNames;
     private int playerCount;

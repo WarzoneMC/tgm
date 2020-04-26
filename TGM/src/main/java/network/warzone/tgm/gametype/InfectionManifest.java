@@ -2,8 +2,6 @@ package network.warzone.tgm.gametype;
 
 import network.warzone.tgm.match.MatchManifest;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.DeathMessageModule;
-import network.warzone.tgm.modules.infection.InfectedTimeLimit;
 import network.warzone.tgm.modules.infection.InfectionModule;
 
 import java.util.ArrayList;
@@ -16,14 +14,11 @@ public class InfectionManifest extends MatchManifest {
 
     @Override
     public List<MatchModule> allocateGameModules() {
-        List<MatchModule> matchModules = new ArrayList<>();
-
-        matchModules.add(new InfectionModule());
-        matchModules.add(new InfectedTimeLimit());
-
-        allocateCoreModules().remove(new DeathMessageModule()); // Replaced by InfectionModule
-
-        return matchModules;
+        return new ArrayList<MatchModule>(){
+            {
+                add(new InfectionModule());
+            }
+        };
     }
 
 }

@@ -7,6 +7,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,46 +33,39 @@ public class Parser {
         } else {
             String[] split = locationElement.getAsString().replaceAll(" ", "").split(",");
 
-            double x = Double.valueOf(split[0].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
-            double y = Double.valueOf(split[1].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
-            double z = Double.valueOf(split[2].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            double x = Double.parseDouble(split[0].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            double y = Double.parseDouble(split[1].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            double z = Double.parseDouble(split[2].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
 
             float yaw = 0;
             float pitch = 0;
 
             if (split.length >= 4) {
-                yaw = Float.valueOf(split[3].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+                yaw = Float.parseFloat(split[3].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
             }
 
             if (split.length >= 5) {
-                pitch = Float.valueOf(split[4].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+                pitch = Float.parseFloat(split[4].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
             }
 
             return new Location(world, x, y, z, yaw, pitch);
         }
     }
 
-    public static List<MatchTeam> getTeamsFromElement(TeamManagerModule teamManagerModule, JsonElement element) {
-        List<MatchTeam> teams = new ArrayList<>();
-
-        if (element.isJsonPrimitive()) {
-            if (element.getAsString().equalsIgnoreCase("all")) {
-                for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
-                    if (!matchTeam.isSpectator()) {
-                        teams.add(matchTeam);
-                    }
-                }
-            }
+    public static Vector convertVector(JsonElement vectorElement) {
+        if (vectorElement.isJsonObject()) {
+            JsonObject vectorJson = vectorElement.getAsJsonObject();
+            double x = vectorJson.get("x").getAsDouble();
+            double y = vectorJson.get("y").getAsDouble();
+            double z = vectorJson.get("z").getAsDouble();
+            return new Vector(x, y, z);
         } else {
-            for (JsonElement jsonElement : element.getAsJsonArray()) {
-                MatchTeam matchTeam = teamManagerModule.getTeamById(jsonElement.getAsString());
-                if (matchTeam != null) {
-                    teams.add(matchTeam);
-                }
-            }
+            String[] split = vectorElement.getAsString().replaceAll(" ", "").split(",");
+            double x = Double.parseDouble(split[0].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            double y = Double.parseDouble(split[1].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            double z = Double.parseDouble(split[2].replaceAll("oo", Integer.toString(Integer.MAX_VALUE)));
+            return new Vector(x, y, z);
         }
-
-        return teams;
     }
 
     /**

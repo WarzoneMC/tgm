@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.util.BossBarUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
@@ -17,6 +18,10 @@ public class StartCountdown extends BossBarCountdown {
     public static final int REQUIRED_PLAYERS = 2;
 
     @Getter private TeamManagerModule teamManagerModule;
+
+    public StartCountdown() {
+        this.bossBar = initBossBar();
+    }
 
     @Override
     public void load(Match match) {
@@ -49,6 +54,7 @@ public class StartCountdown extends BossBarCountdown {
             getBossBar().setColor(BarColor.RED);
 
             setTimeLeft(getTimeMax());
+            BossBarUtil.displayForOldVersions(getBossBar());
             return;
         }
 
@@ -58,10 +64,10 @@ public class StartCountdown extends BossBarCountdown {
             getBossBar().setColor(BarColor.GREEN);
             getBossBar().setTitle(ChatColor.GREEN + "Match starting in " + ChatColor.DARK_RED + getTimeLeftSeconds() +
                     ChatColor.GREEN + " second" + (getTimeLeftSeconds() > 1 ? "s" : ""));
-
+            BossBarUtil.displayForOldVersions(getBossBar());
             if (getTimeLeftSeconds() <= 3) {
                 Bukkit.getOnlinePlayers().forEach(player -> {
-                    player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_PLING, 1000, 1);
+                    player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_BLOCK_PLING, 1000, 1);
                     if (!TGM.get().getModule(TeamManagerModule.class).getSpectators().containsPlayer(player)) {
                         player.sendTitle(ChatColor.YELLOW.toString() + getTimeLeftSeconds(), "", 0, 5, 15);
                     }
@@ -76,7 +82,7 @@ public class StartCountdown extends BossBarCountdown {
         TGM.get().getMatchManager().startMatch();
 
         Bukkit.getOnlinePlayers().forEach(player -> {
-            player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_PLING, 1000f, 2f);
+            player.playSound(player.getLocation().clone().add(0.0, 100.0, 0.0), Sound.BLOCK_NOTE_BLOCK_PLING, 1000f, 2f);
             if (!TGM.get().getModule(TeamManagerModule.class).getSpectators().containsPlayer(player)) {
                 player.sendTitle(ChatColor.GREEN + "GO!", "", 0, 5, 15);
             }

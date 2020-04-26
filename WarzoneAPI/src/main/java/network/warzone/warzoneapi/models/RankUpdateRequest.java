@@ -12,7 +12,16 @@ public class RankUpdateRequest {
     private String rankName;
 
     public enum Action {
-        ADD, REMOVE
+        ADD, REMOVE;
+
+        public static Action byName(String name) {
+            for (Action action : values()) {
+                if (action.name().equalsIgnoreCase(name)) {
+                    return action;
+                }
+            }
+            return null;
+        }
     }
 
 }

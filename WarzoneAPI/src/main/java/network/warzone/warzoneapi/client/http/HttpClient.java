@@ -11,15 +11,20 @@ import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 
+import java.util.UUID;
+
 /**
  * Created by luke on 4/27/17.
  */
+@Getter
 public class HttpClient implements TeamClient {
-    @Getter private HttpClientConfig config;
-    @Getter private final Gson gson;
+
+    private HttpClientConfig config;
+    private final Gson gson;
 
     public HttpClient(HttpClientConfig config) {
         this.config = config;
+
 
         GsonBuilder builder = new GsonBuilder();
 
@@ -55,7 +60,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void heartbeat(Heartbeat heartbeat) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/server/heartbeat")
+            Unirest.post(config.getBaseUrl() + "/mc/server/heartbeat")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
@@ -64,6 +69,20 @@ public class HttpClient implements TeamClient {
         } catch (UnirestException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public GetPlayerByNameResponse player(String name) {
+        try {
+            return Unirest.get(config.getBaseUrl() + "/mc/player/" + name)
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(GetPlayerByNameResponse.class).getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -131,7 +150,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void finishMatch(MatchFinishPacket matchFinishPacket) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/finish")
+            Unirest.post(config.getBaseUrl() + "/mc/match/finish")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
@@ -145,7 +164,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/match/destroy_wool")
+            Unirest.post(config.getBaseUrl() + "/mc/match/destroy_wool")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")
@@ -153,6 +172,21 @@ public class HttpClient implements TeamClient {
                     .asJson();
         } catch (UnirestException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion) {
+        try {
+            HttpResponse<LeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/" + leaderboardCriterion.name().toLowerCase() + "?limit=10")
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(LeaderboardResponse.class);
+            System.out.println(response.getBody());
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return new LeaderboardResponse();
         }
     }
 
@@ -277,6 +311,10 @@ public class HttpClient implements TeamClient {
         } catch (UnirestException e) {
             e.printStackTrace();
             return null;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid ObjectID: " + id);
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -289,6 +327,54 @@ public class HttpClient implements TeamClient {
                     .header("Content-Type", "application/json")
                     .body(playerInfoRequest)
                     .asObject(PlayerInfoResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public PlayerAltsResponse getAlts(String name) {
+        try {
+            HttpResponse<PlayerAltsResponse> response = Unirest.get(config.getBaseUrl() + "/mc/player/alts/" + name)
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .asObject(PlayerAltsResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action) {
+        try {
+            HttpResponse<PlayerTagsUpdateResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/" + username + "/tags/" + action.name().toLowerCase())
+                    .header("x-access-token", config.getAuthToken())
+                    .header("accept", "application/json")
+                    .header("Content-Type", "application/json")
+                    .body(new PlayerTagsUpdateRequest(tag))
+                    .asObject(PlayerTagsUpdateResponse.class);
+            return response.getBody();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public MojangProfile getMojangProfile(UUID uuid) {
+        return getMojangProfile(uuid.toString());
+    }
+
+    @Override
+    public MojangProfile getMojangProfile(String username) {
+        try {
+            HttpResponse<MojangProfile> response = Unirest.get("https://api.ashcon.app/mojang/v2/user/" + username)
+                    .asObject(MojangProfile.class);
             return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();

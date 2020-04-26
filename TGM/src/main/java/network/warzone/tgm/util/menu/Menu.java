@@ -1,5 +1,6 @@
 package network.warzone.tgm.util.menu;
 
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -17,11 +18,14 @@ import java.util.HashMap;
  */
 public abstract class Menu implements Listener {
 
-    private Inventory inventory;
+    @Getter private Inventory inventory;
+    private String realTitle;
+
     private HashMap<Integer, MenuAction> actions = new HashMap<>();
 
     public Menu(String name, int slots) {
         this.inventory = Bukkit.createInventory(null, slots, name);
+        this.realTitle = name;
         TGM.registerEvents(this);
     }
 
@@ -31,12 +35,12 @@ public abstract class Menu implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        if (event.getInventory().getName().equals(this.inventory.getName())) {
+        if (event.getInventory().equals(this.inventory)) {
             event.setCancelled(true);
             Player player = (Player) event.getWhoClicked();
 
-            if (actions.containsKey(event.getSlot())) {
-                actions.get(event.getSlot()).run(player);
+            if (this.actions.containsKey(event.getSlot())) {
+                this.actions.get(event.getSlot()).run(player, event);
             }
         }
     }
@@ -50,6 +54,11 @@ public abstract class Menu implements Listener {
 
     public void setItem(int slot, ItemStack itemStack) {
         this.inventory.setItem(slot, itemStack);
+    }
+
+    public void clear() {
+        this.inventory.clear();
+        this.actions.clear();
     }
 
     public void disable() {

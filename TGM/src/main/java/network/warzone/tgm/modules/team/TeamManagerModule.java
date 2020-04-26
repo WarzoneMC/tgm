@@ -1,5 +1,8 @@
 package network.warzone.tgm.modules.team;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
@@ -12,14 +15,17 @@ import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter @Setter
 public class TeamManagerModule extends MatchModule implements Listener {
@@ -34,10 +40,31 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, true, Integer.MAX_VALUE, 0));
+        teams.add(new MatchTeam("spectators", "Spectators", ChatColor.AQUA, GameMode.ADVENTURE, true,  Integer.MAX_VALUE, 0, false));
 
         for (ParsedTeam parsedTeam : match.getMapContainer().getMapInfo().getTeams()) {
-            teams.add(new MatchTeam(parsedTeam.getId(), parsedTeam.getAlias(), parsedTeam.getTeamColor(), false, parsedTeam.getMax(), parsedTeam.getMin()));
+            teams.add(new MatchTeam(
+                    parsedTeam.getId(),
+                    parsedTeam.getAlias(),
+                    parsedTeam.getTeamColor(),
+                    parsedTeam.getTeamGamemode(),
+                    false,
+                    parsedTeam.getMax(),
+                    parsedTeam.getMin(),
+                    parsedTeam.isFriendlyFire()
+            ));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getEntity() instanceof Player) || !(event.getDamager() instanceof Player)) return;
+        Player player = (Player) event.getEntity();
+        Player damager = (Player) event.getDamager();
+        MatchTeam team = getTeam(player);
+        if (!team.isFriendlyFire() && team.equals(getTeam(damager))) {
+            event.setCancelled(true);
+            event.setDamage(0);
         }
     }
 
@@ -53,26 +80,25 @@ public class TeamManagerModule extends MatchModule implements Listener {
     @EventHandler
     public void onMatchJoin(MatchJoinEvent event) {
         MatchTeam matchTeam = teamJoinController.determineTeam(event.getPlayerContext());
-        joinTeam(event.getPlayerContext(), matchTeam);
+        joinTeam(event.getPlayerContext(), matchTeam, true);
     }
 
-    public void joinTeam(PlayerContext playerContext, MatchTeam matchTeam) {
+    public void joinTeam(PlayerContext playerContext, MatchTeam matchTeam, boolean forced) {
         MatchTeam oldTeam = getTeam(playerContext.getPlayer());
-        if (oldTeam != null) {
-            oldTeam.removePlayer(playerContext);
-        }
+        if (oldTeam != null) oldTeam.removePlayer(playerContext);
 
         matchTeam.addPlayer(playerContext);
-        Bukkit.getPluginManager().callEvent(new TeamChangeEvent(playerContext, matchTeam, oldTeam));
+
+        TeamChangeEvent event = new TeamChangeEvent(playerContext, matchTeam, oldTeam, false, forced);
+        Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            matchTeam.removePlayer(playerContext);
+            if (oldTeam != null) oldTeam.addPlayer(playerContext);
+        }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        handleQuit(event.getPlayer());
-    }
-
-    @EventHandler
-    public void onKick(PlayerKickEvent event) {
         handleQuit(event.getPlayer());
     }
 
@@ -163,10 +189,13 @@ public class TeamManagerModule extends MatchModule implements Listener {
                     smallest = matchTeam;
                     continue;
                 }
-
-                if (((double) matchTeam.getMembers().size()) / matchTeam.getMax() < ((double) smallest.getMembers().size()) / smallest.getMax()) {
+                double teamSize = ((double) matchTeam.getMembers().size()) / matchTeam.getMax();
+                double smallestTeamSize = ((double) smallest.getMembers().size()) / smallest.getMax();
+                if (teamSize < smallestTeamSize) {
                     smallest = matchTeam;
+                    continue;
                 }
+                if (teamSize == smallestTeamSize && new Random().nextBoolean()) smallest = matchTeam;
             }
         }
 
@@ -181,5 +210,16 @@ public class TeamManagerModule extends MatchModule implements Listener {
             }
         }
         return amount;
+    }
+
+    public List<MatchTeam> getTeams(JsonArray jsonArray) {
+        if (jsonArray == null) return new ArrayList<>();
+        List<MatchTeam> teams = new ArrayList<>();
+        for (JsonElement e : jsonArray) {
+            if (!e.isJsonPrimitive()) continue;
+            MatchTeam team = getTeamFromInput(e.getAsString());
+            if (team != null) teams.add(team);
+        }
+        return teams;
     }
 }

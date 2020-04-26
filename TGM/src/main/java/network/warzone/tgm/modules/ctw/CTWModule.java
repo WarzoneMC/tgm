@@ -6,6 +6,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.modules.ItemRemoveModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
@@ -23,7 +24,7 @@ import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.FireworkUtil;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -42,28 +43,33 @@ public class CTWModule extends MatchModule implements Listener {
 
     private final List<WoolObjective> wools = new ArrayList<>();
     private final HashMap<WoolObjective, List<Integer>> woolScoreboardLines = new HashMap<>();
-    private final HashMap<MatchTeam, Integer> teamScoreboardLines = new HashMap<>();
+    private final HashMap<String, Integer> teamScoreboardLines = new HashMap<>();
+
+    private boolean compactLayout = false;
+
+    private TeamManagerModule teamManagerModule;
+    private ScoreboardManagerModule scoreboardManagerModule;
 
     @Override
     public void load(Match match) {
         JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("ctw").getAsJsonObject();
+        this.teamManagerModule = match.getModule(TeamManagerModule.class);
+        this.scoreboardManagerModule = match.getModule(ScoreboardManagerModule.class);
 
-        for (JsonElement monumentElement : dtmJson.getAsJsonArray("wools")) {
-            JsonObject monumentJson = monumentElement.getAsJsonObject();
+        for (JsonElement woolElement : dtmJson.getAsJsonArray("wools")) {
+            JsonObject woolObject = woolElement.getAsJsonObject();
 
-            String name = monumentJson.get("name").getAsString();
-            Region region = match.getModule(RegionManagerModule.class).getRegion(match, monumentJson.get("region"));
-            List<MatchTeam> teams = Parser.getTeamsFromElement(match.getModule(TeamManagerModule.class), monumentJson.get("teams"));
-            DyeColor color = DyeColor.valueOf(Strings.getTechnicalName(monumentJson.get("color").getAsString()));
-
+            String name = woolObject.get("name").getAsString();
+            Region region = match.getModule(RegionManagerModule.class).getRegion(match, woolObject.get("region"));
+            List<MatchTeam> teams = this.teamManagerModule.getTeams(woolObject.get("teams").getAsJsonArray());
+            String woolColor = Strings.getTechnicalName(woolObject.get("woolcolor").getAsString()); //TODO 1.13 Temp fix
+            ChatColor color = ChatColor.valueOf(Strings.getTechnicalName(woolObject.get("color").getAsString()));
             for (MatchTeam matchTeam : teams) {
-                wools.add(new WoolObjective(name, color, matchTeam, region));
+                wools.add(new WoolObjective(name, Material.valueOf(woolColor.toUpperCase() + "_WOOL"), matchTeam, region, color));
             }
 
             teams.clear();
         }
-
-        TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
 
         //wool services
         for (WoolObjective woolObjective : wools) {
@@ -74,7 +80,7 @@ public class CTWModule extends MatchModule implements Listener {
                         updateOnScoreboard(woolObjective);
 
                         Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                                " picked up " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                                " picked up " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                             for (PlayerContext playerContext : otherTeam.getMembers()) {
@@ -93,7 +99,7 @@ public class CTWModule extends MatchModule implements Listener {
                     updateOnScoreboard(woolObjective);
 
                     Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                            " placed " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                            " placed " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
@@ -117,24 +123,28 @@ public class CTWModule extends MatchModule implements Listener {
                     updateOnScoreboard(woolObjective);
 
                      if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                             " dropped " + woolObjective.getChatColor() + ChatColor.BOLD.toString() + woolObjective.getName());
+                             " dropped " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
                  }
 
             });
         }
 
+        ItemRemoveModule module = TGM.get().getModule(ItemRemoveModule.class);
+
         //load wools
-        for (WoolObjective woolObjective : wools) {
+        for (WoolObjective woolObjective : this.wools) {
             woolObjective.load();
+            if (module != null) module.add(new ItemRemoveModule.ItemRemoveInfo(woolObjective.getBlock()).setPreventingItemSpawn(false));
         }
 
+        if (this.wools.size() > 6) this.compactLayout = true;
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getWinningTeam);
     }
 
     private MatchTeam getWinningTeam() {
         Map<MatchTeam, Integer> teamScores = new HashMap<>();
         Map.Entry<MatchTeam, Integer> highest = null;
-        for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
+        for (MatchTeam matchTeam : this.teamManagerModule.getTeams()) {
             if (matchTeam.isSpectator()) continue;
             int score = 0;
             for (WoolObjective woolObjective : this.wools) {
@@ -170,31 +180,56 @@ public class CTWModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
-        List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
-
+        List<MatchTeam> teams = this.teamManagerModule.getTeams();
         int spaceCount = 1;
-        int i = 0;
-        for (MatchTeam matchTeam : teams) {
-            if(matchTeam.isSpectator()) continue;
+        int i = 2;
+        if (!compactLayout) {
+            for (MatchTeam matchTeam : teams) {
+                if (matchTeam.isSpectator()) continue;
 
-            for (WoolObjective woolObjective : wools) {
-                if (woolObjective.getOwner() == matchTeam) {
-                    if (woolScoreboardLines.containsKey(woolObjective)) {
-                        woolScoreboardLines.get(woolObjective).add(i);
-                    } else {
-                        List<Integer> list = new ArrayList<>();
-                        list.add(i);
-                        woolScoreboardLines.put(woolObjective, list);
+                for (WoolObjective woolObjective : wools) {
+                    if (woolObjective.getOwner() == matchTeam) {
+                        if (woolScoreboardLines.containsKey(woolObjective)) {
+                            woolScoreboardLines.get(woolObjective).add(i);
+                        } else {
+                            List<Integer> list = new ArrayList<>();
+                            list.add(i);
+                            woolScoreboardLines.put(woolObjective, list);
+                        }
+
+                        event.getSimpleScoreboard().add(getScoreboardString(woolObjective), i++);
                     }
+                }
+                event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
+                teamScoreboardLines.put(matchTeam.getId(), i++);
 
-                    event.getSimpleScoreboard().add(getScoreboardString(woolObjective), i++);
+                if (teams.indexOf(matchTeam) < teams.size() - 1) {
+                    event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
                 }
             }
-            event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
-            teamScoreboardLines.put(matchTeam, i++);
+        } else {
+            for (MatchTeam matchTeam : teams) {
+                if (matchTeam.isSpectator()) continue;
 
-            if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
+                List<WoolObjective> wools = getTeamWoolObjectives(matchTeam);
+                for (WoolObjective woolObjective : wools) {
+                    if (woolObjective.getOwner() == matchTeam) {
+                        if (woolScoreboardLines.containsKey(woolObjective)) {
+                            woolScoreboardLines.get(woolObjective).add(i);
+                        } else {
+                            List<Integer> list = new ArrayList<>();
+                            list.add(i);
+                            woolScoreboardLines.put(woolObjective, list);
+                        }
+                    }
+                }
+                event.getSimpleScoreboard().add(getScoreboardString(wools), i++);
+                event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
+                teamScoreboardLines.put(matchTeam.getId(), i++);
+
+                if (teams.indexOf(matchTeam) < teams.size() - 1) {
+                    event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
+                }
             }
         }
     }
@@ -213,10 +248,13 @@ public class CTWModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamUpdate(TeamUpdateEvent event) {
-        for (MatchTeam matchTeam : teamScoreboardLines.keySet()) {
+        Set<String> teamIds = this.teamScoreboardLines.keySet();
+        Set<MatchTeam> teams = teamIds.stream().map(id -> this.teamManagerModule.getTeamById(id)).collect(Collectors.toSet());
+
+        for (MatchTeam matchTeam : teams) {
             if (event.getMatchTeam() == matchTeam) {
-                int i = teamScoreboardLines.get(matchTeam);
-                for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+                int i = this.teamScoreboardLines.get(matchTeam.getId());
+                for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
                     simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                     simpleScoreboard.update();
                 }
@@ -225,12 +263,20 @@ public class CTWModule extends MatchModule implements Listener {
     }
 
     private void updateOnScoreboard(WoolObjective woolObjective) {
-        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
-
-        for (int i : woolScoreboardLines.get(woolObjective)) {
-            for (SimpleScoreboard simpleScoreboard : scoreboardManagerModule.getScoreboards().values()) {
-                simpleScoreboard.add(getScoreboardString(woolObjective), i);
-                simpleScoreboard.update();
+        if (!this.compactLayout) {
+            for (int i : this.woolScoreboardLines.get(woolObjective)) {
+                for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
+                    simpleScoreboard.add(getScoreboardString(woolObjective), i);
+                    simpleScoreboard.update();
+                }
+            }
+        } else {
+            List<WoolObjective> woolObjectives = getTeamWoolObjectives(woolObjective.getOwner());
+            for (int i : this.woolScoreboardLines.get(woolObjective)) {
+                for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
+                    simpleScoreboard.add(getScoreboardString(woolObjectives), i);
+                    simpleScoreboard.update();
+                }
             }
         }
     }
@@ -242,22 +288,41 @@ public class CTWModule extends MatchModule implements Listener {
     private String getScoreboardString(WoolObjective woolObjective) {
         WoolStatus woolStatus = woolObjective.getStatus();
         if (woolStatus == WoolStatus.COMPLETED) {
-            return "  " + woolObjective.getChatColor() + SYMBOL_WOOL_COMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
+            return "  " + woolObjective.getColor() + SYMBOL_WOOL_COMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
         } else if (woolStatus == WoolStatus.TOUCHED) {
-            return "  " + woolObjective.getChatColor() + SYMBOL_WOOL_TOUCHED + ChatColor.WHITE + " " + woolObjective.getName();
+            return "  " + woolObjective.getColor() + SYMBOL_WOOL_TOUCHED + ChatColor.WHITE + " " + woolObjective.getName();
         } else {
-            return "  " + woolObjective.getChatColor() + SYMBOL_WOOL_INCOMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
+            return "  " + woolObjective.getColor() + SYMBOL_WOOL_INCOMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
         }
+    }
+
+    private String getScoreboardString(List<WoolObjective> woolObjectives) {
+        StringBuilder result = new StringBuilder();
+        for (WoolObjective woolObjective : woolObjectives) {
+            WoolStatus woolStatus = woolObjective.getStatus();
+            if (woolStatus == WoolStatus.COMPLETED) {
+                result.append("  ").append(woolObjective.getColor()).append(SYMBOL_WOOL_COMPLETE);
+            } else if (woolStatus == WoolStatus.TOUCHED) {
+                result.append("  ").append(woolObjective.getColor()).append(SYMBOL_WOOL_TOUCHED);
+            } else {
+                result.append("  ").append(woolObjective.getColor()).append(SYMBOL_WOOL_INCOMPLETE);
+            }
+        }
+        return result.toString();
     }
 
     @Override
     public void unload() {
-        for (WoolObjective woolObjective : wools) {
+        for (WoolObjective woolObjective : this.wools) {
             woolObjective.unload();
         }
 
-        wools.clear();
-        woolScoreboardLines.clear();
-        teamScoreboardLines.clear();
+        this.wools.clear();
+        this.woolScoreboardLines.clear();
+        this.teamScoreboardLines.clear();
+    }
+
+    private List<WoolObjective> getTeamWoolObjectives(MatchTeam matchTeam) {
+        return this.wools.stream().filter(wool -> wool.getOwner().equals(matchTeam)).collect(Collectors.toList());
     }
 }
