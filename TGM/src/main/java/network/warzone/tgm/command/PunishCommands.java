@@ -248,6 +248,7 @@ public class PunishCommands {
         });
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Command(aliases = "alts", desc = "Lookup alts of a user", min = 1, max = 1, usage = "(name)")
     @CommandPermissions("tgm.lookup")
     public static void alts(CommandContext cmd, CommandSender sender) {
@@ -262,12 +263,44 @@ public class PunishCommands {
                     sender.sendMessage(ChatColor.GREEN + response.getLookupUser().getName() + " has no known alts.");
                     return;
                 }
+
                 String name = response.getLookupUser().getName();
                 List<String> alts = new ArrayList<>(Arrays.asList(
                         "",
                         ChatColor.AQUA + name + (name.endsWith("s") ? "'" : "'s") + " known alts:"
                 ));
-                alts.addAll(response.getUsers().stream().map(user -> ChatColor.GRAY + " - " + ChatColor.WHITE + user.getName()).collect(Collectors.toList()));
+
+                for (UserProfile user : response.getUsers()) {
+                    boolean isBanned = false;
+                    boolean isMuted = false;
+
+                    PunishmentsListResponse punishmentsListResponse = TGM.get().getTeamClient().getPunishments(new PunishmentsListRequest(user.getName(), null));
+                    if (!punishmentsListResponse.isNotFound()) {
+                        for (Punishment punishment : punishmentsListResponse.getPunishments()) {
+                            if (punishment.getType().toUpperCase().equals("BAN") && punishment.isActive()) {
+                                isBanned = true;
+                                break;
+                            }
+
+                            if (punishment.getType().toUpperCase().equals("MUTE") && punishment.isActive()) {
+                                isMuted = true;
+                            }
+                        }
+                    }
+
+                    ChatColor chatColor = ChatColor.WHITE;
+
+                    if (isMuted) {
+                        chatColor = ChatColor.YELLOW;
+                    }
+
+                    if (isBanned) {
+                        chatColor = ChatColor.RED;
+                    }
+
+                    alts.add(ChatColor.GRAY + " - " + chatColor + user.getName());
+                }
+
                 alts.add(" ");
                 sender.sendMessage(alts.toArray(new String[0]));
             }
