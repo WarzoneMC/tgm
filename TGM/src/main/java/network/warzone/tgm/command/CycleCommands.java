@@ -195,6 +195,7 @@ public class CycleCommands {
                     time = cmd.getInteger(0);
                 } catch (CommandNumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
+                    return;
                 }
             }
             sender.sendMessage(ChatColor.GREEN + "Cycling in " + time + " seconds.");
@@ -215,6 +216,7 @@ public class CycleCommands {
                     time = cmd.getInteger(0);
                 } catch (CommandNumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "Unknown time \"" + cmd.getString(0) + "\"");
+                    return;
                 }
             }
             boolean soloStart = Bukkit.getOnlinePlayers().size() <= 1;
