@@ -37,7 +37,7 @@ public class EnterFilterType implements FilterType, Listener {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
-                        if (filterResult == FilterResult.DENY) {
+                        if (filterResult == FilterResult.DENY && event.getPlayer().getGameMode() != GameMode.SPECTATOR) {
                             event.setCancelled(true);
                             if (message != null) event.getPlayer().sendMessage(message);
                         } else if (filterResult == FilterResult.ALLOW) {
