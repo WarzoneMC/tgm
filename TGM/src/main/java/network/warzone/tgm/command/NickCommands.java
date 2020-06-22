@@ -35,6 +35,11 @@ public class NickCommands {
         }
 
         if (cmd.argsLength() == 1 && cmd.getString(0).equals("reset")) {
+            if (!sender.hasPermission("tgm.command.nicks.reset")) {
+                sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+                return;
+            }
+
             List<UUID> nickedPlayers = new ArrayList<>();
 
             originalNames.forEach((uuid, originalName) -> nickedPlayers.add(uuid));
