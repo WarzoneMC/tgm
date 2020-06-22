@@ -11,7 +11,6 @@ import java.util.List;
 // TODO: Make a better event actions module
 public class MapCommandsModule extends MatchModule {
 
-    private Match match;
     private List<String> startCommands = new ArrayList<>();
 
     @Override

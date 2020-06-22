@@ -115,6 +115,7 @@ public class MatchManager {
 
         //if a match is currently running, unload it.
         if (oldMatch != null) {
+            File worldFolder = oldMatch.getWorld().getWorldFolder();
             oldMatch.getWorld().getPlayers().forEach(player ->
                     player.teleport(world.getSpawnLocation()));
 
@@ -125,7 +126,7 @@ public class MatchManager {
             if (!save)
                 Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
                     try {
-                        FileUtils.deleteDirectory(oldMatch.getWorld().getWorldFolder());
+                        FileUtils.deleteDirectory(worldFolder);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
