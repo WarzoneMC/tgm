@@ -15,6 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**
@@ -23,7 +24,7 @@ import java.util.*;
 @Getter
 public class KillstreakModule extends MatchModule implements Listener {
 
-    private Match match;
+    private WeakReference<Match> match;
 
     private DeathModule deathModule;
 
@@ -32,7 +33,7 @@ public class KillstreakModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         deathModule = match.getModule(DeathModule.class);
         this.addDefaults();
         if (match.getMapContainer().getMapInfo().getJsonObject().has("killstreaks")) {
@@ -134,7 +135,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                         .setMessage("%killercolor%%killername% &7is on a kill streak of &6&l%count%&r&7!")
                         .setActions(Arrays.asList(
                                 new SoundKillstreakAction(Sound.ENTITY_WITHER_AMBIENT, SoundKillstreakAction.SoundTarget.EVERYONE, 7.0F, 1.0F),
-                                new FireworkKillstreakAction(new Location(match.getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.CREEPER).withColor(Color.RED).withFade(Color.fromRGB(9371648)).build(), 0)
+                                new FireworkKillstreakAction(new Location(match.get().getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.CREEPER).withColor(Color.RED).withFade(Color.fromRGB(9371648)).build(), 0)
                         )),
 
                 new Killstreak()
@@ -142,7 +143,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                         .setMessage("%killercolor%%killername% &7is on a kill streak of &c&l%count%&r&7!")
                         .setActions(Arrays.asList(
                                 new SoundKillstreakAction(Sound.ENTITY_ENDER_DRAGON_GROWL, SoundKillstreakAction.SoundTarget.EVERYONE, 1000.0F, 1.0F),
-                                new FireworkKillstreakAction(new Location(match.getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.BALL).withColor(Color.RED).withFade(Color.fromRGB(9371648)).build(), 0)
+                                new FireworkKillstreakAction(new Location(match.get().getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.BALL).withColor(Color.RED).withFade(Color.fromRGB(9371648)).build(), 0)
                         )),
 
                 new Killstreak()
@@ -150,7 +151,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                         .setMessage("%killercolor%%killername% &7is on a kill streak of &3&l%count%&r&7!")
                         .setActions(Arrays.asList(
                                 new SoundKillstreakAction(Sound.ENTITY_WITHER_SPAWN, SoundKillstreakAction.SoundTarget.EVERYONE, 1000.0F, 1.4F),
-                                new FireworkKillstreakAction(new Location(match.getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.BALL_LARGE).withColor(Color.RED).withFade(Color.fromRGB(9371648)).build(), 0)
+                                new FireworkKillstreakAction(new Location(match.get().getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.BALL_LARGE).withColor(Color.RED).withFade(Color.fromRGB(9371648)).build(), 0)
                         )),
 
                 new Killstreak()
@@ -158,7 +159,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                         .setMessage("%killercolor%%killername% &7is on a kill streak of &5&l%count%&r&7!")
                         .setActions(Arrays.asList(
                                 new SoundKillstreakAction(Sound.UI_TOAST_CHALLENGE_COMPLETE, SoundKillstreakAction.SoundTarget.PLAYER, 1000.0F, 1.0F),
-                                new FireworkKillstreakAction(new Location(match.getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.STAR).withColor(Color.fromRGB(16766776)).withFade(Color.fromRGB(16774912)).build(), 0)
+                                new FireworkKillstreakAction(new Location(match.get().getWorld(), 0.0, 0.0, 0.0), FireworkEffect.builder().with(FireworkEffect.Type.STAR).withColor(Color.fromRGB(16766776)).withFade(Color.fromRGB(16774912)).build(), 0)
                         ))
         ));
     }

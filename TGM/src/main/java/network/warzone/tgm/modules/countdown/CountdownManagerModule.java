@@ -15,6 +15,7 @@ import network.warzone.tgm.util.Strings;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.Map;
 @ModuleData(load = ModuleLoadTime.EARLIEST)
 public class CountdownManagerModule extends MatchModule {
 
-    private Match match;
+    private WeakReference<Match> match;
     private TeamManagerModule teamManagerModule;
     private TaskedModuleManager taskedModuleManager;
 
@@ -34,7 +35,7 @@ public class CountdownManagerModule extends MatchModule {
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.taskedModuleManager = match.getModule(TaskedModuleManager.class);
         match.getModules().add(new StartCountdown());
@@ -89,7 +90,7 @@ public class CountdownManagerModule extends MatchModule {
     public void addCountdown(String id, CustomCountdown countdown) {
         this.customCountdowns.put(id, countdown);
         TGM.registerEvents(countdown);
-        this.match.getModules().add(countdown);
+        this.match.get().getModules().add(countdown);
         this.taskedModuleManager.addTaskedModule(countdown);
     }
 

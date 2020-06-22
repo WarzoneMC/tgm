@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,13 +51,13 @@ public class BlitzModule extends MatchModule implements Listener {
     private String subtitle = ChatColor.GREEN + "Remaining lives:  " + ChatColor.YELLOW + "%lives%";
     private String actionbar = "";
 
-    private Match match;
+    private WeakReference<Match> match;
 
     private final RespawnRule respawnRule = new RespawnRule(null, 3000, false, false, false);
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         JsonObject mapInfo = match.getMapContainer().getMapInfo().getJsonObject();
 
@@ -143,7 +144,7 @@ public class BlitzModule extends MatchModule implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onJoinAttempt(PlayerJoinTeamAttemptEvent event) {
-        if (!this.match.getMatchStatus().equals(MatchStatus.PRE)) {
+        if (!this.match.get().getMatchStatus().equals(MatchStatus.PRE)) {
             event.getPlayerContext().getPlayer().sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this mode.");
             event.setCancelled(true);
         }

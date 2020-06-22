@@ -12,6 +12,7 @@ import network.warzone.tgm.modules.filter.type.*;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,19 +20,19 @@ public class FilterManagerModule extends MatchModule {
 
     private List<FilterType> filterTypes = new ArrayList<>();
     
-    private Match match;
+    private WeakReference<Match> match;
     
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
     }
 
     @Override
     public void enable() {
-        if (match.getMapContainer().getMapInfo().getJsonObject().has("filters")) {
-            for (JsonElement filterElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("filters")) {
+        if (match.get().getMapContainer().getMapInfo().getJsonObject().has("filters")) {
+            for (JsonElement filterElement : match.get().getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("filters")) {
                 JsonObject filterJson = filterElement.getAsJsonObject();
-                for (FilterType filterType : initFilter(match, filterJson)) {
+                for (FilterType filterType : initFilter(match.get(), filterJson)) {
                     filterTypes.add(filterType);
                     if (filterType instanceof Listener) {
                         TGM.registerEvents((Listener) filterType);

@@ -40,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 @Getter
@@ -56,7 +57,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
     private Region protectiveRegion;
 
-    private Match match;
+    private WeakReference<Match> match;
     private TeamManagerModule teamManagerModule;
     private RespawnModule respawnModule;
 
@@ -69,7 +70,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.flagSubscriber = flagSubscriber;
         this.team = team;
 
-        this.match = TGM.get().getMatchManager().getMatch();
+        this.match = new WeakReference<Match>(TGM.get().getMatchManager().getMatch());
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.respawnModule = TGM.get().getModule(RespawnModule.class);
 
@@ -147,7 +148,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     }
 
     private boolean passesGeneralConditions(MatchTeam team) {
-        return match.getMatchStatus() == MatchStatus.MID && !team.isSpectator();
+        return match.get().getMatchStatus() == MatchStatus.MID && !team.isSpectator();
     }
 
     @EventHandler
@@ -167,21 +168,21 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        if (match.getMatchStatus() != MatchStatus.MID || event.getPlayer() != flagHolder) return;
+        if (match.get().getMatchStatus() != MatchStatus.MID || event.getPlayer() != flagHolder) return;
         this.refreshFlag();
         flagSubscriber.drop(this, event.getPlayer(), null);
     }
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        if (match.getMatchStatus() != MatchStatus.MID || event.getPlayerContext().getPlayer() != flagHolder || event.getTeam().equals(event.getOldTeam())) return;
+        if (match.get().getMatchStatus() != MatchStatus.MID || event.getPlayerContext().getPlayer() != flagHolder || event.getTeam().equals(event.getOldTeam())) return;
         this.refreshFlag();
         flagSubscriber.drop(this, event.getPlayerContext().getPlayer(), null);
     }
 
     @EventHandler
     public void onTGMDeath(TGMPlayerDeathEvent event) {
-        if (match.getMatchStatus() != MatchStatus.MID || event.getVictim() != flagHolder) return;
+        if (match.get().getMatchStatus() != MatchStatus.MID || event.getVictim() != flagHolder) return;
         this.refreshFlag();
         flagSubscriber.drop(this, event.getVictim(), event.getKiller());
     }

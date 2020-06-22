@@ -37,12 +37,13 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 @ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class SpectatorModule extends MatchModule implements Listener {
 
-    private Match match;
+    private WeakReference<Match> match;
     private TeamManagerModule teamManagerModule;
 
     private MatchTeam spectators;
@@ -75,7 +76,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.respawnModule = match.getModule(RespawnModule.class);
         this.spectators = teamManagerModule.getSpectators();
@@ -306,7 +307,7 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (match.getMatchStatus() == MatchStatus.PRE || teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
+        if (match.get().getMatchStatus() == MatchStatus.PRE || teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
             event.setCancelled(true);
             if (event.getItem() == null) return;
             if (event.getItem().isSimilar(teamSelectionItem)) {
@@ -437,7 +438,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     public void printObjective(Player player) {
-        MapInfo mapInfo = this.match.getMapContainer().getMapInfo();
+        MapInfo mapInfo = this.match.get().getMapContainer().getMapInfo();
         String objective;
         if (mapInfo.getObjective() != null) {
             objective = mapInfo.getObjective();

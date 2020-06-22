@@ -16,6 +16,9 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
+
+import java.lang.ref.WeakReference;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.event.EventHandler;
@@ -24,14 +27,14 @@ import org.bukkit.util.Vector;
 
 @Getter
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
-    private Match match;
+    private WeakReference<Match> match;
     private TeamManagerModule teamManagerModule;
     private SpectatorModule spectatorModule;
     private GameClassModule gameClassModule;
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
         gameClassModule = TGM.get().getModule(GameClassModule.class);
@@ -62,7 +65,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     }
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport, boolean firstSpawn) {
-        boolean reset = firstSpawn || !match.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
+        boolean reset = firstSpawn || !match.get().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
         Players.reset(playerContext.getPlayer(), true, !reset);
 
         if (teleport) {

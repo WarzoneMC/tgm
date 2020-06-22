@@ -38,6 +38,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ import java.util.Random;
 @Getter
 public class InfectionModule extends MatchModule implements Listener, TimeSubscriber {
 
-    private Match match;
+    private WeakReference<Match> match;
     private TeamManagerModule teamManager;
     private HashMap<Integer, String> teamScoreboardLines = new HashMap<>();
     private HashMap<String, Integer> teamAliveScoreboardLines = new HashMap<>();
@@ -73,7 +74,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         length = json.get("length").getAsInt();
         teamManager = match.getModule(TeamManagerModule.class);
         deathModule = match.getModule(DeathModule.class);
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         this.humans = teamManager.getTeamById("humans");
         this.infected = teamManager.getTeamById("infected");
         TimeModule time = TGM.get().getModule(TimeModule.class);
@@ -178,7 +179,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     @EventHandler(ignoreCancelled = true)
     public void onJoinAttempt(PlayerJoinTeamAttemptEvent event) {
-        if (this.match.getMatchStatus().equals(MatchStatus.PRE)) {
+        if (this.match.get().getMatchStatus().equals(MatchStatus.PRE)) {
             if (event.isAutoJoin()) {
                 event.setTeam(this.humans);
             }
@@ -249,7 +250,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         if (defaultScoreboardLoaded) {
             for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
         }
-        if (teamManager.getTeamById("humans").getMembers().size() == 0 && match.getMatchStatus().equals(MatchStatus.MID)) {
+        if (teamManager.getTeamById("humans").getMembers().size() == 0 && match.get().getMatchStatus().equals(MatchStatus.MID)) {
             TGM.get().getMatchManager().endMatch(teamManager.getTeamById("infected"));
         }
         event.getPlayerContext().getPlayer().setGameMode(GameMode.ADVENTURE);
@@ -272,7 +273,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     }
 
     private void handleQuit(PlayerEvent event) {
-        if (teamManager.getTeamById("infected").getMembers().size() == 0 && match.getMatchStatus().equals(MatchStatus.MID)) {
+        if (teamManager.getTeamById("infected").getMembers().size() == 0 && match.get().getMatchStatus().equals(MatchStatus.MID)) {
             PlayerContext player = teamManager.getTeamById("humans").getMembers().get(teamManager.getTeamById("humans").getMembers().size() - 1);
             broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
 
