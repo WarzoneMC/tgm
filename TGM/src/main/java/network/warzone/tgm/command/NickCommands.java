@@ -17,12 +17,13 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class NickCommands {
 
-    @Command(aliases = {"nicks"}, desc = "View all nicked players")
+    @Command(aliases = {"nicks"}, desc = "View all nicked players", max = 1)
     @CommandPermissions({"tgm.command.whois"})
     public static void nicks(CommandContext cmd, CommandSender sender) {
         HashMap<UUID, String> originalNames = TGM.get().getNickManager().getOriginalNames();
@@ -30,6 +31,31 @@ public class NickCommands {
 
         if (originalNames.size() == 0) {
             sender.sendMessage(ChatColor.RED + "No nicked players found.");
+            return;
+        }
+
+        if (cmd.argsLength() == 1 && cmd.getString(0).equals("reset")) {
+            if (!sender.hasPermission("tgm.command.nicks.reset")) {
+                sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+                return;
+            }
+
+            List<UUID> nickedPlayers = new ArrayList<>();
+
+            originalNames.forEach((uuid, originalName) -> nickedPlayers.add(uuid));
+
+            for (UUID nickedPlayer : nickedPlayers) {
+                Player player = Bukkit.getPlayer(nickedPlayer);
+                if (player != null) {
+                    try {
+                        TGM.get().getNickManager().reset(player, true);
+                        sender.sendMessage(ChatColor.GREEN + "Unnicked: " + ChatColor.DARK_PURPLE + player.getName());
+                    } catch (NoSuchFieldException | IllegalAccessException e) {
+                        sender.sendMessage(ChatColor.RED + "Failed to unnick: " + ChatColor.DARK_PURPLE + player.getName());
+                    }
+                }
+            }
+
             return;
         }
 

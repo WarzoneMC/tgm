@@ -122,7 +122,7 @@ public class JoinManager implements Listener {
                 player.sendMessage(ChatColor.RED + "Your name must be reset because the player has joined!");
                 try {
                     nickManager.reset(player, false);
-                } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
+                } catch (NoSuchFieldException | IllegalAccessException e) {
                     p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
                 }
             }
@@ -159,7 +159,7 @@ public class JoinManager implements Listener {
                 p.sendMessage(ChatColor.RED + "Could not apply the queued nick. The player is already online!");
                 try {
                     nickManager.reset(p, false);
-                } catch (NoSuchFieldException | IllegalAccessException | UnirestException e) {
+                } catch (NoSuchFieldException | IllegalAccessException e) {
                     p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
                 }
                 // Invalidate the nick.
