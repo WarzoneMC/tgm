@@ -15,6 +15,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
 import org.bukkit.Location;
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -37,7 +38,7 @@ public class EnterFilterType implements FilterType, Listener {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
-                        if (filterResult == FilterResult.DENY) {
+                        if (filterResult == FilterResult.DENY && event.getPlayer().getGameMode() != GameMode.SPECTATOR) {
                             event.setCancelled(true);
                             if (message != null) event.getPlayer().sendMessage(message);
                         } else if (filterResult == FilterResult.ALLOW) {
