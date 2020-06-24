@@ -2,8 +2,6 @@ package network.warzone.tgm.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamManagerModule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

@@ -2,7 +2,6 @@ package network.warzone.tgm.modules.kit;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.kit.parser.EffectKitNodeParser;

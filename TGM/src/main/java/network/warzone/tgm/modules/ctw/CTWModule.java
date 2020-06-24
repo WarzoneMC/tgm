@@ -22,7 +22,6 @@ import network.warzone.tgm.modules.wool.WoolStatus;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.FireworkUtil;
-import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;

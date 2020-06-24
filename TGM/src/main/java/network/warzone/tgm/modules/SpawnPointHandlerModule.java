@@ -16,14 +16,13 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
-
-import java.lang.ref.WeakReference;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
+
+import java.lang.ref.WeakReference;
 
 @Getter
 public class SpawnPointHandlerModule extends MatchModule implements Listener {

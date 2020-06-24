@@ -6,9 +6,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
-import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.user.PlayerContext;
-import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.TimeUnitPair;
 import network.warzone.tgm.util.itemstack.ItemFactory;
@@ -27,7 +25,6 @@ import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class PunishCommands {
 

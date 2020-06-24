@@ -1,6 +1,5 @@
 package network.warzone.tgm.nickname;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
@@ -22,7 +21,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 

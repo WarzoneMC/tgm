@@ -1,6 +1,5 @@
 package network.warzone.tgm.join;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;

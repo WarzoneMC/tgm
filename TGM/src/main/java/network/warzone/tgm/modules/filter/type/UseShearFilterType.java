@@ -13,7 +13,6 @@ import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.util.Parser;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

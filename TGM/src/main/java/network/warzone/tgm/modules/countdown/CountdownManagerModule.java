@@ -10,7 +10,6 @@ import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;

@@ -1,7 +1,6 @@
 package network.warzone.tgm.modules.launchpad;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
