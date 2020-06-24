@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
 public class Punishment {

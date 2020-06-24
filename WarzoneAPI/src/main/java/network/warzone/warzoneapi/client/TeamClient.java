@@ -5,7 +5,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import network.warzone.warzoneapi.models.*;
 
-
 import java.util.UUID;
 
 /**

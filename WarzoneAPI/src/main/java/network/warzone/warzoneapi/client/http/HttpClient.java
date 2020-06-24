@@ -11,8 +11,6 @@ import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 
-import java.util.UUID;
-
 /**
  * Created by luke on 4/27/17.
  */

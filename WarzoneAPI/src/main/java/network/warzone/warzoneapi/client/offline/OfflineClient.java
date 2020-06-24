@@ -1,16 +1,16 @@
 package network.warzone.warzoneapi.client.offline;
 
 import com.google.gson.Gson;
-import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import network.warzone.warzoneapi.client.TeamClient;
-import network.warzone.warzoneapi.models.Map;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by luke on 4/27/17.
