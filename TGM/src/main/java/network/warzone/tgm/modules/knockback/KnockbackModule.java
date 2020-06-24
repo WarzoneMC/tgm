@@ -115,6 +115,12 @@ public class KnockbackModule extends MatchModule implements Listener {
             }
             addArrow((Arrow) projectile, direction);
         }
+        
+        // Fixes arrow randomization
+        if (shooter instanceof Player) {
+            Player player = (Player) shooter;
+            projectile.setVelocity(player.getLocation().getDirection().normalize().multiply(projectile.getVelocity().length()));
+        }
     }
 
     private void addArrow(Arrow arrow, Vector direction) {
