@@ -140,20 +140,4 @@ public class OfflineClient implements TeamClient {
         return new PlayerTagsUpdateResponse(false, "", "", new ArrayList<>(), null);
     }
 
-    @Override
-    public MojangProfile getMojangProfile(UUID uuid) {
-        return getMojangProfile(uuid.toString());
-    }
-
-    @Override
-    public MojangProfile getMojangProfile(String username) {
-        try {
-            HttpResponse<MojangProfile> response = Unirest.get("https://api.ashcon.app/mojang/v2/user/" + username)
-                    .asObject(MojangProfile.class);
-            return response.getBody();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

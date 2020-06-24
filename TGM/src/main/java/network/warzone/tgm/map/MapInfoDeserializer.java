@@ -40,10 +40,11 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
                                     profile = TGM.get().getTeamClient().getMojangProfile(author.getUuid());
                                     ProfileCache.getInstance().add(profile);
                                 }
-                                if (profile != null && profile.getCode() == 0)
+                                if (profile != null) {
                                     author.setDisplayUsername(profile.getUsername());
-                                else
+                                } else {
                                     throw new Exception();
+                                }
                             } catch (Exception e) {
                                 TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);
                             }

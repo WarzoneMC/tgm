@@ -1,5 +1,8 @@
 package network.warzone.warzoneapi.client;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import network.warzone.warzoneapi.models.*;
 
 
@@ -61,8 +64,21 @@ public interface TeamClient {
 
     LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion);
 
-    MojangProfile getMojangProfile(UUID uuid);
+    default MojangProfile getMojangProfile(UUID uuid) {
+        return getMojangProfile(uuid.toString());
+    }
 
-    MojangProfile getMojangProfile(String username);
+    default MojangProfile getMojangProfile(String username) {
+        try {
+            HttpResponse<MojangProfile> response = Unirest.get("https://api.ashcon.app/mojang/v2/user/" + username)
+                    .asObject(MojangProfile.class);
+            if (response.getStatus() != 200) {
+                return null;
+            }
+            return response.getBody();
+        } catch (UnirestException e) {
+            return null;
+        }
+    }
 
 }

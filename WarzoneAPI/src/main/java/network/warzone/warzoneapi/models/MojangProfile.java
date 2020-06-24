@@ -13,8 +13,6 @@ import java.util.UUID;
 @AllArgsConstructor @Getter
 public class MojangProfile {
 
-    int code;
-
     private String username;
     private UUID uuid;
     private List<Username> username_history;

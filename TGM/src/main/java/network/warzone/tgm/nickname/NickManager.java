@@ -46,7 +46,6 @@ public class NickManager {
     private List<QueuedNick> queuedNicks = new ArrayList<>();
 
     private ProfileCache profileCache = ProfileCache.getInstance();
-    //private HashMap<String, Skin> skinCache = new HashMap<>();
 
     public NickManager() {
         visiblityController = new VisibilityControllerImpl(TGM.get().getModule(SpectatorModule.class));
@@ -54,10 +53,13 @@ public class NickManager {
 
     public void addQueuedNick(Player player, String newName) {
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            Skin skin;
             UUID nickedUUID = getUUID(newName);
-            skin = getSkin(nickedUUID);
-
+            Skin skin;
+            if (nickedUUID != null) {
+                skin = getSkin(nickedUUID);
+            } else {
+                skin = null; // TODO: Default to a random player skin
+            }
             queuedNicks.add(new QueuedNick(newName, skin, player));
         });
     }
@@ -77,7 +79,7 @@ public class NickManager {
 
     public void setNick(Player player, String newName) throws NoSuchFieldException, IllegalAccessException {
         setName(player, newName);
-        setSkin(player, newName, null);
+        setSkin(player, newName);
     }
 
     public void reset(Player player, boolean kick) throws NoSuchFieldException, IllegalAccessException {
@@ -89,7 +91,7 @@ public class NickManager {
         } else {
             String originalName = originalNames.get(player.getUniqueId());
             setName(player, originalName);
-            setSkin(player, originalName, player.getUniqueId());
+            setSkin(player, player.getUniqueId());
         }
     }
 
@@ -217,16 +219,21 @@ public class NickManager {
         skins.put(player.getUniqueId(), skin);
     }
 
-    public void setSkin(Player player, String nameOfPlayer, @Nullable UUID uuid) {
+    public void setSkin(Player player, UUID uuid) {
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            Skin skin;
-            UUID theUUID = uuid;
-            if (theUUID == null) {
-                theUUID = getUUID(nameOfPlayer);
+            MojangProfile profile = retrieveProfile(uuid);
+            if (profile != null && profile.getTextures().getSkin() != null) {
+                setSkin(player, profile.getTextures().getSkin());
             }
-            skin = getSkin(theUUID);
+        });
+    }
 
-            if (skin != null) setSkin(player, skin);
+    public void setSkin(Player player, String nameOfPlayer) {
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
+            MojangProfile profile = retrieveProfile(nameOfPlayer);
+            if (profile != null && profile.getTextures().getSkin() != null) {
+                setSkin(player, profile.getTextures().getSkin());
+            }
         });
     }
 
@@ -273,13 +280,17 @@ public class NickManager {
 
     private UUID getUUID(String name) {
         MojangProfile profile = retrieveProfile(name);
-        if (profile == null) return null;
+        if (profile == null) {
+            return null;
+        }
         return profile.getUuid();
     }
 
     private Skin getSkin(UUID uuid) {
         MojangProfile profile = retrieveProfile(uuid);
-        if (profile == null) return null;
+        if (profile == null) {
+            return null;
+        }
         return profile.getTextures().getSkin();
     }
 
@@ -288,6 +299,7 @@ public class NickManager {
             return profileCache.get(name);
         } else {
             MojangProfile profile = TGM.get().getTeamClient().getMojangProfile(name);
+            if (profile == null) return null;
             profileCache.add(profile);
             return profile;
         }
@@ -298,6 +310,7 @@ public class NickManager {
             return profileCache.get(uuid);
         } else {
             MojangProfile profile = TGM.get().getTeamClient().getMojangProfile(uuid);
+            if (profile == null) return null;
             profileCache.add(profile);
             return profile;
         }

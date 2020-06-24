@@ -137,7 +137,7 @@ public class NickCommands {
                     return;
                 }
 
-                TGM.get().getNickManager().setSkin(p, newName, null);
+                TGM.get().getNickManager().setSkin(p, newName);
                 sender.sendMessage(ChatColor.GREEN + "Updated skin to " + ChatColor.YELLOW + newName);
             } else if (option.equals("name") && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
