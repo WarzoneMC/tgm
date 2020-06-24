@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ import java.util.Map;
 @Getter
 public class TDMModule extends MatchModule implements Listener {
     
-    private Match match;
+    private WeakReference<Match> match;
     private PointsModule pointsModule;
     private TeamManagerModule teamManager;
     private TDMObjective tdmObjective = TDMObjective.KILLS;
@@ -37,7 +38,7 @@ public class TDMModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         teamManager = TGM.get().getModule(TeamManagerModule.class);
 
         if (match.getMapContainer().getMapInfo().getJsonObject().has("tdm")) {

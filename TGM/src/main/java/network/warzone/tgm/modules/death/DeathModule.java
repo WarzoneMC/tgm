@@ -21,6 +21,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -30,14 +31,14 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class DeathModule extends MatchModule implements Listener {
 
-    private Match match;
+    private WeakReference<Match> match;
 
     private HashMap<UUID, DeathInfo> players = new HashMap<>();
     private HashMap<UUID, Boolean> dead = new HashMap<>();
     private TeamManagerModule teamManagerModule;
 
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         teamManagerModule = match.getModule(TeamManagerModule.class);
     }
 
@@ -58,7 +59,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if (this.match.getMatchStatus() == MatchStatus.POST) {
+        if (this.match.get().getMatchStatus() == MatchStatus.POST) {
             event.setCancelled(true);
             return;
         }
@@ -139,7 +140,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
-        if (match.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) return;
+        if (match.get().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) return;
         for (ItemStack stack : event.getDrops()) {
             if (stack != null) {
                 event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation(), stack);

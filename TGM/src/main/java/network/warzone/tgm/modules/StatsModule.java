@@ -22,9 +22,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
  */
 @Getter
 public class StatsModule extends MatchModule implements Listener{
-
-    private Match match;
-
     private int xpBarTaskId;
 
     private boolean statsDisabled = false;
@@ -33,7 +30,6 @@ public class StatsModule extends MatchModule implements Listener{
 
     @Override
     public void load(Match match) {
-        this.match = match;
 
         if (match.getMapContainer().getMapInfo().getJsonObject().has("stats")) {
             JsonObject statsObj = (JsonObject) match.getMapContainer().getMapInfo().getJsonObject().get("stats");
@@ -61,7 +57,6 @@ public class StatsModule extends MatchModule implements Listener{
 
     @Override
     public void unload() {
-        this.match = null;
         if (isShowLevel()) Bukkit.getScheduler().cancelTask(xpBarTaskId);
     }
 

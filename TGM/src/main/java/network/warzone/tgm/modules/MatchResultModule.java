@@ -11,6 +11,9 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
+
+import java.lang.ref.WeakReference;
+
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,12 +24,12 @@ import org.bukkit.potion.PotionEffectType;
 
 public class MatchResultModule extends MatchModule implements Listener {
 
-    private Match match;
+    private WeakReference<Match> match;
     private TeamManagerModule teamManagerModule;
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
     }
 
@@ -101,7 +104,7 @@ public class MatchResultModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onMatchResult(PlayerJoinTeamAttemptEvent event) {
-        if (match.getMatchStatus().equals(MatchStatus.POST)) {
+        if (match.get().getMatchStatus().equals(MatchStatus.POST)) {
             event.getPlayerContext().getPlayer().sendMessage(ChatColor.RED + "The match has already ended.");
             event.setCancelled(true);
         }

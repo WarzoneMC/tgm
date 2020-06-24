@@ -29,6 +29,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Team;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
  */
 public class FFAModule extends MatchModule implements Listener {
 
-    private Match match;
+    private WeakReference<Match> match;
     private TeamManagerModule teamManagerModule;
     private ScoreboardManagerModule scoreboardManagerModule;
     @Getter private Map<String, Integer> scores = new HashMap<>();
@@ -56,7 +57,7 @@ public class FFAModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
         this.playersTeam = this.teamManagerModule.getTeams().get(1);
@@ -108,7 +109,7 @@ public class FFAModule extends MatchModule implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onJoinAttempt(PlayerJoinTeamAttemptEvent event) {
-        if (!this.match.getMatchStatus().equals(MatchStatus.PRE) && this.blitzMode) {
+        if (!this.match.get().getMatchStatus().equals(MatchStatus.PRE) && this.blitzMode) {
             event.getPlayerContext().getPlayer().sendMessage(ChatColor.RED + "You can't pick a team after the match starts in this mode.");
             event.setCancelled(true);
         }
@@ -118,7 +119,7 @@ public class FFAModule extends MatchModule implements Listener {
     public void onTeamChange(TeamChangeEvent event) {
         if (event.isCancelled()) return;
         if (event.getTeam().isSpectator()) {
-            if (this.blitzMode && match.getMatchStatus().equals(MatchStatus.MID) && hasWinner()) {
+            if (this.blitzMode && match.get().getMatchStatus().equals(MatchStatus.MID) && hasWinner()) {
                 TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
             }
         } else {
@@ -136,7 +137,7 @@ public class FFAModule extends MatchModule implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         if (this.blitzMode) {
             removeLives(event.getPlayer());
-            if (this.match.getMatchStatus().equals(MatchStatus.MID) && hasWinner()) TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
+            if (this.match.get().getMatchStatus().equals(MatchStatus.MID) && hasWinner()) TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
             refreshScoreboards();
         }
     }
@@ -175,13 +176,13 @@ public class FFAModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onDeathHigh(TGMPlayerDeathEvent event) {
-        if (this.blitzMode && this.match.getMatchStatus().equals(MatchStatus.MID) && hasWinner())
+        if (this.blitzMode && this.match.get().getMatchStatus().equals(MatchStatus.MID) && hasWinner())
             TGM.get().getMatchManager().endMatch(forceWinner(getAlivePlayers().get(0).getPlayer()));
     }
 
     @EventHandler
     public void onRespawn(TGMPlayerRespawnEvent event) {
-        if (this.blitzMode && this.match.getMatchStatus().equals(MatchStatus.MID) && getLives(event.getPlayer()) <= 0) {
+        if (this.blitzMode && this.match.get().getMatchStatus().equals(MatchStatus.MID) && getLives(event.getPlayer()) <= 0) {
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
             event.getPlayer().setAllowFlight(true);
             event.getPlayer().setFlying(true);

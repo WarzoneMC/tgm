@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 public class ScreenManagerModule extends MatchModule {
 
-    private Match match;
+    private WeakReference<Match> match;
 
     private Map<String, Screen> screens = new HashMap<>();
 
@@ -26,7 +27,7 @@ public class ScreenManagerModule extends MatchModule {
 
     @Override
     public void load(Match match) {
-        this.match = match;
+        this.match = new WeakReference<Match>(match);
         JsonObject jsonObject = match.getMapContainer().getMapInfo().getJsonObject();
         if (jsonObject.has("screens")) {
             for (JsonElement jsonElement : jsonObject.getAsJsonArray("screens")) {
@@ -56,7 +57,7 @@ public class ScreenManagerModule extends MatchModule {
                     buttons.add(Button.deserialize(buttonElement.getAsJsonObject()));
                 }
             }
-            Screen screen = new Screen(this.match, title, size, buttons);
+            Screen screen = new Screen(this.match.get(), title, size, buttons);
             if (jsonObject.has("id")) {
                 this.screens.put(jsonObject.get("id").getAsString(), screen);
             }
