@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/81e21a2181ec49cf8d2f1bc2b612a170)](https://app.codacy.com/gh/Warzone/TGM?utm_source=github.com&utm_medium=referral&utm_content=Warzone/TGM&utm_campaign=Badge_Grade_Settings)
 # TGM [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM) ![Minecraft Version](https://img.shields.io/badge/supports%20MC%20version-1.15.2-brightgreen.svg) [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://warz.one/discord)
 Team Game Manager. A Team Oriented Minecraft PVP plugin.
 
