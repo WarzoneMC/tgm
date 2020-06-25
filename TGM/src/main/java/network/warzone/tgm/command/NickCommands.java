@@ -34,7 +34,7 @@ public class NickCommands {
             return;
         }
 
-        if (cmd.argsLength() == 1 && cmd.getString(0).equals("reset")) {
+        if (cmd.argsLength() == 1 && "reset".equals(cmd.getString(0))) {
             if (!sender.hasPermission("tgm.command.nicks.reset")) {
                 sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
                 return;
@@ -87,7 +87,7 @@ public class NickCommands {
         Player p = (Player) sender;
         if (cmd.argsLength() > 0) {
             String option = cmd.getString(0);
-            if (option.equals("set") && cmd.argsLength() > 1) {
+            if ("set".equalsIgnoreCase(option) && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
                 if (newName.length() > 16) {
                     sender.sendMessage(ChatColor.RED + "Username must be shorter than 16 characters.");
@@ -107,7 +107,7 @@ public class NickCommands {
                 boolean force = false;
                 if (cmd.argsLength() > 2) {
                     String arg2 = cmd.getString(2);
-                    force = arg2.equals("force");
+                    force = "force".equals(arg2);
                 }
                 if (force) {
                     try {
@@ -123,14 +123,14 @@ public class NickCommands {
                 if (!force) {
                     sender.sendMessage(ChatColor.GOLD + "Reconnect for the changes to apply!");
                 }
-            } else if (option.equals("reset")) {
+            } else if ("reset".equalsIgnoreCase(option)) {
                 String original = TGM.get().getNickManager().getOriginalNames().get(p.getUniqueId());
                 if (original != null) {
                     TGM.get().getNickManager().reset(p, true);
                 } else {
                     sender.sendMessage(ChatColor.RED + "You are not nicked!");
                 }
-            } else if (option.equals("skin") && cmd.argsLength() > 1) {
+            } else if ("skin".equalsIgnoreCase(option) && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
                 if (newName.length() > 16) {
                     sender.sendMessage(ChatColor.RED + "Username must be shorter than 16 characters.");
@@ -139,7 +139,7 @@ public class NickCommands {
 
                 TGM.get().getNickManager().setSkin(p, newName);
                 sender.sendMessage(ChatColor.GREEN + "Updated skin to " + ChatColor.YELLOW + newName);
-            } else if (option.equals("name") && cmd.argsLength() > 1) {
+            } else if ("name".equalsIgnoreCase(option) && cmd.argsLength() > 1) {
                 String newName = cmd.getString(1);
 
                 if (!newName.matches("^[a-z_A-Z0-9]+$")) {
@@ -163,7 +163,7 @@ public class NickCommands {
                     p.sendMessage(ChatConstant.ERROR_RATE_LIMITED.toString());
                 }
                 sender.sendMessage(ChatColor.GREEN + "Updated username to " + ChatColor.YELLOW + newName);
-            } else if (option.equals("stats") && cmd.argsLength() > 1) {
+            } else if ("stats".equalsIgnoreCase(option) && cmd.argsLength() > 1) {
                 if (cmd.argsLength() > 2) {
                     try {
                         String statToChange = cmd.getString(1);
@@ -204,7 +204,7 @@ public class NickCommands {
                     }
                     sender.sendMessage(ChatColor.GREEN + "Set stats to preset " + ChatColor.YELLOW + type);
                 }
-            } else if (option.equals("rank") && cmd.argsLength() > 1) {
+            } else if ("rank".equalsIgnoreCase(option) && cmd.argsLength() > 1) {
                 String newRank = cmd.getString(1);
 
                 Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
@@ -212,7 +212,7 @@ public class NickCommands {
                     for (Rank r : TGM.get().getTeamClient().retrieveRanks()) {
                         if (r.getName().equalsIgnoreCase(newRank)) rank = r;
                     }
-                    if (newRank.equals("none")) {
+                    if ("none".equals(newRank)) {
                         NickedUserProfile profile = TGM.get().getNickManager().getUserProfile(p);
                         profile.setRanksLoaded(new ArrayList<>());
                         TGM.get().getNickManager().getStats().put(p.getUniqueId(), profile);

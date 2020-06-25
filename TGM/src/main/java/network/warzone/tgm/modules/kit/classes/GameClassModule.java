@@ -35,6 +35,14 @@ public class GameClassModule extends MatchModule implements Listener {
 
     private HashMap<UUID, String> playerClasses = new HashMap<>();
 
+    @Getter private HashMap<UUID, String> classSwitches = new HashMap<>();
+    private AbilityManager abilityManager;
+    private TeamManagerModule teamManagerModule;
+    @Getter private Set<GameClass> gameClassSet = new HashSet<>();
+
+    // cache this for checking class violators
+    private List<String> rawUsedClasses;
+
     public String getCurrentClass(Player p) {
         return playerClasses.get(p.getUniqueId());
     }
@@ -46,59 +54,6 @@ public class GameClassModule extends MatchModule implements Listener {
     public static boolean isUsingClasses(JsonObject mapJson) {
         return (mapJson.has("classes") && ((mapJson.get("classes").isJsonPrimitive() && mapJson.get("classes").getAsJsonPrimitive().isBoolean() && mapJson.get("classes").getAsBoolean()) || mapJson.get("classes").isJsonArray()));
     }
-
-    public enum GameClassStore {
-        PHOENIX(PhoenixClass.class,
-                Arrays.asList(PhoenixAbility.class),
-                ItemFactory.createItem(Material.FIRE_CHARGE,
-                ChatColor.GOLD + "Phoenix",
-                    Arrays.asList(ChatColor.YELLOW + "Fight with the power of the sun!"))),
-
-        NINJA(NinjaClass.class,
-                Arrays.asList(NinjaAbility.class),
-                ItemFactory.createItem(Material.FLINT,
-                ChatColor.WHITE + "Ninja",
-                    Arrays.asList(ChatColor.YELLOW + "Don't need armor when you can't get hit!"))),
-
-        BUILDER(BuilderClass.class,
-                Arrays.asList(BuilderAbility.class),
-                ItemFactory.createItem(Material.OAK_STAIRS,
-                ChatColor.YELLOW + "Builder",
-                    Arrays.asList(ChatColor.YELLOW + "Extra blocks to help build fortifications.")));
-
-        @Getter private Class hostGameClass;
-        @Getter private List<Class<? extends Ability>> hostAbilities;
-        @Getter private ItemStack menuItem;
-
-        GameClassStore(Class hostGameClass, List<Class<? extends Ability>> hostAbilities, ItemStack menuItem) {
-            this.hostGameClass = hostGameClass;
-            this.hostAbilities = hostAbilities;
-            this.menuItem = menuItem;
-        }
-
-        public String getDisplayName() {
-            if (menuItem.getItemMeta() == null) return Strings.capitalizeString(this.name().toLowerCase());
-            return menuItem.getItemMeta().getDisplayName();
-        }
-
-        private static Set<Class<? extends Ability>> abilityClassUsages(List<String> usingClasses) {
-            Set<Class<? extends Ability>> currentAbilityClassSet = new HashSet<>();
-            for (GameClassStore gameClassStore : GameClassStore.values()) {
-                if (!usingClasses.contains(gameClassStore.name())) continue;
-                currentAbilityClassSet.addAll(gameClassStore.getHostAbilities());
-            }
-            return currentAbilityClassSet;
-        }
-    }
-
-
-    @Getter private HashMap<UUID, String> classSwitches = new HashMap<>();
-    private AbilityManager abilityManager;
-    private TeamManagerModule teamManagerModule;
-    @Getter private Set<GameClass> gameClassSet = new HashSet<>();
-
-    // cache this for checking class violators
-    private List<String> rawUsedClasses;
 
     @Override
     public void load(Match match) {
@@ -165,7 +120,6 @@ public class GameClassModule extends MatchModule implements Listener {
         removeClassForPlayer(event.getPlayer());
     }
 
-
     public void addSwitchClassRequest(Player p, String desiredClass) {
         addSwitchClassRequest(p, desiredClass, true);
     }
@@ -210,8 +164,6 @@ public class GameClassModule extends MatchModule implements Listener {
         setupClassForPlayer(player);
     }
 
-
-
     private void removeClassForPlayer(Player player) {
         GameClass gameClass = getGameClass(getCurrentClass(player));
         removeClassForPlayer(player, gameClass);
@@ -235,4 +187,49 @@ public class GameClassModule extends MatchModule implements Listener {
         }
         return null;
     }
+
+    public enum GameClassStore {
+        PHOENIX(PhoenixClass.class,
+                Arrays.asList(PhoenixAbility.class),
+                ItemFactory.createItem(Material.FIRE_CHARGE,
+                        ChatColor.GOLD + "Phoenix",
+                        Arrays.asList(ChatColor.YELLOW + "Fight with the power of the sun!"))),
+
+        NINJA(NinjaClass.class,
+                Arrays.asList(NinjaAbility.class),
+                ItemFactory.createItem(Material.FLINT,
+                        ChatColor.WHITE + "Ninja",
+                        Arrays.asList(ChatColor.YELLOW + "Don't need armor when you can't get hit!"))),
+
+        BUILDER(BuilderClass.class,
+                Arrays.asList(BuilderAbility.class),
+                ItemFactory.createItem(Material.OAK_STAIRS,
+                        ChatColor.YELLOW + "Builder",
+                        Arrays.asList(ChatColor.YELLOW + "Extra blocks to help build fortifications.")));
+
+        @Getter private Class hostGameClass;
+        @Getter private List<Class<? extends Ability>> hostAbilities;
+        @Getter private ItemStack menuItem;
+
+        GameClassStore(Class hostGameClass, List<Class<? extends Ability>> hostAbilities, ItemStack menuItem) {
+            this.hostGameClass = hostGameClass;
+            this.hostAbilities = hostAbilities;
+            this.menuItem = menuItem;
+        }
+
+        public String getDisplayName() {
+            if (menuItem.getItemMeta() == null) return Strings.capitalizeString(this.name().toLowerCase());
+            return menuItem.getItemMeta().getDisplayName();
+        }
+
+        private static Set<Class<? extends Ability>> abilityClassUsages(List<String> usingClasses) {
+            Set<Class<? extends Ability>> currentAbilityClassSet = new HashSet<>();
+            for (GameClassStore gameClassStore : GameClassStore.values()) {
+                if (!usingClasses.contains(gameClassStore.name())) continue;
+                currentAbilityClassSet.addAll(gameClassStore.getHostAbilities());
+            }
+            return currentAbilityClassSet;
+        }
+    }
+
 }

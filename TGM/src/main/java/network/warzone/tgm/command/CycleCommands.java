@@ -69,7 +69,7 @@ public class CycleCommands {
 
         GameType type = null;
         for (GameType gameType : GameType.values()) {
-            if (gameType.name().toLowerCase().equals(typeString.toLowerCase())) {
+            if (gameType.name().equalsIgnoreCase(typeString)) {
                 type = gameType;
             }
         }

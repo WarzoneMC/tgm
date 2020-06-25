@@ -159,7 +159,7 @@ public class NickManager {
         if (kills != null) {
             nickedStats.setKills(kills);
         }
-        if (deaths != null){
+        if (deaths != null) {
             nickedStats.setDeaths(deaths);
         }
         if (wins != null) {

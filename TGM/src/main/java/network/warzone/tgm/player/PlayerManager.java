@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class PlayerManager {
 
-    @Getter Collection<PlayerContext> players = new ConcurrentLinkedQueue<>();
+    @Getter private Collection<PlayerContext> players = new ConcurrentLinkedQueue<>();
 
     public void addPlayer(PlayerContext playerContext) {
         List<PlayerContext> toRemove = players.stream()

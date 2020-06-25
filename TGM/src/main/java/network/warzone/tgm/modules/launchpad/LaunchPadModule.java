@@ -65,8 +65,10 @@ public class LaunchPadModule extends MatchModule implements TaskedModule, Listen
             if (!allowedTeam(event.getPlayer())) return;
             if (isDelayed()) standingOnPadDate.put(event.getPlayer(), getTime());
             else launch(event.getPlayer());
-        } else if (region.contains(event.getFrom().getBlock()) && !region.contains(event.getTo().getBlock())) {
-            if (allowedTeam(event.getPlayer())) standingOnPadDate.remove(event.getPlayer());
+        } else if (region.contains(event.getFrom().getBlock())
+                && !region.contains(event.getTo().getBlock())
+                && allowedTeam(event.getPlayer())) {
+            standingOnPadDate.remove(event.getPlayer());
         }
     }
 
@@ -114,7 +116,21 @@ public class LaunchPadModule extends MatchModule implements TaskedModule, Listen
         }
     }
 
-    static LaunchPadModule deserialize(JsonObject jsonObject) {
+    private long getTime() {
+        return new Date().getTime();
+    }
+
+    private boolean isDelayed() {
+        return delay > 0;
+    }
+
+    private boolean allowedTeam(Player player) {
+        if (this.teams == null || this.teams.isEmpty()) return true;
+        MatchTeam team = this.teamManagerModule.getTeam(player);
+        return team.isSpectator() || this.teams.contains(team);
+    }
+
+    public static LaunchPadModule deserialize(JsonObject jsonObject) {
         Preconditions.checkArgument(jsonObject.has("region"), "Launch Pad requires a region.");
         Preconditions.checkArgument(jsonObject.has("motion"), "Launch Pad requires a motion direction.");
         Region region = TGM.get().getModule(RegionManagerModule.class).getRegion(TGM.get().getMatchManager().getMatch(), jsonObject.get("region"));
@@ -129,20 +145,6 @@ public class LaunchPadModule extends MatchModule implements TaskedModule, Listen
             teams.addAll(teamManagerModule.getTeams(jsonObject.getAsJsonArray("teams")));
         }
         return new LaunchPadModule(region, delay, motion, directional, teams);
-    }
-
-    private long getTime() {
-        return new Date().getTime();
-    }
-
-    private boolean isDelayed() {
-        return delay > 0;
-    }
-
-    private boolean allowedTeam(Player player) {
-        if (this.teams == null || this.teams.isEmpty()) return true;
-        MatchTeam team = this.teamManagerModule.getTeam(player);
-        return team.isSpectator() || this.teams.contains(team);
     }
 
 }

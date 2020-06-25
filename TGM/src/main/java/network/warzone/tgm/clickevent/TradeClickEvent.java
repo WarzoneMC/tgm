@@ -13,7 +13,8 @@ import java.util.List;
  */
 public class TradeClickEvent extends ClickEvent {
 
-    private List<ItemStack> give, take;
+    private List<ItemStack> give;
+    private List<ItemStack> take;
 
     public TradeClickEvent(List<ItemStack> give, List<ItemStack> take) {
         this.give = give;

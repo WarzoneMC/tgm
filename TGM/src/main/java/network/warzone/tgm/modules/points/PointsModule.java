@@ -35,9 +35,8 @@ public class PointsModule extends MatchModule {
                         targets.put(matchTeam.getId(), target);
                     }
                 }
-            } else {
-                //todo: per team target parsing
             }
+            //TODO: per team target parsing
         }
     }
 

@@ -30,6 +30,8 @@ import java.util.*;
 @Getter
 public class ChatModule extends MatchModule implements Listener {
 
+    private static final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
+
     private TeamManagerModule teamManagerModule;
     private TimeModule timeModule;
     private final List<Chat> chatLog = new ArrayList<>();
@@ -44,8 +46,6 @@ public class ChatModule extends MatchModule implements Listener {
     public static Map<String, ChatChannel> getChannels() {
         return channels;
     }
-
-    private final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event) {
@@ -111,7 +111,7 @@ public class ChatModule extends MatchModule implements Listener {
             format.append(prefix)
                     .append(matchTeam.getColor())
                     .append(event.getPlayer().getName());
-            if (!playerContext.isNicked() && userProfile.getActiveTag() != null && !userProfile.getActiveTag().equals(""))
+            if (!playerContext.isNicked() && userProfile.getActiveTag() != null && !"".equals(userProfile.getActiveTag()))
                 format.append(ChatColor.GRAY)
                         .append(" [")
                         .append(ChatColor.translateAlternateColorCodes('&', userProfile.getActiveTag()))

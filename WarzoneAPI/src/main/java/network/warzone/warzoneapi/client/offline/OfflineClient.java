@@ -22,17 +22,17 @@ public class OfflineClient implements TeamClient {
         Unirest.setObjectMapper(new ObjectMapper() {
 
             public <T> T readValue(String s, Class<T> aClass) {
-                try{
+                try {
                     return gson.fromJson(s, aClass);
-                } catch(Exception e){
+                } catch(Exception e) {
                     throw new RuntimeException(e);
                 }
             }
 
             public String writeValue(Object o) {
-                try{
+                try {
                     return gson.toJson(o);
-                } catch(Exception e){
+                } catch(Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -88,7 +88,7 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest){
+    public RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest) {
         return null;
     };
 

@@ -17,13 +17,13 @@ public class RankEditRequest {
     private Object value;
 
     public enum EditableField {
-        PREFIX(){
+        PREFIX() {
             @Override
             public String parseValue(String value) {
                 return value;
             }
         },
-        DISPLAY(){
+        DISPLAY() {
             @Override
             public String parseValue(String value) {
                 return value;
@@ -35,7 +35,7 @@ public class RankEditRequest {
                 return Integer.parseInt(value);
             }
         },
-        PERMISSIONS(){
+        PERMISSIONS() {
             @Override
             public List<String> parseValue(String value) {
                 List<String> list = new ArrayList<>();
@@ -46,13 +46,13 @@ public class RankEditRequest {
                 return list;
             }
         },
-        STAFF(){
+        STAFF() {
             @Override
             public Boolean parseValue(String value) {
                 return Boolean.valueOf(value);
             }
         },
-        DEFAULT(){
+        DEFAULT() {
             @Override
             public Boolean parseValue(String value) {
                 return Boolean.valueOf(value);

@@ -63,7 +63,7 @@ public class StatsModule extends MatchModule implements Listener{
     @EventHandler
     public void onPlayerXP(PlayerXPEvent event) {
         if (isStatsDisabled()) return;
-        if (Levels.calculateLevel(event.getFromXP()) < Levels.calculateLevel(event.getToXP())){
+        if (Levels.calculateLevel(event.getFromXP()) < Levels.calculateLevel(event.getToXP())) {
             Bukkit.getPluginManager().callEvent(new PlayerLevelUpEvent(event.getPlayerContext(), event.getPlayerContext().getUserProfile().getLevel() - 1, event.getPlayerContext().getUserProfile().getLevel()));
         }
     }

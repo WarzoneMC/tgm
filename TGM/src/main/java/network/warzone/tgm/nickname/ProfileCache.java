@@ -13,9 +13,6 @@ public class ProfileCache extends ArrayList<MojangProfile> {
 
     @Getter private static ProfileCache instance = new ProfileCache();
 
-    private ProfileCache() {
-    }
-
     @Override
     public boolean add(MojangProfile mojangProfile) {
         if (mojangProfile == null) return false;

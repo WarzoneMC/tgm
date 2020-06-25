@@ -219,7 +219,7 @@ public class BroadcastManager {
         }
     }
 
-    List<Broadcast> getOnEvents(String name) {
+    protected List<Broadcast> getOnEvents(String name) {
         List<Broadcast> broadcasts = new ArrayList<>();
         for (String id : onEvents.getOrDefault(name, Collections.emptyList())) {
             Broadcast broadcast = getBroadcast(id);

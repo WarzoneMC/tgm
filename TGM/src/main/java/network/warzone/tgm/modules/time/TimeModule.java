@@ -69,10 +69,8 @@ public class TimeModule extends MatchModule {
             for (Broadcast broadcast : broadcasts) {
                 broadcast.run(time);
             }
-            if (isTimeLimited()) {
-                if (time >= timeLimit) {
-                    endMatch();
-                }
+            if (isTimeLimited() && time >= timeLimit) {
+                endMatch();
             }
         }, 20, 20).getTaskId();
     }

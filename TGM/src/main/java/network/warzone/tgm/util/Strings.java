@@ -3,7 +3,8 @@ package network.warzone.tgm.util;
 import network.warzone.warzoneapi.models.Author;
 
 public class Strings {
-    public static String formatTime(double time) {
+    public static String formatTime(double t) {
+        double time = t;
         boolean negative = false;
         if (time < 0) {
             negative = true;

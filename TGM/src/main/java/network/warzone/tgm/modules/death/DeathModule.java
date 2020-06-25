@@ -161,7 +161,7 @@ public class DeathModule extends MatchModule implements Listener {
         this.dead.remove(player.getUniqueId());
     }
 
-    private boolean isDead(Player player) {
+    public boolean isDead(Player player) {
         return this.dead.containsKey(player.getUniqueId());
     }
 

@@ -48,7 +48,7 @@ public class TagCommands {
                     return;
                 }
                 String tag;
-                if (cmd.getString(1).equals("-")) tag = null;
+                if ("-".equals(cmd.getString(1))) tag = null;
                 else tag = cmd.getString(1);
                 String target;
                 if (sender.hasPermission("tgm.tags.set") && cmd.argsLength() >= 3)

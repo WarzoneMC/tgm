@@ -37,6 +37,8 @@ public class LegacyDamageModule extends MatchModule implements Listener {
                 case STONE_SHOVEL:
                     event.setDamage(event.getDamage() - 0.75D + 1.25D);
                     break;
+                default:
+                    break;
             }
         } else if (event.getDamager() instanceof Arrow) {
             event.setDamage(event.getDamage() / 1.3);

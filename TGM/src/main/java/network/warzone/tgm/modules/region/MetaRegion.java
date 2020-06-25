@@ -20,7 +20,12 @@ public class MetaRegion implements Region {
     private List<Region> regions = new ArrayList<>();
 
     private World world;
-    private int minX, minY, minZ, maxX, maxY, maxZ;
+    private int minX;
+    private int minY;
+    private int minZ;
+    private int maxX;
+    private int maxY;
+    private int maxZ;
     private Location min;
     private Location max;
 
@@ -47,7 +52,7 @@ public class MetaRegion implements Region {
 
     @Override
     public Location getCenter() {
-        return new Location(world, (minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
+        return new Location(world, (minX + maxX) / 2D, (minY + maxY) / 2D, (minZ + maxZ) / 2D);
     }
 
     @Override

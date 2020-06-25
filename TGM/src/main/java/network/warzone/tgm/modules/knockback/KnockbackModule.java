@@ -46,6 +46,10 @@ public class KnockbackModule extends MatchModule implements Listener {
     private static double knockBackBowVertical;
     private static double knockBackPunchMultiplier;
 
+    private Random random = new Random();
+    private Map<Arrow, Vector> arrowDirection = new HashMap<>();
+    private Map<Player, EntityDamageByEntityContext> queued = new HashMap<>();
+
     static {
         CAUSES.add(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
         CAUSES.add(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK);
@@ -65,10 +69,6 @@ public class KnockbackModule extends MatchModule implements Listener {
         knockBackBowVertical = TGM.get().getConfig().getDouble("custom-knockback.bow-vertical");
         knockBackPunchMultiplier = TGM.get().getConfig().getDouble("custom-knockback.punch-multiplier");
     }
-
-    private Random random = new Random();
-    private Map<Arrow, Vector> arrowDirection = new HashMap<>();
-    private Map<Player, EntityDamageByEntityContext> queued = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageByEntityEvent event) {
@@ -208,8 +208,8 @@ public class KnockbackModule extends MatchModule implements Listener {
         }
     }
 
-    private Vector getBaseKnockback(LivingEntity victim, Vector velocity, Entity attacker) {
-        velocity = velocity.clone();
+    private Vector getBaseKnockback(LivingEntity victim, Vector vector, Entity attacker) {
+        Vector velocity = vector.clone();
         double d0 = attacker.getLocation().getX() - victim.getLocation().getX();
         double d1;
 

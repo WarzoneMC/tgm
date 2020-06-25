@@ -54,7 +54,7 @@ public class UserProfile {
     public Punishment getLatestMute() {
         if (punishments != null && !punishments.isEmpty()) {
             for (Punishment punishment : getPunishments()) {
-                if (punishment.getType().toLowerCase().equals("mute") && punishment.isActive()) return punishment;
+                if ("MUTE".equalsIgnoreCase(punishment.getType()) && punishment.isActive()) return punishment;
             }
         }
         return null;
@@ -63,7 +63,7 @@ public class UserProfile {
     public Punishment getLatestBan() {
         if (punishments != null && !punishments.isEmpty()) {
             for (Punishment punishment : getPunishments()) {
-                if (punishment.getType().toLowerCase().equals("ban") && punishment.isActive()) return punishment;
+                if ("BAN".equalsIgnoreCase(punishment.getType()) && punishment.isActive()) return punishment;
             }
         }
         return null;

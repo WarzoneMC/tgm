@@ -90,9 +90,10 @@ public class CTFAmountController extends CTFController {
     private void checkGameOver() {
         MatchTeam teamWhoWon = null;
         for (Map.Entry<MatchTeam, Integer> entry : teamScores.entrySet()) {
-            if (entry.getValue() < captureAmount) continue;
-            teamWhoWon = entry.getKey();
-            break;
+            if (entry.getValue() >= captureAmount) {
+                teamWhoWon = entry.getKey();
+                break;
+            }
         }
         if (teamWhoWon == null) return;
         super.gameOver(teamWhoWon);

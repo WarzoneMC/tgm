@@ -84,14 +84,10 @@ public class RegenModule extends MatchModule implements Listener {
         double realMax = Math.max(min, max);
 
         if (value < realMin) {
-            value = realMin;
+            return realMin;
+        } else {
+            return Math.min(value, realMax);
         }
-
-        if (value > realMax) {
-            value = realMax;
-        }
-
-        return value;
     }
 
 }

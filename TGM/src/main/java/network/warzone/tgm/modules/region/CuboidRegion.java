@@ -10,10 +10,16 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Getter
 public class CuboidRegion implements Region {
-    @Getter private final World world;
-    @Getter double minX, minY, minZ, maxX, maxY, maxZ;
+    private final World world;
+
+    private double minX;
+    private double minY;
+    private double minZ;
+    private double maxX;
+    private double maxY;
+    private double maxZ;
 
     private final Location min;
     private final Location max;

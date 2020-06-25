@@ -1,8 +1,11 @@
 package network.warzone.tgm.match;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public enum ModuleLoadTime {
 
     /**

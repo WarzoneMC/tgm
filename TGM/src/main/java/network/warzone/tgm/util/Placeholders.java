@@ -13,10 +13,11 @@ import java.util.Map;
 public class Placeholders {
 
     public static String apply(String input, Map<String, String> placeholders) {
+        String output = input;
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            input = input.replaceAll("%" + entry.getKey() + "%", entry.getValue());
+            output = output.replaceAll("%" + entry.getKey() + "%", entry.getValue());
         }
-        return input;
+        return output;
     }
 
     public static void addPlaceholders(Map<String, String> placeholders, Player player) {

@@ -30,6 +30,9 @@ public class PunishCommands {
 
     private static final Pattern IP_PATTERN = Pattern.compile(
             "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    private static final ChatColor punisherColor = ChatColor.DARK_PURPLE;
+    private static final ChatColor punishedColor = ChatColor.LIGHT_PURPLE;
+    private static final ChatColor durationColor = ChatColor.LIGHT_PURPLE;
 
     public static boolean isIP(final String ip) {
         return IP_PATTERN.matcher(ip).matches();
@@ -37,15 +40,13 @@ public class PunishCommands {
 
     @Command(aliases = {"punish", "pun", "pg", "pgui"}, desc = "Punishment interface", usage = "(reload | <players>)", flags = "s")
     public static void punish(CommandContext cmd, CommandSender sender) throws CommandPermissionsException {
-        if (cmd.argsLength() == 1) {
-            if (cmd.getString(0).equalsIgnoreCase("reload")) {
-                if (!sender.hasPermission("tgm.punish.preset.reload")) {
-                    throw new CommandPermissionsException();
-                }
-                PunishMenu.getPresetsMenu().load();
-                sender.sendMessage(ChatColor.YELLOW + "Reloaded punishment presets.");
-                return;
+        if (cmd.argsLength() == 1 && "reload".equalsIgnoreCase(cmd.getString(0))) {
+            if (!sender.hasPermission("tgm.punish.preset.reload")) {
+                throw new CommandPermissionsException();
             }
+            PunishMenu.getPresetsMenu().load();
+            sender.sendMessage(ChatColor.YELLOW + "Reloaded punishment presets.");
+            return;
         }
         if (sender instanceof Player) {
             Player player = (Player) sender;
@@ -185,7 +186,7 @@ public class PunishCommands {
                     }
                 }
                 sender.sendMessage(ChatColor.YELLOW + "Punishments for " + displayName);
-                java.util.Map<ObjectId, String> map = new HashMap<>();
+                HashMap<ObjectId, String> map = new HashMap<>();
                 for (PunishmentsListResponse.LoadedUser loadedUser : punishmentsListResponse.getLoadedUsers()) {
                     map.put(loadedUser.getId(), loadedUser.getName());
                 }
@@ -274,12 +275,12 @@ public class PunishCommands {
                     PunishmentsListResponse punishmentsListResponse = TGM.get().getTeamClient().getPunishments(new PunishmentsListRequest(user.getName(), null));
                     if (!punishmentsListResponse.isNotFound()) {
                         for (Punishment punishment : punishmentsListResponse.getPunishments()) {
-                            if (punishment.getType().toUpperCase().equals("BAN") && punishment.isActive()) {
+                            if ("BAN".equals(punishment.getType().toUpperCase()) && punishment.isActive()) {
                                 isBanned = true;
                                 break;
                             }
 
-                            if (punishment.getType().toUpperCase().equals("MUTE") && punishment.isActive()) {
+                            if ("MUTE".equals(punishment.getType().toUpperCase()) && punishment.isActive()) {
                                 isMuted = true;
                             }
                         }
@@ -313,7 +314,7 @@ public class PunishCommands {
             if (revertPunishmentResponse == null || revertPunishmentResponse.isNotFound()) {
                 sender.sendMessage(ChatColor.RED + "Punishment not found.");
             } else {
-                java.util.Map<ObjectId, String> userMappings = new HashMap<>();
+                HashMap<ObjectId, String> userMappings = new HashMap<>();
                 for (RevertPunishmentResponse.LoadedUser loadedUser : revertPunishmentResponse.getLoadedUsers()) {
                     userMappings.put(loadedUser.getId(), loadedUser.getName());
                 }
@@ -437,7 +438,7 @@ public class PunishCommands {
         try {
             index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
         } catch (NumberFormatException e) {
-            sender.sendMessage(org.bukkit.ChatColor.RED + "Number expected.");
+            sender.sendMessage(ChatColor.RED + "Number expected.");
             return;
         }
 
@@ -478,8 +479,8 @@ public class PunishCommands {
                 TextComponent message = new TextComponent(reported);
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tp " + report.getReported()));
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + reported).append("\n\n")
-                        .append(org.bukkit.ChatColor.GRAY + "Date/Time: ").append(dateFormat.format(date)).append("\n")
-                        .append(org.bukkit.ChatColor.GRAY + "Reporter: ").append(report.getReporter()).create()));
+                        .append(ChatColor.GRAY + "Date/Time: ").append(dateFormat.format(date)).append("\n")
+                        .append(ChatColor.GRAY + "Reporter: ").append(report.getReporter()).create()));
 
                 sender.spigot().sendMessage(message);
             }
@@ -575,10 +576,6 @@ public class PunishCommands {
         if (revertOption && !punishment.isReverted()) textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/revert " + punishment.getId().toString()));
         return textComponent;
     }
-
-    private static final ChatColor punisherColor = ChatColor.DARK_PURPLE;
-    private static final ChatColor punishedColor = ChatColor.LIGHT_PURPLE;
-    private static final ChatColor durationColor = ChatColor.LIGHT_PURPLE;
 
     private static void broadcastPunishment(String name, String ip, String punisher, String action, TimeUnitPair timeUnitPair, String reason, boolean timed, boolean everyone) {
         TGM.get().getLogger().info(String.format("new-punishment {name=%s, ip=%s, punisher=%s, action=%s, timeUnitPair=%s, reason=%s, timed=%b, public=%s}",

@@ -61,7 +61,7 @@ public class Generator {
         }
     }
 
-    void tick() {
+    protected void tick() {
         if (currentInterval > 0) {
             currentInterval--;
             runningTime++;
@@ -72,7 +72,7 @@ public class Generator {
         if (generatorHologram != null) generatorTimeHandle.process();
     }
 
-    void resetTimer() {
+    protected void resetTimer() {
         currentInterval = interval;
     }
 

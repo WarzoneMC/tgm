@@ -20,11 +20,8 @@ public class ItemUtils {
     }
 
     public static boolean compare(ItemStack i1, ItemStack i2) {
-        if (i1 != null && i2 != null) {
-            if (i1.getItemMeta() != null && i2.getItemMeta() != null) {
-                if (i1.getItemMeta().getDisplayName().equals(i2.getItemMeta().getDisplayName()))
-                    return true;
-            }
+        if (i1 != null && i2 != null && i1.getItemMeta() != null && i2.getItemMeta() != null) {
+            return i1.getItemMeta().getDisplayName().equals(i2.getItemMeta().getDisplayName());
         }
         return false;
     }

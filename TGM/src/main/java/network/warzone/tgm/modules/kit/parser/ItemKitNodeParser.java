@@ -50,10 +50,8 @@ public class ItemKitNodeParser implements KitNodeParser {
 
     private ItemStack parseItemStack(JsonObject jsonObject) {
         ItemStack itemStack = ItemDeserializer.parse(jsonObject);
-        if (jsonObject.has("color")) {
-            if (itemStack.getType().name().contains("LEATHER_")) { // Leather armor
-                hasColor = true;
-            }
+        if (jsonObject.has("color") && itemStack.getType().name().contains("LEATHER_")) { // Leather armor
+            hasColor = true;
         }
         return itemStack;
     }

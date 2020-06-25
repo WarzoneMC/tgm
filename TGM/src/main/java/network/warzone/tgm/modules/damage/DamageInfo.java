@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules.damage;
 
+import lombok.Getter;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -7,9 +8,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 /**
  * Created by luke on 12/13/15.
  */
+@Getter
 public class DamageInfo {
 
-    EntityDamageEvent event;
+    private EntityDamageEvent event;
 
     private LivingEntity hurtEntity = null;
     private LivingEntity damagerEntity = null;
@@ -61,33 +63,5 @@ public class DamageInfo {
                 //todo: tnt tracking
             }
         }
-    }
-
-    public LivingEntity getHurtEntity() {
-        return hurtEntity;
-    }
-
-    public LivingEntity getDamagerEntity() {
-        return damagerEntity;
-    }
-
-    public Player getHurtPlayer() {
-        return hurtPlayer;
-    }
-
-    public Player getDamagerPlayer() {
-        return damagerPlayer;
-    }
-
-    public Entity getHurtNonLivingEntity() {
-        return hurtNonLivingEntity;
-    }
-
-    public Projectile getProjectile() {
-        return projectile;
-    }
-
-    public TNTPrimed getTnt() {
-        return tnt;
     }
 }

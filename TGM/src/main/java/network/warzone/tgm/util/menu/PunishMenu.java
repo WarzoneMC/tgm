@@ -314,10 +314,8 @@ public class PunishMenu extends Menu {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if (this.mode != Mode.NONE) return;
-        if (event.getInventory().equals(this.getInventory())) {
-            if (event.getPlayer().getUniqueId().equals(playerUuid)) {
-                super.disable();
-            }
+        if (event.getInventory().equals(this.getInventory()) && event.getPlayer().getUniqueId().equals(playerUuid)) {
+            super.disable();
         }
     }
 

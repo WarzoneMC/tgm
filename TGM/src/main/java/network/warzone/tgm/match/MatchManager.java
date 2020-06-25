@@ -44,7 +44,7 @@ public class MatchManager {
     public void endMatch(MatchTeam winningTeam) {
         List<MatchTeam> losers = new ArrayList<>();
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
-            if (!matchTeam.isSpectator() && matchTeam != winningTeam) {
+            if (!matchTeam.isSpectator() && matchTeam.equals(winningTeam)) {
                 losers.add(matchTeam);
             }
         }

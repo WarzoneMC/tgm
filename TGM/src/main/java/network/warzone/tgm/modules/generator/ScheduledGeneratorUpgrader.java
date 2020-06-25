@@ -33,7 +33,7 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
         }
     }
 
-    void upgrade(ScheduledGeneratorUpgrade scheduledGeneratorUpgrade) {
+    private void upgrade(ScheduledGeneratorUpgrade scheduledGeneratorUpgrade) {
         generatorLevel++;
         applyUpgrade(scheduledGeneratorUpgrade);
         hostGenerator.resetTimer();
@@ -47,7 +47,7 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
     }
 
     @Override
-    void unload() {
+    protected void unload() {
         int timeRan = hostGenerator.getRunningTime();
         for (Map.Entry<Integer, Integer> mapEntry : taskMap.entrySet()) {
             if (mapEntry.getKey() < timeRan) continue;

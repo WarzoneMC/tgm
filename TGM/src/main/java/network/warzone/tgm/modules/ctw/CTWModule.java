@@ -83,7 +83,7 @@ public class CTWModule extends MatchModule implements Listener {
 
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                             for (PlayerContext playerContext : otherTeam.getMembers()) {
-                                if (otherTeam.isSpectator() || otherTeam == matchTeam) {
+                                if (otherTeam.isSpectator() || otherTeam.equals(matchTeam)) {
                                     playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
                                 } else {
                                     playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
@@ -102,7 +102,7 @@ public class CTWModule extends MatchModule implements Listener {
 
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
-                            if (otherTeam.isSpectator() || otherTeam == matchTeam) {
+                            if (otherTeam.isSpectator() || otherTeam.equals(matchTeam)) {
                                 playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
                             } else {
                                 playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
@@ -161,7 +161,7 @@ public class CTWModule extends MatchModule implements Listener {
         }
         if (highest != null) {
             final Map.Entry<MatchTeam, Integer> entry = highest;
-            int amount = teamScores.entrySet().stream().filter(en -> entry.getValue().equals(en.getValue())).collect(Collectors.toList()).size();
+            int amount = (int) teamScores.entrySet().stream().filter(en -> entry.getValue().equals(en.getValue())).count();
             if (amount > 1) return null;
             else return entry.getKey();
         }
@@ -187,7 +187,7 @@ public class CTWModule extends MatchModule implements Listener {
                 if (matchTeam.isSpectator()) continue;
 
                 for (WoolObjective woolObjective : wools) {
-                    if (woolObjective.getOwner() == matchTeam) {
+                    if (woolObjective.getOwner().equals(matchTeam)) {
                         if (woolScoreboardLines.containsKey(woolObjective)) {
                             woolScoreboardLines.get(woolObjective).add(i);
                         } else {
@@ -212,7 +212,7 @@ public class CTWModule extends MatchModule implements Listener {
 
                 List<WoolObjective> wools = getTeamWoolObjectives(matchTeam);
                 for (WoolObjective woolObjective : wools) {
-                    if (woolObjective.getOwner() == matchTeam) {
+                    if (woolObjective.getOwner().equals(matchTeam)) {
                         if (woolScoreboardLines.containsKey(woolObjective)) {
                             woolScoreboardLines.get(woolObjective).add(i);
                         } else {
@@ -236,10 +236,8 @@ public class CTWModule extends MatchModule implements Listener {
     public List<WoolObjective> getIncompleteWools(MatchTeam matchTeam) {
         List<WoolObjective> list = new ArrayList<>();
         for (WoolObjective woolObjective : wools) {
-            if (woolObjective.getOwner() == matchTeam) {
-                if (!woolObjective.isCompleted()) {
-                    list.add(woolObjective);
-                }
+            if (woolObjective.getOwner().equals(matchTeam) && !woolObjective.isCompleted()) {
+                list.add(woolObjective);
             }
         }
         return list;
@@ -251,7 +249,7 @@ public class CTWModule extends MatchModule implements Listener {
         Set<MatchTeam> teams = teamIds.stream().map(id -> this.teamManagerModule.getTeamById(id)).collect(Collectors.toSet());
 
         for (MatchTeam matchTeam : teams) {
-            if (event.getMatchTeam() == matchTeam) {
+            if (event.getMatchTeam().equals(matchTeam)) {
                 int i = this.teamScoreboardLines.get(matchTeam.getId());
                 for (SimpleScoreboard simpleScoreboard : this.scoreboardManagerModule.getScoreboards().values()) {
                     simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);

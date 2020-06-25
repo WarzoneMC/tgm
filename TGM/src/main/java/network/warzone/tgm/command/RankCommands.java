@@ -101,7 +101,7 @@ public class RankCommands {
             String name = cmd.getString(1);
             Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                 for (Rank rank : TGM.get().getTeamClient().retrieveRanks()) {
-                    if (rank.getName().equalsIgnoreCase(name)){
+                    if (rank.getName().equalsIgnoreCase(name)) {
                         sender.sendMessage(ChatColor.YELLOW + "Rank info for " + ChatColor.GRAY + rank.getName());
                         sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + rank.getId().toString());
                         sender.sendMessage(ChatColor.GRAY + "Name: " + ChatColor.RESET + rank.getName());
@@ -209,7 +209,7 @@ public class RankCommands {
                         case ADD:
                             sender.sendMessage(ChatColor.GRAY + "Added permissions " + ChatColor.RESET + permissions.toString() + ChatColor.GRAY + " to rank " + ChatColor.RESET + response.getRank().getName());
                             break;
-                        case REMOVE:
+                        default:
                             sender.sendMessage(ChatColor.GRAY + "Removed permissions " + ChatColor.RESET + permissions.toString() + ChatColor.GRAY + " from rank " + ChatColor.RESET + response.getRank().getName());
                             break;
                     }

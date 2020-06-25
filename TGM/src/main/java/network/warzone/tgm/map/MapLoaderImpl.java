@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by luke on 4/27/17.
@@ -43,11 +44,15 @@ public class MapLoaderImpl implements MapLoader {
     }
 
     private boolean isMapFolder(File folder) {
-        for (File file : folder.listFiles()) {
-            if (file.getName().equals("map.json")) {
-                return true;
+        try {
+            for (File file : Objects.requireNonNull(folder.listFiles())) {
+                if ("map.json".equals(file.getName())) {
+                    return true;
+                }
             }
+            return false;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 }

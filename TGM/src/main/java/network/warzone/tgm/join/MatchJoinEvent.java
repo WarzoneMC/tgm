@@ -19,7 +19,7 @@ public class MatchJoinEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     @Getter
-    PlayerContext playerContext;
+    private PlayerContext playerContext;
 
     @Override
     public HandlerList getHandlers() {

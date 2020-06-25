@@ -11,10 +11,11 @@ import java.util.List;
 /**
  * Created by Jorge on 09/09/2019
  */
+@Getter
 public class SphereRegion implements Region {
 
-    @Getter private final Location center;
-    @Getter private final double radius;
+    private final Location center;
+    private final double radius;
 
     private final Location min;
     private final Location max;

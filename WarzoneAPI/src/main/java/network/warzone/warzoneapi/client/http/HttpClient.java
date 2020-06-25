@@ -2,7 +2,6 @@ package network.warzone.warzoneapi.client.http;
 
 import com.google.gson.*;
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -38,17 +37,17 @@ public class HttpClient implements TeamClient {
         Unirest.setObjectMapper(new ObjectMapper() {
 
             public <T> T readValue(String s, Class<T> aClass) {
-                try{
+                try {
                     return gson.fromJson(s, aClass);
-                }catch(Exception e){
+                } catch(Exception e) {
                     throw new RuntimeException(e);
                 }
             }
 
             public String writeValue(Object o) {
-                try{
+                try {
                     return gson.toJson(o);
-                }catch(Exception e){
+                } catch(Exception e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -118,7 +117,7 @@ public class HttpClient implements TeamClient {
     @Override
     public void addKill(Death death) {
         try {
-            HttpResponse<JsonNode> jsonResponse = Unirest.post(config.getBaseUrl() + "/mc/death/new")
+            Unirest.post(config.getBaseUrl() + "/mc/death/new")
                     .header("x-access-token", config.getAuthToken())
                     .header("accept", "application/json")
                     .header("Content-Type", "application/json")

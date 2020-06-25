@@ -9,9 +9,11 @@ import org.bukkit.util.NumberConversions;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class CylinderRegion implements Region {
-    @Getter private final Location base;
-    @Getter private final double radius, height;
+    private final Location base;
+    private final double radius;
+    private final double height;
 
     private final Location min;
     private final Location max;

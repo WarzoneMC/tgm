@@ -47,10 +47,8 @@ public class PhoenixAbility extends Ability {
 
     @EventHandler
     public void onBlockChangeForm(EntityChangeBlockEvent event) {
-        if (event.getEntityType() == EntityType.FALLING_BLOCK) {
-            if (event.getTo() == Material.FIRE) {
-                event.setCancelled(true);
-            }
+        if (event.getEntityType() == EntityType.FALLING_BLOCK && event.getTo() == Material.FIRE) {
+            event.setCancelled(true);
         }
     }
 
@@ -70,11 +68,14 @@ public class PhoenixAbility extends Ability {
                     if (entity instanceof LivingEntity) {
                         if (entity instanceof Player) {
                             Player targetPlayer = (Player) entity;
-                            if (team.containsPlayer(targetPlayer) || teamManagerModule.getTeam(targetPlayer).isSpectator())
+                            if (team.containsPlayer(targetPlayer) || teamManagerModule.getTeam(targetPlayer).isSpectator()) {
                                 continue;
-                        } else if (entity instanceof Creature) {
-                            if (entity.getCustomName() != null && entity.getCustomName().contains(team.getColor().toString()))
+                            }
+                        } else {
+                            if (entity instanceof Creature && entity.getCustomName() != null
+                                    && entity.getCustomName().contains(team.getColor().toString())) {
                                 continue;
+                            }
                         }
                         entity.setFireTicks(240);
                         ((LivingEntity) entity).damage(6.0, player);

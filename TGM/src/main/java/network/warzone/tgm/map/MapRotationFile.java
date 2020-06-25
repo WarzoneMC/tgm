@@ -80,8 +80,8 @@ public class MapRotationFile implements MapRotation {
     }
 
     @Override
-    public void saveRotationPosition(int index) {
-        index = index % rotation.size();
+    public void saveRotationPosition(int i) {
+        int index = i % rotation.size();
         try {
             Files.write(String.valueOf(index), rindex, Charset.defaultCharset());
         } catch (Exception e) {

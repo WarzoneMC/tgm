@@ -50,9 +50,9 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
             spawnPlayer(event.getPlayerContext(), event.getTeam(), true, true);
         }
         //player is swapping teams pre/post match.
-        else {
+        //else {
             //we don't need to teleport them in this case. Let them stay in their position.
-        }
+        //}
     }
 
     @EventHandler(ignoreCancelled = true)

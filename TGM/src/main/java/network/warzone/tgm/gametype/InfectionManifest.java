@@ -14,7 +14,7 @@ public class InfectionManifest extends MatchManifest {
 
     @Override
     public List<MatchModule> allocateGameModules() {
-        return new ArrayList<MatchModule>(){
+        return new ArrayList<MatchModule>() {
             {
                 add(new InfectionModule());
             }

@@ -14,11 +14,11 @@ import java.lang.reflect.Type;
  */
 public class EffectDeserializer implements JsonDeserializer<PotionEffect> {
 
-    @Getter @Setter static EffectTagParser<PotionEffectType> typeParser = new EffectTypeParser();
-    @Getter @Setter static EffectTagParser<Integer> durationParser = new EffectDurationParser();
-    @Getter @Setter static EffectTagParser<Integer> amplifierParser = new EffectAmplifierParser();
-    @Getter @Setter static EffectTagParser<Boolean> ambientParser = new EffectAmbientParser();
-    @Getter @Setter static EffectTagParser<Boolean> particleParser = new EffectParticleParser();
+    @Getter @Setter private static EffectTagParser<PotionEffectType> typeParser = new EffectTypeParser();
+    @Getter @Setter private static EffectTagParser<Integer> durationParser = new EffectDurationParser();
+    @Getter @Setter private static EffectTagParser<Integer> amplifierParser = new EffectAmplifierParser();
+    @Getter @Setter private static EffectTagParser<Boolean> ambientParser = new EffectAmbientParser();
+    @Getter @Setter private static EffectTagParser<Boolean> particleParser = new EffectParticleParser();
 
     public static PotionEffect parse(JsonObject object) {
         PotionEffectType type = typeParser.parse(object);

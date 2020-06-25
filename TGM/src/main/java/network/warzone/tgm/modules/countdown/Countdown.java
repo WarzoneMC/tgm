@@ -11,7 +11,8 @@ import network.warzone.tgm.modules.tasked.TaskedModule;
 @Getter @Setter
 public abstract class Countdown extends MatchModule implements TaskedModule {
 
-    private double timeLeft, timeMax; //ticks
+    private double timeLeft; //ticks
+    private double timeMax; //ticks
 
     private boolean cancelled = true;
 

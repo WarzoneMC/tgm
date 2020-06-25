@@ -2,7 +2,6 @@ package network.warzone.tgm.modules.countdown;
 
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.match.Match;
 import network.warzone.tgm.util.BossBarUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
@@ -14,11 +13,6 @@ public class CycleCountdown extends BossBarCountdown {
 
     public CycleCountdown() {
         this.bossBar = initBossBar();
-    }
-
-    @Override
-    public void load(Match match) {
-
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,26 +79,21 @@ public class WoolObjective implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlaceHighest(BlockPlaceEvent event) {
-        if (event.getBlockPlaced().getType() == block) {
-            if (!completed) {
+        if (!completed && event.getBlockPlaced().getType() == block) {
+            if (!podium.contains(event.getBlockPlaced().getLocation())) {
+                return;
+            }
+            if (!owner.containsPlayer(event.getPlayer())) {
+                return;
+            }
+            event.setCancelled(false); //override filter
+            setCompleted(true);
 
-                if (!podium.contains(event.getBlockPlaced().getLocation())) {
-                    return;
-                }
+            TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+            MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
 
-                if (!owner.containsPlayer(event.getPlayer())) {
-                    return;
-                }
-
-                event.setCancelled(false); //override filter
-                setCompleted(true);
-
-                TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-                MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-
-                for (WoolObjectiveService woolObjectiveService : services) {
-                    woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
-                }
+            for (WoolObjectiveService woolObjectiveService : services) {
+                woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
             }
         }
     }
@@ -142,21 +138,16 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onPickup(EntityPickupItemEvent event) {
-        if (event.getEntity() instanceof Player) {
-            if (event.getItem() != null && event.getItem().getItemStack().getType().name().contains("WOOL")) { //TODO 1.13 Temp fix
-                if (event.getItem().getItemStack().getType() == block) {
-                    handleWoolPickup(((Player) event.getEntity()).getPlayer());
-                }
-            }
+        if (event.getEntity() instanceof Player && event.getItem().getItemStack().getType() == block) {
+            handleWoolPickup(((Player) event.getEntity()).getPlayer());
         }
     }
 
     @EventHandler
     public void onCollect(InventoryClickEvent event) {
-        if (event.getCurrentItem() != null && event.getCurrentItem().getType().name().contains("WOOL")) { //TODO 1.13 Temp fix
-            if (event.getCurrentItem().getType() == block) {
-                handleWoolPickup((Player) event.getWhoClicked());
-            }
+        ItemStack item = event.getCurrentItem();
+        if (item != null && item.getType() == block) {
+            handleWoolPickup((Player) event.getWhoClicked());
         }
     }
 

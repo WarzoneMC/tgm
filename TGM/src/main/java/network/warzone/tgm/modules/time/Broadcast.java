@@ -18,8 +18,8 @@ public class Broadcast {
     private String message;
     private List<String> commands;
 
-    int interval;
-    boolean repeat;
+    private int interval;
+    private boolean repeat;
     private List<Integer> exclude;
 
     public void run(int time) {

@@ -56,7 +56,7 @@ public class NickedUserProfile extends UserProfile {
         return TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).isStaff();
     }
 
-    static NickedUserProfile createFromUserProfile(UserProfile profile) {
+    public static NickedUserProfile createFromUserProfile(UserProfile profile) {
         return new NickedUserProfile(
                 profile.getId(),
                 profile.getName(),

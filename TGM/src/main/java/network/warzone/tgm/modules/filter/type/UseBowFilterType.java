@@ -50,8 +50,7 @@ public class UseBowFilterType implements FilterType, Listener {
     }
 
     private boolean contains(Region region, Location location) {
-        if (!inverted) return region.contains(location);
-        else return !region.contains(location);
+        return (!inverted && region.contains(location)) || (inverted && !region.contains(location));
     }
 
     public static UseBowFilterType parse(Match match, JsonObject jsonObject) {

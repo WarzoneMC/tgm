@@ -11,8 +11,11 @@ import org.bukkit.entity.Player;
 @AllArgsConstructor
 public class TeleportClickEvent extends ClickEvent {
 
-    double x, y, z;
-    float yaw, pitch;
+    private double x;
+    private double y;
+    private double z;
+    private float yaw;
+    private float pitch;
 
     public TeleportClickEvent(Location location) {
         this.x = location.getX();

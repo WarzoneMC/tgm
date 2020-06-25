@@ -61,15 +61,15 @@ public class FilterManagerModule extends MatchModule {
                 .replace("-", "")
                 .toLowerCase();
 
-        if (type.equals("build"))               filterTypes.add(BuildFilterType.parse(match, jsonObject));
-        else if (type.equals("enter"))          filterTypes.add(EnterFilterType.parse(match, jsonObject));
-        else if (type.equals("usebow"))         filterTypes.add(UseBowFilterType.parse(match, jsonObject));
-        else if (type.equals("useshear"))       filterTypes.add(UseShearFilterType.parse(match, jsonObject));
-        else if (type.equals("leave"))          filterTypes.add(LeaveFilterType.parse(match, jsonObject));
-        else if (type.equals("blockexplode"))   filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
-        else if (type.equals("blockplace"))     filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
-        else if (type.equals("blockbreak"))     filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));
-        else if (type.equals("voidbuild"))      filterTypes.add(VoidBuildFilterType.parse(match, jsonObject));
+        if ("build".equals(type))               filterTypes.add(BuildFilterType.parse(match, jsonObject));
+        else if ("enter".equals(type))          filterTypes.add(EnterFilterType.parse(match, jsonObject));
+        else if ("usebow".equals(type))         filterTypes.add(UseBowFilterType.parse(match, jsonObject));
+        else if ("useshear".equals(type))       filterTypes.add(UseShearFilterType.parse(match, jsonObject));
+        else if ("leave".equals(type))          filterTypes.add(LeaveFilterType.parse(match, jsonObject));
+        else if ("blockexplode".equals(type))   filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
+        else if ("blockplace".equals(type))     filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
+        else if ("blockbreak".equals(type))     filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));
+        else if ("voidbuild".equals(type))      filterTypes.add(VoidBuildFilterType.parse(match, jsonObject));
 
         return filterTypes;
     }

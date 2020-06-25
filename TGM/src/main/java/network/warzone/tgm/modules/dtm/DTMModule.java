@@ -32,6 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,7 @@ public class DTMModule extends MatchModule implements Listener {
             List<Material> materials = Parser.getMaterialsFromElement(monumentJson.get("materials"));
             int health = monumentJson.get("health").getAsInt();
 
-            this.monuments.add(new Monument(name, teams, region, materials, health, health));
+            this.monuments.add(new Monument(new WeakReference<>(match), name, teams, region, materials, health, health));
             if (materials == null) {
                 continue;
             }

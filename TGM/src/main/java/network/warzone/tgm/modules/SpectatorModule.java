@@ -131,7 +131,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
     }
 
-    void updateTeamMenuItem(MatchTeam matchTeam, int i) {
+    private void updateTeamMenuItem(MatchTeam matchTeam, int i) {
         ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
         leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
@@ -144,7 +144,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         teamSelectionMenu.setItem(i, itemStack);
     }
 
-    void updateSpectatorMenuItem(MatchTeam matchTeam) {
+    private void updateSpectatorMenuItem(MatchTeam matchTeam) {
         ItemStack itemStack = new ItemStack(Material.LEATHER_BOOTS);
         LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemStack.getItemMeta();
         leatherArmorMeta.setDisplayName(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias());
@@ -156,7 +156,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         teamSelectionMenu.setItem(8, itemStack);
     }
 
-    void updateMenu() {
+    private void updateMenu() {
         int totalMatchSize = 0;
         int totalMatchMaxSize = 0;
         int i = 2;
@@ -361,28 +361,25 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onHangingDestroy(HangingBreakByEntityEvent event) { // Item Frames and Paintings
-        if (event.getRemover() != null && event.getRemover() instanceof Player) {
-            if (isSpectating((Player) event.getRemover())) {
-                event.setCancelled(true);
-            }
+        if (event.getRemover() != null && event.getRemover() instanceof Player
+                && isSpectating((Player) event.getRemover())) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onVehicleDamage(VehicleDamageEvent event) {
-        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
-            if (isSpectating((Player) event.getAttacker())) {
-                event.setCancelled(true);
-            }
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player
+                && isSpectating((Player) event.getAttacker())) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onVehicleDestroy(VehicleDestroyEvent event) {
-        if (event.getAttacker() != null && event.getAttacker() instanceof Player) {
-            if (isSpectating((Player) event.getAttacker())) {
-                event.setCancelled(true);
-            }
+        if (event.getAttacker() != null && event.getAttacker() instanceof Player
+                && isSpectating((Player) event.getAttacker())) {
+            event.setCancelled(true);
         }
     }
 
@@ -417,16 +414,18 @@ public class SpectatorModule extends MatchModule implements Listener {
     @EventHandler
     public void onAEC(AreaEffectCloudApplyEvent event) {
         for (Entity entity : event.getAffectedEntities()) {
-            if (entity instanceof Player && isSpectating((Player) entity))
+            if (entity instanceof Player && isSpectating((Player) entity)) {
                 event.getAffectedEntities().remove(entity);
+            }
         }
     }
 
     @EventHandler
     public void onPotion(PotionSplashEvent event) {
         for (Entity entity : event.getAffectedEntities()) {
-            if (entity instanceof Player && isSpectating((Player) entity))
+            if (entity instanceof Player && isSpectating((Player) entity)) {
                 event.getAffectedEntities().remove(entity);
+            }
         }
     }
 

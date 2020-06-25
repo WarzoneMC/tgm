@@ -63,7 +63,7 @@ public class MiscCommands {
     @Command(aliases = {"profilecache"}, desc = "Manage the profile cache.", usage = "<clear>", min = 1)
     @CommandPermissions({"tgm.command.profilecache"})
     public static void profileCache(CommandContext commandContext, CommandSender sender) {
-        if (commandContext.getString(0).equals("clear")) {
+        if ("clear".equalsIgnoreCase(commandContext.getString(0))) {
             ProfileCache.getInstance().clear();
             sender.sendMessage(ChatColor.YELLOW + "Cleared the profile cache.");
         }

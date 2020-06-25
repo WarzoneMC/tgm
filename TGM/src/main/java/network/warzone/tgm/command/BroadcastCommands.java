@@ -22,19 +22,19 @@ public class BroadcastCommands {
     @CommandPermissions({"tgm.broadcast"})
     public static void broadcast(CommandContext cmd, CommandSender sender) {
         BroadcastManager broadcastManager = TGM.get().getBroadcastManager();
-        if (cmd.getString(0).equalsIgnoreCase("preset")) {
+        if ("preset".equalsIgnoreCase(cmd.getString(0))) {
             if (cmd.argsLength() <= 1) {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " preset <id> [args]");
                 return;
             }
             if (!broadcastManager.broadcast(cmd.getString(1), (cmd.argsLength() > 2 ? cmd.getParsedSlice(2) : new String[]{}))) sender.sendMessage(ChatColor.RED + "Broadcast not found.");
-        } else if (cmd.getString(0).equalsIgnoreCase("raw")) {
+        } else if ("raw".equalsIgnoreCase(cmd.getString(0))) {
             if (cmd.argsLength() <= 1) {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " raw <message>");
                 return;
             }
             broadcastManager.broadcastRaw(cmd.getRemainingString(1));
-        } else if (cmd.getString(0).equalsIgnoreCase("ppreset") || cmd.getString(0).equalsIgnoreCase("playerpreset")) {
+        } else if ("ppreset".equalsIgnoreCase(cmd.getString(0)) || "playerpreset".equalsIgnoreCase(cmd.getString(0))) {
             if (cmd.argsLength() <= 1) {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " playerpreset <player> <id> [args]");
                 return;
@@ -45,7 +45,7 @@ public class BroadcastCommands {
                 return;
             }
             if (!broadcastManager.broadcast(target, cmd.getString(2), (cmd.argsLength() > 3 ? cmd.getParsedSlice(3) : new String[]{}))) sender.sendMessage(ChatColor.RED + "Broadcast not found.");
-        } else if (cmd.getString(0).equalsIgnoreCase("praw") || cmd.getString(0).equalsIgnoreCase("playerraw")) {
+        } else if ("praw".equalsIgnoreCase(cmd.getString(0)) || "playerraw".equalsIgnoreCase(cmd.getString(0))) {
             if (cmd.argsLength() <= 2) {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " playerraw <player> <message>");
                 return;
@@ -56,7 +56,7 @@ public class BroadcastCommands {
                 return;
             }
             broadcastManager.broadcastRaw(target, cmd.getRemainingString(2));
-        } else if (cmd.getString(0).equalsIgnoreCase("list")) {
+        } else if ("list".equalsIgnoreCase(cmd.getString(0))) {
             if (!broadcastManager.getBroadcasts().isEmpty()) {
                 sender.sendMessage(ChatColor.YELLOW + "Presets: ");
                 broadcastManager.getBroadcasts().forEach(broadcast -> sender.sendMessage(
@@ -65,34 +65,34 @@ public class BroadcastCommands {
             } else {
                 sender.sendMessage(ChatColor.YELLOW + "No broadcast presets defined.");
             }
-        } else if (cmd.getString(0).equalsIgnoreCase("config")) {
+        } else if ("config".equalsIgnoreCase(cmd.getString(0))) {
             if (cmd.argsLength() <= 1) {
                 sender.sendMessage(ChatColor.RED + "/" + cmd.getCommand() + " config <autobroadcast|interval|url|queue> [value]");
                 return;
             }
-            if (cmd.getString(1).equalsIgnoreCase("autobroadcast")) {
-                if (cmd.argsLength() > 2) if (!broadcastManager.setAutobroadcast(Boolean.valueOf(cmd.getString(2)))) {
+            if ("autobroadcast".equalsIgnoreCase(cmd.getString(1))) {
+                if (cmd.argsLength() > 2 && !broadcastManager.setAutobroadcast(Boolean.parseBoolean(cmd.getString(2)))) {
                     sender.sendMessage(ChatColor.RED + "Could not set autobroadcast.");
                     return;
                 }
                 sender.sendMessage(ChatColor.AQUA + "Autobroadcast: " + (broadcastManager.isAutoBroadcast()? ChatColor.GREEN : ChatColor.RED) + broadcastManager.isAutoBroadcast());
 
-            } else if (cmd.getString(1).equalsIgnoreCase("interval")) {
-                if (cmd.argsLength() > 2) if (!broadcastManager.setInterval(Integer.valueOf(cmd.getString(2)))){
+            } else if ("interval".equalsIgnoreCase(cmd.getString(1))) {
+                if (cmd.argsLength() > 2 && !broadcastManager.setInterval(Integer.parseInt(cmd.getString(2)))) {
                     sender.sendMessage(ChatColor.RED + "Could not set interval.");
                     return;
                 }
                 sender.sendMessage(ChatColor.AQUA + "Interval: " + ChatColor.GREEN + broadcastManager.getInterval());
 
-            } else if (cmd.getString(1).equalsIgnoreCase("url")) {
-                if (cmd.argsLength() > 2) if (!broadcastManager.setURL(cmd.getString(2).equals("-") ? null : cmd.getString(2))) {
+            } else if ("url".equalsIgnoreCase(cmd.getString(1))) {
+                if (cmd.argsLength() > 2 && !broadcastManager.setURL("-".equals(cmd.getString(2)) ? null : cmd.getString(2))) {
                     sender.sendMessage(ChatColor.RED + "Could not set broadcasts url.");
                     return;
                 }
                 sender.sendMessage(ChatColor.AQUA + "Broadcasts URL: " + ChatColor.GREEN + broadcastManager.getUrl());
 
-            } else if (cmd.getString(1).equalsIgnoreCase("queue")) {
-                if (cmd.argsLength() > 2) if (!broadcastManager.setQueue(cmd.getString(2).equals("-") ? Collections.emptyList() : Arrays.asList(cmd.getParsedSlice(2)))) {
+            } else if ("queue".equalsIgnoreCase(cmd.getString(1))) {
+                if (cmd.argsLength() > 2 && !broadcastManager.setQueue("-".equals(cmd.getString(2)) ? Collections.emptyList() : Arrays.asList(cmd.getParsedSlice(2)))) {
                     sender.sendMessage(ChatColor.RED + "Could not set autobroadcast queue.");
                     return;
                 }
@@ -100,11 +100,11 @@ public class BroadcastCommands {
             } else {
                 sender.sendMessage(ChatColor.RED + "Unknown setting.");
             }
-        } else if (cmd.getString(0).equalsIgnoreCase("reload")) {
+        } else if ("reload".equalsIgnoreCase(cmd.getString(0))) {
             broadcastManager.reload();
             sender.sendMessage(ChatColor.GREEN + "Broadcast configuration & list reloaded.");
 
-        } else if (cmd.getString(0).equalsIgnoreCase("stop")) {
+        } else if ("stop".equalsIgnoreCase(cmd.getString(0))) {
             if (broadcastManager.getTask() == null) {
                 sender.sendMessage(ChatColor.RED + "Autobroadcast task not running.");
                 return;
@@ -112,7 +112,7 @@ public class BroadcastCommands {
             broadcastManager.stopTask();
             sender.sendMessage(ChatColor.YELLOW + "Stopped auto-broadcasting.");
 
-        } else if (cmd.getString(0).equalsIgnoreCase("start")) {
+        } else if ("start".equalsIgnoreCase(cmd.getString(0))) {
             if (broadcastManager.getTask() != null) {
                 sender.sendMessage(ChatColor.RED + "Autobroadcast task already running.");
                 return;

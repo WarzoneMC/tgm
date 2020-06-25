@@ -153,7 +153,7 @@ public class ControlPoint implements Listener {
             progress++;
             controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
         } else {
-            if (matchTeam == progressingTowardsTeam) {
+            if (matchTeam.equals(progressingTowardsTeam)) {
                 if (progress < definition.getMaxProgress()) {
                     progress++; //don't go over the max cap number.
                     controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
@@ -170,7 +170,7 @@ public class ControlPoint implements Listener {
                     controlPointService.lost(controller);
                     controller = null;
                 }
-            } else if (progress >= definition.getMaxProgress() && matchTeam == progressingTowardsTeam) {
+            } else if (progress >= definition.getMaxProgress() && matchTeam.equals(progressingTowardsTeam)) {
                 if (controller == null) {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
@@ -194,7 +194,7 @@ public class ControlPoint implements Listener {
 
     private void renderBlocks(MatchTeam matchTeam, boolean isInitial) {
         ChatColor color1 = progressingTowardsTeam.getColor();
-        ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : (isInitial ? ChatColor.RESET : ChatColor.WHITE);
+        ChatColor color2 = matchTeam.equals(controller) ? controller.getColor() : (isInitial ? ChatColor.RESET : ChatColor.WHITE);
         Location center = region.getCenter();
         double x = center.getX();
         double z = center.getZ();

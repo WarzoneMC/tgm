@@ -39,7 +39,7 @@ public class CraftingModule extends MatchModule implements Listener {
                         if (mat == null) continue;
                         this.removedRecipes.add(mat);
                     }
-                } else if (crafting.get("remove").isJsonPrimitive() && crafting.get("remove").getAsString().equals("*")) {
+                } else if (crafting.get("remove").isJsonPrimitive() && "*".equals(crafting.get("remove").getAsString())) {
                     removeAll = true;
                 }
             }
