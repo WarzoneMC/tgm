@@ -85,7 +85,7 @@ public class KillstreakModule extends MatchModule implements Listener {
                             .replace("%count%", String.valueOf(killstreak.getCount()))
                     );
 
-                killstreak.getActions().forEach(a -> a.apply(deathInfo.killer));
+                killstreak.getActions().forEach(a -> a.safeApply(deathInfo.killer));
 
                 killstreak.getCommands().forEach(s -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ColorConverter.filterString(s)
                         .replace("%killername%", deathInfo.killerName)
