@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 @Getter
@@ -77,9 +79,9 @@ public class Generator {
     }
 
     private void perform() {
-        if (range >= 0 && location.getWorld().getNearbyPlayers(location, range).size() == 0) return;
+        if (range >= 0 && location.getWorld().getNearbyEntities(BoundingBox.of(location, range, range, range), entity -> entity instanceof Player).size() == 0) return;
         if (limit > 0) {
-            int nearbySimilarItems = location.getWorld().getNearbyEntitiesByType(Item.class, location, 2, (theEntity) -> theEntity.getItemStack().getType() == item.getType()).stream().mapToInt((itemEntity) -> itemEntity.getItemStack().getAmount()).sum();
+            int nearbySimilarItems = location.getWorld().getNearbyEntities(location, 2, 2, 2, (theEntity) -> theEntity instanceof Item && ((Item) theEntity).getItemStack().getType() == item.getType()).stream().mapToInt((itemEntity) -> ((Item)itemEntity).getItemStack().getAmount()).sum();
             if (nearbySimilarItems >= limit) return;
         }
         location.getWorld().dropItemNaturally(location, item).setVelocity(new Vector(0, 0, 0));

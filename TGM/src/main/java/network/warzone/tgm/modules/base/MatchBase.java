@@ -96,7 +96,7 @@ public class MatchBase implements Listener {
             !baseRegion.contains(event.getFrom())) return;
         else {
             List<PlayerRedeemable> eligiblePlayerRedeemables = hasPlayerRedeemables(event.getPlayer());
-            List<ItemRedeemable> eligibleItemRedeemables = applicableItemRedeemables(event.getPlayer().getActiveItem());
+            List<ItemRedeemable> eligibleItemRedeemables = applicableItemRedeemables(event.getPlayer().getInventory().getItemInMainHand());
             if (eligiblePlayerRedeemables.size() == 0 && eligibleItemRedeemables.size() == 0) return;
             redeemPlayerRedeemables(eligiblePlayerRedeemables, event.getPlayer());
             redeemItemRedeemables(eligibleItemRedeemables, event.getPlayer());

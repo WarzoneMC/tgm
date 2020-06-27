@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -63,7 +64,7 @@ public class Players {
     }
 
     public static int getPing(Player player) {
-        return player.spigot().getPing();
+        return ((CraftPlayer) player).getHandle().ping; // Spigot needs to step up its game
     }
 
     public static void sendMessage(Player player, String message, Object... objects) {

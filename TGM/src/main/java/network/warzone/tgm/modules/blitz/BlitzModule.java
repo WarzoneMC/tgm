@@ -3,6 +3,9 @@ package network.warzone.tgm.modules.blitz;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -118,7 +121,9 @@ public class BlitzModule extends MatchModule implements Listener {
         livesDisplayTaskId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (teamManagerModule.getTeam(player).isSpectator()) return;
-                player.sendActionBar(ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName())));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(
+                        ChatColor.translateAlternateColorCodes('&', actionbar.replaceAll("%lives%", "" + getLives(player)).replaceAll("%player%", player.getName()))
+                ));
             }
         }, 2L, 2L).getTaskId();
     }

@@ -1,9 +1,11 @@
 package network.warzone.tgm.parser.item.meta;
 
 import com.google.gson.JsonObject;
+import net.minecraft.server.v1_16_R1.IChatBaseComponent;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftMetaBook;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -26,14 +28,16 @@ public class ItemBookParser implements ItemMetaParser {
 
     static {
         try {
-            //classIChatBaseComponent = Class.forName("net.minecraft.server.v1_15_R1.IChatBaseComponent");
-            classChatSerializer = Class.forName("net.minecraft.server.v1_15_R1.IChatBaseComponent$ChatSerializer");
+//            classChatSerializer = Class.forName("net.minecraft.server.v1_16_R1.IChatBaseComponent$ChatSerializer");
+            classChatSerializer = IChatBaseComponent.ChatSerializer.class;
             methodA = classChatSerializer.getDeclaredMethod("a", String.class);
 
-            classCraftMetaBook = Class.forName("org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMetaBook");
+//            classCraftMetaBook = Class.forName("org.bukkit.craftbukkit.v1_16_R1.inventory.CraftMetaBook");
+            classCraftMetaBook = CraftMetaBook.class;
             fieldPages = classCraftMetaBook.getDeclaredField("pages");
 
-        } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException e) {
+//        } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

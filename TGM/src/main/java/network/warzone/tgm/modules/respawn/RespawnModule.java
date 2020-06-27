@@ -1,6 +1,6 @@
 package network.warzone.tgm.modules.respawn;
 
-import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
+//import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -100,12 +100,12 @@ public class RespawnModule extends MatchModule implements Listener {
         goal.setConfirmed(true);
     }
 
-    @EventHandler
-    public void onProjectile(PlayerReadyArrowEvent event) {
-        if (isDead(event.getPlayer())) {
-            event.setCancelled(true);
-        }
-    }
+//    @EventHandler
+//    public void onProjectile(PlayerReadyArrowEvent event) {
+//        if (isDead(event.getPlayer())) {
+//            event.setCancelled(true);
+//        }
+//    }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
