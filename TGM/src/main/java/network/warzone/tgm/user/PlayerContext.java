@@ -74,39 +74,39 @@ public class PlayerContext {
             return ChatColor.of("#AAFFFF") + "[" + level + "]";
         }
         else if (level < 60) {
-            return ChatColor.of("#96FFBC) + "[" + level + "]";
+            return ChatColor.of("#96FFBC") + "[" + level + "]";
         }
-        else if (level < 70 {
-            return ChatColor.of("#87FF87) + "[" + level + "]";
+        else if (level < 70) {
+            return ChatColor.of("#87FF87") + "[" + level + "]";
         }
-        else if (level < 80 {
-            return ChatColor.of("#D9FFAA) + "[" + level + "]";
+        else if (level < 80) {
+            return ChatColor.of("#D9FFAA") + "[" + level + "]";
         }
-        else if (level < 90 {
-            return ChatColor.of("#FFFFAA) + "[" + level + "]";
+        else if (level < 90) {
+            return ChatColor.of("#FFFFAA") + "[" + level + "]";
         }
-        else if (level < 100
-            return ChatColor.of("#FFD9AA) + "[" + level + "]";
+        else if (level < 100) {
+            return ChatColor.of("#FFD9AA") + "[" + level + "]";
         }
-        else if (level < 120
-            return ChatColor.of("#FFFFAA) + "[" + level + "]";
+        else if (level < 120) {
+            return ChatColor.of("#FFFFAA") + "[" + level + "]";
         }
-        else if (level < 140
-            return ChatColor.of("#FFAAC9) + "[" + level + "]";
+        else if (level < 140) {
+            return ChatColor.of("#FFAAC9") + "[" + level + "]";
         }
-        else if (level < 160
-            return ChatColor.of("#FF96DA) + "[" + level + "]";
+        else if (level < 160) {
+            return ChatColor.of("#FF96DA") + "[" + level + "]";
         }
-        else if (level < 180
-            return ChatColor.of("#FFF66FF) + "[" + level + "]";
+        else if (level < 180) {
+            return ChatColor.of("#FFF66FF") + "[" + level + "]";
         }
-        else if (level < 200
-            return ChatColor.of("#E266FF) + "[" + level + "]";
+        else if (level < 200) {
+            return ChatColor.of("#E266FF") + "[" + level + "]";
         }
-        else if (level < 220
-            return ChatColor.of("#C966FF) + "[" + level + "]";                  
+        else if (level < 220) {
+            return ChatColor.of("#C966FF") + "[" + level + "]";                  
         } else {
-            return ChatColor.of("#E266FF) + "[" + level + "]";
+            return ChatColor.of("#E266FF") + "[" + level + "]";
         }
                      
     }
