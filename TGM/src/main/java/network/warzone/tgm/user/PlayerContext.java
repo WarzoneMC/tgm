@@ -59,37 +59,56 @@ public class PlayerContext {
         int level = getUserProfile(original).getLevel();
 
         if (level < 10) {
-            return ChatColor.GRAY + "[" + level + "]";
+            return ChatColor.of("#BBBAD3") + "[" + level + "]";
         }
         else if (level < 20) {
-            return ChatColor.DARK_AQUA + "[" + level + "]";
+            return ChatColor.of("#B1AAFF") + "[" + level + "]";
         }
         else if (level < 30) {
-            return ChatColor.BLUE + "[" + level + "]";
+            return ChatColor.of("#AAC1FF") + "[" + level + "]";
         }
         else if (level < 40) {
-            return ChatColor.LIGHT_PURPLE + "[" + level + "]";
+            return ChatColor.of("#AAE1FF") + "[" + level + "]";
+        }
+        else if (level < 50) {
+            return ChatColor.of("#AAFFFF") + "[" + level + "]";
         }
         else if (level < 60) {
-            return ChatColor.DARK_PURPLE + "[" + level + "]";
+            return ChatColor.of("#96FFBC) + "[" + level + "]";
         }
-        else if (level < 80) {
-            return ChatColor.DARK_RED + "[" + level + "]";
+        else if (level < 70 {
+            return ChatColor.of("#87FF87) + "[" + level + "]";
         }
-        else if (level < 100) {
-            return ChatColor.RED + "[" + level + "]";
+        else if (level < 80 {
+            return ChatColor.of("#D9FFAA) + "[" + level + "]";
         }
-        else if (level < 120) {
-            return ChatColor.GOLD + "[" + level + "]";
+        else if (level < 90 {
+            return ChatColor.of("#FFFFAA) + "[" + level + "]";
         }
-        else if (level < 140) {
-            return ChatColor.YELLOW + "[" + level + "]";
+        else if (level < 100
+            return ChatColor.of("#FFD9AA) + "[" + level + "]";
         }
-        else if (level < 160) {
-            return ChatColor.GREEN + "[" + level + "]";
+        else if (level < 120
+            return ChatColor.of("#FFFFAA) + "[" + level + "]";
+        }
+        else if (level < 140
+            return ChatColor.of("#FFAAC9) + "[" + level + "]";
+        }
+        else if (level < 160
+            return ChatColor.of("#FF96DA) + "[" + level + "]";
+        }
+        else if (level < 180
+            return ChatColor.of("#FFF66FF) + "[" + level + "]";
+        }
+        else if (level < 200
+            return ChatColor.of("#E266FF) + "[" + level + "]";
+        }
+        else if (level < 220
+            return ChatColor.of("#C966FF) + "[" + level + "]";                  
         } else {
-            return ChatColor.DARK_GREEN + "[" + level + "]";
+            return ChatColor.of("#E266FF) + "[" + level + "]";
         }
+                     
     }
 
     public void updateRank(Rank r) {
