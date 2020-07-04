@@ -31,7 +31,7 @@ public class MapRotationFile {
     public MapContainer cycle(boolean initial) {
         current = (current + (initial ? 0 : 1)) % rotation.getMaps().size();
 
-        if (!rotation.isDefault() && current % rotation.getMaps().size() == 0) {
+        if (!rotation.isDefault() && current == rotation.getMaps().size() - 1) {
             MapContainer nextMap = rotation.getMaps().get(current);
             indexes.remove(rotation.getName());
             rotation = getRotationForPlayerCount(Bukkit.getOnlinePlayers().size());
