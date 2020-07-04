@@ -24,6 +24,7 @@ import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.parser.item.ItemDeserializer;
 import network.warzone.tgm.player.PlayerManager;
+import network.warzone.tgm.util.Plugins;
 import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.client.http.HttpClient;
@@ -137,6 +138,8 @@ public class TGM extends JavaPlugin {
         PunishMenu.getPresetsMenu().load();
 
         GameRuleModule.setGameRuleDefaults(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
+
+        Plugins.checkProtocolSupport();
 
         matchManager.cycleNextMatch();
         nickManager = new NickManager(); 
