@@ -12,8 +12,8 @@ api:
     # Default: true
     enabled: true
 # Location of the map rotation file.
-# Default: Maps/rotation.txt
-rotation: Maps/rotation.txt
+# Default: Maps/rotation.json
+rotation: Maps/rotation.json
 
 chat:
   # Allow players to talk in chat. Can be toggled in-game with the `/chat mute` command and can be bypassed with the tgm.chat.bypass permission node.
