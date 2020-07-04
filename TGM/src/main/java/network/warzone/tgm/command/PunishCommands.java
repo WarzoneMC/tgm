@@ -288,6 +288,10 @@ public class PunishCommands {
 
                     ChatColor chatColor = ChatColor.WHITE;
 
+                    if (Bukkit.getPlayer(user.getName()) != null) {
+                        chatColor = ChatColor.GREEN;
+                    }
+
                     if (isMuted) {
                         chatColor = ChatColor.YELLOW;
                     }
