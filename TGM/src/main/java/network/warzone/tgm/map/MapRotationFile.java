@@ -35,6 +35,7 @@ public class MapRotationFile {
             MapContainer nextMap = rotation.getMaps().get(current);
             indexes.remove(rotation.getName());
             rotation = getRotationForPlayerCount(Bukkit.getOnlinePlayers().size());
+            current = loadRotationPosition(-1);
 
             return nextMap;
         }
