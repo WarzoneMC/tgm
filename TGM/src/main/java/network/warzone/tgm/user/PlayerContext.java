@@ -1,15 +1,21 @@
 package network.warzone.tgm.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.command.CycleCommands;
+import network.warzone.tgm.util.Plugins;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
+import protocolsupport.api.ProtocolVersion;
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Created by luke on 4/27/17.
@@ -17,6 +23,28 @@ import java.util.List;
 public class PlayerContext {
     @Getter private Player player;
     private UserProfile userProfile;
+    private static final List<PlayerLevel> levels = new ArrayList<>();
+
+    static {
+        levels.add(new PlayerLevel((lvl) -> lvl < 10, ChatColor.of("#BBBAD3"), ChatColor.GRAY));
+        levels.add(new PlayerLevel((lvl) -> lvl < 20, ChatColor.of("#AAC1FF"), ChatColor.DARK_AQUA));
+        levels.add(new PlayerLevel((lvl) -> lvl < 30, ChatColor.of("#B1AAFF"), ChatColor.BLUE));
+        levels.add(new PlayerLevel((lvl) -> lvl < 40, ChatColor.of("#AAE1FF"), ChatColor.LIGHT_PURPLE));
+        levels.add(new PlayerLevel((lvl) -> lvl < 50, ChatColor.of("#AAFFFF"), ChatColor.AQUA));
+        levels.add(new PlayerLevel((lvl) -> lvl < 60, ChatColor.of("#96FFBC"), ChatColor.DARK_PURPLE));
+        levels.add(new PlayerLevel((lvl) -> lvl < 70, ChatColor.of("#ABFFA5"), ChatColor.GREEN));
+        levels.add(new PlayerLevel((lvl) -> lvl < 80, ChatColor.of("#D9FFAA"), ChatColor.DARK_RED));
+        levels.add(new PlayerLevel((lvl) -> lvl < 90, ChatColor.of("#FFFFAA"), ChatColor.YELLOW));
+        levels.add(new PlayerLevel((lvl) -> lvl < 100, ChatColor.of("#FFD9AA"), ChatColor.RED));
+        levels.add(new PlayerLevel((lvl) -> lvl < 120, ChatColor.of("#FFAAAA"), ChatColor.GOLD));
+        levels.add(new PlayerLevel((lvl) -> lvl < 140, ChatColor.of("#FFAAC9"), ChatColor.YELLOW));
+        levels.add(new PlayerLevel((lvl) -> lvl < 160, ChatColor.of("#FF96DA"), ChatColor.GREEN));
+        levels.add(new PlayerLevel((lvl) -> lvl < 180, ChatColor.of("#FF66FF"), ChatColor.YELLOW));
+        levels.add(new PlayerLevel((lvl) -> lvl < 200, ChatColor.of("#E266FF"), ChatColor.LIGHT_PURPLE));
+        levels.add(new PlayerLevel((lvl) -> lvl < 220, ChatColor.of("#C966FF"), ChatColor.DARK_PURPLE));
+        // fallback
+        levels.add(new PlayerLevel((lvl) -> true, ChatColor.of("#9E66FF"), ChatColor.DARK_GREEN));
+    }
 
     public PlayerContext(Player player, UserProfile userProfile) {
         this.player = player;
@@ -57,58 +85,17 @@ public class PlayerContext {
 
     public String getLevelString(boolean original) {
         int level = getUserProfile(original).getLevel();
+        ChatColor chosenColor = null;
+        for (PlayerLevel levelEntry : levels) {
+            if (levelEntry.check.test(level)) {
+                chosenColor = levelEntry.levelColor;
+                if (!Plugins.USING_PROTOCOL_SUPPORT) break;
+                if (!Plugins.ProtocolSupport.usingVersionOrNewer(this.player, ProtocolVersion.MINECRAFT_1_16)) chosenColor = levelEntry.fallbackLevelColor;
+                break;
+            }
+        }
 
-        if (level < 10) {
-            return ChatColor.of("#BBBAD3") + "[" + level + "]";
-        }
-        else if (level < 20) {
-            return ChatColor.of("#B1AAFF") + "[" + level + "]";
-        }
-        else if (level < 30) {
-            return ChatColor.of("#AAC1FF") + "[" + level + "]";
-        }
-        else if (level < 40) {
-            return ChatColor.of("#AAE1FF") + "[" + level + "]";
-        }
-        else if (level < 50) {
-            return ChatColor.of("#AAFFFF") + "[" + level + "]";
-        }
-        else if (level < 60) {
-            return ChatColor.of("#96FFBC") + "[" + level + "]";
-        }
-        else if (level < 70) {
-            return ChatColor.of("#87FF87") + "[" + level + "]";
-        }
-        else if (level < 80) {
-            return ChatColor.of("#D9FFAA") + "[" + level + "]";
-        }
-        else if (level < 90) {
-            return ChatColor.of("#FFFFAA") + "[" + level + "]";
-        }
-        else if (level < 100) {
-            return ChatColor.of("#FFD9AA") + "[" + level + "]";
-        }
-        else if (level < 120) {
-            return ChatColor.of("#FFFFAA") + "[" + level + "]";
-        }
-        else if (level < 140) {
-            return ChatColor.of("#FFAAC9") + "[" + level + "]";
-        }
-        else if (level < 160) {
-            return ChatColor.of("#FF96DA") + "[" + level + "]";
-        }
-        else if (level < 180) {
-            return ChatColor.of("#FFF66FF") + "[" + level + "]";
-        }
-        else if (level < 200) {
-            return ChatColor.of("#E266FF") + "[" + level + "]";
-        }
-        else if (level < 220) {
-            return ChatColor.of("#C966FF") + "[" + level + "]";                  
-        } else {
-            return ChatColor.of("#E266FF") + "[" + level + "]";
-        }
-                     
+        return "" + chosenColor + "[" + level + "]";
     }
 
     public void updateRank(Rank r) {
@@ -131,5 +118,16 @@ public class PlayerContext {
             getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(player, rank.getPermissions()));
         }
 
+    }
+
+    @AllArgsConstructor @Getter
+    private static class PlayerLevel {
+        private final Predicate<Integer> check;
+        private final ChatColor levelColor;
+        private final ChatColor fallbackLevelColor;
+
+        public PlayerLevel(Predicate<Integer> check, ChatColor levelColor) {
+            this(check, levelColor, ChatColor.GRAY);
+        }
     }
 }

@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.chat;
 
 import lombok.Getter;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
@@ -152,7 +153,6 @@ public class ChatModule extends MatchModule implements Listener {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         if (!event.isCancelled())  {
             Bukkit.getOnlinePlayers().forEach(player -> {
-                TextComponent message = new TextComponent(String.format(event.getFormat(), playerContext.getPlayer().getName(), event.getMessage()) );
                 BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString().replace("[", "").replace("]", "")),
                         new TextComponent("\n"),
                         new TextComponent("\n" + ChatColor.AQUA + "XP: " + ChatColor.RESET + playerContext.getUserProfile().getXP()),
@@ -163,8 +163,14 @@ public class ChatModule extends MatchModule implements Listener {
                         new TextComponent("\n" + ChatColor.AQUA + "Wins: " + ChatColor.RESET + playerContext.getUserProfile().getWins()),
                         new TextComponent("\n" + ChatColor.AQUA + "Losses: " + ChatColor.RESET + playerContext.getUserProfile().getLosses()),
                         new TextComponent("\n" + ChatColor.AQUA + "W/L: " + ChatColor.RESET + playerContext.getUserProfile().getWLR())};
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, stats));
-                player.spigot().sendMessage(message);
+                HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, stats);
+
+                ComponentBuilder builder = new ComponentBuilder();
+                BaseComponent[] mainComponents = TextComponent.fromLegacyText(String.format(event.getFormat(), playerContext.getPlayer().getName(), event.getMessage()));
+                for (BaseComponent component : mainComponents) {
+                    component.setHoverEvent(hoverEvent);
+                }
+                player.spigot().sendMessage(mainComponents);
             });
             Bukkit.getConsoleSender().sendMessage(event.getFormat().replace("%%", "%"));
         }
