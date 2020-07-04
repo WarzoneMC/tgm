@@ -39,7 +39,6 @@ public class MapRotationFile {
 
     public void refresh() {
         // Load rotation files
-        rotationLibrary.clear();
 
         if (!rotationFile.exists()) {
             this.rotationLibrary = Collections.singletonList(new Rotation("Preset", true, new RotationRequirement(0, 999999), this.mapLibrary.getMaps()));
