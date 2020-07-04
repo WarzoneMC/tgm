@@ -491,7 +491,7 @@ public class CycleCommands {
     @CommandPermissions({"tgm.loadmaps"})
     public static void loadmaps(CommandContext cmd, CommandSender sender) {
         TGM.get().getMatchManager().getMapLibrary().refreshMaps();
-        TGM.get().getMatchManager().getRotationFile().refresh();
+        TGM.get().getMatchManager().getMapRotation().refresh();
         sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
     }
 

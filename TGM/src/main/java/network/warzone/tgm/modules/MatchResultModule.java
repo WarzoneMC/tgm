@@ -85,7 +85,7 @@ public class MatchResultModule extends MatchModule implements Listener {
             }
                 player.sendMessage("" + ChatColor.AQUA + ChatColor.STRIKETHROUGH + "---------------------");
         }
-        MapRotationFile rotation = TGM.get().getMatchManager().getRotationFile();
+        MapRotationFile rotation = TGM.get().getMatchManager().getMapRotation();
         rotation.saveRotationPosition(rotation.getCurrent() + 1);
     }
 

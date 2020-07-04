@@ -120,7 +120,7 @@ public class TGM extends JavaPlugin {
         };
 
         matchManager = new MatchManager(fileConfiguration);
-        matchManager.getRotationFile().refresh();
+        matchManager.getMapRotation().refresh();
 
         playerManager = new PlayerManager();
         joinManager = new JoinManager();

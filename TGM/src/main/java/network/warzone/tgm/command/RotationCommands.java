@@ -20,7 +20,7 @@ public class RotationCommands {
     @Command(aliases={"rots", "rotations"}, desc= "View all the rotations.")
     public static void viewRotations(CommandContext context, CommandSender sender) throws CommandException {
         int index = context.argsLength() == 0 ? 1 : context.getInteger(0);
-        List<Rotation> rotationLibrary = TGM.get().getMatchManager().getRotationFile().getRotationLibrary();
+        List<Rotation> rotationLibrary = TGM.get().getMatchManager().getMapRotation().getRotationLibrary();
 
         int pageSize = 9;
 
@@ -57,19 +57,19 @@ public class RotationCommands {
 
         String rotationName = context.getJoinedStrings(0);
 
-        if (!TGM.get().getMatchManager().getRotationFile().hasRotation(rotationName)) {
+        if (!TGM.get().getMatchManager().getMapRotation().hasRotation(rotationName)) {
             sender.sendMessage(ChatColor.RED + "Invalid rotation. Try /rotations to view all rotations.");
             return;
         }
 
-        TGM.get().getMatchManager().getRotationFile().setRotation(rotationName);
+        TGM.get().getMatchManager().getMapRotation().setRotation(rotationName);
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&aUpdated rotation to &e" + rotationName + "&a."));
     }
 
     @Command(aliases = {"rot", "rotation"}, desc = "View the maps that are in the rotation.", usage = "[page]")
     public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
         int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
-        List<MapContainer> rotation = TGM.get().getMatchManager().getRotationFile().getMaps();
+        List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
 
         int pageSize = 9;
 
@@ -85,7 +85,7 @@ public class RotationCommands {
             index = 1;
         }
 
-        String rotationName = TGM.get().getMatchManager().getRotationFile().getRotation().getName();
+        String rotationName = TGM.get().getMatchManager().getMapRotation().getRotation().getName();
         sender.sendMessage(ChatColor.YELLOW + rotationName + " Rotation (" + index + "/" + pages + "): ");
         try {
             for (int i = 0; i < pageSize; i++) {
@@ -101,7 +101,7 @@ public class RotationCommands {
     private static TextComponent rotationToTextComponent(int position, Rotation rotation) {
         String rotationName = ChatColor.GOLD + rotation.getName();
 
-        if (rotation.equals(TGM.get().getMatchManager().getRotationFile().getRotation())) {
+        if (rotation.equals(TGM.get().getMatchManager().getMapRotation().getRotation())) {
             rotationName = ChatColor.GREEN + "" + (position + 1) + ". " + rotationName;
         } else {
             rotationName = ChatColor.WHITE + "" + (position + 1) + ". " + rotationName;

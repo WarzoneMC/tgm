@@ -217,7 +217,7 @@ public class JoinManager implements Listener {
 
     private void handleRotationUpdate(boolean isLeaving) {
         int playerCount = Bukkit.getOnlinePlayers().size() - (isLeaving ? 1 : 0);
-        MapRotationFile rotationFile = TGM.get().getMatchManager().getRotationFile();
+        MapRotationFile rotationFile = TGM.get().getMatchManager().getMapRotation();
 
         if (!rotationFile.getRotation().isDefault()) return;
         Rotation potentialRotation = rotationFile.getRotationForPlayerCount(playerCount);
