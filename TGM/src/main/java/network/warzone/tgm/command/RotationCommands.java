@@ -59,6 +59,7 @@ public class RotationCommands {
 
         if (!TGM.get().getMatchManager().getRotationFile().hasRotation(rotationName)) {
             sender.sendMessage(ChatColor.RED + "Invalid rotation. Try /rotations to view all rotations.");
+            return;
         }
 
         TGM.get().getMatchManager().getRotationFile().setRotation(rotationName);
