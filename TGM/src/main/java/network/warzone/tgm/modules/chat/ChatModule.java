@@ -2,7 +2,6 @@ package network.warzone.tgm.modules.chat;
 
 import lombok.Getter;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
@@ -165,7 +164,6 @@ public class ChatModule extends MatchModule implements Listener {
                         new TextComponent("\n" + ChatColor.AQUA + "W/L: " + ChatColor.RESET + playerContext.getUserProfile().getWLR())};
                 HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, stats);
 
-                ComponentBuilder builder = new ComponentBuilder();
                 BaseComponent[] mainComponents = TextComponent.fromLegacyText(String.format(event.getFormat(), playerContext.getPlayer().getName(), event.getMessage()));
                 for (BaseComponent component : mainComponents) {
                     component.setHoverEvent(hoverEvent);

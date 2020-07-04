@@ -3,7 +3,6 @@ package network.warzone.tgm.user;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.command.CycleCommands;
 import network.warzone.tgm.util.Plugins;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
