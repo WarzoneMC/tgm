@@ -106,7 +106,7 @@ public class RotationCommands {
             rotationName = ChatColor.WHITE + "" + (position + 1) + ". " + rotationName;
         }
         TextComponent message = new TextComponent(rotationName);
-        message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + rotation.getName()));
+        message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/setrot " + rotation.getName()));
         ComponentBuilder builder = new ComponentBuilder(ChatColor.GOLD + rotation.getName() + (rotation.isDefault() ? ChatColor.GRAY + " - Default" : "")).append("\n\n")
                 .append(ChatColor.GRAY + "Requirements: ").append(ChatColor.YELLOW +
                         (rotation.isDefault() ? rotation.getRequirements().getMin() + "-" + rotation.getRequirements().getMax() + " players" : "N/A")).append("\n")
