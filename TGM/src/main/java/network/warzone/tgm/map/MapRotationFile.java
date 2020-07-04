@@ -3,6 +3,7 @@ package network.warzone.tgm.map;
 import com.google.gson.stream.JsonReader;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
+import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.FileReader;
@@ -15,7 +16,7 @@ public class MapRotationFile {
     private final MapLibrary mapLibrary;
     private final File rotationFile;
     private List<Rotation> rotationLibrary;
-    private Map<String, Integer> indexes;
+    private final Map<String, Integer> indexes;
 
     private Rotation rotation;
     private int current = 0;
@@ -29,6 +30,15 @@ public class MapRotationFile {
 
     public MapContainer cycle(boolean initial) {
         current = (current + (initial ? 0 : 1)) % rotation.getMaps().size();
+
+        if (!rotation.isDefault() && current % rotation.getMaps().size() == 0) {
+            MapContainer nextMap = rotation.getMaps().get(current);
+            indexes.remove(rotation.getName());
+            rotation = getRotationForPlayerCount(Bukkit.getOnlinePlayers().size());
+
+            return nextMap;
+        }
+
         saveRotationPosition(current);
         return rotation.getMaps().get(current);
     }
@@ -83,5 +93,20 @@ public class MapRotationFile {
 
     public void saveRotationPosition(int index) {
         indexes.put(rotation.getName(), index);
+    }
+
+    public Rotation getDefaultRotation() {
+        return this.rotationLibrary.stream()
+                .filter(Rotation::isDefault)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Rotation getRotationForPlayerCount(int playerCount) {
+        return rotationLibrary.stream()
+                .filter(Rotation::isDefault)
+                .filter(rotation -> rotation.getRequirements().getMin() <= playerCount && rotation.getRequirements().getMax() >= playerCount)
+                .findFirst()
+                .orElseGet(this::getDefaultRotation);
     }
 }
