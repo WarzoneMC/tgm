@@ -153,37 +153,6 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"rot", "rotation", "rotations"}, desc = "View the maps that are in the rotation.", usage = "[page]")
-    public static void rotation(final CommandContext cmd, CommandSender sender) throws CommandException {
-        int index = cmd.argsLength() == 0 ? 1 : cmd.getInteger(0);
-        List<MapContainer> rotation = TGM.get().getMatchManager().getMapRotation().getMaps();
-
-        int pageSize = 9;
-
-        int pagesRemainder = rotation.size() % pageSize;
-        int pagesDivisible = rotation.size() / pageSize;
-        int pages = pagesDivisible;
-
-        if (pagesRemainder >= 1) {
-            pages = pagesDivisible + 1;
-        }
-
-        if ((index > pages) || (index <= 0)) {
-            index = 1;
-        }
-
-        sender.sendMessage(ChatColor.YELLOW + "Active Rotation (" + index + "/" + pages + "): ");
-        try {
-            for (int i = 0; i < pageSize; i++) {
-                int position = pageSize * (index - 1) + i;
-                MapContainer map = rotation.get(position);
-                TextComponent message = mapToTextComponent(position, map.getMapInfo());
-                sender.spigot().sendMessage(message);
-            }
-        } catch (IndexOutOfBoundsException ignored) {
-        }
-    }
-
     @Command(aliases = {"cycle"}, desc = "Cycle to a new map.")
     @CommandPermissions({"tgm.cycle"})
     public static void cycle(CommandContext cmd, CommandSender sender) {
@@ -522,7 +491,7 @@ public class CycleCommands {
     @CommandPermissions({"tgm.loadmaps"})
     public static void loadmaps(CommandContext cmd, CommandSender sender) {
         TGM.get().getMatchManager().getMapLibrary().refreshMaps();
-        TGM.get().getMatchManager().getMapRotation().refresh();
+        TGM.get().getMatchManager().getRotationFile().refresh();
         sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
     }
 
@@ -908,7 +877,7 @@ public class CycleCommands {
         return main;
     }
 
-    private static TextComponent mapToTextComponent(int position, MapInfo mapInfo) {
+    public static TextComponent mapToTextComponent(int position, MapInfo mapInfo) {
         String mapName = ChatColor.GOLD + mapInfo.getName();
 
         if (mapInfo.equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {

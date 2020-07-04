@@ -24,7 +24,7 @@ import java.util.UUID;
 @Getter
 public class MatchManager {
     private MapLibrary mapLibrary;
-    private MapRotation mapRotation;
+    private MapRotationFile rotationFile;
     private Match match = null;
     private int matchNumber = 0;
 
@@ -34,7 +34,7 @@ public class MatchManager {
         mapLibrary = new MapLibrary(fileConfiguration, new MapLoaderImpl());
         mapLibrary.refreshMaps();
 
-        mapRotation = new MapRotationFile(mapLibrary);
+        rotationFile = new MapRotationFile(mapLibrary);
     }
 
     public void startMatch() {
@@ -59,7 +59,7 @@ public class MatchManager {
         //find a new map to cycle to.
         MapContainer mapContainer = forcedNextMap;
         if (mapContainer == null) {
-            mapContainer = mapRotation.cycle(matchNumber == 1);
+            mapContainer = rotationFile.cycle(matchNumber == 1);
         }
         forcedNextMap = null;
 
@@ -137,7 +137,7 @@ public class MatchManager {
         if (forcedNextMap != null) {
             return forcedNextMap;
         } else {
-            return mapRotation.getNext();
+            return rotationFile.getNext();
         }
     }
 }

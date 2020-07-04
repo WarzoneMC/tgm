@@ -15,6 +15,8 @@ import network.warzone.tgm.command.*;
 import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.MapInfoDeserializer;
+import network.warzone.tgm.map.Rotation;
+import network.warzone.tgm.map.RotationDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
@@ -88,6 +90,7 @@ public class TGM extends JavaPlugin {
                 // TGM
                 .registerTypeAdapter(MapInfo.class, new MapInfoDeserializer())
                 .registerTypeAdapter(Killstreak.class, new KillstreakDeserializer())
+                .registerTypeAdapter(Rotation.class, new RotationDeserializer())
                 // Bukkit
                 .registerTypeAdapter(ItemStack.class, new ItemDeserializer())
                 .registerTypeAdapter(PotionEffect.class, new EffectDeserializer())
@@ -119,6 +122,8 @@ public class TGM extends JavaPlugin {
         };
 
         matchManager = new MatchManager(fileConfiguration);
+        matchManager.getRotationFile().refresh();
+
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
         apiManager = new ApiManager();
@@ -130,6 +135,7 @@ public class TGM extends JavaPlugin {
         commandManager.register(BroadcastCommands.class);
         commandManager.register(MiscCommands.class);
         commandManager.register(NickCommands.class);
+        commandManager.register(RotationCommands.class);
         if (apiConfig.getBoolean("enabled", false)) {
             commandManager.register(PunishCommands.class);
             commandManager.register(TagCommands.class);
