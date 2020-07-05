@@ -14,7 +14,14 @@ import network.warzone.tgm.nickname.QueuedNick;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.HashMaps;
 import network.warzone.tgm.util.Ranks;
-import network.warzone.warzoneapi.models.*;
+import network.warzone.warzoneapi.models.PlayerAltsResponse;
+import network.warzone.warzoneapi.models.PlayerLogin;
+import network.warzone.warzoneapi.models.Punishment;
+import network.warzone.warzoneapi.models.PunishmentsListRequest;
+import network.warzone.warzoneapi.models.PunishmentsListResponse;
+import network.warzone.warzoneapi.models.Skin;
+import network.warzone.warzoneapi.models.UserProfile;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
