@@ -3,6 +3,7 @@ package network.warzone.tgm.command;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -50,9 +51,11 @@ public class RotationCommands {
 
 
     @Command(aliases={"setrot", "setrotation"}, desc = "Sets the current rotation.")
+    @CommandPermissions({"tgm.command.setrot"})
     public static void setRotation(CommandContext context, CommandSender sender) {
         if (context.argsLength() == 0) {
             sender.sendMessage(ChatColor.RED + "No rotation provided.");
+            return;
         }
 
         String rotationName = context.getJoinedStrings(0);
