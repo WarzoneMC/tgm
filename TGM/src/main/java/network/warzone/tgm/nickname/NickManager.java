@@ -85,6 +85,7 @@ public class NickManager {
             originalNames.remove(player.getUniqueId());
             nickNames.remove(player.getUniqueId());
             skins.remove(player.getUniqueId());
+            stats.remove(player.getUniqueId());
             player.kickPlayer(ChatColor.RED + "Resetting nickname");
         } else {
             String originalName = originalNames.get(player.getUniqueId());
@@ -151,6 +152,7 @@ public class NickManager {
         }
 
         stats.put(player.getUniqueId(), nickedStats);
+        setNew(player, false);
         updatePlayerList(player);
     }
 
