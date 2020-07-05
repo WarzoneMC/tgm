@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules;
 
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.map.MapRotation;
+import network.warzone.tgm.map.MapRotationFile;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchResultEvent;
@@ -85,7 +85,7 @@ public class MatchResultModule extends MatchModule implements Listener {
             }
                 player.sendMessage("" + ChatColor.AQUA + ChatColor.STRIKETHROUGH + "---------------------");
         }
-        MapRotation rotation = TGM.get().getMatchManager().getMapRotation();
+        MapRotationFile rotation = TGM.get().getMatchManager().getMapRotation();
         rotation.saveRotationPosition(rotation.getCurrent() + 1);
     }
 
