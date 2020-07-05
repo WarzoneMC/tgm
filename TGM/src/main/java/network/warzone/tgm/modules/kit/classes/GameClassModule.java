@@ -205,7 +205,13 @@ public class GameClassModule extends MatchModule implements Listener {
                 Arrays.asList(BuilderAbility.class),
                 ItemFactory.createItem(Material.OAK_STAIRS,
                         ChatColor.YELLOW + "Builder",
-                        Arrays.asList(ChatColor.YELLOW + "Extra blocks to help build fortifications.")));
+                        Arrays.asList(ChatColor.YELLOW + "Extra blocks to help build fortifications."))),
+
+        SPY(SpyClass.class,
+                Arrays.asList(SpyAbility.class),
+                ItemFactory.createItem(Material.LEATHER_HELMET,
+                        ChatColor.LIGHT_PURPLE + "Spy",
+                        Arrays.asList(ChatColor.YELLOW + "Keep your friends close, and your enemies closer!")));
 
         @Getter private Class hostGameClass;
         @Getter private List<Class<? extends Ability>> hostAbilities;
