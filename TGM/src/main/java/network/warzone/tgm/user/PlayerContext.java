@@ -5,6 +5,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.util.Plugins;
 import network.warzone.tgm.util.Ranks;
+import network.warzone.tgm.util.ChatUtil.ColorFallbackComponent;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
 import protocolsupport.api.ProtocolVersion;
@@ -78,23 +79,22 @@ public class PlayerContext {
         return TGM.get().getNickManager().getNickNames().containsKey(player.getUniqueId());
     }
 
-    public String getLevelString() {
+    public ColorFallbackComponent getLevelString() {
         return getLevelString(false);
     }
 
-    public String getLevelString(boolean original) {
+    public ColorFallbackComponent getLevelString(boolean original) {
         int level = getUserProfile(original).getLevel();
-        ChatColor chosenColor = null;
         for (PlayerLevel levelEntry : levels) {
             if (levelEntry.check.test(level)) {
-                chosenColor = levelEntry.levelColor;
-                if (!Plugins.USING_PROTOCOL_SUPPORT) break;
-                if (!Plugins.ProtocolSupport.usingVersionOrNewer(this.player, ProtocolVersion.MINECRAFT_1_16)) chosenColor = levelEntry.fallbackLevelColor;
-                break;
+                return new ColorFallbackComponent(
+                        "" + levelEntry.levelColor + "[" + level + "]" ,
+                        "" + levelEntry.fallbackLevelColor + "[" + level + "]" );
             }
         }
 
-        return "" + chosenColor + "[" + level + "]";
+        // will not be reached due to fallback entry
+        return null;
     }
 
     public void updateRank(Rank r) {

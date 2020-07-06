@@ -77,7 +77,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
     }
 
     public void updatePlayerListName(PlayerContext player, MatchTeam team) {
-        String prefix = player.getLevelString();
+        String prefix = player.getLevelString().message;
         if (prefix != null) {
             String name = player.getPlayer().getName();
             String colouredPrefix = ChatColor.translateAlternateColorCodes('&', prefix.trim());
