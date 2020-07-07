@@ -50,7 +50,7 @@ Here's a basic example of what map configuration files look like:
 
 2. Compile the latest version of TGM or download it from our [Jenkins](https://jenkins.bennydoesstuff.me/job/TGM/).
  
-3. Create a `Maps` folder in the root directory of your server and insert a supported TGM map. Make sure you also include a `rotation.txt` file with the names of maps you would like to be present in the rotation.
+3. Create a `Maps` folder in the root directory of your server and insert a supported TGM map. Make sure you also include a `rotation.json` file with the names of maps you would like to be present in the rotation.
     - You can download our Maps folder as a reference on the Maps repository located [here](https://github.com/WarzoneMC/Maps).
     - If you would like to load multiple map repositories or simply change the location, you can change the setting in the `plugins/TGM/config.yml` file.
  
