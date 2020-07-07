@@ -3,7 +3,6 @@ package network.warzone.tgm.nickname;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
-import net.minecraft.server.v1_16_R1.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
