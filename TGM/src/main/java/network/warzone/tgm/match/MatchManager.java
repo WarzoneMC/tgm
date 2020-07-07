@@ -24,7 +24,7 @@ import java.util.UUID;
 @Getter
 public class MatchManager {
     private MapLibrary mapLibrary;
-    private MapRotation mapRotation;
+    private MapRotationFile mapRotation;
     private Match match = null;
     private int matchNumber = 0;
 

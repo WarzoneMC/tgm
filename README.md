@@ -1,4 +1,4 @@
-# TGM [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM) ![Minecraft Version](https://img.shields.io/badge/supports%20MC%20version-1.15.2-brightgreen.svg) [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://warz.one/discord)
+# TGM [![Build Status](https://jenkins.bennydoesstuff.me/buildStatus/icon?job=TGM)](https://jenkins.bennydoesstuff.me/job/TGM) ![Minecraft Version](https://img.shields.io/badge/supports%20MC%20version-1.16.1-brightgreen.svg) [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://warz.one/discord)
 Team Game Manager. A Team Oriented Minecraft PVP plugin.
 
 ## Project Goals
@@ -50,7 +50,7 @@ Here's a basic example of what map configuration files look like:
 
 2. Compile the latest version of TGM or download it from our [Jenkins](https://jenkins.bennydoesstuff.me/job/TGM/).
  
-3. Create a `Maps` folder in the root directory of your server and insert a supported TGM map. Make sure you also include a `rotation.txt` file with the names of maps you would like to be present in the rotation.
+3. Create a `Maps` folder in the root directory of your server and insert a supported TGM map. Make sure you also include a `rotation.json` file with the names of maps you would like to be present in the rotation.
     - You can download our Maps folder as a reference on the Maps repository located [here](https://github.com/WarzoneMC/Maps).
     - If you would like to load multiple map repositories or simply change the location, you can change the setting in the `plugins/TGM/config.yml` file.
  
