@@ -137,12 +137,10 @@ public class SpyAbility extends Ability {
         if (damageInfo.getHurtPlayer() != null && damageInfo.getDamagerPlayer() != null && damageInfo.getProjectile() == null) {
             Player damager = damageInfo.getDamagerPlayer();
             Player hurt = damageInfo.getHurtPlayer();
-            if (disguised.contains(damager)) {
-                if (isWithinAngle(damager.getEyeLocation().getYaw(), hurt.getEyeLocation().getYaw(), 30)) {
-                    event.setDamage(event.getDamage() * 2.0);
-                    damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1F, 1F);
-                    damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1F, 1F);
-                }
+            if (disguised.contains(damager) && isWithinAngle(damager.getEyeLocation().getYaw(), hurt.getEyeLocation().getYaw(), 30)) {
+                event.setDamage(event.getDamage() * 2.0);
+                damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1F, 1F);
+                damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1F, 1F);
             }
         }
     }
@@ -157,10 +155,10 @@ public class SpyAbility extends Ability {
         }
     }
 
-    private boolean isWithinAngle(float yaw1, float yaw2, int range) {
-        yaw1 += 180;
-        yaw2 += 180;
-        return yaw1 > yaw2 - range && yaw1 < yaw2 + range;
+    private boolean isWithinAngle(float min, float max, int range) {
+        float yaw1 = min + 180;
+        float yaw2 = max + 180;
+        return yaw1 + 180 > yaw2 - range && yaw1 < yaw2 + range;
     }
 
 }
