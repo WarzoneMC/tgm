@@ -34,6 +34,7 @@ public class ChatUtil {
         public final String fallbackMessage;
 
         public String getMessageForPlayer(Player player) {
+            if (!Plugins.isProtocolSupportPresent()) return this.message;
             return Plugins.ProtocolSupport.usingVersionOrNewer(player, ProtocolVersion.MINECRAFT_1_16) ? this.message : this.fallbackMessage;
         }
     }
