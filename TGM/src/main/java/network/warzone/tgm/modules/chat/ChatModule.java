@@ -107,7 +107,7 @@ public class ChatModule extends MatchModule implements Listener {
             UserProfile userProfile = playerContext.getUserProfile();
             String prefix = userProfile.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', userProfile.getPrefix().trim()) + " " : "";
             StringBuilder format = new StringBuilder();
-            if (!TGM.get().getModule(StatsModule.class).isStatsDisabled()) format.append(playerContext.getLevelString().message).append(" ");
+            if (!TGM.get().getModule(StatsModule.class).isStatsDisabled()) format.append(playerContext.getLevelString()).append(" ");
             format.append(prefix)
                     .append(matchTeam.getColor())
                     .append(event.getPlayer().getName());
@@ -152,7 +152,7 @@ public class ChatModule extends MatchModule implements Listener {
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(event.getPlayer());
         if (!event.isCancelled())  {
             Bukkit.getOnlinePlayers().forEach(player -> {
-                BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString().getMessageForPlayer(player)
+                BaseComponent[] stats = new BaseComponent[]{new TextComponent(ChatColor.AQUA + "Level: " + playerContext.getLevelString()
                         .replace("[", "").replace("]", "")),
                         new TextComponent("\n"),
                         new TextComponent("\n" + ChatColor.AQUA + "XP: " + ChatColor.RESET + playerContext.getUserProfile().getXP()),

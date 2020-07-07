@@ -26,7 +26,6 @@ import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Strings;
-import network.warzone.tgm.util.ChatUtil.ColorFallbackComponent;
 import network.warzone.tgm.util.menu.ClassMenu;
 import network.warzone.warzoneapi.models.GetPlayerByNameResponse;
 import network.warzone.warzoneapi.models.LeaderboardCriterion;
@@ -801,8 +800,7 @@ public class CycleCommands {
         PlayerContext targetUser = TGM.get().getPlayerManager().getPlayerContext(targetPlayer);
         boolean getNickedStats = !target.equalsIgnoreCase(targetUser.getOriginalName()) && targetUser.isNicked();
         UserProfile profile = getNickedStats ? targetUser.getUserProfile() : targetUser.getUserProfile(true);
-        ColorFallbackComponent levelComponent = getNickedStats ? targetUser.getLevelString() : targetUser.getLevelString(true);
-        String levelString = (sender instanceof Player) ? levelComponent.getMessageForPlayer((Player) sender) : levelComponent.fallbackMessage;
+        String levelString = getNickedStats ? targetUser.getLevelString() : targetUser.getLevelString(true);
         sender.sendMessage(ChatColor.BLUE + ChatColor.STRIKETHROUGH.toString() + "-------------------------------");
         sender.sendMessage(ChatColor.DARK_AQUA + "   Viewing stats for " + ChatColor.AQUA + (target.equalsIgnoreCase(targetUser.getOriginalName()) ? targetUser.getOriginalName() : targetUser.getDisplayName()));
         sender.sendMessage("");
