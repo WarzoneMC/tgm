@@ -15,6 +15,8 @@ import network.warzone.tgm.command.*;
 import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.MapInfoDeserializer;
+import network.warzone.tgm.map.Rotation;
+import network.warzone.tgm.map.RotationDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
@@ -24,6 +26,7 @@ import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.parser.item.ItemDeserializer;
 import network.warzone.tgm.player.PlayerManager;
+import network.warzone.tgm.util.Plugins;
 import network.warzone.tgm.util.menu.PunishMenu;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.client.http.HttpClient;
@@ -86,6 +89,7 @@ public class TGM extends JavaPlugin {
                 // TGM
                 .registerTypeAdapter(MapInfo.class, new MapInfoDeserializer())
                 .registerTypeAdapter(Killstreak.class, new KillstreakDeserializer())
+                .registerTypeAdapter(Rotation.class, new RotationDeserializer())
                 // Bukkit
                 .registerTypeAdapter(ItemStack.class, new ItemDeserializer())
                 .registerTypeAdapter(PotionEffect.class, new EffectDeserializer())
@@ -117,6 +121,8 @@ public class TGM extends JavaPlugin {
         };
 
         matchManager = new MatchManager(fileConfiguration);
+        matchManager.getMapRotation().refresh();
+
         playerManager = new PlayerManager();
         joinManager = new JoinManager();
         apiManager = new ApiManager();
@@ -128,6 +134,7 @@ public class TGM extends JavaPlugin {
         commandManager.register(BroadcastCommands.class);
         commandManager.register(MiscCommands.class);
         commandManager.register(NickCommands.class);
+        commandManager.register(RotationCommands.class);
         if (apiConfig.getBoolean("enabled", false)) {
             commandManager.register(PunishCommands.class);
             commandManager.register(TagCommands.class);
@@ -137,6 +144,8 @@ public class TGM extends JavaPlugin {
         PunishMenu.getPresetsMenu().load();
 
         GameRuleModule.setGameRuleDefaults(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
+
+        Plugins.checkProtocolSupport();
 
         matchManager.cycleNextMatch();
         nickManager = new NickManager(); 

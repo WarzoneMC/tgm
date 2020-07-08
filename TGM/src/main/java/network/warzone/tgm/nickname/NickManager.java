@@ -3,7 +3,7 @@ package network.warzone.tgm.nickname;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import lombok.Getter;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_16_R1.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
@@ -18,7 +18,7 @@ import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -85,6 +85,7 @@ public class NickManager {
             originalNames.remove(player.getUniqueId());
             nickNames.remove(player.getUniqueId());
             skins.remove(player.getUniqueId());
+            stats.remove(player.getUniqueId());
             player.kickPlayer(ChatColor.RED + "Resetting nickname");
         } else {
             String originalName = originalNames.get(player.getUniqueId());
@@ -151,6 +152,7 @@ public class NickManager {
         }
 
         stats.put(player.getUniqueId(), nickedStats);
+        setNew(player, false);
         updatePlayerList(player);
     }
 
