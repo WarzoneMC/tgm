@@ -33,7 +33,6 @@ import network.warzone.warzoneapi.client.http.HttpClient;
 import network.warzone.warzoneapi.client.http.HttpClientConfig;
 import network.warzone.warzoneapi.client.offline.OfflineClient;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -197,7 +196,4 @@ public class TGM extends JavaPlugin {
         return matchManager.getMatch().getModules(clazz);
     }
 
-    public static NamespacedKey getKey(String name) {
-        return new NamespacedKey(TGM.get(), name);
-    }
 }
