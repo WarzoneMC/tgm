@@ -2,7 +2,10 @@ package network.warzone.tgm.nickname;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import com.mojang.datafixers.util.Pair;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.server.v1_16_R1.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
@@ -12,273 +15,245 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.visibility.VisibilityController;
 import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
 import network.warzone.tgm.user.PlayerContext;
-import network.warzone.tgm.util.HashMaps;
+import network.warzone.tgm.util.GameProfileUtil;
 import network.warzone.warzoneapi.models.MojangProfile;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class NickManager {
 
-    private VisibilityController visiblityController;
+    private final VisibilityController visibilityController;
 
     @Getter
-    private HashMap<UUID, String> originalNames = new HashMap<>();
+    private final List<Nick> nicks = new ArrayList<>();
 
-    @Getter
-    private HashMap<UUID, String> nickNames = new HashMap<>();
-
-    @Getter
-    private HashMap<UUID, Skin> skins = new HashMap<>();
-
-    @Getter
-    private HashMap<UUID, NickedUserProfile> stats = new HashMap<>();
-
-    @Getter
-    private List<QueuedNick> queuedNicks = new ArrayList<>();
-
-    private ProfileCache profileCache = ProfileCache.getInstance();
+    private final ProfileCache profileCache = ProfileCache.getInstance();
 
     public NickManager() {
-        visiblityController = new VisibilityControllerImpl(TGM.get().getModule(SpectatorModule.class));
+        visibilityController = new VisibilityControllerImpl(TGM.get().getModule(SpectatorModule.class));
     }
 
-    public void addQueuedNick(Player player, String newName) {
+    public void create(PlayerContext context, NickDetails details) {
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            UUID nickedUUID = getUUID(newName);
-            Skin skin;
-            if (nickedUUID != null) {
-                skin = getSkin(nickedUUID);
-            } else {
-                skin = null; // TODO: Default to a random player skin
+            nicks.removeIf(nick -> nick.getUuid().equals(context.getPlayer().getUniqueId()) && !nick.isActive());
+
+            UUID originalUUID = context.getPlayer().getUniqueId();
+            String name = details.getName();
+            UUID nickedUUID = getUUID(details.getSkin());
+            Skin skin = nickedUUID != null ? getSkin(nickedUUID) : null;
+            NickedUserProfile profile = NickedUserProfile.createFromUserProfile(context.getUserProfile());
+
+            if (details.getRank() != null) {
+                profile.setRanksLoaded(new ArrayList<>());
+                profile.addRank(details.getRank());
             }
-            queuedNicks.add(new QueuedNick(newName, skin, player));
+
+            if (details.getKills() != null) profile.setKills(details.getKills());
+            if (details.getDeaths() != null) profile.setDeaths(details.getDeaths());
+            if (details.getWins() != null) profile.setWins(details.getWins());
+            if (details.getLosses() != null) profile.setLosses(details.getLosses());
+            if (details.getObjectives() != null) profile.setWool_destroys(details.getKills());
+            if (details.getFrozen() != null) profile.setFrozen(details.getFrozen());
+
+            nicks.add(new Nick(
+                    originalUUID,
+                    getOriginalName(context.getPlayer().getName()),
+                    name,
+                    skin,
+                    details,
+                    profile,
+                    false,
+                    false
+            ));
         });
+    }
+
+    public void update(PlayerContext context, Consumer<Nick> action) {
+        getNicks(context).forEach(action);
+    }
+
+    public void apply(PlayerContext context, boolean force) {
+        nicks.removeIf(nick -> nick.getUuid().equals(context.getPlayer().getUniqueId()) && nick.isApplied());
+        if (!force) {
+            update(context, nick -> {
+                nick.setApplied(true);
+            });
+        } else {
+            update(context, nick -> {
+                nick.setApplied(true);
+                nick.setActive(true);
+                try {
+                    if (nick.getName() != null) {
+                        setName(context, nick.getName());
+                    }
+                    setSkin(context, nick.getSkin());
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+            });
+        }
+    }
+
+    public void reset(PlayerContext context, boolean force) {
+        if (!force) {
+            nicks.removeIf(uuidMatch(context));
+            context.getPlayer().kickPlayer(ChatColor.RED + "Resetting nick.");
+        } else {
+            String originalName = getNick(context).map(Nick::getOriginalName).orElse(context.getPlayer().getName());
+            Skin skin = getSkin(context.getPlayer().getUniqueId());
+            nicks.removeIf(uuidMatch(context));
+            try {
+                setName(context, originalName);
+                setSkin(context, skin);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+        }
+    }
+
+    public List<Nick> getNicks(PlayerContext context) {
+        return nicks.stream().filter(uuidMatch(context)).collect(Collectors.toList());
+    }
+
+    public Optional<Nick> getNick(PlayerContext context) {
+        return nicks.stream().filter(uuidMatch(context)).findFirst();
+    }
+
+    public boolean hasNick(PlayerContext context) {
+        return nicks.stream().anyMatch(uuidMatch(context));
+    }
+
+    public boolean isNicked(PlayerContext context) {
+        return nicks.stream().anyMatch(nick -> nick.getUuid().equals(context.getPlayer().getUniqueId()) && nick.isActive());
+    }
+
+    public boolean isNickName(String name) {
+        return nicks.stream().anyMatch(nick -> nick.getName().equals(name) && nick.isActive());
     }
 
     public String getOriginalName(String username) {
-        if (nickNames.containsValue(username)) {
-            UUID uuid = HashMaps.reverseGetFirst(username, nickNames);
-            return originalNames.get(uuid);
-        } else {
-            return username;
-        }
+        Optional<Nick> playerNick = nicks.stream().filter(nick -> nick.getName().equals(username)).findFirst();
+
+        return playerNick.map(Nick::getOriginalName).orElse(username);
     }
 
-    public Optional<QueuedNick> getQueuedNick(Player player) {
-        return queuedNicks.stream().filter(queuedNick -> queuedNick.getPlayer().getUniqueId().equals(player.getUniqueId())).findFirst();
-    }
-
-    public void setNick(Player player, String newName) throws NoSuchFieldException, IllegalAccessException {
-        setName(player, newName);
-        setSkin(player, newName);
-    }
-
-    public void reset(Player player, boolean kick) throws NoSuchFieldException, IllegalAccessException {
-        if (kick) {
-            originalNames.remove(player.getUniqueId());
-            nickNames.remove(player.getUniqueId());
-            skins.remove(player.getUniqueId());
-            stats.remove(player.getUniqueId());
-            player.kickPlayer(ChatColor.RED + "Resetting nickname");
-        } else {
-            String originalName = originalNames.get(player.getUniqueId());
-            setName(player, originalName);
-            setSkin(player, player.getUniqueId());
-        }
-    }
-
-    public void setName(Player player, String newName) throws NoSuchFieldException, IllegalAccessException {
-        EntityPlayer entityPlayer = getEntityPlayer(player);
-        updateOriginalName(player, newName);
-
+    public void setName(PlayerContext context, String newName) throws NoSuchFieldException, IllegalAccessException {
         TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-        MatchTeam matchTeam = teamManagerModule.getTeam(player);
+        MatchTeam matchTeam = teamManagerModule.getTeam(context.getPlayer());
 
         // Modify the player's game profile.
-        GameProfile profile = entityPlayer.getProfile();
-        setGameProfileField(profile, "name", newName);
+        GameProfile profile = GameProfileUtil.getGameProfile(context.getPlayer());
+        GameProfileUtil.setGameProfileField(profile, "name", newName);
 
-        updatePlayers(player);
-        updatePlayerTeam(player, matchTeam);
-        updatePlayerList(player);
+        updatePlayers(context.getPlayer());
+        updatePlayerTeam(context, matchTeam);
+        updatePlayerList(context);
     }
 
-    private void updateOriginalName(Player player, String newName) {
-        nickNames.put(player.getUniqueId(), newName);
-
-        if (!originalNames.containsKey(player.getUniqueId())) {
-            originalNames.put(player.getUniqueId(), player.getName());
-        } else if (newName.equals(originalNames.get(player.getUniqueId()))) {
-            originalNames.remove(player.getUniqueId());
-            nickNames.remove(player.getUniqueId());
-        }
-    }
-
-    private void setGameProfileField(Object obj, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field field = GameProfile.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-
-        field.set(obj, value);
-    }
-
-    public void setStats(Player player, String statName, int value) throws NoSuchFieldException {
-        NickedUserProfile nickedStats = getUserProfile(player);
-
-        switch(statName.toLowerCase()) {
-            case "kills":
-                setStats(player, value, null, null, null, null);
-                break;
-            case "deaths":
-                setStats(player, null, value, null, null, null);
-                break;
-            case "wins":
-                setStats(player, null, null, value, null, null);
-                break;
-            case "losses":
-                setStats(player, null, null, null, value, null);
-                break;
-            case "objectives":
-                setStats(player, null, null, null, null, value);
-                break;
-            default:
-                throw new NoSuchFieldException();
-        }
-
-        stats.put(player.getUniqueId(), nickedStats);
-        setNew(player, false);
-        updatePlayerList(player);
-    }
-
-    public void setStats(Player player, Integer kills, Integer deaths, Integer wins, Integer losses, Integer woolDestroys) {
-        NickedUserProfile nickedStats = getUserProfile(player);
-        if (kills != null) {
-            nickedStats.setKills(kills);
-        }
-        if (deaths != null) {
-            nickedStats.setDeaths(deaths);
-        }
-        if (wins != null) {
-            nickedStats.setWins(wins);
-        }
-        if (losses != null) {
-            nickedStats.setLosses(losses);
-        }
-        if (woolDestroys != null) {
-            nickedStats.setWool_destroys(woolDestroys);
-        }
-        stats.put(player.getUniqueId(), nickedStats);
-
-        updatePlayerList(player);
-    }
-
-    public void setRank(Player player, Rank rank) {
-        NickedUserProfile nickedStats = getUserProfile(player);
-        nickedStats.setRanksLoaded(new ArrayList<>());
-        nickedStats.addRank(rank);
-        stats.put(player.getUniqueId(), nickedStats);
-    }
-
-    public void setNew(Player player, boolean isNew) {
-        NickedUserProfile nickedStats = getUserProfile(player);
-        nickedStats.setNew(isNew);
-        stats.put(player.getUniqueId(), nickedStats);
-    }
-
-    private void updatePlayerList(Player player) {
-        PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
-        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
-        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-        scoreboardManagerModule.updatePlayerListName(context, teamManagerModule.getTeam(player));
-    }
-
-    private void updatePlayerTeam(Player player, MatchTeam team) {
-        PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
-        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
-        scoreboardManagerModule.updatePlayerTeam(context, team, team);
-    }
-
-    public NickedUserProfile getUserProfile(Player player) {
-        PlayerContext context = TGM.get().getPlayerManager().getPlayerContext(player);
-        return stats.getOrDefault(player.getUniqueId(), NickedUserProfile.createFromUserProfile(context.getUserProfile()));
-    }
-
-    public void setSkin(Player player, Skin skin) {
-        EntityPlayer entityPlayer = getEntityPlayer(player);
+    public void setSkin(PlayerContext context, Skin skin) {
+        EntityPlayer entityPlayer = getEntityPlayer(context.getPlayer());
 
         entityPlayer.getProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
 
-        updatePlayers(player);
-
-        skins.put(player.getUniqueId(), skin);
+        updatePlayers(context.getPlayer());
     }
 
-    public void setSkin(Player player, UUID uuid) {
-        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            MojangProfile profile = retrieveProfile(uuid);
-            if (profile != null && profile.getTextures().getSkin() != null) {
-                setSkin(player, profile.getTextures().getSkin());
-            }
-        });
+    private void updatePlayerList(PlayerContext context) {
+        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
+        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+        scoreboardManagerModule.updatePlayerListName(context, teamManagerModule.getTeam(context.getPlayer()));
     }
 
-    public void setSkin(Player player, String nameOfPlayer) {
-        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
-            MojangProfile profile = retrieveProfile(nameOfPlayer);
-            if (profile != null && profile.getTextures().getSkin() != null) {
-                setSkin(player, profile.getTextures().getSkin());
-            }
-        });
+    private void updatePlayerTeam(PlayerContext context, MatchTeam team) {
+        ScoreboardManagerModule scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
+        scoreboardManagerModule.updatePlayerTeam(context, team, team);
     }
 
     private void updatePlayers(Player toExclude) {
         EntityPlayer entityPlayer = getEntityPlayer(toExclude);
 
-        PacketPlayOutPlayerInfo removeSelfPacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
-        entityPlayer.playerConnection.sendPacket(removeSelfPacket);
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!p.equals(toExclude) && visiblityController.canSee(p, toExclude)) {
-                EntityPlayer entityOther = getEntityPlayer(p);
-
-                // Remove the old player.
-                PacketPlayOutPlayerInfo removePlayerPacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
-                entityOther.playerConnection.sendPacket(removePlayerPacket);
-
-                // Add the player back.
-                PacketPlayOutPlayerInfo addPlayerPacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
-                PacketPlayOutEntityDestroy destroyEntityPacket = new PacketPlayOutEntityDestroy(toExclude.getEntityId());
-                PacketPlayOutNamedEntitySpawn namedEntitySpawnPacket = new PacketPlayOutNamedEntitySpawn(entityPlayer);
-                entityOther.playerConnection.sendPacket(addPlayerPacket);
-                entityOther.playerConnection.sendPacket(destroyEntityPacket);
-                entityOther.playerConnection.sendPacket(namedEntitySpawnPacket);
-            }
+        List<Pair<EnumItemSlot, ItemStack>> inventory = new ArrayList<>();
+        if (toExclude.getEquipment() != null) {
+            inventory.add(new Pair<>(EnumItemSlot.HEAD, CraftItemStack.asNMSCopy(toExclude.getEquipment().getHelmet())));
+            inventory.add(new Pair<>(EnumItemSlot.CHEST, CraftItemStack.asNMSCopy(toExclude.getEquipment().getChestplate())));
+            inventory.add(new Pair<>(EnumItemSlot.LEGS, CraftItemStack.asNMSCopy(toExclude.getEquipment().getLeggings())));
+            inventory.add(new Pair<>(EnumItemSlot.FEET, CraftItemStack.asNMSCopy(toExclude.getEquipment().getBoots())));
+            inventory.add(new Pair<>(EnumItemSlot.MAINHAND, CraftItemStack.asNMSCopy(toExclude.getEquipment().getItemInMainHand())));
+            inventory.add(new Pair<>(EnumItemSlot.OFFHAND, CraftItemStack.asNMSCopy(toExclude.getEquipment().getItemInOffHand())));
         }
 
-        PacketPlayOutPlayerInfo addSelfPacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
-        entityPlayer.playerConnection.sendPacket(addSelfPacket);
-//        PacketPlayOutRespawn respawn = new PacketPlayOutRespawn(DimensionManager.OVERWORLD, WorldType.getType(Objects.requireNonNull(toExclude.getWorld().getWorldType()).getName()), EnumGamemode.getById(toExclude.getGameMode().getValue()));
-        toExclude.spigot().respawn();
-        PacketPlayOutEntityTeleport playerTP = new PacketPlayOutEntityTeleport(entityPlayer);
+        PacketPlayOutPlayerInfo playerInfoRemovePacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, entityPlayer);
+        PacketPlayOutPlayerInfo playerInfoAddPacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer);
+        PacketPlayOutEntityDestroy entityDestroyPacket = new PacketPlayOutEntityDestroy(toExclude.getEntityId());
+        PacketPlayOutNamedEntitySpawn namedEntitySpawnPacket = new PacketPlayOutNamedEntitySpawn(entityPlayer);
+        PacketPlayOutEntityEquipment entityEquipmentPacket = new PacketPlayOutEntityEquipment(toExclude.getEntityId(), inventory);
+
+        Location l = toExclude.getLocation();
+        PacketPlayOutPosition positionPacket = new PacketPlayOutPosition(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), -1);
+        PacketPlayOutEntityHeadRotation entityHeadRotationPacket = new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) ((l.getYaw() * 256.0F) / 360.0F));
+
+        DataWatcherObject<Byte> dataWatcherObject;
         try {
-            Field field = PacketPlayOutEntityTeleport.class.getDeclaredField("a");
+            Field field = EntityHuman.class.getDeclaredField("bp");
             field.setAccessible(true);
-            field.set(playerTP, -1);
+            dataWatcherObject = (DataWatcherObject<Byte>) field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
+            return;
         }
-        entityPlayer.playerConnection.sendPacket(playerTP);
-        toExclude.updateInventory();
-        entityPlayer.updateAbilities();
+
+        entityPlayer.getDataWatcher().set(dataWatcherObject, (byte) (0x40 | 0x20 | 0x10 | 0x08 | 0x04 | 0x02 | 0x01));
+        PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(toExclude.getEntityId(), entityPlayer.getDataWatcher(), true);
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            EntityPlayer entityOther = getEntityPlayer(p);
+            CraftPlayer craftHandle = (CraftPlayer) p;
+            if (p.equals(toExclude)) {
+                entityOther.playerConnection.sendPacket(playerInfoRemovePacket);
+                entityOther.playerConnection.sendPacket(playerInfoAddPacket);
+
+                toExclude.spigot().respawn();
+
+                entityOther.playerConnection.sendPacket(positionPacket);
+
+                craftHandle.updateScaledHealth();
+                craftHandle.updateCommands();
+                p.updateInventory();
+                entityOther.updateAbilities();
+            } else if (visibilityController.canSee(p, toExclude)) {
+                // Remove the old player.
+                entityOther.playerConnection.sendPacket(playerInfoRemovePacket);
+                entityOther.playerConnection.sendPacket(entityDestroyPacket);
+
+                // Add the player back.
+                entityOther.playerConnection.sendPacket(playerInfoAddPacket);
+                entityOther.playerConnection.sendPacket(namedEntitySpawnPacket);
+
+                // Send the player's inventory.
+                entityOther.playerConnection.sendPacket(entityEquipmentPacket);
+                // Send the data metadata, this displays the second layer of the skin.
+                entityOther.playerConnection.sendPacket(entityMetadataPacket);
+                entityOther.playerConnection.sendPacket(entityHeadRotationPacket);
+            } else {
+                entityPlayer.playerConnection.sendPacket(playerInfoRemovePacket);
+                entityPlayer.playerConnection.sendPacket(playerInfoAddPacket);
+            }
+        }
     }
 
-    private UUID getUUID(String name) {
+    public NickedUserProfile getUserProfile(PlayerContext context) {
+        return nicks.stream().filter(uuidMatch(context)).findFirst().map(Nick::getProfile).orElse(NickedUserProfile.createFromUserProfile(context.getUserProfile()));
+    }
+
+    public UUID getUUID(String name) {
         MojangProfile profile = retrieveProfile(name);
         if (profile == null) {
             return null;
@@ -286,7 +261,7 @@ public class NickManager {
         return profile.getUuid();
     }
 
-    private Skin getSkin(UUID uuid) {
+    public Skin getSkin(UUID uuid) {
         MojangProfile profile = retrieveProfile(uuid);
         if (profile == null) {
             return null;
@@ -318,6 +293,18 @@ public class NickManager {
 
     private EntityPlayer getEntityPlayer(Player player) {
         return ((CraftPlayer) player).getHandle();
+    }
+
+    private Predicate<Nick> uuidMatch(PlayerContext context) {
+        return nick -> nick.getUuid().equals(context.getPlayer().getUniqueId());
+    }
+
+    @Getter @Setter @AllArgsConstructor
+    public static class NickDetails {
+        private String name, skin;
+        private Rank rank;
+        private Integer kills, deaths, wins, losses, objectives;
+        private Boolean frozen;
     }
 
 }

@@ -1,5 +1,7 @@
 package network.warzone.tgm.nickname;
 
+import lombok.Getter;
+import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.warzoneapi.models.Punishment;
 import network.warzone.warzoneapi.models.Rank;
@@ -11,49 +13,53 @@ import java.util.List;
 
 public class NickedUserProfile extends UserProfile {
 
-    private NickedUserProfile(ObjectId id, String name, String nameLower, String uuid, long initialJoinDate, long lastOnlineDate, List<String> ips, List<String> ranks, List<Rank> ranksLoaded, int wins, int losses, int kills, int deaths, int wool_destroys, List<Punishment> punishments, boolean isNew) {
-        super(id, name, nameLower, uuid, initialJoinDate, lastOnlineDate, ips, ranks, ranksLoaded, wins, losses, kills, deaths, wool_destroys, punishments, new ArrayList<>(), null, isNew);
+    @Getter @Setter
+    private boolean frozen;
+
+    private NickedUserProfile(ObjectId id, String name, String nameLower, String uuid, long initialJoinDate, long lastOnlineDate, List<String> ips, List<String> ranks, List<Rank> ranksLoaded, int wins, int losses, int kills, int deaths, int wool_destroys, List<Punishment> punishments, List<String> tags, boolean isNew) {
+        super(id, name, nameLower, uuid, initialJoinDate, lastOnlineDate, ips, ranks, ranksLoaded, wins, losses, kills, deaths, wool_destroys, punishments, tags, null, isNew);
+        this.frozen = false;
     }
 
     @Override
     public void addKill() {
         super.addKill();
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addKill();
+        if (!frozen) TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addKill();
     }
 
     @Override
     public void addDeath() {
         super.addDeath();
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addDeath();
+        if (!frozen) TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addDeath();
     }
 
     @Override
     public void addLoss() {
         super.addLoss();
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addLoss();
+        if (!frozen) TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addLoss();
     }
 
     @Override
     public void addWin() {
         super.addWin();
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addWin();
+        if (!frozen) TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addWin();
     }
 
     @Override
     public void addWoolDestroy() {
         super.addWoolDestroy();
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addWoolDestroy();
+        if (!frozen) TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addWoolDestroy();
     }
 
     @Override
     public void addPunishment(Punishment punishment) {
         super.addPunishment(punishment);
-        TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addPunishment(punishment);
+        if (!frozen) TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).addPunishment(punishment);
     }
 
     @Override
     public boolean isStaff() {
-        return TGM.get().getPlayerManager().getPlayerContext(getUuid()).getUserProfile(true).isStaff();
+        return super.isStaff();
     }
 
     public static NickedUserProfile createFromUserProfile(UserProfile profile) {
@@ -73,6 +79,7 @@ public class NickedUserProfile extends UserProfile {
                 profile.getDeaths(),
                 profile.getWool_destroys(),
                 profile.getPunishments(),
+                profile.getTags(),
                 profile.isNew()
         );
     }
