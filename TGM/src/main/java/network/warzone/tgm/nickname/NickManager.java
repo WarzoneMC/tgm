@@ -19,7 +19,6 @@ import network.warzone.tgm.util.GameProfileUtil;
 import network.warzone.warzoneapi.models.MojangProfile;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.Skin;
-import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
