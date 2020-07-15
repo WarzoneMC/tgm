@@ -16,6 +16,5 @@ public class GameProfileUtil {
 
     public static GameProfile getGameProfile(Player player) {
         return ((CraftPlayer) player).getHandle().getProfile();
-
     }
 }
