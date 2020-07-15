@@ -19,6 +19,7 @@ import network.warzone.tgm.util.GameProfileUtil;
 import network.warzone.warzoneapi.models.MojangProfile;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.Skin;
+import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -53,7 +54,7 @@ public class NickManager {
             String name = details.getName();
             UUID nickedUUID = getUUID(details.getSkin());
             Skin skin = nickedUUID != null ? getSkin(nickedUUID) : null;
-            NickedUserProfile profile = NickedUserProfile.createFromUserProfile(context.getUserProfile());
+            NickedUserProfile profile = new NickedUserProfile(context.getUserProfile());
 
             if (details.getRank() != null) {
                 profile.setRanksLoaded(new ArrayList<>());
@@ -250,7 +251,7 @@ public class NickManager {
     }
 
     public NickedUserProfile getUserProfile(PlayerContext context) {
-        return nicks.stream().filter(uuidMatch(context)).findFirst().map(Nick::getProfile).orElse(NickedUserProfile.createFromUserProfile(context.getUserProfile()));
+        return nicks.stream().filter(uuidMatch(context)).findFirst().map(Nick::getProfile).orElse(new NickedUserProfile(context.getUserProfile()));
     }
 
     public UUID getUUID(String name) {
@@ -301,9 +302,14 @@ public class NickManager {
 
     @Getter @Setter @AllArgsConstructor
     public static class NickDetails {
-        private String name, skin;
+        private String name;
+        private String skin;
         private Rank rank;
-        private Integer kills, deaths, wins, losses, objectives;
+        private Integer kills;
+        private Integer deaths;
+        private Integer wins;
+        private Integer losses;
+        private Integer objectives;
         private Boolean frozen;
     }
 

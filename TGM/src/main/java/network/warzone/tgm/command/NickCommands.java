@@ -1,6 +1,9 @@
 package network.warzone.tgm.command;
 
-import com.sk89q.minecraft.util.commands.*;
+import com.sk89q.minecraft.util.commands.Command;
+import com.sk89q.minecraft.util.commands.CommandContext;
+import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.nickname.Nick;
@@ -12,6 +15,7 @@ import network.warzone.warzoneapi.models.RankList;
 import network.warzone.warzoneapi.models.Skin;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -209,7 +213,8 @@ public class NickCommands {
                             p.sendMessage(ChatColor.GREEN + "Updated " + ChatColor.YELLOW + stat + ChatColor.GREEN + " to " + ChatColor.YELLOW + newValue);
                         }
                     } else {
-                        double wlr, kdr;
+                        double wlr;
+                        double kdr;
                         int objectives;
                         if ("good".equals(stat)) {
                             kdr = generateDouble(2, 3);
@@ -351,8 +356,8 @@ public class NickCommands {
 
     private static void send(String message, ChatColor color, Player target) {
         String pattern = "\\[(/[a-zA-Z0-9 ]+)]";
-        message = message.replaceAll(pattern, ChatColor.YELLOW + "$1" + color);
-        target.sendMessage(color + message);
+        String formattedMessage = message.replaceAll(pattern, ChatColor.YELLOW + "$1" + color);
+        target.sendMessage(color + formattedMessage);
     }
 
     private static double generateDouble(double min, double max) {
