@@ -299,7 +299,7 @@ public class NickManager {
         if (details.getDeaths() != null) profile.setDeaths(details.getDeaths());
         if (details.getWins() != null) profile.setWins(details.getWins());
         if (details.getLosses() != null) profile.setLosses(details.getLosses());
-        if (details.getObjectives() != null) profile.setWool_destroys(details.getKills());
+        if (details.getObjectives() != null) profile.setWool_destroys(details.getObjectives());
         if (details.getFrozen() != null) profile.setFrozen(details.getFrozen());
     }
 

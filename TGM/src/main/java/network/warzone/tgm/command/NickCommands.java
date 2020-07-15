@@ -4,7 +4,6 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import net.minecraft.server.v1_16_R1.PlayerSelector;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.nickname.Nick;
@@ -95,7 +94,7 @@ public class NickCommands {
         } else if ("reset".equals(subcommand)) {
             reset(cmd, p, context, targetIsSelf);
         } else if ("status".equals(subcommand)) {
-            status(cmd, p, context, targetIsSelf);
+            status(p, context, targetIsSelf);
         }
     }
 
@@ -142,13 +141,13 @@ public class NickCommands {
         NickManager.NickDetails details = new NickManager.NickDetails(
                 name,
                 skin,
-                cmd.argsLength() > index + 3 ? getRank(cmd.getString(index + 3)) : null,
-                cmd.argsLength() > index + 4 ? cmd.getInteger(index + 4) : null,
-                cmd.argsLength() > index + 5 ? cmd.getInteger(index + 5) : null,
-                cmd.argsLength() > index + 6 ? cmd.getInteger(index + 6) : null,
-                cmd.argsLength() > index + 7 ? cmd.getInteger(index + 7) : null,
-                cmd.argsLength() > index + 8 ? cmd.getInteger(index + 8) : null,
-                cmd.argsLength() > index + 9 ? cmd.getString(index + 9).equals("true") : null
+                getRank(cmd.getString(index + 3, "")),
+                cmd.getInteger(index + 4, context.getUserProfile(true).getKills()),
+                cmd.getInteger(index + 5, context.getUserProfile(true).getDeaths()),
+                cmd.getInteger(index + 6, context.getUserProfile(true).getWins()),
+                cmd.getInteger(index + 7, context.getUserProfile(true).getLosses()),
+                cmd.getInteger(index + 8, context.getUserProfile(true).getWool_destroys()),
+                "true".equals(cmd.getString(index + 9, null))
         );
         nickManager.create(context, details);
         send("Created new nick. Use [/nick preview] to view and [/nick apply] to apply it.", ChatColor.GREEN, sender);
@@ -395,7 +394,7 @@ public class NickCommands {
         }
     }
 
-    private static void status(CommandContext cmd, Player sender, PlayerContext context, boolean target) {
+    private static void status(Player sender, PlayerContext context, boolean target) {
         NickManager nickManager = TGM.get().getNickManager();
         Optional<Nick> optionalNick = nickManager.getNick(context);
         if (!optionalNick.isPresent()) {
