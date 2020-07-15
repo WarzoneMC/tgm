@@ -56,17 +56,7 @@ public class NickManager {
             Skin skin = nickedUUID != null ? getSkin(nickedUUID) : null;
             NickedUserProfile profile = new NickedUserProfile(context.getUserProfile());
 
-            if (details.getRank() != null) {
-                profile.setRanksLoaded(new ArrayList<>());
-                profile.addRank(details.getRank());
-            }
-
-            if (details.getKills() != null) profile.setKills(details.getKills());
-            if (details.getDeaths() != null) profile.setDeaths(details.getDeaths());
-            if (details.getWins() != null) profile.setWins(details.getWins());
-            if (details.getLosses() != null) profile.setLosses(details.getLosses());
-            if (details.getObjectives() != null) profile.setWool_destroys(details.getKills());
-            if (details.getFrozen() != null) profile.setFrozen(details.getFrozen());
+            applyDetailToProfile(details, profile);
 
             nicks.add(new Nick(
                     originalUUID,
@@ -298,6 +288,20 @@ public class NickManager {
 
     private Predicate<Nick> uuidMatch(PlayerContext context) {
         return nick -> nick.getUuid().equals(context.getPlayer().getUniqueId());
+    }
+
+    private void applyDetailToProfile(NickDetails details, NickedUserProfile profile) {
+        if (details.getRank() != null) {
+            profile.setRanksLoaded(new ArrayList<>());
+            profile.addRank(details.getRank());
+        }
+
+        if (details.getKills() != null) profile.setKills(details.getKills());
+        if (details.getDeaths() != null) profile.setDeaths(details.getDeaths());
+        if (details.getWins() != null) profile.setWins(details.getWins());
+        if (details.getLosses() != null) profile.setLosses(details.getLosses());
+        if (details.getObjectives() != null) profile.setWool_destroys(details.getKills());
+        if (details.getFrozen() != null) profile.setFrozen(details.getFrozen());
     }
 
     @Getter @Setter @AllArgsConstructor
