@@ -342,7 +342,7 @@ public class PunishCommands {
         });
     }
 
-    @Command(aliases = {"chat"}, desc = "Control chat settings", min = 1, usage = "(mute|clear)")
+    @Command(aliases = {"chat", "c"}, desc = "Control chat settings", min = 1, usage = "(mute|clear)")
     @CommandPermissions({"tgm.chat.control"})
     public static void chat(CommandContext cmd, CommandSender sender) {
         String action = cmd.getString(0);
