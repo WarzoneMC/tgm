@@ -770,7 +770,7 @@ public class CycleCommands {
         }
     }
 
-    public static void viewStats(CommandSender sender, String target) {
+    private static void viewStats(CommandSender sender, String target) {
         Player targetPlayer = Bukkit.getServer().getPlayer(target);
         if (targetPlayer == null) {
             Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
@@ -854,7 +854,7 @@ public class CycleCommands {
         teamManager.joinTeam(playerContext, matchTeam, ignoreFull);
     }
 
-    private static TextComponent profileToTextComponent(UserProfile profile, int place, LeaderboardCriterion criterion) {
+    public static TextComponent profileToTextComponent(UserProfile profile, int place, LeaderboardCriterion criterion) {
         TextComponent main = new TextComponent(
                 ChatColor.translateAlternateColorCodes('&', "&7" + place + "." + " &b" +
                         profile.getName() + " &7(&9" + criterion.extract(profile) + " " +
