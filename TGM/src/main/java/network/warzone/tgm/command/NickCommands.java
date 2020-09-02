@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class NickCommands {
 
-    private static final String NAME_REGEX = "^[a-z_A-Z0-9]+$";
+    private static final String NAME_REGEX = "^[a-z_A-Z0-9]{1,16}$";
 
     @Command(aliases = {"nicks"}, desc = "View all nicked players", max = 1)
     @CommandPermissions({"tgm.command.whois"})
