@@ -26,11 +26,11 @@ public class ItemBookParser implements ItemMetaParser {
 
     static {
         try {
-            //classIChatBaseComponent = Class.forName("net.minecraft.server.v1_16_R1.IChatBaseComponent");
-            classChatSerializer = Class.forName("net.minecraft.server.v1_16_R1.IChatBaseComponent$ChatSerializer");
+            //classIChatBaseComponent = Class.forName("net.minecraft.server.v1_16_R2.IChatBaseComponent");
+            classChatSerializer = Class.forName("net.minecraft.server.v1_16_R2.IChatBaseComponent$ChatSerializer");
             methodA = classChatSerializer.getDeclaredMethod("a", String.class);
 
-            classCraftMetaBook = Class.forName("org.bukkit.craftbukkit.v1_16_R1.inventory.CraftMetaBook");
+            classCraftMetaBook = Class.forName("org.bukkit.craftbukkit.v1_16_R2.inventory.CraftMetaBook");
             fieldPages = classCraftMetaBook.getDeclaredField("pages");
 
         } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException e) {

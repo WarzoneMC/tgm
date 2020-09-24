@@ -1,7 +1,7 @@
 package network.warzone.tgm.util;
 
 import com.mojang.authlib.GameProfile;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
