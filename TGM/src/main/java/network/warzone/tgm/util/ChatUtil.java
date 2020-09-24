@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R2.ChatMessageType;
 import net.minecraft.server.v1_16_R2.IChatBaseComponent;
 import net.minecraft.server.v1_16_R2.PacketPlayOutChat;
 import net.minecraft.server.v1_16_R2.SystemUtils;
