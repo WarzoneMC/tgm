@@ -13,8 +13,8 @@ public class Plugins {
     private static final String PROTOCOL_SUPPORT = "ProtocolSupport";
     private static final String WORLD_EDIT = "WorldEdit";
 
-    @Getter public static boolean protocolSupportPresent = false;
-    @Getter public static boolean worldEditPresent = false;
+    @Getter private static boolean protocolSupportPresent = false;
+    @Getter private static boolean worldEditPresent = false;
 
     public static void checkSoftDependencies() {
         protocolSupportPresent  = isPresent(PROTOCOL_SUPPORT);
