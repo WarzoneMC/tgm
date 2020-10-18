@@ -1,5 +1,6 @@
 package network.warzone.tgm.util;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import protocolsupport.api.ProtocolSupportAPI;
@@ -10,14 +11,14 @@ import protocolsupport.api.ProtocolVersion;
  */
 public class Plugins {
     private static final String PROTOCOL_SUPPORT = "ProtocolSupport";
-    public static boolean USING_PROTOCOL_SUPPORT = false;
+    private static final String WORLD_EDIT = "WorldEdit";
 
-    public static boolean isProtocolSupportPresent() {
-        return isPresent(PROTOCOL_SUPPORT);
-    }
-    
-    public static void checkProtocolSupport() {
-        USING_PROTOCOL_SUPPORT = isProtocolSupportPresent();
+    @Getter public static boolean protocolSupportPresent = false;
+    @Getter public static boolean worldEditPresent = false;
+
+    public static void checkSoftDependencies() {
+        protocolSupportPresent  = isPresent(PROTOCOL_SUPPORT);
+        worldEditPresent        = isPresent(WORLD_EDIT);
     }
 
     public static boolean isPresent(String name) {

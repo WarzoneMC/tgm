@@ -1,7 +1,11 @@
 package network.warzone.tgm.util;
 
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.util.Location;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
@@ -68,6 +72,22 @@ public class Players {
 
     public static void sendMessage(Player player, String message, Object... objects) {
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', String.format(message, objects)));
+    }
+
+    public static void findFreePosition(Player player) {
+        if (Plugins.isWorldEditPresent()) {
+            BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
+            Location pos = bukkitPlayer.getSolidBlockTrace(300);
+            if (pos != null) {
+                bukkitPlayer.findFreePosition(pos);
+            }
+        }
+    }
+
+    public static void passThroughForwardWall(Player player) {
+        if (Plugins.isWorldEditPresent()) {
+            BukkitAdapter.adapt(player).passThroughForwardWall(6);
+        }
     }
 
 }

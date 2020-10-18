@@ -144,7 +144,7 @@ public class TGM extends JavaPlugin {
 
         GameRuleModule.setGameRuleDefaults(Bukkit.getWorlds().get(0)); //Set gamerules in main unused world
 
-        Plugins.checkProtocolSupport();
+        Plugins.checkSoftDependencies();
 
         matchManager.cycleNextMatch();
         nickManager = new NickManager(); 
