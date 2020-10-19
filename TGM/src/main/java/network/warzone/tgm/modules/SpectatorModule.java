@@ -11,6 +11,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
+import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.Menu;
 import network.warzone.tgm.util.menu.PlayerMenu;
@@ -310,6 +311,15 @@ public class SpectatorModule extends MatchModule implements Listener {
         if (match.get().getMatchStatus() == MatchStatus.PRE || teamManagerModule.getTeam(event.getPlayer()).isSpectator()) {
             event.setCancelled(true);
             if (event.getItem() == null) return;
+            if (event.getItem().getType() == Material.COMPASS) {
+                if (event.getAction().name().contains("LEFT")) {
+                    Players.findFreePosition(event.getPlayer());
+                    return;
+                } else if (event.getAction().name().contains("RIGHT")) {
+                    Players.passThroughForwardWall(event.getPlayer());
+                    return;
+                }
+            }
             if (event.getItem().isSimilar(teamSelectionItem)) {
                 teamSelectionMenu.open(event.getPlayer());
             } else if (event.getItem().isSimilar(teleportMenuItem)) {
@@ -335,8 +345,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                     ChatColor teamColor = entry.getValue();
                     teleportMenu.setItem(i, ItemFactory.getPlayerSkull(player.getName(), teamColor + player.getName(), " ", "&fClick to teleport to " + player.getName()),
                             (clicker, clickEvent) -> {
-                        if (player.isOnline()) clicker.teleport(player.getLocation());
-                    });
+                                if (player.isOnline()) clicker.teleport(player.getLocation());
+                            });
                     i++;
                     if (i >= size) break;
                 }

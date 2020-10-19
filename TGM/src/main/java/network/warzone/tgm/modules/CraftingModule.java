@@ -26,7 +26,6 @@ public class CraftingModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        this.removedRecipes.add(Material.COMPASS);
         boolean removeAll = false;
         JsonElement c = match.getMapContainer().getMapInfo().getJsonObject().get("crafting");
         if (c != null && c.isJsonObject()) {
