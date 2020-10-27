@@ -3,6 +3,7 @@ package network.warzone.tgm.util;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.util.Location;
+import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -12,6 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Players {
@@ -87,6 +90,19 @@ public class Players {
         if (Plugins.isWorldEditPresent()) {
             BukkitAdapter.adapt(player).passThroughForwardWall(6);
         }
+    }
+
+    public static org.bukkit.Location location(PlayerContext context) {
+        return context.getPlayer().getLocation();
+    }
+
+    public static Optional<PlayerContext> getNearestPlayer(PlayerContext player, List<PlayerContext> players) {
+        return players.stream().min((p1, p2) -> {
+            org.bukkit.Location loc = location(player);
+            org.bukkit.Location loc1 = location(p1);
+            org.bukkit.Location loc2 = location(p2);
+            return Integer.compare((int) loc.distance(loc1), (int) loc.distance(loc2));
+        });
     }
 
 }

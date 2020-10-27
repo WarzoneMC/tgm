@@ -26,6 +26,7 @@ public class TeamChangeEvent extends Event implements Cancellable {
 
     @Setter private boolean cancelled;
     @Getter @Setter private boolean forced;
+    @Getter @Setter private boolean silent;
 
     @Override
     public HandlerList getHandlers() {

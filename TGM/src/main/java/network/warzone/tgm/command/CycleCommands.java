@@ -851,7 +851,7 @@ public class CycleCommands {
         }
 
         PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
-        teamManager.joinTeam(playerContext, matchTeam, ignoreFull);
+        teamManager.joinTeam(playerContext, matchTeam, ignoreFull, false);
     }
 
     public static TextComponent profileToTextComponent(UserProfile profile, int place, LeaderboardCriterion criterion) {
