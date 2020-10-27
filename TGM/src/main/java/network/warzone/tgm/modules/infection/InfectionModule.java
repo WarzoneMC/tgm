@@ -5,6 +5,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.death.DeathInfo;
 import network.warzone.tgm.modules.death.DeathMessageModule;
@@ -23,6 +24,7 @@ import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
+import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -37,12 +39,11 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Draem on 7/31/2017.
@@ -68,13 +69,15 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
 
     private final RespawnRule defaultRespawnRule = new RespawnRule(null, 3000, true, true, false);
 
+    private BukkitTask task;
+
     @Override
     public void load(Match match) {
         JsonObject json = match.getMapContainer().getMapInfo().getJsonObject().get("infection").getAsJsonObject();
         length = json.get("length").getAsInt();
         teamManager = match.getModule(TeamManagerModule.class);
         deathModule = match.getModule(DeathModule.class);
-        this.match = new WeakReference<Match>(match);
+        this.match = new WeakReference<>(match);
         this.humans = teamManager.getTeamById("humans");
         this.infected = teamManager.getTeamById("infected");
         TimeModule time = TGM.get().getModule(TimeModule.class);
@@ -115,9 +118,14 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
                     return true;
                 }
         );
-
     }
 
+    public PlayerContext infectRandom() {
+        PlayerContext player = this.humans.getMembers().get(new Random().nextInt(this.humans.getMembers().size()));
+        broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
+        teamManager.joinTeam(player, infected, true, true);
+        return player;
+    }
 
     @Override
     public void enable() {
@@ -125,34 +133,39 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         int zombies = ((int) (players * (5 / 100.0F)) == 0 ? 1 : (int) (players * (5 / 100.0F))) - this.infected.getMembers().size();
         if (zombies > 0 && players != 1) {
             for (int i = 0; i < zombies; i++) {
-                PlayerContext player = this.humans.getMembers().get(new Random().nextInt(this.humans.getMembers().size()));
-                broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
-
-                infect(player.getPlayer());
-                freeze(player.getPlayer());
+                infectRandom();
             }
         }
 
         for (MatchTeam team : teamManager.getTeams()) {
             team.getMembers().forEach(playerContext -> playerContext.getPlayer().setGameMode(GameMode.ADVENTURE));
         }
+        this.task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+            for (PlayerContext i : infected.getMembers()) {
+                Player infectedPlayer = i.getPlayer();
+                Optional<PlayerContext> playerOptional = Players.getNearestPlayer(i, humans.getMembers());
+                playerOptional.ifPresent(context -> infectedPlayer.setCompassTarget(Players.location(context)));
+            }
+        }, 5L, 5L);
     }
 
     public void processSecond(int elapsed) {
         int diff = (length * 60) - elapsed;
         if (diff < 0) diff = 0;
         timeScoreboardValue = ChatColor.WHITE + "Time left: " + ChatColor.AQUA + Strings.formatTime(diff);
-        for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
+        for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values())
+            refreshOnlyDynamicScoreboard(simpleScoreboard);
     }
 
     @Override
     public void unload() {
         teamScoreboardLines.clear();
         teamAliveScoreboardLines.clear();
+        if (this.task != null) this.task.cancel();
     }
 
     private MatchTeam getWinningTeam() {
-        return teamManager.getTeamByAlias("humans");
+        return this.humans;
     }
 
 
@@ -223,7 +236,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         // Check if the player who died is a human.
         if (playerTeam.equals(humans)) {
             // Infect the player
-            infect(deathInfo.player);
+            teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(event.getVictim()), infected, true, true);
         }
     }
 
@@ -248,33 +261,51 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     public void onTeamChange(TeamChangeEvent event) {
         if (event.isCancelled()) return;
         if (defaultScoreboardLoaded) {
-            for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values()) refreshOnlyDynamicScoreboard(simpleScoreboard);
+            for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values())
+                refreshOnlyDynamicScoreboard(simpleScoreboard);
         }
-        if (teamManager.getTeamById("humans").getMembers().size() == 0 && match.get().getMatchStatus().equals(MatchStatus.MID)) {
-            TGM.get().getMatchManager().endMatch(teamManager.getTeamById("infected"));
+        Player player = event.getPlayerContext().getPlayer();
+        if (infected.equals(event.getTeam())) {
+            infect(player);
+            addTag(player);
+            if (humans.getMembers().size() == 0 && match.get().getMatchStatus().equals(MatchStatus.MID)) {
+                TGM.get().getMatchManager().endMatch(infected);
+                return;
+            }
+            long timePassed = new Date().getTime() - this.match.get().getStartedTime();
+            if (timePassed < 10000) {
+                freeze(player, (int) (10000 - timePassed) / 50);
+            }
+        } else {
+            removeTag(player);
         }
-        event.getPlayerContext().getPlayer().setGameMode(GameMode.ADVENTURE);
+    }
 
-        if (event.getTeam().getId().equalsIgnoreCase("infected")) {
-            event.getPlayerContext().getPlayer().addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
+    @EventHandler
+    public void onMatchEnd(MatchResultEvent event) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            removeTag(player);
         }
-
-        event.getPlayerContext().getPlayer().setGameMode(GameMode.ADVENTURE);
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
-        handleQuit(event);
+        removeTag(event.getPlayer());
+        handleQuit();
     }
 
-    @EventHandler
-    public void onPlayerKick(PlayerKickEvent event) {
-        handleQuit(event);
+    private void addTag(Player player) {
+        player.addScoreboardTag("infected");
     }
 
-    private void handleQuit(PlayerEvent event) {
-        if (teamManager.getTeamById("infected").getMembers().size() == 0 && match.get().getMatchStatus().equals(MatchStatus.MID)) {
-            PlayerContext player = teamManager.getTeamById("humans").getMembers().get(teamManager.getTeamById("humans").getMembers().size() - 1);
+    private void removeTag(Player player) {
+        player.removeScoreboardTag("infected");
+    }
+
+    private void handleQuit() {
+        if (infected.getMembers().size() == 0 && match.get().getMatchStatus().equals(MatchStatus.MID)) {
+            // Infect the last player to join
+            PlayerContext player = humans.getMembers().get(humans.getMembers().size() - 1);
             broadcastMessage(String.format("&2&l%s &7has been infected!", player.getPlayer().getName()));
 
             infect(player.getPlayer());
@@ -284,22 +315,20 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     //TODO Remove effects and replace with new kit module
     private void infect(Player player) {
         player.getWorld().strikeLightningEffect(player.getLocation());
-
-        teamManager.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), teamManager.getTeamById("infected"), true);
-        if (teamManager.getTeamById("humans").getMembers().size() > 0)
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c&lYou have been infected!"));
         player.addPotionEffects(Collections.singleton(new PotionEffect(PotionEffectType.JUMP, 50000, 1, true, false)));
         player.setGameMode(GameMode.ADVENTURE);
+        addTag(player);
     }
 
-    private void freeze(Player player) {
+    private void freeze(Player player, int ticks) {
         player.addPotionEffects(Arrays.asList(
-                new PotionEffect(PotionEffectType.SLOW, 10 * 20, 255, true, false),
-                new PotionEffect(PotionEffectType.JUMP, 10 * 20, 128, true, false),
-                new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 255, true, false)
+                new PotionEffect(PotionEffectType.SLOW, ticks, 255, true, false),
+                new PotionEffect(PotionEffectType.JUMP, ticks, 128, true, false),
+                new PotionEffect(PotionEffectType.BLINDNESS, ticks, 255, true, false)
         ));
 
-        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> unfreeze(player), 10 * 20);
+        Bukkit.getScheduler().runTaskLater(TGM.get(), () -> unfreeze(player), ticks);
     }
 
     private void unfreeze(Player player) {
