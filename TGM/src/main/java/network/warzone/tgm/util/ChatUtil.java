@@ -2,13 +2,13 @@ package network.warzone.tgm.util;
 
 import java.util.Collection;
 
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import net.minecraft.server.v1_16_R2.ChatMessageType;
-import net.minecraft.server.v1_16_R2.IChatBaseComponent;
-import net.minecraft.server.v1_16_R2.PacketPlayOutChat;
-import net.minecraft.server.v1_16_R2.SystemUtils;
+import net.minecraft.server.v1_16_R3.ChatMessageType;
+import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
+import net.minecraft.server.v1_16_R3.SystemUtils;
 
 public class ChatUtil {
     public static void sendChatComponents(Collection<Player> players, IChatBaseComponent[] components) {
