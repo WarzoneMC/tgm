@@ -19,6 +19,7 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+
         <repository>
             <id>maven.sk89q.io</id>
             <url>http://maven.sk89q.com/repo/</url>
@@ -31,18 +32,14 @@
             <artifactId>warzone-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.16.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.16.4-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.github.OvercastNetwork.sk89q-command-framework</groupId>
             <artifactId>command-framework-bukkit</artifactId>
@@ -87,5 +84,4 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
 </project>
