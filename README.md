@@ -61,7 +61,7 @@ Here's a basic example of what map configuration files look like:
 
 ## Compiling
 
-1. Clone the repo to your computer. `git clone https://github.com/Warzone/TGM`
+1. Clone the repo to your computer.
 
 2. Compile CraftBukkit by downloading and running the BuildTools jar from [here](https://hub.spigotmc.org/jenkins/job/BuildTools). Make sure you include the `-compile craftbukkit` flag when compiling it, otherwise you might receive errors when later compiling the plugin.
 
@@ -69,7 +69,7 @@ Here's a basic example of what map configuration files look like:
 
 ## Developer Tips
 
-1. We use [Lombok](https://projectlombok.org/). Make sure you have the Lombok plugin installed on your preferred IDE, otherwise you cannot compile.
+1. We use [Lombok](https://projectlombok.org/). Make sure you have the Lombok plugin installed on your preferred IDE.
 
 ## Documentation
 
