@@ -14,16 +14,20 @@ public class Rotation {
     private List<MapContainer> activeMaps;
 
     public Rotation(final String name, final boolean isDefault, final RotationRequirement requirements, List<MapContainer> baseMaps) {
+        this(name, isDefault, requirements, baseMaps, false);
+    }
+
+    public Rotation(final String name, final boolean isDefault, final RotationRequirement requirements, List<MapContainer> baseMaps, final boolean initialShuffle) {
         this.name = name;
         this.isDefault = isDefault;
         this.requirements = requirements;
         this.baseMaps = baseMaps;
         this.activeMaps = new ArrayList<>(baseMaps);
+        if (initialShuffle) this.shuffleMaps();
     }
 
     public List<MapContainer> getMaps() {
         return this.activeMaps;
-
     }
 
     public void shuffleMaps() {
