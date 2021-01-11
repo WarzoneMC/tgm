@@ -27,6 +27,8 @@ import org.bukkit.event.player.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.destroystokyo.paper.Title;
+
 /**
  * Created by luke on 4/27/17.
  */
@@ -164,7 +166,12 @@ public class JoinManager implements Listener {
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
         } else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";
 
-        if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
+        if (playerContext.getUserProfile().isNew()) {
+            joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
+            event.getPlayer()
+                    .sendTitle(new Title("", ChatColor.translateAlternateColorCodes('&', "&cUse &b/join&c to play!")));
+        }
+        
         event.setJoinMessage(joinMsg);
 
         handleRotationUpdate(false);
