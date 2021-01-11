@@ -38,6 +38,9 @@ map:
   # Store the game matches in the `matches` folder found in the server root directory.
   # Default: false
   save-matches: false
+  # When the match ends, how long to take to cycle to the next map.
+  # Default: 10
+  cycle-countdown: 10
   # Map repository location.
   sources:
   - Maps
