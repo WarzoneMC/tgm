@@ -8,6 +8,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.kit.classes.GameClass;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -16,6 +17,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
+import network.warzone.tgm.util.menu.KitEditorMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.event.EventHandler;
@@ -30,13 +32,15 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
     private SpectatorModule spectatorModule;
     private GameClassModule gameClassModule;
+    private KitEditorModule kitEditorModule;
 
     @Override
     public void load(Match match) {
         this.match = new WeakReference<Match>(match);
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
-        gameClassModule = TGM.get().getModule(GameClassModule.class);
+        this.gameClassModule = TGM.get().getModule(GameClassModule.class);
+        this.kitEditorModule = match.getModule(KitEditorModule.class);
     }
 
     @EventHandler
@@ -82,13 +86,11 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
-                } else {
-                    if (reset) {
-                        gameClassModule.performSwitch(playerContext.getPlayer());
-                        GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
-                        if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
-                        playerContext.getPlayer().updateInventory();
-                    }
+                } else if (reset) {
+                    gameClassModule.performSwitch(playerContext.getPlayer());
+                    GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
+                    if (gameClass != null) gameClass.apply(playerContext.getPlayer(), matchTeam.getColor());
+                    playerContext.getPlayer().updateInventory();
                 }
                 playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
             }, 1L);  // Delay by 1 tick to prevent missing armor points bug
@@ -99,12 +101,16 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
-                }
-                if (reset) {
-                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                } else if (reset) {
+                    if (KitEditorModule.isEnabled() && kitEditorModule.isKitEditable() && kitEditorModule.getEditorMenus().containsKey(playerContext.getPlayer().getUniqueId())) {
+                        KitEditorMenu kitEditorMenu = kitEditorModule.getEditorMenus().get(playerContext.getPlayer().getUniqueId());
+                        kitEditorMenu.getKit().apply(playerContext.getPlayer(), matchTeam);
+                    } else {
+                        matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
+                    }
                     playerContext.getPlayer().updateInventory();
                 }
-                playerContext.getPlayer().setFireTicks(-20);  // Weird lava bug
+                playerContext.getPlayer().setFireTicks(-20); // Weird lava bug
             }, 1L); // Delay by 1 tick to prevent missing armor points bug
     }
 

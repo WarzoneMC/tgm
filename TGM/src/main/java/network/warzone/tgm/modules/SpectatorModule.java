@@ -5,6 +5,7 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.*;
+import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
@@ -13,6 +14,7 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.itemstack.ItemFactory;
+import network.warzone.tgm.util.menu.KitEditorMenu;
 import network.warzone.tgm.util.menu.Menu;
 import network.warzone.tgm.util.menu.PlayerMenu;
 import network.warzone.tgm.util.menu.PublicMenu;
@@ -53,6 +55,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     private final ItemStack compassItem;
     private final ItemStack teamSelectionItem;
     private final ItemStack teleportMenuItem;
+    private final ItemStack kitEditorItem;
 
     private final ItemStack leatherHelmet;
 
@@ -61,6 +64,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     private final Map<UUID, Long> lastMovement = new HashMap<>();
 
     private RespawnModule respawnModule;
+    private KitEditorModule kitEditorModule;
 
     public SpectatorModule() {
         this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
@@ -68,6 +72,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.NETHER_STAR, ChatColor.YELLOW + "Team Selection");
         teleportMenuItem = ItemFactory.createItem(Material.CLOCK, ChatColor.YELLOW + "Player Teleport");
+        kitEditorItem = ItemFactory.createItem(Material.CHEST, ChatColor.YELLOW + "Kit Editor");
 
         leatherHelmet = new ItemStack(Material.LEATHER_HELMET);
         LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
@@ -81,6 +86,7 @@ public class SpectatorModule extends MatchModule implements Listener {
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.respawnModule = match.getModule(RespawnModule.class);
         this.spectators = teamManagerModule.getSpectators();
+        this.kitEditorModule = match.getModule(KitEditorModule.class);
 
         /**
          * Only assign the menu actions once. No need to update these every second.
@@ -130,6 +136,9 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().getInventory().setItem(2, compassItem);
         playerContext.getPlayer().getInventory().setItem(4, teamSelectionItem);
         playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
+        if (kitEditorModule.isEnabled() && kitEditorModule.isKitEditable()) {
+            playerContext.getPlayer().getInventory().setItem(8, kitEditorItem);
+        }
     }
 
     private void updateTeamMenuItem(MatchTeam matchTeam, int i) {
@@ -288,7 +297,11 @@ public class SpectatorModule extends MatchModule implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player && isSpectating((Player) event.getWhoClicked())) {
-            event.setCancelled(true);
+            Player player = (Player) event.getWhoClicked();
+
+            if (!kitEditorModule.getEditorMenus().containsKey(player.getUniqueId()) || !kitEditorModule.getEditorMenus().get(player.getUniqueId()).getInventory().equals(event.getInventory())) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -352,6 +365,20 @@ public class SpectatorModule extends MatchModule implements Listener {
                 }
                 teleportMenu.open(event.getPlayer());
                 players.clear();
+            } else if (event.getItem().isSimilar(kitEditorItem)) {
+                if (KitEditorModule.isEnabled()) {
+                    KitEditorMenu kitEditor;
+                    if (kitEditorModule.getEditorMenus().containsKey(event.getPlayer().getUniqueId())) {
+                        kitEditor = kitEditorModule.getEditorMenus().get(event.getPlayer().getUniqueId());
+                    } else {
+                        List<MatchTeam> matchTeams = teamManagerModule.getTeams(); // Team doesn't matter because this code only runs if there are no team specific kits.
+                        kitEditor = new KitEditorMenu(matchTeams.get(1).getKits(), match.get().getMapContainer().getMapInfo().getName());
+                        kitEditorModule.getEditorMenus().put(event.getPlayer().getUniqueId(), kitEditor);
+                    }
+                    kitEditor.open(event.getPlayer());
+                } else {
+                    event.getPlayer().sendMessage(ChatColor.RED + "Kit editing has been disabled.");
+                }
             }
         }
     }

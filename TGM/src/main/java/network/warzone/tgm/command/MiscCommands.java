@@ -5,6 +5,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.nickname.ProfileCache;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.ServerUtil;
@@ -66,6 +67,22 @@ public class MiscCommands {
         if ("clear".equalsIgnoreCase(commandContext.getString(0))) {
             ProfileCache.getInstance().clear();
             sender.sendMessage(ChatColor.YELLOW + "Cleared the profile cache.");
+        }
+    }
+
+    @Command(aliases = {"kiteditor", "ke"}, desc = "Manages the kit layout editor", usage = "<on|off>", min = 1)
+    @CommandPermissions({"tgm.kiteditor.manage"})
+    public static void kitEditor(CommandContext commandContext, CommandSender sender) {
+        KitEditorModule kitEditorModule = TGM.get().getModule(KitEditorModule.class);
+        if ("on".equalsIgnoreCase(commandContext.getString(0))) {
+            KitEditorModule.setEnabled(true);
+            sender.sendMessage(ChatColor.GREEN + "Enabled kit layout editing.");
+        } else if ("off".equalsIgnoreCase(commandContext.getString(0))) {
+            KitEditorModule.setEnabled(false);
+            kitEditorModule.unload();
+            sender.sendMessage(ChatColor.GREEN + "Disabled kit layout editing.");
+        } else {
+            sender.sendMessage(ChatColor.RED + "/kiteditor <on|off>");
         }
     }
 

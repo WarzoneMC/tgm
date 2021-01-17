@@ -12,7 +12,6 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class KitLoaderModule extends MatchModule {
 
     //@Getter private final List<KitNodeParser> parsers = new ArrayList<>();
@@ -32,6 +31,10 @@ public class KitLoaderModule extends MatchModule {
     @Override
     public void load(Match match) {
         if (match.getMapContainer().getMapInfo().getJsonObject().has("kits")) {
+            TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
+            KitEditorModule kitEditorModule = match.getModule(KitEditorModule.class);
+
+            int i = 0;
             for (JsonElement kitElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("kits")) {
                 JsonObject kitJson = kitElement.getAsJsonObject();
 
@@ -46,7 +49,6 @@ public class KitLoaderModule extends MatchModule {
                 }
 
                 List<MatchTeam> teams = new ArrayList<>();
-                TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
                 if (kitJson.has("teams")) {
                     for (JsonElement jsonElement : kitJson.getAsJsonArray("teams")) {
                         if (!jsonElement.isJsonPrimitive()) continue;
@@ -91,7 +93,9 @@ public class KitLoaderModule extends MatchModule {
                     matchTeam.addKit(kit);
                 }
 
+                i++;
             }
+            kitEditorModule.setKitEditable(i == 1); // Only allow kit editing if there is one single kit
         }
     }
 }
