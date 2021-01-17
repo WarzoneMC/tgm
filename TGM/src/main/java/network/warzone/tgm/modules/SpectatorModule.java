@@ -136,10 +136,14 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().getInventory().setItem(2, compassItem);
         playerContext.getPlayer().getInventory().setItem(4, teamSelectionItem);
         playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
+
         if (kitEditorModule.isEnabled() && kitEditorModule.isKitEditable()) {
             playerContext.getPlayer().getInventory().setItem(8, kitEditorItem);
         }
+
+        playerContext.getPlayer().getInventory().setHeldItemSlot(4);
     }
+
 
     private void updateTeamMenuItem(MatchTeam matchTeam, int i) {
         ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
