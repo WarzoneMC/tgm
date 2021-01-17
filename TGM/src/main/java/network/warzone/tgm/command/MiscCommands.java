@@ -69,4 +69,9 @@ public class MiscCommands {
         }
     }
 
+    @Command(aliases = {"rules"}, desc = "Get link to Network rules.")
+    public static void rules(CommandContext commandContext, CommandSender sender) {
+        sender.sendMessage(ChatColor.YELLOW + "Please read and abide by our rules which can be found here: " + TGM.get().getConfig().getString("server.rules"));
+    }
+
 }
