@@ -886,7 +886,7 @@ public class CycleCommands {
             mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
         }
         TextComponent message = new TextComponent(mapName);
-        message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/sn " + mapInfo.getName()));
+        message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/setnext " + mapInfo.getName()));
         message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GOLD + mapInfo.getName()).append("\n\n")
                 .append(ChatColor.GRAY + "Authors: ").append(ChatColor.YELLOW + mapInfo.getAuthors().stream().map(Strings::getAuthorUsername).collect(Collectors.joining(", "))).append("\n")
                 .append(ChatColor.GRAY + "Game Type: ").append(ChatColor.YELLOW + mapInfo.getGametype().toString()).append("\n")
