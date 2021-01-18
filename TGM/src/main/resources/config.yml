@@ -69,6 +69,8 @@ server:
   ip: "your.server.ip"
   # Store link displayed when a player tries to join a specific team.
   store: "https://warz.one/store"
+  # Discord link displayed when a player is banned from the Server.
+  discord: "https://discord.io/WarzoneMC"
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"

@@ -527,7 +527,7 @@ public class PunishCommands {
                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET +
                     (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                    + ChatColor.AQUA + "Appeal at " + TGM.get().getConfig().getString("server.discord") + "\n"
                     + ChatColor.GRAY + "ID: " + punishment.getId().toString();
             if (punishment.isIp_ban()) {
                 boolean found = false;
