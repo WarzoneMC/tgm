@@ -18,6 +18,11 @@ public class RotationDeserializer implements JsonDeserializer<Rotation> {
             isDefault = json.get("default").getAsBoolean();
         }
 
+        boolean initialShuffle = false;
+        if (json.has("shuffle")) {
+            initialShuffle = json.get("shuffle").getAsBoolean();
+        }
+
         RotationRequirement requirements = new RotationRequirement(0, 999999);
         if (json.has("requirements")) {
             requirements = TGM.get().getGson().fromJson(json.get("requirements").getAsJsonObject(), RotationRequirement.class);
@@ -32,6 +37,6 @@ public class RotationDeserializer implements JsonDeserializer<Rotation> {
             }
         }
 
-        return new Rotation(name, isDefault, requirements, maps);
+        return new Rotation(name, isDefault, requirements, maps, initialShuffle);
     }
 }
