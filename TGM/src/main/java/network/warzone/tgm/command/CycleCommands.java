@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 public class CycleCommands {
 
-    @Command(aliases = {"maps"}, desc = "View the maps that are on Warzone, although not necessarily in the rotation.", usage = "[type]? [page]")
+    @Command(aliases = {"maps"}, desc = "View the maps that are on server, although not necessarily in the rotation.", usage = "[type]? [page]")
     public static void maps(CommandContext cmd, CommandSender sender) throws CommandException {
         int index = 1;
         String typeString = "";
@@ -107,7 +107,7 @@ public class CycleCommands {
         }
     }
 
-    @Command(aliases = {"findmaps"}, desc = "Find the maps that are on Warzone, although not necessarily in the rotation.", min = 1, usage = "<map name> [page]")
+    @Command(aliases = {"findmaps"}, desc = "Find the maps that are on the server, although not necessarily in the rotation.", min = 1, usage = "<map name> [page]")
     public static void findmaps(CommandContext cmd, CommandSender sender) throws CommandException {
         List<MapContainer> mapLibrary = TGM.get().getMatchManager().getMapLibrary().getMaps();
         List<Integer> foundMaps = new ArrayList<>();
