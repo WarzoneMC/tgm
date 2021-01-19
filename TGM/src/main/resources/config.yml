@@ -73,7 +73,7 @@ server:
   # Store link displayed when a player tries to join a specific team.
   store: "https://warz.one/store"
   # Appeal link displayed when a player is banned from the Server.
-  appeal: "https://discord.io/WarzoneMC"
+  appeal: "https://warz.one/discord"
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
