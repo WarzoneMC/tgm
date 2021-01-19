@@ -41,6 +41,9 @@ map:
   # When the match ends, how long to take to cycle to the next map.
   # Default: 10
   cycle-countdown: 10
+  # When the match starts, how long to take to start the match.
+  # Default: 20
+  start-countdown: 20
   # Map repository location.
   sources:
   - Maps
