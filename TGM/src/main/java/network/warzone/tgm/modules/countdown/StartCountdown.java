@@ -14,7 +14,7 @@ import org.bukkit.boss.BossBar;
 
 public class StartCountdown extends BossBarCountdown {
 
-    public static final int START_TIME = 20;
+    public static int START_TIME = TGM.get().getConfig().getInt("map.start-countdown");
     public static final int REQUIRED_PLAYERS = 2;
 
     @Getter private TeamManagerModule teamManagerModule;

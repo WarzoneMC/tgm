@@ -84,6 +84,9 @@ public class MiscCommands {
         } else {
             sender.sendMessage(ChatColor.RED + "/kiteditor <on|off>");
         }
-    }
 
+    @Command(aliases = {"rules"}, desc = "View the server rules.")
+    public static void rules(CommandContext commandContext, CommandSender sender) {
+        sender.sendMessage(ChatColor.YELLOW + "Please read and abide by our rules which can be found here: " + TGM.get().getConfig().getString("server.rules"));
+    }
 }

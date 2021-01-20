@@ -41,6 +41,9 @@ map:
   # When the match ends, how long to take to cycle to the next map.
   # Default: 10
   cycle-countdown: 10
+  # When the match starts, how long to take to start the match.
+  # Default: 20
+  start-countdown: 20
   # Map repository location.
   sources:
   - Maps
@@ -69,6 +72,8 @@ server:
   ip: "your.server.ip"
   # Store link displayed when a player tries to join a specific team.
   store: "https://warz.one/store"
+  # Appeal link displayed when a player is banned from the Server.
+  appeal: "https://warz.one/discord"
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
