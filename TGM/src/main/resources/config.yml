@@ -71,6 +71,8 @@ server:
   store: "https://warz.one/store"
   # Rules link displayed when a player runs /rules.
   rules: "https://warz.one/rules"
+  # Forums link displayed when a player runs /forums.
+  forums: "https://warz.one/forums"
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"

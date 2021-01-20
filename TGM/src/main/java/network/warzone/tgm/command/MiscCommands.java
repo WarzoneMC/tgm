@@ -74,4 +74,9 @@ public class MiscCommands {
         sender.sendMessage(ChatColor.YELLOW + "Please read and abide by our rules which can be found here: " + TGM.get().getConfig().getString("server.rules"));
     }
 
+    @Command(aliases = {"forums"}, desc = "View the server forums.")
+    public static void forums(CommandContext commandContext, CommandSender sender) {
+        sender.sendMessage(ChatColor.YELLOW + "You can access our forums here: " + TGM.get().getConfig().getString("server.forums"));
+    }
+
 }
