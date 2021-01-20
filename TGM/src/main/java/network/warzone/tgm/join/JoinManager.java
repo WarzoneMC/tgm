@@ -27,6 +27,8 @@ import org.bukkit.event.player.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.destroystokyo.paper.Title;
+
 /**
  * Created by luke on 4/27/17.
  */
@@ -66,7 +68,7 @@ public class JoinManager implements Listener {
             event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
                     + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
                     + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                    + ChatColor.AQUA + "Appeal at https://discord.io/WarzoneMC\n"
+                    + ChatColor.AQUA + "Appeal at " + TGM.get().getConfig().getString("server.appeal") + "\n"
                     + ChatColor.GRAY + "ID: " + punishment.getId().toString()
             );
             event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
@@ -164,7 +166,12 @@ public class JoinManager implements Listener {
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
         } else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";
 
-        if (playerContext.getUserProfile().isNew()) joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
+        if (playerContext.getUserProfile().isNew()) {
+            joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
+            event.getPlayer()
+                    .sendTitle(new Title("", ChatColor.translateAlternateColorCodes('&', "&7Use &b/join&7 to play!")));
+        }
+        
         event.setJoinMessage(joinMsg);
 
         handleRotationUpdate(false);
