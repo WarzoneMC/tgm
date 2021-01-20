@@ -30,11 +30,11 @@ public class KitLoaderModule extends MatchModule {
 
     @Override
     public void load(Match match) {
+        KitEditorModule kitEditorModule = match.getModule(KitEditorModule.class);
+        int i = 0;
         if (match.getMapContainer().getMapInfo().getJsonObject().has("kits")) {
             TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
-            KitEditorModule kitEditorModule = match.getModule(KitEditorModule.class);
 
-            int i = 0;
             for (JsonElement kitElement : match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("kits")) {
                 JsonObject kitJson = kitElement.getAsJsonObject();
 
@@ -95,7 +95,7 @@ public class KitLoaderModule extends MatchModule {
 
                 i++;
             }
-            kitEditorModule.setKitEditable(i == 1); // Only allow kit editing if there is one single kit
         }
+        kitEditorModule.setKitEditable(i == 1); // Only allow kit editing if there is one single kit
     }
 }
