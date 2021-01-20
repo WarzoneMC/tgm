@@ -27,6 +27,7 @@ chat:
     # Message that will be displayed to players when the chat is muted if they do not have permission to bypass the chat mute.
     # Default: "&cChat is currently disabled."
     muted: "&cChat is currently disabled."
+
 map:
   # If players will be placed in to survival after the game is ended
   # Any player in survival mode may break blocks during post game
@@ -58,6 +59,7 @@ map:
     # Skip conditions if API is not enabled or on maps where stat tracking has been disabled.
     # Default: true
     ignore-untracked: true
+
 server:
   # Display name for the server object served by the API.
   # Default: Warzone
@@ -76,6 +78,7 @@ server:
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
+
 # Configurable knockback values.
 custom-knockback:
   enabled: true
