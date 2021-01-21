@@ -258,11 +258,10 @@ public class CycleCommands {
 
             TGM.get().getMatchManager().setForcedNextMap(found);
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!cmd.hasFlag('s') || player.hasPermission("tgm.setnext")) {
-                    player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
-                            ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
-                }
+            boolean announceToEveryone = !cmd.hasFlag('s');
+            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> announceToEveryone || player.hasPermission("tgm.setnext")).collect(Collectors.toSet())) {
+                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
+                        ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
             }
         } else {
             sender.sendMessage(ChatColor.RED + "/sn [-s] <map_name>");
