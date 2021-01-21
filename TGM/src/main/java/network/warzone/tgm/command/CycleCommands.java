@@ -232,7 +232,7 @@ public class CycleCommands {
         sender.sendMessage(ChatColor.GREEN + "Countdowns cancelled.");
     }
 
-    @Command(aliases = {"setnext", "sn"}, desc = "Set the next map.")
+    @Command(aliases = {"setnext", "sn"}, desc = "Set the next map.", anyFlags = true, flags = "s")
     @CommandPermissions({"tgm.setnext"})
     public static void setNext(CommandContext cmd, CommandSender sender) {
         if (cmd.argsLength() > 0) {
@@ -257,9 +257,15 @@ public class CycleCommands {
             }
 
             TGM.get().getMatchManager().setForcedNextMap(found);
-            sender.sendMessage(ChatColor.GREEN + "Set the next map to " + ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!cmd.hasFlag('s') || player.hasPermission("tgm.setnext")) {
+                    player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
+                            ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
+                }
+            }
         } else {
-            sender.sendMessage(ChatColor.RED + "/sn <map_name>");
+            sender.sendMessage(ChatColor.RED + "/sn [-s] <map_name>");
         }
     }
 
