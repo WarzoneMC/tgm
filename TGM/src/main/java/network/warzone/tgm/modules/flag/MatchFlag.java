@@ -200,7 +200,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
     @Override
     public boolean hasRedeemable(Player player) {
-        return flagHolder.equals(player);
+        return flagHolder != null && flagHolder.equals(player);
     }
 
     /**
