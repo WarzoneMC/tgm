@@ -183,6 +183,5 @@ public class KitEditorMenu implements Listener {
         Bukkit.getScheduler().runTask(TGM.get(), () -> {
             event.getPlayer().getInventory().clear(0);
         });
-
     }
 }

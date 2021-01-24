@@ -102,7 +102,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
                 } else if (reset) {
-                    if (KitEditorModule.isEnabled() && kitEditorModule.isKitEditable() && kitEditorModule.getEditorMenus().containsKey(playerContext.getPlayer().getUniqueId())) {
+                    if (KitEditorModule.isEnabled() && KitEditorModule.isKitEditable() && kitEditorModule.getEditorMenus().containsKey(playerContext.getPlayer().getUniqueId())) {
                         KitEditorMenu kitEditorMenu = kitEditorModule.getEditorMenus().get(playerContext.getPlayer().getUniqueId());
                         kitEditorMenu.getKit().apply(playerContext.getPlayer(), matchTeam);
                     } else {

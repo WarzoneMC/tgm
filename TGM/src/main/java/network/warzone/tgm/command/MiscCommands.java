@@ -76,6 +76,8 @@ public class MiscCommands {
         KitEditorModule kitEditorModule = TGM.get().getModule(KitEditorModule.class);
         if ("on".equalsIgnoreCase(commandContext.getString(0))) {
             KitEditorModule.setEnabled(true);
+            kitEditorModule.load();
+            if (KitEditorModule.isKitEditable()) kitEditorModule.applyItem();
             sender.sendMessage(ChatColor.GREEN + "Enabled kit layout editing.");
         } else if ("off".equalsIgnoreCase(commandContext.getString(0))) {
             KitEditorModule.setEnabled(false);

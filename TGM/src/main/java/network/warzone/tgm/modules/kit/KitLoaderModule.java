@@ -30,8 +30,7 @@ public class KitLoaderModule extends MatchModule {
 
     @Override
     public void load(Match match) {
-        KitEditorModule kitEditorModule = match.getModule(KitEditorModule.class);
-        kitEditorModule.setKitEditable(match.getMapContainer().getMapInfo().getJsonObject().has("kits")
+        KitEditorModule.setKitEditable(match.getMapContainer().getMapInfo().getJsonObject().has("kits")
                 && match.getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("kits").size() == 1);
 
         if (match.getMapContainer().getMapInfo().getJsonObject().has("kits")) {

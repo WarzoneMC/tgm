@@ -50,12 +50,11 @@ public class SpectatorModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
 
     private MatchTeam spectators;
-    private PublicMenu teamSelectionMenu;
+    private final PublicMenu teamSelectionMenu;
 
     private final ItemStack compassItem;
     private final ItemStack teamSelectionItem;
     private final ItemStack teleportMenuItem;
-    private final ItemStack kitEditorItem;
 
     private final ItemStack leatherHelmet;
 
@@ -72,7 +71,6 @@ public class SpectatorModule extends MatchModule implements Listener {
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.NETHER_STAR, ChatColor.YELLOW + "Team Selection");
         teleportMenuItem = ItemFactory.createItem(Material.CLOCK, ChatColor.YELLOW + "Player Teleport");
-        kitEditorItem = ItemFactory.createItem(Material.CHEST, ChatColor.YELLOW + "Kit Editor");
 
         leatherHelmet = new ItemStack(Material.LEATHER_HELMET);
         LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
@@ -136,14 +134,10 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().getInventory().setItem(2, compassItem);
         playerContext.getPlayer().getInventory().setItem(4, teamSelectionItem);
         playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
-
-        if (kitEditorModule.isEnabled() && kitEditorModule.isKitEditable()) {
-            playerContext.getPlayer().getInventory().setItem(8, kitEditorItem);
-        }
+        // Inventory slot 8 is reserved for the kitEditorItem in KitLoaderModule
 
         playerContext.getPlayer().getInventory().setHeldItemSlot(4);
     }
-
 
     private void updateTeamMenuItem(MatchTeam matchTeam, int i) {
         ItemStack itemStack = new ItemStack(Material.LEATHER_HELMET);
@@ -369,8 +363,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                 }
                 teleportMenu.open(event.getPlayer());
                 players.clear();
-            } else if (event.getItem().isSimilar(kitEditorItem)) {
-                if (KitEditorModule.isEnabled()) {
+            } else if (event.getItem().isSimilar(kitEditorModule.getKitEditorItem())) {
+                if (KitEditorModule.isEnabled() && KitEditorModule.isKitEditable()) {
                     KitEditorMenu kitEditor;
                     if (kitEditorModule.getEditorMenus().containsKey(event.getPlayer().getUniqueId())) {
                         kitEditor = kitEditorModule.getEditorMenus().get(event.getPlayer().getUniqueId());
