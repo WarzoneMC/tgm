@@ -34,6 +34,8 @@ public class PunishCommands {
     private static final ChatColor punishedColor = ChatColor.LIGHT_PURPLE;
     private static final ChatColor durationColor = ChatColor.LIGHT_PURPLE;
 
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
     public static boolean isIP(final String ip) {
         return IP_PATTERN.matcher(ip).matches();
     }
@@ -169,10 +171,27 @@ public class PunishCommands {
         issuePunishment("warn", name, sender, "warned", new TimeUnitPair(1, ChronoUnit.MILLIS), reason, false, !cmd.hasFlag('s'));
     }
 
-    @Command(aliases = {"punishments", "p"}, desc = "Get player punishments", min = 1, max = 1, usage = "(name|ip)")
-    @CommandPermissions({"tgm.punish.list"})
+    @Command(aliases = {"punishments", "p"}, desc = "Get player punishments", max = 1, usage = "(name|ip)")
     public static void punishments(CommandContext cmd, CommandSender sender) {
-        String name = cmd.getString(0);
+        String name;
+        boolean ownPunishments = cmd.argsLength() == 0;
+        boolean restrictedView = !sender.hasPermission("tgm.punish.list");
+
+        if (ownPunishments) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.RED + "Consoles don't have punishments.");
+                return;
+            }
+            Player player = (Player) sender;
+            name = player.getName();
+        } else {
+            if (restrictedView) {
+                sender.sendMessage(ChatColor.RED + "Insufficient permissions.");
+                return;
+            }
+            name = cmd.getString(0);
+        }
+
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             PunishmentsListResponse punishmentsListResponse = TGM.get().getTeamClient().getPunishments(new PunishmentsListRequest(!isIP(name) ? name : null, isIP(name) ? name : null));
             if (punishmentsListResponse.isNotFound()) {
@@ -183,15 +202,24 @@ public class PunishCommands {
                 for (PunishmentsListResponse.LoadedUser user : punishmentsListResponse.getLoadedUsers()) {
                     if (name.equalsIgnoreCase(user.getName())) {
                         displayName = user.getName();
+                        break;
                     }
                 }
-                sender.sendMessage(ChatColor.YELLOW + "Punishments for " + displayName);
+                if (punishmentsListResponse.getPunishments().size() == 0) {
+                    sender.sendMessage(ChatColor.YELLOW + (ownPunishments ? "You have no punishments." : displayName + " has no punishments."));
+                    return;
+                }
+                sender.sendMessage(ChatColor.YELLOW + (ownPunishments ? "Your punishments:" : "Punishments for " + displayName + ":"));
                 HashMap<ObjectId, String> map = new HashMap<>();
                 for (PunishmentsListResponse.LoadedUser loadedUser : punishmentsListResponse.getLoadedUsers()) {
                     map.put(loadedUser.getId(), loadedUser.getName());
                 }
                 for (Punishment punishment : punishmentsListResponse.getPunishments()) {
-                    sender.spigot().sendMessage(punishmentToTextComponent(punishment, map.get(punishment.getPunished()), map.getOrDefault(punishment.getPunisher(), "Console"), true));
+                    if (restrictedView) {
+                        sender.spigot().sendMessage(restrictedPunishmentToTextComponent(punishment, map.get(punishment.getPunished())));
+                    } else {
+                        sender.spigot().sendMessage(punishmentToTextComponent(punishment, map.get(punishment.getPunished()), map.getOrDefault(punishment.getPunisher(), "Console"), true));
+                    }
                 }
             }
         });
@@ -555,7 +583,6 @@ public class PunishCommands {
     }
 
     private static TextComponent punishmentToTextComponent(Punishment punishment, String punished, String punisher, boolean revertOption) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
         TextComponent textComponent = new TextComponent(ChatColor.GRAY + "[" + dateFormat.format(new Date(punishment.getIssued())) + "] "
                 + (punishment.isReverted() ? ChatColor.STRIKETHROUGH + "" : (punishment.isActive() ? ChatColor.RED : ChatColor.YELLOW))
                 + punishment.getType() + ChatColor.RESET + " " + (punished == null ? punishment.getIp() : punished));
@@ -574,6 +601,24 @@ public class PunishCommands {
         }));
 
         if (revertOption && !punishment.isReverted()) textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/revert " + punishment.getId().toString()));
+        return textComponent;
+    }
+
+    private static TextComponent restrictedPunishmentToTextComponent(Punishment punishment, String punished) {
+        TextComponent textComponent = new TextComponent(ChatColor.GRAY + "[" + dateFormat.format(new Date(punishment.getIssued())) + "] "
+                + (punishment.isReverted() ? ChatColor.STRIKETHROUGH + "" : (punishment.isActive() ? ChatColor.RED : ChatColor.YELLOW))
+                + punishment.getType() + ChatColor.RESET + " " + (punished == null ? punishment.getIp() : punished));
+
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[]{
+                new TextComponent(ChatColor.GRAY + "ID: "               + ChatColor.RESET + punishment.getId().toString()),
+                new TextComponent(ChatColor.GRAY + "\nType: "           + ChatColor.RESET + punishment.getType().toUpperCase()),
+                new TextComponent(ChatColor.GRAY + "\nIP Punishment: "  + ChatColor.RESET + punishment.isIp_ban()),
+                new TextComponent(ChatColor.GRAY + "\nReverted: "       + ChatColor.RESET + punishment.isReverted()),
+                new TextComponent(ChatColor.GRAY + "\nIssued: "         + ChatColor.RESET + new Date(punishment.getIssued()).toString()),
+                new TextComponent(ChatColor.GRAY + "\nExpires: "        + ChatColor.RESET + (punishment.getExpires() != -1 ? new Date(punishment.getExpires()).toString() : "Never")),
+                new TextComponent(ChatColor.GRAY + "\n\nReason: "       + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()))
+        }));
+
         return textComponent;
     }
 
