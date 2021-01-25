@@ -23,28 +23,31 @@ public class PlayerContext {
     }
     public UserProfile getUserProfile(boolean original) {
         if (hasNickedStats() && isNicked() && !original) {
-            return TGM.get().getNickManager().getStats().get(player.getUniqueId());
-        } else {
-            return userProfile;
-        }
-    }
-    public String getDisplayName() {
-        return TGM.get().getNickManager().getNickNames().getOrDefault(player.getUniqueId(), player.getName());
-    }
-    public String getOriginalName() {
-        return TGM.get().getNickManager().getOriginalNames().getOrDefault(player.getUniqueId(), player.getName());
-    }
-    public boolean hasNickedStats() {
-        return TGM.get().getNickManager().getStats().containsKey(player.getUniqueId());
-    }
-    public boolean isNicked() {
-        return TGM.get().getNickManager().getNickNames().containsKey(player.getUniqueId());
-    }
-    public String getLevelString() {
-        return getLevelString(false);
-    }
-    public String getLevelString(boolean original) {
-        int level = getUserProfile(original).getLevel();
+package network.warzone.tgm.user;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.util.Ranks;
+import network.warzone.warzoneapi.models.Rank;
+import network.warzone.warzoneapi.models.UserProfile;
+import net.md_5.bungee.api.ChatColor;
+
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
+/**
+ * Created by luke on 4/27/17.
+ */
+public class PlayerContext {
+    @Getter private Player player;
+    private UserProfile userProfile;
+    private static final List<PlayerLevel> levels = new ArrayList<>();
+
+    static {
 
 
         if (level < 10) {
@@ -81,9 +84,61 @@ public class PlayerContext {
         }
     }
 
+    public PlayerContext(Player player, UserProfile userProfile) {
+        this.player = player;
+        this.userProfile = userProfile;
+    }
+
+    public UserProfile getUserProfile() {
+        return getUserProfile(false);
+    }
+
+    public UserProfile getUserProfile(boolean original) {
+        if (isNicked() && !original) {
+            return TGM.get().getNickManager().getNick(this).get().getProfile();
+        } else {
+            return userProfile;
+        }
+    }
+
+    public String getDisplayName() {
+        if (isNicked()) {
+            return TGM.get().getNickManager().getNick(this).get().getName();
+        }
+        return player.getName();
+    }
+
+    public String getOriginalName() {
+        if (isNicked()) {
+            return TGM.get().getNickManager().getNick(this).get().getOriginalName();
+        }
+        return player.getName();
+    }
+
+    public boolean isNicked() {
+        return TGM.get().getNickManager().isNicked(this);
+    }
+
+    public String getLevelString() {
+        return getLevelString(false);
+    }
+
+    public String getLevelString(boolean original) {
+        int level = getUserProfile(original).getLevel();
+        for (PlayerLevel levelEntry : levels) {
+            if (levelEntry.check.test(level)) {
+                return "" + levelEntry.levelColor + "[" + level + "]"; 
+            }
+        }
+
+        // will not be reached due to fallback entry
+        return null;
+    }
+
     public void updateRank(Rank r) {
         updateRank(r, false);
     }
+
     public void updateRank(Rank r, boolean forceUpdate) {
         List<String> oldPermissions = new ArrayList<>();
         boolean update = false;
@@ -99,5 +154,12 @@ public class PlayerContext {
             Ranks.removePermissions(player, oldPermissions);
             getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(player, rank.getPermissions()));
         }
+
+    }
+
+    @AllArgsConstructor @Getter
+    private static class PlayerLevel {
+        private final Predicate<Integer> check;
+        private final ChatColor levelColor;
     }
 }
