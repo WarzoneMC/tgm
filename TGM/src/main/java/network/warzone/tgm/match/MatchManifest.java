@@ -14,6 +14,7 @@ import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.generator.GeneratorModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
+import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.knockback.KnockbackModule;
@@ -69,6 +70,7 @@ public abstract class MatchManifest {
         modules.add(new RegionManagerModule());
         modules.add(new TaskedModuleManager());
         modules.add(new CountdownManagerModule());
+        modules.add(new KitEditorModule());
         modules.add(new KitLoaderModule());
         modules.add(new DeathModule());
         modules.add(new DeathMessageModule());
