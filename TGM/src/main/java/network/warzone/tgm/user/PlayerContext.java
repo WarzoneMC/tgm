@@ -23,19 +23,19 @@ public class PlayerContext {
     private static final List<PlayerLevel> levels = new ArrayList<>();
 
     static {
-        levels.add(new PlayerLevel((lvl) -> lvl < 10, ChatColor.GRAY;
-        levels.add(new PlayerLevel((lvl) -> lvl < 20, ChatColor.DARK_AQUA;
-        levels.add(new PlayerLevel((lvl) -> lvl < 30, ChatColor.BLUE;
-        levels.add(new PlayerLevel((lvl) -> lvl < 40, ChatColor.LIGHT_PURPLE;
-        levels.add(new PlayerLevel((lvl) -> lvl < 60, ChatColor.DARK_PURPLE;
-        levels.add(new PlayerLevel((lvl) -> lvl < 80, ChatColor.DARK_RED;
-        levels.add(new PlayerLevel((lvl) -> lvl < 100, ChatColor.RED;
-        levels.add(new PlayerLevel((lvl) -> lvl < 120, ChatColor.GOLD;
-        levels.add(new PlayerLevel((lvl) -> lvl < 160, ChatColor.YELLOW;
-        levels.add(new PlayerLevel((lvl) -> lvl < 200, ChatColor.GREEN;
-        levels.add(new PlayerLevel((lvl) -> lvl < 220, ChatColor.DARK_GREEN;
+        levels.add(new PlayerLevel((lvl) -> lvl < 10, ChatColor.GRAY)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 20, ChatColor.DARK_AQUA)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 30, ChatColor.BLUE)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 40, ChatColor.LIGHT_PURPLE)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 60, ChatColor.DARK_PURPLE)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 80, ChatColor.DARK_RED)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 100, ChatColor.RED)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 120, ChatColor.GOLD)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 160, ChatColor.YELLOW)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 200, ChatColor.GREEN)));
+        levels.add(new PlayerLevel((lvl) -> lvl < 220, ChatColor.DARK_GREEN)));
         // fallback
-        levels.add(new PlayerLevel((lvl) -> true, ChatColor.of("#9E66FF")));
+        levels.add(new PlayerLevel((lvl) -> true, ChatColor.DARK_GREEN)));
     }
 
     public PlayerContext(Player player, UserProfile userProfile) {
