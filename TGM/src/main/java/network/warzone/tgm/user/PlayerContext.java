@@ -33,7 +33,6 @@ public class PlayerContext {
         levels.add(new PlayerLevel((lvl) -> lvl < 120, ChatColor.GOLD));
         levels.add(new PlayerLevel((lvl) -> lvl < 160, ChatColor.YELLOW));
         levels.add(new PlayerLevel((lvl) -> lvl < 200, ChatColor.GREEN));
-        levels.add(new PlayerLevel((lvl) -> lvl < 220, ChatColor.DARK_GREEN));
         // fallback
         levels.add(new PlayerLevel((lvl) -> true, ChatColor.DARK_GREEN));
     }
