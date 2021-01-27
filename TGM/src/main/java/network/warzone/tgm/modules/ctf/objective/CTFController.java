@@ -43,7 +43,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
         MatchTeam team = teamManagerModule.getTeam(stealer);
         Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.GRAY
-                + " stole " + ChatColor.BOLD + flag.getTeam().getColor() + flag.getTeam().getAlias()
+                + " stole " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
                 + ChatColor.GRAY + "'s flag");
         playSoundForTeam(team);
     }
@@ -54,7 +54,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
         Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.GRAY
-                + " dropped " + ChatColor.BOLD + flag.getTeam().getColor() + flag.getTeam().getAlias()
+                + " dropped " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
                 + ChatColor.GRAY + "'s flag");
     }
 
@@ -63,7 +63,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
         Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.GRAY
-                + " captured " + ChatColor.BOLD + flag.getTeam().getColor() + flag.getTeam().getAlias()
+                + " captured " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
                 + ChatColor.GRAY + "'s flag");
         playSoundForTeam(capturerTeam);
     }
