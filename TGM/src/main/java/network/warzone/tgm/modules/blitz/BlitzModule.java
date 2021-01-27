@@ -216,7 +216,8 @@ public class BlitzModule extends MatchModule implements Listener {
 
     private void handleQuit(PlayerEvent event) {
         if ((teamManagerModule.getTeam(event.getPlayer()) != null && teamManagerModule.getTeam(event.getPlayer()).isSpectator())) return;
-        updateScoreboardTeamLine(teamManagerModule.getTeam(event.getPlayer()), getAlivePlayers(teamManagerModule.getTeam(event.getPlayer())).size() - 1);
+        playerLives.remove(event.getPlayer().getUniqueId());
+        updateScoreboardTeamLine(teamManagerModule.getTeam(event.getPlayer()), getAlivePlayers(teamManagerModule.getTeam(event.getPlayer())).size());
 
         if (!TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) return;
 
