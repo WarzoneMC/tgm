@@ -65,6 +65,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.GRAY
                 + " captured " + flag.getTeam().getColor() + flag.getTeam().getAlias()
                 + ChatColor.GRAY + "'s flag");
+        playSoundForTeam(capturerTeam);
     }
 
     public void unload() {
