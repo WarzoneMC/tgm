@@ -6,9 +6,12 @@ import network.warzone.tgm.modules.flag.MatchFlag;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.user.PlayerContext;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -38,11 +41,11 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     @Override
     public void pickup(MatchFlag flag, Player stealer) {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
-        stealer.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1000000, 2, true, false), true);
         MatchTeam team = teamManagerModule.getTeam(stealer);
         Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.GRAY
-                + " stole " + flag.getTeam().getColor() + flag.getTeam().getAlias()
+                + " stole " + ChatColor.BOLD + flag.getTeam().getColor() + flag.getTeam().getAlias()
                 + ChatColor.GRAY + "'s flag");
+        playSoundForTeam(team);
     }
 
     @Override
@@ -51,14 +54,13 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
         Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.GRAY
-                + " dropped " + flag.getTeam().getColor() + flag.getTeam().getAlias()
+                + " dropped " + ChatColor.BOLD + flag.getTeam().getColor() + flag.getTeam().getAlias()
                 + ChatColor.GRAY + "'s flag");
     }
 
     @Override
     public void capture(MatchFlag flag, Player capturer) {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
-        capturer.removePotionEffect(PotionEffectType.SLOW);
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
         Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.GRAY
                 + " captured " + flag.getTeam().getColor() + flag.getTeam().getAlias()
@@ -71,5 +73,17 @@ public abstract class CTFController implements FlagSubscriber, Listener {
 
     public final void gameOver(MatchTeam team) {
         subscriber.gameOver(team);
+    }
+
+    private void playSoundForTeam(MatchTeam successTeam) {
+        for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
+            for (PlayerContext playerContext : otherTeam.getMembers()) {
+                if (otherTeam.isSpectator() || otherTeam.equals(successTeam)) {
+                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                } else {
+                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                }
+            }
+        }
     }
 }
