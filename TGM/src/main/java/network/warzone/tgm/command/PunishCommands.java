@@ -216,6 +216,7 @@ public class PunishCommands {
                 }
                 for (Punishment punishment : punishmentsListResponse.getPunishments()) {
                     if (restrictedView) {
+                        if (!map.get(punishment.getPunished()).equalsIgnoreCase(displayName)) continue;
                         sender.spigot().sendMessage(restrictedPunishmentToTextComponent(punishment, map.get(punishment.getPunished())));
                     } else {
                         sender.spigot().sendMessage(punishmentToTextComponent(punishment, map.get(punishment.getPunished()), map.getOrDefault(punishment.getPunisher(), "Console"), true));
@@ -302,19 +303,30 @@ public class PunishCommands {
 
                     PunishmentsListResponse punishmentsListResponse = TGM.get().getTeamClient().getPunishments(new PunishmentsListRequest(user.getName(), null));
                     if (!punishmentsListResponse.isNotFound()) {
+                        HashMap<ObjectId, String> map = new HashMap<>();
+                        for (PunishmentsListResponse.LoadedUser loadedUser : punishmentsListResponse.getLoadedUsers()) {
+                            map.put(loadedUser.getId(), loadedUser.getName());
+                        }
+
                         for (Punishment punishment : punishmentsListResponse.getPunishments()) {
-                            if ("BAN".equals(punishment.getType().toUpperCase()) && punishment.isActive()) {
+                            if (!map.get(punishment.getPunished()).equalsIgnoreCase(user.getName())) continue;
+
+                            if ("BAN".equalsIgnoreCase(punishment.getType()) && punishment.isActive()) {
                                 isBanned = true;
                                 break;
                             }
 
-                            if ("MUTE".equals(punishment.getType().toUpperCase()) && punishment.isActive()) {
+                            if ("MUTE".equalsIgnoreCase(punishment.getType()) && punishment.isActive()) {
                                 isMuted = true;
                             }
                         }
                     }
 
                     ChatColor chatColor = ChatColor.WHITE;
+
+                    if (Bukkit.getPlayer(user.getName()) != null) {
+                        chatColor = ChatColor.GREEN;
+                    }
 
                     if (isMuted) {
                         chatColor = ChatColor.YELLOW;
