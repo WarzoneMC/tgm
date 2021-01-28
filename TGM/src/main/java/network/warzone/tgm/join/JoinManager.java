@@ -3,6 +3,8 @@ package network.warzone.tgm.join;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.MapRotationFile;
 import network.warzone.tgm.map.Rotation;
@@ -12,10 +14,14 @@ import network.warzone.tgm.nickname.Nick;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
+import network.warzone.warzoneapi.models.PlayerAltsResponse;
 import network.warzone.warzoneapi.models.PlayerLogin;
 import network.warzone.warzoneapi.models.Punishment;
+import network.warzone.warzoneapi.models.PunishmentsListRequest;
+import network.warzone.warzoneapi.models.PunishmentsListResponse;
 import network.warzone.warzoneapi.models.Skin;
 import network.warzone.warzoneapi.models.UserProfile;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -174,6 +180,60 @@ public class JoinManager implements Listener {
         
         event.setJoinMessage(joinMsg);
 
+        Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> { // Check alts asynchronously to prevent delaying the join event
+            PlayerAltsResponse response = TGM.get().getTeamClient().getAlts(event.getPlayer().getName());
+            if (response != null && !response.isError() && !response.getUsers().isEmpty()) {
+                List<String> punishedAlts = new ArrayList<>();
+
+                boolean banned = false;
+
+                for (UserProfile user : response.getUsers()) {
+                    PunishmentsListResponse punishmentsListResponse = TGM.get().getTeamClient().getPunishments(new PunishmentsListRequest(user.getName(), null));
+                    if (!punishmentsListResponse.isNotFound()) {
+                        boolean altBanned = false;
+                        boolean altMuted = false;
+
+                        for (Punishment punishment : punishmentsListResponse.getPunishments()) {
+                            if ("BAN".equals(punishment.getType().toUpperCase()) && punishment.isActive()) {
+                                altBanned = true;
+                            }
+
+                            if ("MUTE".equals(punishment.getType().toUpperCase()) && punishment.isActive()) {
+                                altMuted = true;
+                            }
+                        }
+
+                        if (altBanned) {
+                            banned = true;
+                            punishedAlts.add(ChatColor.GRAY + "- " + ChatColor.RED + user.getName());
+                        } else if (altMuted) {
+                            punishedAlts.add(ChatColor.GRAY + "- " + ChatColor.YELLOW + user.getName());
+                        }
+                    }
+                }
+
+                if (punishedAlts.isEmpty()) return;
+
+                String staffNotification = ChatColor.DARK_RED + "[STAFF] " + (banned ? ChatColor.RED : ChatColor.YELLOW) +
+                        event.getPlayer().getName() + " might be " + (banned ? "ban" : "mute") + "-evading";
+
+                TextComponent message = new TextComponent(staffNotification);
+
+                TextComponent[] hoverMessage = new TextComponent[punishedAlts.size()];
+                for (int i = 0; i < punishedAlts.size(); i++) {
+                    hoverMessage[i] = new TextComponent(punishedAlts.get(i));
+                }
+
+                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverMessage));
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.hasPermission("tgm.lookup")) {
+                        player.spigot().sendMessage(message);
+                    }
+                }
+                Bukkit.getConsoleSender().sendMessage(message);
+            }
+        });
         handleRotationUpdate(false);
     }
 
