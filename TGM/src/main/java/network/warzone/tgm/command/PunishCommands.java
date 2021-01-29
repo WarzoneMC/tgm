@@ -24,6 +24,8 @@ import org.bukkit.inventory.ItemStack;
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Pattern;
 
 public class PunishCommands {
@@ -35,6 +37,9 @@ public class PunishCommands {
     private static final ChatColor durationColor = ChatColor.LIGHT_PURPLE;
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+    private static final ConcurrentLinkedQueue<String> cooldowns = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentHashMap<String, String> confirmations = new ConcurrentHashMap<>();
 
     public static boolean isIP(final String ip) {
         return IP_PATTERN.matcher(ip).matches();
@@ -532,6 +537,36 @@ public class PunishCommands {
     }
 
     private static void issuePunishment(String type, String name, String ip, boolean ip_ban, CommandSender punisher, String verb, TimeUnitPair timeUnitPair, String reason, boolean time, boolean broadcast) {
+        if (cooldowns.contains(name.toLowerCase())) {
+            if (confirmations.containsKey(punisher.getName()) && confirmations.get(punisher.getName()).equalsIgnoreCase(name)) {
+                confirmations.remove(punisher.getName());
+            } else {
+                punisher.sendMessage(ChatColor.RED + "This player has recently been punished. Please resend the command to confirm the new punishment.");
+                confirmations.put(punisher.getName(), name.toLowerCase());
+
+                Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
+                    if (confirmations.getOrDefault(punisher.getName(), name).equalsIgnoreCase(name)) confirmations.remove(punisher.getName());
+                }, 10 * 20); // 10 seconds
+                return;
+            }
+        }
+
+        cooldowns.add(name.toLowerCase());
+
+        int originalCooldownAmount = 0;
+        for (String punished : cooldowns) {
+            if (punished.equalsIgnoreCase(name)) originalCooldownAmount++;
+        }
+        int finalOriginalCooldownAmount = originalCooldownAmount;
+
+        Bukkit.getScheduler().runTaskLaterAsynchronously(TGM.get(), () -> {
+            int cooldownAmount = 0;
+            for (String punished : cooldowns) {
+                if (punished.equalsIgnoreCase(name)) cooldownAmount++;
+            }
+            if (finalOriginalCooldownAmount == cooldownAmount) cooldowns.removeAll(Collections.singletonList(name.toLowerCase()));
+        }, 10 * 20); // 10 seconds
+
         Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
             IssuePunishmentResponse response = TGM.get().getTeamClient().issuePunishment(
                     new IssuePunishmentRequest(
