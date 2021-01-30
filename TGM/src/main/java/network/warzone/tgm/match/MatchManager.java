@@ -2,6 +2,7 @@ package network.warzone.tgm.match;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.*;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -49,8 +50,28 @@ public class MatchManager {
             }
         }
         match.disable();
+        handleRotationUpdate();
 
         Bukkit.getPluginManager().callEvent(new MatchResultEvent(match, winningTeam, losers));
+    }
+
+    private static void handleRotationUpdate() {
+        int playerCount = Bukkit.getOnlinePlayers().size();
+        MapRotationFile rotationFile = TGM.get().getMatchManager().getMapRotation();
+
+        if (!rotationFile.getRotation().isDefault()) return;
+        Rotation potentialRotation = rotationFile.getRotationForPlayerCount(playerCount);
+
+        if (potentialRotation != rotationFile.getRotation()) {
+            System.out.println("Rotation has changed to " + potentialRotation.getName() + " from " + rotationFile.getRotation().getName());
+            Bukkit.getOnlinePlayers().forEach(
+                    player -> player.sendMessage(
+                            ChatColor.GRAY + "The rotation has been updated to " + ChatColor.GOLD + potentialRotation.getName() + ChatColor.GRAY + " to accommodate for the new player size."
+                    )
+            );
+
+            rotationFile.setRotation(potentialRotation.getName());
+        }
     }
 
     public void cycleNextMatch() {

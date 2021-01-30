@@ -173,8 +173,6 @@ public class JoinManager implements Listener {
         }
         
         event.setJoinMessage(joinMsg);
-
-        handleRotationUpdate(false);
     }
 
     //TODO: Persistent modules
@@ -197,26 +195,6 @@ public class JoinManager implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         event.setQuitMessage(ChatColor.GRAY + event.getPlayer().getName() + " left.");
         handleQuit(event.getPlayer());
-        handleRotationUpdate(true);
-    }
-
-    private void handleRotationUpdate(boolean isLeaving) {
-        int playerCount = Bukkit.getOnlinePlayers().size() - (isLeaving ? 1 : 0);
-        MapRotationFile rotationFile = TGM.get().getMatchManager().getMapRotation();
-
-        if (!rotationFile.getRotation().isDefault()) return;
-        Rotation potentialRotation = rotationFile.getRotationForPlayerCount(playerCount);
-
-        if (potentialRotation != rotationFile.getRotation()) {
-            System.out.println("Rotation has changed to " + potentialRotation.getName() + " from " + rotationFile.getRotation().getName());
-            Bukkit.getOnlinePlayers().forEach(
-                    player -> player.sendMessage(
-                            ChatColor.GRAY + "The rotation has been updated to " + ChatColor.GOLD + potentialRotation.getName() + ChatColor.GRAY + " to accommodate for the new player size."
-                    )
-            );
-
-            rotationFile.setRotation(potentialRotation.getName());
-        }
     }
 
     private void handleQuit(Player player) {
