@@ -45,6 +45,7 @@ public class WoolChestModule extends MatchModule implements Listener {
     public void unload() {
         Bukkit.getScheduler().cancelTask(runnableId);
         woolChests.clear();
+        disqualifiedChests.clear();
     }
 
     @EventHandler
@@ -102,6 +103,7 @@ public class WoolChestModule extends MatchModule implements Listener {
                     event.getPlayer().sendMessage(ChatColor.RED + "You cannot break the wool chest!");
                 }
             }
+            if (!event.isCancelled()) disqualifiedChests.remove(event.getBlock().getLocation());
         }
     }
 
