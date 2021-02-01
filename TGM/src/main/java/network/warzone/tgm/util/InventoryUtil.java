@@ -71,8 +71,9 @@ public class InventoryUtil {
         inventory.setItem(4, player.getInventory().getItemInOffHand());
 
         KillstreakModule killstreakModule = TGM.get().getModule(KillstreakModule.class);
-        if (killstreakModule.getKillstreak(player.getUniqueId().toString()) > 0) {
-            inventory.setItem(6, getKillstreakItem(player));
+        int killstreak = killstreakModule.getKillstreak(player.getUniqueId().toString());
+        if (killstreak > 0) {
+            inventory.setItem(6, getKillstreakItem(killstreak));
         }
 
         inventory.setItem(7, getHealthItem(player));
@@ -83,9 +84,7 @@ public class InventoryUtil {
         return Color.fromRGB(0);
     }
 
-    private static ItemStack getKillstreakItem(Player player) {
-        KillstreakModule killstreakModule = TGM.get().getModule(KillstreakModule.class);
-        int killstreak = killstreakModule.getKillstreak(player.getUniqueId().toString());
+    private static ItemStack getKillstreakItem(int killstreak) {
         int amount = killstreak > 64 ? 1 : killstreak;
         return ItemFactory.createItem(Material.IRON_SWORD, ChatColor.GREEN + "Killstreak: " + ChatColor.DARK_GREEN + killstreak, amount);
     }
