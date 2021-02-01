@@ -135,8 +135,6 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().getInventory().setItem(4, teamSelectionItem);
         playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
         // Inventory slot 8 is reserved for the kitEditorItem in KitLoaderModule
-
-        playerContext.getPlayer().getInventory().setHeldItemSlot(4);
     }
 
     private void updateTeamMenuItem(MatchTeam matchTeam, int i) {

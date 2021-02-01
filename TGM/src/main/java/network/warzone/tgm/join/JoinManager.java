@@ -170,6 +170,7 @@ public class JoinManager implements Listener {
             joinMsg += ChatColor.LIGHT_PURPLE + " [NEW]";
             event.getPlayer()
                     .sendTitle(new Title("", ChatColor.translateAlternateColorCodes('&', "&7Use &b/join&7 to play!")));
+            event.getPlayer().getInventory().setHeldItemSlot(4);
         }
         
         event.setJoinMessage(joinMsg);
