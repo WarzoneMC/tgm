@@ -48,7 +48,7 @@ map:
   update-remotes-on-startup: false
   # Remote Map Sources
   remotes:
-    official_repo:
+    official:
       branch: master
       destination: Maps
       uri: https://github.com/Warzone/Maps.git
