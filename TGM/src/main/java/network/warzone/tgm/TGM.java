@@ -2,7 +2,6 @@ package network.warzone.tgm;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mashape.unirest.http.Unirest;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
@@ -44,7 +43,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -150,16 +148,6 @@ public class TGM extends JavaPlugin {
         nickManager = new NickManager(); 
     }
 
-    @Override
-    public void onDisable() {
-
-
-        try {
-            Unirest.shutdown();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {

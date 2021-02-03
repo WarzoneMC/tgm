@@ -1,8 +1,5 @@
 package network.warzone.warzoneapi.client.offline;
 
-import com.google.gson.Gson;
-import com.mashape.unirest.http.ObjectMapper;
-import com.mashape.unirest.http.Unirest;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
@@ -16,29 +13,6 @@ import java.util.List;
  * Created by luke on 4/27/17.
  */
 public class OfflineClient implements TeamClient {
-
-    public OfflineClient() {
-        Gson gson = new Gson();
-        Unirest.setObjectMapper(new ObjectMapper() {
-
-            public <T> T readValue(String s, Class<T> aClass) {
-                try {
-                    return gson.fromJson(s, aClass);
-                } catch(Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            public String writeValue(Object o) {
-                try {
-                    return gson.toJson(o);
-                } catch(Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-    }
 
     @Override
     public void heartbeat(Heartbeat heartbeat) {
@@ -138,6 +112,10 @@ public class OfflineClient implements TeamClient {
     @Override
     public PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action) {
         return new PlayerTagsUpdateResponse(false, "", "", new ArrayList<>(), null);
+    }
+
+    public MojangProfile getMojangProfile(String username) {
+        return null;
     }
 
 }
