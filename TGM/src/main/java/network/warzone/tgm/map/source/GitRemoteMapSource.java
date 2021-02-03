@@ -76,6 +76,10 @@ public class GitRemoteMapSource extends MapSource {
             }
             localGitRepo.close();
         } else {
+            if (this.destinationDirectory.exists() && this.destinationDirectory.listFiles().length > 0) {
+                System.out.println("Destination directory is not empty. Skipping clone.");
+                return;
+            }
             try {
                 System.out.println("Cloning remote repository...");
                 CloneCommand cloneCommand = Git.cloneRepository()
