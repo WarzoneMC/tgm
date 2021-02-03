@@ -53,6 +53,10 @@ public class MiscCommands {
         if ("UPDATE".equalsIgnoreCase(action)) {
             mapLibrary.updateRemote(remote, sender);
         } else {
+            if (cmd.argsLength() == 1) {
+                sender.sendMessage(ChatColor.RED + "Please specify a remote name");
+                return;
+            }
             sendRepoData(sender, remote);
         }
     }

@@ -117,6 +117,10 @@ public class MapLibrary {
         } else {
             GitRemoteMapSource remoteMapSource = this.getRemoteByName(remote);
             if (remoteMapSource != null) tasks.add(remoteMapSource::refreshMaps);
+            else {
+                sender.sendMessage(ChatColor.RED + "Unrecognized remote '" + remote + "'");
+                return;
+            }
         }
 
         if (tasks.size() == 0) return;
