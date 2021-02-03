@@ -51,6 +51,7 @@ public class MiscCommands {
         final String remote = cmd.argsLength() == 1 ? "ALL" : cmd.getString(1);
 
         if ("UPDATE".equalsIgnoreCase(action)) {
+            sender.sendMessage(ChatColor.YELLOW + "Updating remote(s), this may take awhile...");
             mapLibrary.updateRemote(remote, sender);
         } else {
             if (cmd.argsLength() == 1) {
