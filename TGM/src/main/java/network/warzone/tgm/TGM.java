@@ -81,8 +81,8 @@ public class TGM extends JavaPlugin {
     public void onEnable() {
         instance = this;
         this.startupTime = new Date().getTime();
-        FileConfiguration fileConfiguration = getConfig();
         saveDefaultConfig();
+        FileConfiguration fileConfiguration = getConfig();
 
         gson = new GsonBuilder()
                 // TGM
@@ -147,7 +147,7 @@ public class TGM extends JavaPlugin {
         Plugins.checkSoftDependencies();
 
         matchManager.cycleNextMatch();
-        nickManager = new NickManager(); 
+        if (matchManager.getMatch() != null) nickManager = new NickManager(); 
     }
 
     @Override

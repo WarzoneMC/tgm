@@ -80,13 +80,16 @@ public class MatchManager {
     }
 
     public void cycleNextMatch() {
-        matchNumber++;
-
         //find a new map to cycle to.
         MapContainer mapContainer = forcedNextMap;
         if (mapContainer == null) {
             mapContainer = mapRotation.cycle(matchNumber == 1);
+            if (mapContainer == null) {
+                System.out.println("No maps could be found in the rotation. Are there any maps?");
+                return;
+            }
         }
+        matchNumber++;
         forcedNextMap = null;
 
         //generate next match's uuid

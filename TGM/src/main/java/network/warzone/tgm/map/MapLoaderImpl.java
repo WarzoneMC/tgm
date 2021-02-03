@@ -16,6 +16,7 @@ public class MapLoaderImpl implements MapLoader {
 
     @Override
     public List<MapContainer> loadMaps(File folder) {
+        if (!folder.exists()) return new ArrayList<>();
         List<MapContainer> maps = new ArrayList<>();
 
         File[] children = folder.listFiles();

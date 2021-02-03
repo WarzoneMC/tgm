@@ -29,14 +29,17 @@ public class RotationDeserializer implements JsonDeserializer<Rotation> {
         }
 
         List<MapContainer> maps = new ArrayList<>();
+        List<String> mapNames = new ArrayList<>();
         for (JsonElement element : json.getAsJsonArray("maps")) {
+            final String mapElementName = element.getAsString();
+            mapNames.add(mapElementName);
             for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-                if (mapContainer.getMapInfo().getName().equalsIgnoreCase(element.getAsString())) {
+                if (mapContainer.getMapInfo().getName().equalsIgnoreCase(mapElementName)) {
                     maps.add(mapContainer);
                 }
             }
         }
 
-        return new Rotation(name, isDefault, requirements, maps, initialShuffle);
+        return new Rotation(name, isDefault, requirements, maps, mapNames, initialShuffle);
     }
 }
