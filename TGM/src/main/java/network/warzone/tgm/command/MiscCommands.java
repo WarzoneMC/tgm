@@ -76,8 +76,8 @@ public class MiscCommands {
         } else {
             sender.sendMessage(ChatColor.WHITE + "Local Repository Data for remote " + ChatColor.GREEN + repoData.NAME);
             sender.sendMessage("");
-            sender.sendMessage(ChatColor.WHITE + "HEAD: " + ChatColor.GREEN + repoData.HEAD_ID);
-            sender.sendMessage(ChatColor.WHITE + "HEAD Commit Message: " + ChatColor.GREEN + repoData.HEAD_MESSAGE);
+            sender.sendMessage(ChatColor.WHITE + "Latest Commit: " + ChatColor.GREEN + repoData.HEAD_ID);
+            sender.sendMessage(ChatColor.WHITE + "Latest Commit Message: " + ChatColor.GREEN + repoData.HEAD_MESSAGE);
             sender.sendMessage(ChatColor.WHITE + "Branch: " + ChatColor.GREEN + repoData.BRANCH);
         }
     }
