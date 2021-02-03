@@ -97,7 +97,7 @@ public class GitRemoteMapSource extends MapSource {
                 exception.printStackTrace();
                 return;
             }
-            System.out.println("Successfully cloned maps from " + this.remoteURI + "!");
+            System.out.println("Successfully cloned maps from remote '" + this.name + "'");
         }
 	}
 
