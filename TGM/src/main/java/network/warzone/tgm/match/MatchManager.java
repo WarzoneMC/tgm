@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.generator.ChunkGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +25,10 @@ import java.util.UUID;
  */
 @Getter
 public class MatchManager {
+
+
+    private static final ChunkGenerator CHUNK_GENERATOR = new NullChunkGenerator();
+
     private MapLibrary mapLibrary;
     private MapRotationFile mapRotation;
     private Match match = null;
@@ -95,7 +100,7 @@ public class MatchManager {
 
         //create the new world under a random uuid in the matches folder.
         WorldCreator worldCreator = new WorldCreator("matches/" + matchUuid.toString());
-        worldCreator.generator(new NullChunkGenerator());
+        worldCreator.generator(CHUNK_GENERATOR);
         worldCreator.generateStructures(false);
 
         World world = worldCreator.createWorld();
