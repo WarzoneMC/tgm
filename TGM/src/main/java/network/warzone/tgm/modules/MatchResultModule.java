@@ -54,19 +54,19 @@ public class MatchResultModule extends MatchModule implements Listener {
             Location location = player.getLocation().clone().add(0.0, 100.0, 0.0);
 
             if (spectators.containsPlayer(player)) {
-                player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
+                player.playSound(location, Sound.ENTITY_WITHER_DEATH, 100, 1);
             } else {
                 applyPostPlayer(player);
 
                 if (event.getWinningTeam() == null) {
                     player.sendTitle("", ChatColor.YELLOW + "The result was a tie!", 10, 40, 10);
-                    player.playSound(location, Sound.ENTITY_WITHER_SPAWN, 1000, 1);
+                    player.playSound(location, Sound.ENTITY_WITHER_SPAWN, 100, 1);
                 } else if (event.getWinningTeam().containsPlayer(player)) {
                     player.sendTitle("", ChatColor.GREEN + "Your team won!", 10, 40, 10);
-                    player.playSound(location, Sound.ENTITY_WITHER_DEATH, 1000, 1);
+                    player.playSound(location, Sound.ENTITY_WITHER_DEATH, 100, 1);
                 } else {
                     player.sendTitle("", ChatColor.RED + "Your team lost!", 10, 40, 10);
-                    player.playSound(location, Sound.ENTITY_WITHER_SPAWN, 1000, 1);
+                    player.playSound(location, Sound.ENTITY_WITHER_SPAWN, 100, 1);
                 }
             }
 
