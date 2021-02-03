@@ -44,6 +44,14 @@ map:
   # When the match starts, how long to take to start the match.
   # Default: 20
   start-countdown: 20
+  # Whether remote map sources should be updated on startup
+  update-remotes-on-startup: false
+  # Remote Map Sources
+  remotes:
+    official_repo:
+      branch: master
+      destination: Maps
+      uri: https://github.com/Warzone/Maps.git
   # Map repository location.
   sources:
   - Maps

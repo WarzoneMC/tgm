@@ -29,6 +29,7 @@ public class MapRotationFile {
     }
 
     public MapContainer cycle(boolean initial) {
+        if (rotation.getMaps().size() == 0) return null;
         current = (current + (initial ? 0 : 1)) % rotation.getMaps().size();
 
         if (!rotation.isDefault() && current == rotation.getMaps().size() - 1) {
@@ -52,7 +53,7 @@ public class MapRotationFile {
         // Load rotation files
 
         if (!rotationFile.exists()) {
-            this.rotationLibrary = Collections.singletonList(new Rotation("Preset", true, new RotationRequirement(0, 999999), this.mapLibrary.getMaps()));
+            this.rotationLibrary = Collections.singletonList(new Rotation("Preset", true, new RotationRequirement(0, 999999), this.mapLibrary.getMaps(), null));
             this.rotation = this.rotationLibrary.get(0);
 
             this.current = 0;
@@ -66,6 +67,7 @@ public class MapRotationFile {
             this.rotationLibrary = Arrays.asList(rotationList);
 
             rotation = this.rotationLibrary.stream().filter(Rotation::isDefault).findFirst().orElseThrow(() -> new IllegalArgumentException("No default rotation present."));
+            rotation.refresh();
             current = this.loadRotationPosition(0);
         } catch (IOException | IllegalArgumentException e) {
             e.printStackTrace();

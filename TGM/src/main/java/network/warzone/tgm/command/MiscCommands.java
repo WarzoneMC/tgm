@@ -1,10 +1,17 @@
 package network.warzone.tgm.command;
 
+import javax.annotation.Nullable;
+
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import com.sk89q.minecraft.util.commands.CommandPermissionsException;
+
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.map.MapLibrary;
+import network.warzone.tgm.map.source.GitRemoteMapSource;
+import network.warzone.tgm.map.source.GitRemoteMapSource.RepoData;
 import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.nickname.ProfileCache;
 import network.warzone.tgm.util.Players;
@@ -20,6 +27,55 @@ be enabled WHETHER THE API IS ENABLED OR NOT.
  */
 
 public class MiscCommands {
+
+    @Command(aliases = {"remotes"}, desc = "Manage remote map sources", usage = "(name)")
+    public static void remotes(CommandContext cmd, CommandSender sender) throws CommandPermissionsException {
+        if (sender instanceof Player) {
+            if (!sender.hasPermission("tgm.manage_remotes")) {
+                throw new CommandPermissionsException();
+            }
+        }
+
+        MapLibrary mapLibrary = TGM.get().getMatchManager().getMapLibrary();
+        if (cmd.argsLength() == 0) {
+            sender.sendMessage("Remotes: " + ChatColor.GREEN + mapLibrary.getRemotes().size());
+            sender.sendMessage("");
+            sender.sendMessage("For more information about specific remotes: " + ChatColor.YELLOW + "/remotes <update/view> <all/(remote name)>");
+            sender.sendMessage(ChatColor.GREEN + "- update " + ChatColor.WHITE + "= Fetching maps from remote source");
+            sender.sendMessage(ChatColor.GREEN + "- view " + ChatColor.WHITE + " = View metadata about remote source");
+            sender.sendMessage("");
+            return;
+        }
+
+        final String action = cmd.getString(0);
+        final String remote = cmd.argsLength() == 1 ? "ALL" : cmd.getString(1);
+
+        if ("UPDATE".equalsIgnoreCase(action)) {
+            mapLibrary.updateRemote(remote, sender);
+        } else {
+            sendRepoData(sender, remote);
+        }
+    }
+
+    private static void sendRepoData(CommandSender sender, final String remote) {
+        GitRemoteMapSource remoteMapSource = TGM.get().getMatchManager().getMapLibrary().getRemoteByName(remote);
+        if (remoteMapSource == null) {
+            sender.sendMessage(ChatColor.RED + "Remote name '" + remote + "' could not be recognized");
+            return;
+        }
+
+        RepoData repoData = remoteMapSource.getRepoData();
+
+        if (repoData == null) {
+            sender.sendMessage(ChatColor.RED + "Could not get data about local repository");
+        } else {
+            sender.sendMessage(ChatColor.WHITE + "Local Repository Data for remote " + ChatColor.GREEN + repoData.NAME);
+            sender.sendMessage("");
+            sender.sendMessage(ChatColor.WHITE + "HEAD: " + ChatColor.GREEN + repoData.HEAD_ID);
+            sender.sendMessage(ChatColor.WHITE + "HEAD Commit Message: " + ChatColor.GREEN + repoData.HEAD_MESSAGE);
+            sender.sendMessage(ChatColor.WHITE + "Branch: " + ChatColor.GREEN + repoData.BRANCH);
+        }
+    }
 
     @Command(aliases = {"ping"}, desc = "Check player ping", max = 1, usage = "(name)")
     public static void ping(CommandContext cmd, CommandSender sender) {

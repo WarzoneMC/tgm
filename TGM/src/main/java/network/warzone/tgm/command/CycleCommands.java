@@ -11,6 +11,7 @@ import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.map.MapInfo;
+import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.chat.ChatChannel;
 import network.warzone.tgm.modules.chat.ChatConstant;
@@ -498,6 +499,8 @@ public class CycleCommands {
         TGM.get().getMatchManager().getMapLibrary().refreshMaps();
         TGM.get().getMatchManager().getMapRotation().refresh();
         sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
+        // Attempt to cycle to a new match, if a match does not yet exist after loading maps
+        if (TGM.get().getMatchManager().getMatch() == null) TGM.get().getMatchManager().cycleNextMatch();
     }
 
     @Command(aliases = {"channel", "chatchannel", "cc"}, desc = "Change or select a chat channel.", usage = "(all|team|staff)", min = 1)
@@ -885,7 +888,8 @@ public class CycleCommands {
     public static TextComponent mapToTextComponent(int position, MapInfo mapInfo) {
         String mapName = ChatColor.GOLD + mapInfo.getName();
 
-        if (mapInfo.equals(TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo())) {
+        Match currentMatch = TGM.get().getMatchManager().getMatch();
+        if (currentMatch != null && mapInfo.equals(currentMatch.getMapContainer().getMapInfo())) {
             mapName = ChatColor.GREEN + "" + (position + 1) + ". " + mapName;
         } else {
             mapName = ChatColor.WHITE + "" + (position + 1) + ". " + mapName;
