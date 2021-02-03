@@ -86,7 +86,8 @@ public class InventoryUtil {
 
     private static ItemStack getKillstreakItem(int killstreak) {
         int amount = killstreak > 64 ? 1 : killstreak;
-        return ItemFactory.createItem(Material.IRON_SWORD, ChatColor.GREEN + "Killstreak: " + ChatColor.DARK_GREEN + killstreak, amount);
+        Material material = killstreak > 64 ? Material.DIAMOND_SWORD : Material.IRON_SWORD;
+        return ItemFactory.createItem(material, ChatColor.GREEN + "Killstreak: " + ChatColor.DARK_GREEN + killstreak, amount);
     }
 
     private static ItemStack getHealthItem(Player player) {
