@@ -42,8 +42,6 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
                                 }
                                 if (profile != null) {
                                     author.setDisplayUsername(profile.getUsername());
-                                } else {
-                                    throw new Exception();
                                 }
                             } catch (Exception e) {
                                 TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);

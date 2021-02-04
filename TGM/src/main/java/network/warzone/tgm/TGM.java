@@ -1,11 +1,13 @@
 package network.warzone.tgm;
 
+import cl.bgmp.bukkit.util.CommandsManagerRegistration;
+import cl.bgmp.minecraft.util.commands.CommandsManager;
+import cl.bgmp.minecraft.util.commands.annotations.TabCompletion;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandException;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandPermissionsException;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandUsageException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.minecraft.util.commands.CommandsManager;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.api.ApiManager;
@@ -34,6 +36,7 @@ import network.warzone.warzoneapi.client.offline.OfflineClient;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -110,12 +113,7 @@ public class TGM extends JavaPlugin {
             teamClient = new OfflineClient();
         }
 
-        commands = new CommandsManager<CommandSender>() {
-            @Override
-            public boolean hasPermission(CommandSender sender, String perm) {
-                return sender.isOp() || sender.hasPermission(perm);
-            }
-        };
+        commands = new TGMCommandManager();
 
         matchManager = new MatchManager(fileConfiguration);
         matchManager.getMapRotation().refresh();
@@ -127,6 +125,7 @@ public class TGM extends JavaPlugin {
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 
+        commandManager.register(TGMCommand.TGMCommandNode.class);
         commandManager.register(CycleCommands.class);
         commandManager.register(BroadcastCommands.class);
         commandManager.register(MiscCommands.class);
@@ -159,7 +158,7 @@ public class TGM extends JavaPlugin {
             } else {
                 sender.sendMessage(ChatColor.RED + "You do not have permission.");
             }
-        } catch (com.sk89q.minecraft.util.commands.CommandUsageException e) {
+        } catch (CommandUsageException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandException e) {
