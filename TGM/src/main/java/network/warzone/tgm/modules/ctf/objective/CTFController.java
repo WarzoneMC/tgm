@@ -43,11 +43,11 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
         MatchTeam team = teamManagerModule.getTeam(stealer);
         if (flag.getTeam() == null) {
-            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " picked up " + flag.getName());
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " picked up " + ChatColor.BOLD + flag.getName());
         } else {
             Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
                     + " picked up " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                    + ChatColor.WHITE + "'s " + flag.getName());
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
         }
         playSoundForTeam(team);
     }
@@ -58,11 +58,11 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
         if (flag.getTeam() == null) {
-            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " dropped " + flag.getName());
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " dropped " + ChatColor.BOLD + flag.getName());
         } else {
             Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
                     + " dropped " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                    + ChatColor.WHITE + "'s " + flag.getName());
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
         }
     }
 
@@ -71,11 +71,11 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
         if (flag.getTeam() == null) {
-            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE + " captured " + flag.getName());
+            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE + " captured " + ChatColor.BOLD + flag.getName());
         } else {
             Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE
                     + " captured " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                    + ChatColor.WHITE + "'s " + flag.getName());
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
         }
         playSoundForTeam(capturerTeam);
     }
