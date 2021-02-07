@@ -110,7 +110,8 @@ public class CTFTimeController extends CTFController implements TimeLimitService
             if (flag.getFlagHolder() == null) continue;
             if (!addedAnyFlags) addedAnyFlags = true;
             MatchTeam team = teamManagerModule.getTeam(flag.getFlagHolder());
-            scoreboard.add(flag.getTeam().getColor() +
+            ChatColor flagOwnerColor = flag.getTeam() == null ? ChatColor.WHITE : flag.getTeam().getColor();
+            scoreboard.add(flagOwnerColor +
                     CTFModule.RIGHT_ARROW + " " + team.getColor() + flag.getFlagHolder().getName(), ++positionOnScoreboard);
         }
         if (addedAnyFlags) scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);

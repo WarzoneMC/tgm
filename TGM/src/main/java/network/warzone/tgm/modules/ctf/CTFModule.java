@@ -74,7 +74,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
                 MatchTeam matchTeam = teamManagerModule.getTeamById(baseObject.get("team").getAsString());
                 List<MatchFlag> flags = new ArrayList<>();
                 for (MatchFlag flag : matchFlags) {
-                    if (flag.getTeam().equals(matchTeam)) continue;
+                    if (flag.getTeam() != null && flag.getTeam().equals(matchTeam)) continue;
                     flags.add(flag);
                 }
                 matchBases.add(new MatchBase(baseRegion, matchTeam, flags));

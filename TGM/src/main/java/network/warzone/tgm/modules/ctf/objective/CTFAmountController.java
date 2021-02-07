@@ -7,6 +7,7 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 
@@ -80,7 +81,8 @@ public class CTFAmountController extends CTFController {
             if (flag.getFlagHolder() == null) continue;
             if (!addedAnyFlags) addedAnyFlags = true;
             MatchTeam team = teamManagerModule.getTeam(flag.getFlagHolder());
-            scoreboard.add(flag.getTeam().getColor() +
+            ChatColor flagOwnerColor = flag.getTeam() == null ? ChatColor.WHITE : flag.getTeam().getColor();
+            scoreboard.add(flagOwnerColor +
                     CTFModule.RIGHT_ARROW + " " + team.getColor() + flag.getFlagHolder().getName(), ++positionOnScoreboard);
         }
         if (addedAnyFlags) scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);

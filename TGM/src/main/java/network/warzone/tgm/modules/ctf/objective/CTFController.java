@@ -42,9 +42,13 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     public void pickup(MatchFlag flag, Player stealer) {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
         MatchTeam team = teamManagerModule.getTeam(stealer);
-        Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
-                + " stole " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                + ChatColor.WHITE + "'s flag");
+        if (flag.getTeam() == null) {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " picked up " + flag.getName());
+        } else {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
+                    + " picked up " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
+                    + ChatColor.WHITE + "'s " + flag.getName());
+        }
         playSoundForTeam(team);
     }
 
@@ -53,18 +57,26 @@ public abstract class CTFController implements FlagSubscriber, Listener {
         MatchTeam team = teamManagerModule.getTeam(stealer);
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
-        Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
-                + " dropped " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                + ChatColor.WHITE + "'s flag");
+        if (flag.getTeam() == null) {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " dropped " + flag.getName());
+        } else {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
+                    + " dropped " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
+                    + ChatColor.WHITE + "'s " + flag.getName());
+        }
     }
 
     @Override
     public void capture(MatchFlag flag, Player capturer) {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
-        Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE
-                + " captured " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                + ChatColor.GRAY + "'s flag");
+        if (flag.getTeam() == null) {
+            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE + " captured " + flag.getName());
+        } else {
+            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE
+                    + " captured " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
+                    + ChatColor.WHITE + "'s " + flag.getName());
+        }
         playSoundForTeam(capturerTeam);
     }
 

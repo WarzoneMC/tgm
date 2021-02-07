@@ -50,6 +50,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private String bannerType;
     private String rotation;
     private Location location;
+    private String name;
 
     private FlagSubscriber flagSubscriber;
     private MatchTeam team;
@@ -61,7 +62,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private TeamManagerModule teamManagerModule;
     private RespawnModule respawnModule;
 
-    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team) {
+    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name) {
 
         this.bannerPatterns = bannerPatterns;
         this.bannerType = bannerType;
@@ -69,6 +70,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.location = location;
         this.flagSubscriber = flagSubscriber;
         this.team = team;
+        this.name = name;
 
         this.match = new WeakReference<Match>(TGM.get().getMatchManager().getMatch());
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
@@ -217,9 +219,11 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         Location location = Parser.convertLocation(world, flagJson.get("location"));
 
         TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-        MatchTeam team = teamManagerModule.getTeamById(flagJson.get("team").getAsString());
+        MatchTeam team = flagJson.has("team") ? teamManagerModule.getTeamById(flagJson.get("team").getAsString()) : null;
 
-        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team);
+        String name = flagJson.has("name") ? flagJson.get("name").getAsString() : "Flag";
+
+        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name);
     }
 
 }
