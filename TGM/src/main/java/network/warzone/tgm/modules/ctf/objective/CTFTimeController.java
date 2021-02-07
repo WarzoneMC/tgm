@@ -46,14 +46,14 @@ public class CTFTimeController extends CTFController implements TimeLimitService
     @Override
     public void pickup(MatchFlag flag, Player stealer) {
         super.pickup(flag, stealer);
-        currentFlagHolders.add(flag.getTeam());
+        currentFlagHolders.add(teamManagerModule.getTeam(stealer));
         updateAllScoreboards(getFormattedTime());
     }
 
     @Override
     public void drop(MatchFlag flag, Player stealer, Player attacker) {
         super.drop(flag, stealer, attacker);
-        currentFlagHolders.remove(flag.getTeam());
+        currentFlagHolders.remove(teamManagerModule.getTeam(stealer));
         updateAllScoreboards(getFormattedTime());
     }
 
