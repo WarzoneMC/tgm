@@ -19,6 +19,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.*;
 
+import static org.bukkit.SoundCategory.AMBIENT;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class DeathMessageModule extends MatchModule implements Listener {
@@ -49,8 +50,8 @@ public class DeathMessageModule extends MatchModule implements Listener {
             if (messageEvaluator.evaluate(deathInfo)) break;
         }
 
-        deathInfo.player.getWorld().playSound(deathInfo.playerLocation, Sound.ENTITY_IRON_GOLEM_DEATH, 2, 2);
-        if (deathInfo.killer != null) deathInfo.killer.playSound(deathInfo.killer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 3, 1.4f);
+        deathInfo.player.getWorld().playSound(deathInfo.playerLocation, Sound.ENTITY_IRON_GOLEM_DEATH, AMBIENT, 2, 2);
+        if (deathInfo.killer != null) deathInfo.killer.playSound(deathInfo.killer.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, AMBIENT, 3, 1.4f);
     }
 
     public static void broadcastDeathMessage(Player dead, Player killer, String message, Object... args) {
