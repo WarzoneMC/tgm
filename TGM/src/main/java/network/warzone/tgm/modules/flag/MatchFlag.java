@@ -57,12 +57,12 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private Location location;
     private String name;
     private long respawnTime;
-    private boolean respawnBlock;
+    private boolean respawnBlock; // Whether this flag is capable of blocking a team from respawning (based on the json), never changes during a match.
 
     private BukkitTask task;
     private boolean willRespawn;
     private long timeDropped;
-    private boolean blockingRespawns;
+    private boolean blockingRespawns; // Whether this flag is currently blocking a team from respawning (based on the match state).
 
     private FlagSubscriber flagSubscriber;
     private MatchTeam team;
