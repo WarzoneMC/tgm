@@ -30,7 +30,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
     private List<MatchBase> matchBases = new ArrayList<>();
     private List<MatchFlag> matchFlags = new ArrayList<>();
 
-    public static final String RIGHT_ARROW = "\u2192"; // →
+    public static final String RIGHT_ARROW = "\u2794"; // ➔
 
     @Override
     public void load(Match match) {

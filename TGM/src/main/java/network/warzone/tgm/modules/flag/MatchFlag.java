@@ -89,18 +89,21 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.respawnModule = TGM.get().getModule(RespawnModule.class);
 
-        task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-            if (this.willRespawn && (now() >= (this.timeDropped + this.respawnTime))) {
-                this.willRespawn = false;
-                placeFlag();
-                playRespawnSound();
-                if(this.team == null){
-                    Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
-                } else {
-                    Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN + " has respawned.");
+        // No task necessary if json specifies instant flag respawns
+        if(this.respawnTime > 0){
+            task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+                if (this.willRespawn && (now() >= (this.timeDropped + this.respawnTime))) {
+                    this.willRespawn = false;
+                    placeFlag();
+                    playRespawnSound();
+                    if(this.team == null){
+                        Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
+                    } else {
+                        Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN + " has respawned.");
+                    }
                 }
-            }
-        }, 0L, 1L);
+            }, 10L, 10L);
+        }
 
         TGM.registerEvents(this);
 
@@ -156,7 +159,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
     private void refreshFlag() {
         if (match.get().getMatchStatus() != MatchStatus.MID) return;
-        if (this.respawnTime == 0) {
+        if (this.respawnTime <= 0) {
             placeFlag();
             playRespawnSound();
             if(this.team == null){
@@ -178,7 +181,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private void playRespawnSound() {
         for (MatchTeam team : teamManagerModule.getTeams()) {
             for (PlayerContext playerContext : team.getMembers()) {
-                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_ENDERMAN_AMBIENT, 0.8f, 0.8f);
+                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_ENDERMAN_AMBIENT, 1f, 1f);
             }
         }
     }
@@ -248,7 +251,11 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
     public void unload() {
         flagHolder = null;
-        task.cancel();
+
+        // No task was scheduled if json specifies instant flag respawns
+        if(this.respawnTime > 0){
+            task.cancel();
+        }
         TGM.unregisterEvents(this);
     }
 
@@ -283,7 +290,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         String name = flagJson.has("name") ? flagJson.get("name").getAsString() : "Flag";
 
         // Defined in json in seconds, TGM converts to ms for internal use
-        long respawnTime = flagJson.has("respawn") ? flagJson.get("respawn").getAsLong() * 1000 : 0;
+        long respawnTime = flagJson.has("respawn-time") ? flagJson.get("respawn-time").getAsLong() * 1000 : 0;
 
         return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime);
     }
