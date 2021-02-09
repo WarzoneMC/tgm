@@ -12,6 +12,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
+import static org.bukkit.SoundCategory.AMBIENT;
+
 @AllArgsConstructor @Getter
 public class KOTHControlPointService implements ControlPointService {
 
@@ -40,9 +42,9 @@ public class KOTHControlPointService implements ControlPointService {
         for (MatchTeam team : match.getModule(TeamManagerModule.class).getTeams()) {
             for (PlayerContext playerContext : team.getMembers()) {
                 if (team.equals(matchTeam) || team.isSpectator()) {
-                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, AMBIENT, 0.7f, 2f);
                 } else {
-                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, AMBIENT, 0.8f, 0.8f);
                 }
             }
         }
