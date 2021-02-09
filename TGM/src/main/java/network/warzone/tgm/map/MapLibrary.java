@@ -5,21 +5,18 @@ import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.source.GitRemoteMapSource;
 import network.warzone.tgm.util.AsyncHelper;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 /**
  * Created by luke on 4/27/17.

@@ -1,9 +1,8 @@
 package network.warzone.tgm.util;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.Nullable;
 
 /*
  * Created by chatasma on 02/02/2021

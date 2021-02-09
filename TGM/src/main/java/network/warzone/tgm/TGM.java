@@ -2,7 +2,6 @@ package network.warzone.tgm;
 
 import cl.bgmp.bukkit.util.CommandsManagerRegistration;
 import cl.bgmp.minecraft.util.commands.CommandsManager;
-import cl.bgmp.minecraft.util.commands.annotations.TabCompletion;
 import cl.bgmp.minecraft.util.commands.exceptions.CommandException;
 import cl.bgmp.minecraft.util.commands.exceptions.CommandPermissionsException;
 import cl.bgmp.minecraft.util.commands.exceptions.CommandUsageException;
@@ -36,7 +35,6 @@ import network.warzone.warzoneapi.client.offline.OfflineClient;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;

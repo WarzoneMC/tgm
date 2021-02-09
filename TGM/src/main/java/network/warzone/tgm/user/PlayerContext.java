@@ -2,12 +2,11 @@ package network.warzone.tgm.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
-import net.md_5.bungee.api.ChatColor;
-
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
