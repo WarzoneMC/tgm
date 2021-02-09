@@ -23,26 +23,26 @@ public class CTFAmountController extends CTFController {
     private Map<MatchTeam, Integer> teamScores = new HashMap<>();
     private int captureAmount;
 
-    public CTFAmountController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int captureAmount, List<PotionEffect> effects) {
-        super(subscriber, allFlags, effects);
+    public CTFAmountController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int captureAmount) {
+        super(subscriber, allFlags);
         this.captureAmount = captureAmount;
     }
 
     @Override
-    public void pickup(MatchFlag flag, Player stealer) {
-        super.pickup(flag, stealer);
+    public void pickup(MatchFlag flag, Player stealer, List<PotionEffect> effects) {
+        super.pickup(flag, stealer, effects);
         updateAllScoreboards();
     }
 
     @Override
-    public void drop(MatchFlag flag, Player stealer, Player attacker) {
-        super.drop(flag, stealer, attacker);
+    public void drop(MatchFlag flag, Player stealer, Player attacker, List<PotionEffect> effects) {
+        super.drop(flag, stealer, attacker, effects);
         updateAllScoreboards();
     }
 
     @Override
-    public void capture(MatchFlag flag, Player capturer) {
-        super.capture(flag, capturer);
+    public void capture(MatchFlag flag, Player capturer, List<PotionEffect> effects) {
+        super.capture(flag, capturer, effects);
         MatchTeam capturingTeam = teamManagerModule.getTeam(capturer);
         int currentScore = teamScores.getOrDefault(capturingTeam, 0);
         teamScores.put(capturingTeam, ++currentScore);

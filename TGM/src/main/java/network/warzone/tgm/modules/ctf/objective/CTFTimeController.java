@@ -30,8 +30,8 @@ public class CTFTimeController extends CTFController implements TimeLimitService
     private int timeLimit;
     private int taskID;
 
-    public CTFTimeController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int timeLimit, List<PotionEffect> effects) {
-        super(subscriber, allFlags, effects);
+    public CTFTimeController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int timeLimit) {
+        super(subscriber, allFlags);
         this.timeLimit = timeLimit;
         this.timeModule = TGM.get().getModule(TimeModule.class);
         timeModule.getTimeSubscribers().add(this);
@@ -45,15 +45,15 @@ public class CTFTimeController extends CTFController implements TimeLimitService
     }
 
     @Override
-    public void pickup(MatchFlag flag, Player stealer) {
-        super.pickup(flag, stealer);
+    public void pickup(MatchFlag flag, Player stealer, List<PotionEffect> effects) {
+        super.pickup(flag, stealer, effects);
         currentFlagHolders.add(teamManagerModule.getTeam(stealer));
         updateAllScoreboards(getFormattedTime());
     }
 
     @Override
-    public void drop(MatchFlag flag, Player stealer, Player attacker) {
-        super.drop(flag, stealer, attacker);
+    public void drop(MatchFlag flag, Player stealer, Player attacker, List<PotionEffect> effects) {
+        super.drop(flag, stealer, attacker, effects);
         currentFlagHolders.remove(teamManagerModule.getTeam(stealer));
         updateAllScoreboards(getFormattedTime());
     }

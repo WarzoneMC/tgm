@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -30,18 +29,16 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     protected List<MatchFlag> allFlags;
     protected TeamManagerModule teamManagerModule;
     protected ScoreboardManagerModule scoreboardManagerModule;
-    protected List<PotionEffect> effects;
-    public CTFController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, List<PotionEffect> effects) {
+    public CTFController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags) {
         this.subscriber = subscriber;
         this.allFlags = allFlags;
-        this.effects = effects;
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
         TGM.registerEvents(this);
     }
 
     @Override
-    public void pickup(MatchFlag flag, Player stealer) {
+    public void pickup(MatchFlag flag, Player stealer, List<PotionEffect> effects) {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
         for (PotionEffect effect : effects) {
             stealer.addPotionEffect(effect);
@@ -58,7 +55,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     }
 
     @Override
-    public void drop(MatchFlag flag, Player stealer, Player attacker) {
+    public void drop(MatchFlag flag, Player stealer, Player attacker, List<PotionEffect> effects) {
         for (PotionEffect effect : effects) {
             stealer.removePotionEffect(effect.getType());
         }
@@ -75,7 +72,7 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     }
 
     @Override
-    public void capture(MatchFlag flag, Player capturer) {
+    public void capture(MatchFlag flag, Player capturer, List<PotionEffect> effects) {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
         for (PotionEffect effect : effects) {
             capturer.removePotionEffect(effect.getType());

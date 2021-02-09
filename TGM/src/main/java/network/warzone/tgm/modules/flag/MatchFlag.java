@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules.flag;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
@@ -13,6 +14,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.parser.banner.BannerPatternsDeserializer;
+import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Parser;
@@ -42,9 +44,11 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -58,6 +62,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private String name;
     private long respawnTime;
     private boolean respawnBlock; // Whether this flag is capable of blocking a team from respawning (based on the json), never changes during a match.
+    private List<PotionEffect> effects;
 
     private BukkitTask task;
     private boolean willRespawn;
@@ -74,7 +79,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private TeamManagerModule teamManagerModule;
     private RespawnModule respawnModule;
 
-    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name, long respawnTime, boolean respawnBlock) {
+    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name, long respawnTime, boolean respawnBlock, List<PotionEffect> effects) {
 
         this.bannerPatterns = bannerPatterns;
         this.bannerType = bannerType;
@@ -85,6 +90,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.name = name;
         this.respawnTime = respawnTime;
         this.respawnBlock = respawnBlock;
+        this.effects = effects;
 
         this.willRespawn = false;
         this.blockingRespawns = false;
@@ -231,7 +237,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),false);
             Bukkit.getPluginManager().callEvent(newEvent);
         }
-        flagSubscriber.pickup(this, event.getPlayer());
+        flagSubscriber.pickup(this, event.getPlayer(), effects);
     }
 
     @EventHandler
@@ -243,7 +249,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
-        flagSubscriber.drop(this, event.getPlayer(), null);
+        flagSubscriber.drop(this, event.getPlayer(), null, effects);
         this.refreshFlag();
     }
 
@@ -256,7 +262,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
-        flagSubscriber.drop(this, event.getPlayerContext().getPlayer(), null);
+        flagSubscriber.drop(this, event.getPlayerContext().getPlayer(), null, effects);
         this.refreshFlag();
     }
 
@@ -269,7 +275,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
-        flagSubscriber.drop(this, event.getVictim(), event.getKiller());
+        flagSubscriber.drop(this, event.getVictim(), event.getKiller(), effects);
         this.refreshFlag();
     }
 
@@ -291,7 +297,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
-        flagSubscriber.capture(this, player);
+        flagSubscriber.capture(this, player, effects);
         this.refreshFlag();
     }
 
@@ -323,7 +329,14 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
         boolean respawnBlock = flagJson.has("respawn-block") ? flagJson.get("respawn-block").getAsBoolean() : false;
 
-        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime, respawnBlock);
+        List<PotionEffect> effects = new ArrayList<>();
+        if (flagJson.has("effects")) {
+            for (JsonElement effect : flagJson.get("effects").getAsJsonArray()) {
+                effects.add(EffectDeserializer.parse(effect.getAsJsonObject()));
+            }
+        }
+
+        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime, respawnBlock, effects);
     }
 
 }
