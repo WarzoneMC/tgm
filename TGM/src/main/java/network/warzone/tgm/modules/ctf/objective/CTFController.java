@@ -59,6 +59,9 @@ public abstract class CTFController implements FlagSubscriber, Listener {
 
     @Override
     public void drop(MatchFlag flag, Player stealer, Player attacker) {
+        for (PotionEffect effect : effects) {
+            stealer.removePotionEffect(effect.getType());
+        }
         MatchTeam team = teamManagerModule.getTeam(stealer);
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
