@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +23,8 @@ public class CTFAmountController extends CTFController {
     private Map<MatchTeam, Integer> teamScores = new HashMap<>();
     private int captureAmount;
 
-    public CTFAmountController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int captureAmount) {
-        super(subscriber, allFlags);
+    public CTFAmountController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int captureAmount, List<PotionEffect> effects) {
+        super(subscriber, allFlags, effects);
         this.captureAmount = captureAmount;
     }
 

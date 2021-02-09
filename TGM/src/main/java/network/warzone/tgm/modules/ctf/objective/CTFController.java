@@ -30,9 +30,11 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     protected List<MatchFlag> allFlags;
     protected TeamManagerModule teamManagerModule;
     protected ScoreboardManagerModule scoreboardManagerModule;
-    public CTFController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags) {
+    protected List<PotionEffect> effects;
+    public CTFController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, List<PotionEffect> effects) {
         this.subscriber = subscriber;
         this.allFlags = allFlags;
+        this.effects = effects;
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.scoreboardManagerModule = TGM.get().getModule(ScoreboardManagerModule.class);
         TGM.registerEvents(this);
@@ -41,6 +43,9 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     @Override
     public void pickup(MatchFlag flag, Player stealer) {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
+        for (PotionEffect effect : effects) {
+            stealer.addPotionEffect(effect);
+        }
         MatchTeam team = teamManagerModule.getTeam(stealer);
         if (flag.getTeam() == null) {
             Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " picked up " + ChatColor.BOLD + flag.getName());
@@ -69,6 +74,9 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     @Override
     public void capture(MatchFlag flag, Player capturer) {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
+        for (PotionEffect effect : effects) {
+            capturer.removePotionEffect(effect.getType());
+        }
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
         if (flag.getTeam() == null) {
             Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE + " captured " + ChatColor.BOLD + flag.getName());

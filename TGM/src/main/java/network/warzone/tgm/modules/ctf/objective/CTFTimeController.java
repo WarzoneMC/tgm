@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
 
@@ -29,8 +30,8 @@ public class CTFTimeController extends CTFController implements TimeLimitService
     private int timeLimit;
     private int taskID;
 
-    public CTFTimeController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int timeLimit) {
-        super(subscriber, allFlags);
+    public CTFTimeController(CTFControllerSubscriber subscriber, List<MatchFlag> allFlags, int timeLimit, List<PotionEffect> effects) {
+        super(subscriber, allFlags, effects);
         this.timeLimit = timeLimit;
         this.timeModule = TGM.get().getModule(TimeModule.class);
         timeModule.getTimeSubscribers().add(this);
@@ -97,7 +98,7 @@ public class CTFTimeController extends CTFController implements TimeLimitService
         scoreboard.removeAll(ScoreboardManagerModule.getReservedExclusions());
         int spaceCount = 1;
         int positionOnScoreboard = 1;
-        scoreboard.add("Time: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
+        scoreboard.add("Time Left: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
         for (MatchTeam team : teamManagerModule.getTeams()) {
             if (team.isSpectator()) continue;
             scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);

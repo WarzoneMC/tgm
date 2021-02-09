@@ -15,8 +15,10 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.util.Strings;
 import network.warzone.tgm.util.itemstack.ItemUtils;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
     private CTFController controller;
     private List<MatchBase> matchBases = new ArrayList<>();
     private List<MatchFlag> matchFlags = new ArrayList<>();
+    private List<PotionEffect> effects = new ArrayList<>();
 
     public static final String RIGHT_ARROW = "\u2794"; // ➔
 
@@ -42,16 +45,23 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
 
         // Based on Objective, determine controller and apply other effects
         JsonObject optionObject = ctfJson.get("options").getAsJsonObject();
+
+        if (optionObject.has("effects")) {
+            for (JsonElement effect : optionObject.get("effects").getAsJsonArray()) {
+                this.effects.add(EffectDeserializer.parse(effect.getAsJsonObject()));
+            }
+        }
+
         if (objective == CTFObjective.TIME) {
             TimeModule timeModule = TGM.get().getModule(TimeModule.class);
             int timeLimit = optionObject.get("time").getAsInt();
             timeModule.setTimeLimited(true);
             timeModule.setTimeLimit(timeLimit);
-            this.controller = new CTFTimeController(this, matchFlags, timeLimit);
+            this.controller = new CTFTimeController(this, matchFlags, timeLimit, effects);
             timeModule.setTimeLimitService((TimeLimitService) this.controller);
         } else if (objective == CTFObjective.AMOUNT) {
             int captureAmount = optionObject.get("captures").getAsInt();
-            this.controller = new CTFAmountController(this, matchFlags, captureAmount);
+            this.controller = new CTFAmountController(this, matchFlags, captureAmount, effects);
         }
 
         // Deserialize flags json into MatchFlag instances
@@ -63,6 +73,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
         // Don't allow flags to be dropped
         ItemRemoveModule itemRemoveModule = TGM.get().getModule(ItemRemoveModule.class);
         itemRemoveModule.addAll(ItemUtils.allBannerTypes());
+
 
         // If Objective is amount, bases are required for flags to be captured
         if (objective == CTFObjective.AMOUNT) {
