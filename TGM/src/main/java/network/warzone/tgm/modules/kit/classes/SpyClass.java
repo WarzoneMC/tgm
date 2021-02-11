@@ -1,10 +1,9 @@
 package network.warzone.tgm.modules.kit.classes;
 
-import org.bukkit.Material;
-
 import network.warzone.tgm.modules.kit.classes.abilities.Ability;
 import network.warzone.tgm.util.SlotType;
 import network.warzone.tgm.util.itemstack.ItemFactory;
+import org.bukkit.Material;
 
 /**
  * Created by lucas on 4/28/16.

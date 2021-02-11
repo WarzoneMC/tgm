@@ -1,6 +1,10 @@
 package network.warzone.tgm.command;
 
-import com.sk89q.minecraft.util.commands.*;
+import cl.bgmp.minecraft.util.commands.CommandContext;
+import cl.bgmp.minecraft.util.commands.annotations.Command;
+import cl.bgmp.minecraft.util.commands.annotations.CommandPermissions;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandException;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandNumberFormatException;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

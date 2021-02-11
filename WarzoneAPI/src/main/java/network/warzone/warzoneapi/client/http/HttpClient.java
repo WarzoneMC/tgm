@@ -1,10 +1,7 @@
 package network.warzone.warzoneapi.client.http;
 
 import com.google.gson.*;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.ObjectMapper;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import kong.unirest.*;
 import lombok.Getter;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
@@ -18,6 +15,7 @@ public class HttpClient implements TeamClient {
 
     private HttpClientConfig config;
     private final Gson gson;
+    private final UnirestInstance unirest;
 
     public HttpClient(HttpClientConfig config) {
         this.config = config;
@@ -33,8 +31,10 @@ public class HttpClient implements TeamClient {
 
         this.gson = builder.create();
 
+        Config unirestConfig = new Config();
+        
         //serialize objects using gson
-        Unirest.setObjectMapper(new ObjectMapper() {
+        unirestConfig.setObjectMapper(new ObjectMapper() {
 
             public <T> T readValue(String s, Class<T> aClass) {
                 try {
@@ -52,15 +52,18 @@ public class HttpClient implements TeamClient {
                 }
             }
         });
+
+        unirestConfig.addDefaultHeader("accept", "application/json");
+        unirestConfig.addDefaultHeader("Content-Type", "application/json");
+        
+        this.unirest = new UnirestInstance(unirestConfig);
     }
 
     @Override
     public void heartbeat(Heartbeat heartbeat) {
         try {
-            Unirest.post(config.getBaseUrl() + "/mc/server/heartbeat")
+            unirest.post(config.getBaseUrl() + "/mc/server/heartbeat")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(heartbeat)
                     .asJson();
         } catch (UnirestException e) {
@@ -71,10 +74,7 @@ public class HttpClient implements TeamClient {
     @Override
     public GetPlayerByNameResponse player(String name) {
         try {
-            return Unirest.get(config.getBaseUrl() + "/mc/player/" + name)
-                    .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
+            return unirest.get(config.getBaseUrl() + "/mc/player/" + name)
                     .asObject(GetPlayerByNameResponse.class).getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
@@ -85,10 +85,8 @@ public class HttpClient implements TeamClient {
     @Override
     public UserProfile login(PlayerLogin playerLogin) {
         try {
-            HttpResponse<UserProfile> userProfileResponse = Unirest.post(config.getBaseUrl() + "/mc/player/login")
+            HttpResponse<UserProfile> userProfileResponse = unirest.post(config.getBaseUrl() + "/mc/player/login")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(playerLogin)
                     .asObject(UserProfile.class);
             return userProfileResponse.getBody();
@@ -101,10 +99,8 @@ public class HttpClient implements TeamClient {
     @Override
     public MapLoadResponse loadmap(Map map) {
         try {
-            HttpResponse<MapLoadResponse> mapLoadResponse = Unirest.post(config.getBaseUrl() + "/mc/map/load")
+            HttpResponse<MapLoadResponse> mapLoadResponse = unirest.post(config.getBaseUrl() + "/mc/map/load")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(map)
                     .asObject(MapLoadResponse.class);
             return mapLoadResponse.getBody();
@@ -117,10 +113,8 @@ public class HttpClient implements TeamClient {
     @Override
     public void addKill(Death death) {
         try {
-            Unirest.post(config.getBaseUrl() + "/mc/death/new")
+            unirest.post(config.getBaseUrl() + "/mc/death/new")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(death)
                     .asJson();
         } catch (UnirestException e) {
@@ -131,10 +125,8 @@ public class HttpClient implements TeamClient {
     @Override
     public MatchInProgress loadMatch(MatchLoadRequest matchLoadRequest) {
         try {
-            HttpResponse<MatchInProgress> userProfileResponse = Unirest.post(config.getBaseUrl() + "/mc/match/load")
+            HttpResponse<MatchInProgress> userProfileResponse = unirest.post(config.getBaseUrl() + "/mc/match/load")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(matchLoadRequest)
                     .asObject(MatchInProgress.class);
             return userProfileResponse.getBody();
@@ -147,10 +139,8 @@ public class HttpClient implements TeamClient {
     @Override
     public void finishMatch(MatchFinishPacket matchFinishPacket) {
         try {
-            Unirest.post(config.getBaseUrl() + "/mc/match/finish")
+            unirest.post(config.getBaseUrl() + "/mc/match/finish")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(matchFinishPacket)
                     .asJson();
         } catch (UnirestException e) {
@@ -161,10 +151,8 @@ public class HttpClient implements TeamClient {
     @Override
     public void destroyWool(DestroyWoolRequest destroyWoolRequest) {
         try {
-            Unirest.post(config.getBaseUrl() + "/mc/match/destroy_wool")
+            unirest.post(config.getBaseUrl() + "/mc/match/destroy_wool")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(destroyWoolRequest)
                     .asJson();
         } catch (UnirestException e) {
@@ -175,9 +163,8 @@ public class HttpClient implements TeamClient {
     @Override
     public LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion) {
         try {
-            HttpResponse<LeaderboardResponse> response = Unirest.get(config.getBaseUrl() + "/mc/leaderboard/" + leaderboardCriterion.name().toLowerCase() + "?limit=10")
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
+            HttpResponse<LeaderboardResponse> response = unirest.get(config.getBaseUrl() + "/mc/leaderboard/" + leaderboardCriterion.name().toLowerCase() + "?limit=10")
+                    .header("x-access-token", config.getAuthToken())
                     .asObject(LeaderboardResponse.class);
             System.out.println(response.getBody());
             return response.getBody();
@@ -190,10 +177,7 @@ public class HttpClient implements TeamClient {
     @Override
     public RankList retrieveRanks() {
         try {
-            HttpResponse<RankList> ranksResponse = Unirest.get(config.getBaseUrl() + "/mc/ranks")
-                    .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
+            HttpResponse<RankList> ranksResponse = unirest.get(config.getBaseUrl() + "/mc/ranks")
                     .asObject(RankList.class);
             return ranksResponse.getBody();
         } catch (UnirestException e) {
@@ -205,10 +189,8 @@ public class HttpClient implements TeamClient {
     @Override
     public RankUpdateResponse updateRank(String name, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest) {
         try {
-            HttpResponse<RankUpdateResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/" + name + "/rank/" + action.name().toLowerCase())
+            HttpResponse<RankUpdateResponse> response = unirest.post(config.getBaseUrl() + "/mc/player/" + name + "/rank/" + action.name().toLowerCase())
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(rankUpdateRequest)
                     .asObject(RankUpdateResponse.class);
             return response.getBody();
@@ -221,10 +203,8 @@ public class HttpClient implements TeamClient {
     @Override
     public RankManageResponse manageRank(RankManageRequest.Action action, RankManageRequest rankManageRequest) {
         try {
-            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/" + action.name().toLowerCase())
+            HttpResponse<RankManageResponse> response = unirest.post(config.getBaseUrl() + "/mc/rank/" + action.name().toLowerCase())
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(rankManageRequest)
                     .asObject(RankManageResponse.class);
             return response.getBody();
@@ -237,10 +217,8 @@ public class HttpClient implements TeamClient {
     @Override
     public RankManageResponse editRank(RankEditRequest.EditableField field, RankEditRequest rankEditRequest) {
         try {
-            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/set/" + field.name().toLowerCase())
+            HttpResponse<RankManageResponse> response = unirest.post(config.getBaseUrl() + "/mc/rank/set/" + field.name().toLowerCase())
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(rankEditRequest)
                     .asObject(RankManageResponse.class);
             return response.getBody();
@@ -253,10 +231,8 @@ public class HttpClient implements TeamClient {
     @Override
     public RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest) {
         try {
-            HttpResponse<RankManageResponse> response = Unirest.post(config.getBaseUrl() + "/mc/rank/permissions/" + action.name().toLowerCase())
+            HttpResponse<RankManageResponse> response = unirest.post(config.getBaseUrl() + "/mc/rank/permissions/" + action.name().toLowerCase())
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(permissionsUpdateRequest)
                     .asObject(RankManageResponse.class);
             return response.getBody();
@@ -268,10 +244,8 @@ public class HttpClient implements TeamClient {
 
     public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
         try {
-            HttpResponse<IssuePunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/issue_punishment")
+            HttpResponse<IssuePunishmentResponse> response = unirest.post(config.getBaseUrl() + "/mc/player/issue_punishment")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(issuePunishmentRequest)
                     .asObject(IssuePunishmentResponse.class);
             return response.getBody();
@@ -283,10 +257,8 @@ public class HttpClient implements TeamClient {
 
     public PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest) {
         try {
-            HttpResponse<PunishmentsListResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/punishments")
+            HttpResponse<PunishmentsListResponse> response = unirest.post(config.getBaseUrl() + "/mc/player/punishments")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(punishmentsListRequest)
                     .asObject(PunishmentsListResponse.class);
             return response.getBody();
@@ -298,10 +270,8 @@ public class HttpClient implements TeamClient {
 
     public RevertPunishmentResponse revertPunishment(String id) {
         try {
-            HttpResponse<RevertPunishmentResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/revert_punishment")
+            HttpResponse<RevertPunishmentResponse> response = unirest.post(config.getBaseUrl() + "/mc/player/revert_punishment")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(new RevertPunishmentRequest(new ObjectId(id)))
                     .asObject(RevertPunishmentResponse.class);
             return response.getBody();
@@ -318,10 +288,8 @@ public class HttpClient implements TeamClient {
     @Override
     public PlayerInfoResponse getPlayerInfo(PlayerInfoRequest playerInfoRequest) {
         try {
-            HttpResponse<PlayerInfoResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/lookup")
+            HttpResponse<PlayerInfoResponse> response = unirest.post(config.getBaseUrl() + "/mc/player/lookup")
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(playerInfoRequest)
                     .asObject(PlayerInfoResponse.class);
             return response.getBody();
@@ -334,10 +302,8 @@ public class HttpClient implements TeamClient {
     @Override
     public PlayerAltsResponse getAlts(String name) {
         try {
-            HttpResponse<PlayerAltsResponse> response = Unirest.get(config.getBaseUrl() + "/mc/player/alts/" + name)
+            HttpResponse<PlayerAltsResponse> response = unirest.get(config.getBaseUrl() + "/mc/player/alts/" + name)
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .asObject(PlayerAltsResponse.class);
             return response.getBody();
         } catch (UnirestException e) {
@@ -349,15 +315,26 @@ public class HttpClient implements TeamClient {
     @Override
     public PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action) {
         try {
-            HttpResponse<PlayerTagsUpdateResponse> response = Unirest.post(config.getBaseUrl() + "/mc/player/" + username + "/tags/" + action.name().toLowerCase())
+            HttpResponse<PlayerTagsUpdateResponse> response = unirest.post(config.getBaseUrl() + "/mc/player/" + username + "/tags/" + action.name().toLowerCase())
                     .header("x-access-token", config.getAuthToken())
-                    .header("accept", "application/json")
-                    .header("Content-Type", "application/json")
                     .body(new PlayerTagsUpdateRequest(tag))
                     .asObject(PlayerTagsUpdateResponse.class);
             return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    public MojangProfile getMojangProfile(String username) {
+        try {
+            HttpResponse<MojangProfile> response = unirest.get("https://api.ashcon.app/mojang/v2/user/" + username)
+                    .asObject(MojangProfile.class);
+            if (response.getStatus() != 200) {
+                return null;
+            }
+            return response.getBody();
+        } catch (UnirestException e) {
             return null;
         }
     }

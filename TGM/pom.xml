@@ -23,6 +23,10 @@
             <id>maven.sk89q.io</id>
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
+        <repository>
+            <id>bgm</id>
+            <url>https://maven.bgmp.cl/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -44,9 +48,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.OvercastNetwork.sk89q-command-framework</groupId>
+            <groupId>cl.bgmp</groupId>
             <artifactId>command-framework-bukkit</artifactId>
-            <version>d1e29bedbe</version>
+            <version>1.0.3-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bukkit</groupId>

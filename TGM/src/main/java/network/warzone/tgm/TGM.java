@@ -1,12 +1,12 @@
 package network.warzone.tgm;
 
+import cl.bgmp.bukkit.util.CommandsManagerRegistration;
+import cl.bgmp.minecraft.util.commands.CommandsManager;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandException;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandPermissionsException;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandUsageException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mashape.unirest.http.Unirest;
-import com.sk89q.bukkit.util.CommandsManagerRegistration;
-import com.sk89q.minecraft.util.commands.CommandException;
-import com.sk89q.minecraft.util.commands.CommandPermissionsException;
-import com.sk89q.minecraft.util.commands.CommandsManager;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.api.ApiManager;
@@ -44,7 +44,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -112,12 +111,7 @@ public class TGM extends JavaPlugin {
             teamClient = new OfflineClient();
         }
 
-        commands = new CommandsManager<CommandSender>() {
-            @Override
-            public boolean hasPermission(CommandSender sender, String perm) {
-                return sender.isOp() || sender.hasPermission(perm);
-            }
-        };
+        commands = new TGMCommandManager();
 
         matchManager = new MatchManager(fileConfiguration);
         matchManager.getMapRotation().refresh();
@@ -129,6 +123,7 @@ public class TGM extends JavaPlugin {
 
         this.commandManager = new CommandsManagerRegistration(this, this.commands);
 
+        commandManager.register(TGMCommand.TGMCommandNode.class);
         commandManager.register(CycleCommands.class);
         commandManager.register(BroadcastCommands.class);
         commandManager.register(MiscCommands.class);
@@ -150,16 +145,6 @@ public class TGM extends JavaPlugin {
         if (matchManager.getMatch() != null) nickManager = new NickManager(); 
     }
 
-    @Override
-    public void onDisable() {
-
-
-        try {
-            Unirest.shutdown();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -171,7 +156,7 @@ public class TGM extends JavaPlugin {
             } else {
                 sender.sendMessage(ChatColor.RED + "You do not have permission.");
             }
-        } catch (com.sk89q.minecraft.util.commands.CommandUsageException e) {
+        } catch (CommandUsageException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
             sender.sendMessage(ChatColor.RED + e.getUsage());
         } catch (CommandException e) {
