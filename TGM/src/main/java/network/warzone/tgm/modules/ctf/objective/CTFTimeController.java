@@ -20,6 +20,8 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.*;
 
+import static network.warzone.tgm.util.ColorConverter.format;
+
 /**
  * Created by yikes on 12/15/2019
  */
@@ -46,6 +48,7 @@ public class CTFTimeController extends CTFController implements TimeLimitService
 
     @Override
     public void pickup(MatchFlag flag, Player stealer, List<PotionEffect> effects) {
+        stealer.sendTitle(format("&aYou are carrying &f&l"+flag.getName()), format("&eHold it to get points for your team!"), 0, 100, 20);
         super.pickup(flag, stealer, effects);
         currentFlagHolders.add(teamManagerModule.getTeam(stealer));
         updateAllScoreboards(getFormattedTime());

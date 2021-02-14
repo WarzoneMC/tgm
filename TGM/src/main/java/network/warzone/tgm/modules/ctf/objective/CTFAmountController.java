@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static network.warzone.tgm.util.ColorConverter.format;
+
 /**
  * Created by yikes on 12/15/2019
  */
@@ -30,6 +32,7 @@ public class CTFAmountController extends CTFController {
 
     @Override
     public void pickup(MatchFlag flag, Player stealer, List<PotionEffect> effects) {
+        stealer.sendTitle(format("&aYou are carrying &f&l"+flag.getName()), format("&eBring it back to your base!"), 0, 100, 20);
         super.pickup(flag, stealer, effects);
         updateAllScoreboards();
     }
