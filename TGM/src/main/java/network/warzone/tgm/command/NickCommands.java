@@ -1,9 +1,9 @@
 package network.warzone.tgm.command;
 
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import cl.bgmp.minecraft.util.commands.CommandContext;
+import cl.bgmp.minecraft.util.commands.annotations.Command;
+import cl.bgmp.minecraft.util.commands.annotations.CommandPermissions;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandNumberFormatException;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.chat.ChatConstant;
 import network.warzone.tgm.nickname.Nick;

@@ -33,6 +33,8 @@ import org.bukkit.event.Listener;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.bukkit.SoundCategory.AMBIENT;
+
 @Getter
 public class CTWModule extends MatchModule implements Listener {
 
@@ -84,9 +86,9 @@ public class CTWModule extends MatchModule implements Listener {
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                             for (PlayerContext playerContext : otherTeam.getMembers()) {
                                 if (otherTeam.isSpectator() || otherTeam.equals(matchTeam)) {
-                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, AMBIENT, 0.7f, 2f);
                                 } else {
-                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                                    playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, AMBIENT, 0.8f, 0.8f);
                                 }
                             }
                         }
@@ -103,9 +105,9 @@ public class CTWModule extends MatchModule implements Listener {
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
                             if (otherTeam.isSpectator() || otherTeam.equals(matchTeam)) {
-                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.7f, 2f);
+                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.BLOCK_PORTAL_TRAVEL, AMBIENT, 0.7f, 2f);
                             } else {
-                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, 0.8f, 0.8f);
+                                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_BLAZE_DEATH, AMBIENT, 0.8f, 0.8f);
                             }
                         }
                     }

@@ -97,3 +97,13 @@ custom-knockback:
   bow-base: 0.345
   bow-vertical: 0.35
   punch-multiplier: 1
+heapdump:
+  # Upload heap dump to a Bytebin server (https://github.com/lucko/bytebin). If enabled, heap dumps will not remain within
+  # the server files.
+  # Default: false
+  upload: false
+  # URL of the Bytebin server.
+  url: "http://localhost:8080"
+  # Directory where heap dumps will be stored.
+  # Default: dumps
+  dir: "dumps"

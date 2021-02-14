@@ -1,16 +1,13 @@
 package network.warzone.tgm.modules.kit.classes.abilities;
 
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.FireworkEffect;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.modules.damage.DamageInfo;
+import network.warzone.tgm.modules.team.MatchTeam;
+import network.warzone.tgm.util.ColorConverter;
+import network.warzone.tgm.util.FireworkUtil;
+import network.warzone.tgm.util.itemstack.ItemFactory;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -20,13 +17,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
-import net.md_5.bungee.api.ChatColor;
-import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.damage.DamageInfo;
-import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.util.ColorConverter;
-import network.warzone.tgm.util.FireworkUtil;
-import network.warzone.tgm.util.itemstack.ItemFactory;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 /**
  * Created by lucas on 4/28/16.

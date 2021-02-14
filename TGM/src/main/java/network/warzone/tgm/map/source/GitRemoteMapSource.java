@@ -1,19 +1,8 @@
 package network.warzone.tgm.map.source;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.PasswordAuthentication;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
-
 import com.google.common.collect.Iterables;
-
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PullCommand;
-import org.eclipse.jgit.api.PullResult;
-import org.eclipse.jgit.api.TransportCommand;
+import lombok.AllArgsConstructor;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -25,7 +14,11 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.util.FS;
 
-import lombok.AllArgsConstructor;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collections;
 
 public class GitRemoteMapSource extends MapSource {
     private final String remoteURI;
