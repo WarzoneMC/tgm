@@ -166,7 +166,6 @@ public class HttpClient implements TeamClient {
             HttpResponse<LeaderboardResponse> response = unirest.get(config.getBaseUrl() + "/mc/leaderboard/" + leaderboardCriterion.name().toLowerCase() + "?limit=10")
                     .header("x-access-token", config.getAuthToken())
                     .asObject(LeaderboardResponse.class);
-            System.out.println(response.getBody());
             return response.getBody();
         } catch (UnirestException e) {
             e.printStackTrace();
