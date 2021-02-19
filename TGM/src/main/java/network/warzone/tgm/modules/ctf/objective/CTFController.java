@@ -14,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.List;
 
@@ -36,32 +37,53 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     }
 
     @Override
-    public void pickup(MatchFlag flag, Player stealer) {
+    public void pickup(MatchFlag flag, Player stealer, List<PotionEffect> effects) {
         stealer.getInventory().setHelmet(flag.generateBannerItem());
+        for (PotionEffect effect : effects) {
+            stealer.addPotionEffect(effect);
+        }
         MatchTeam team = teamManagerModule.getTeam(stealer);
-        Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
-                + " stole " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                + ChatColor.WHITE + "'s flag");
+        if (flag.getTeam() == null) {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " picked up " + ChatColor.BOLD + flag.getName());
+        } else {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
+                    + " picked up " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
+        }
         playSoundForTeam(team);
     }
 
     @Override
-    public void drop(MatchFlag flag, Player stealer, Player attacker) {
+    public void drop(MatchFlag flag, Player stealer, Player attacker, List<PotionEffect> effects) {
+        for (PotionEffect effect : effects) {
+            stealer.removePotionEffect(effect.getType());
+        }
         MatchTeam team = teamManagerModule.getTeam(stealer);
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
-        Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
-                + " dropped " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                + ChatColor.WHITE + "'s flag");
+        if (flag.getTeam() == null) {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " dropped " + ChatColor.BOLD + flag.getName());
+        } else {
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
+                    + " dropped " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
+        }
     }
 
     @Override
-    public void capture(MatchFlag flag, Player capturer) {
+    public void capture(MatchFlag flag, Player capturer, List<PotionEffect> effects) {
         capturer.getInventory().setHelmet(new ItemStack(Material.AIR));
+        for (PotionEffect effect : effects) {
+            capturer.removePotionEffect(effect.getType());
+        }
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
-        Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE
-                + " captured " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                + ChatColor.GRAY + "'s flag");
+        if (flag.getTeam() == null) {
+            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE + " captured " + ChatColor.BOLD + flag.getName());
+        } else {
+            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE
+                    + " captured " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
+        }
         playSoundForTeam(capturerTeam);
     }
 

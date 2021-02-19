@@ -1,5 +1,6 @@
 package network.warzone.tgm.modules.flag;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
@@ -13,12 +14,16 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.parser.banner.BannerPatternsDeserializer;
+import network.warzone.tgm.parser.effect.EffectDeserializer;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Parser;
 import network.warzone.tgm.util.Strings;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
@@ -39,8 +44,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -50,6 +59,15 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private String bannerType;
     private String rotation;
     private Location location;
+    private String name;
+    private long respawnTime;
+    private boolean respawnBlock; // Whether this flag is capable of blocking a team from respawning (based on the json), never changes during a match.
+    private List<PotionEffect> effects;
+
+    private BukkitTask task;
+    private boolean willRespawn;
+    private long timeDropped;
+    private boolean blockingRespawns; // Whether this flag is currently blocking a team from respawning (based on the match state).
 
     private FlagSubscriber flagSubscriber;
     private MatchTeam team;
@@ -61,7 +79,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private TeamManagerModule teamManagerModule;
     private RespawnModule respawnModule;
 
-    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team) {
+    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name, long respawnTime, boolean respawnBlock, List<PotionEffect> effects) {
 
         this.bannerPatterns = bannerPatterns;
         this.bannerType = bannerType;
@@ -69,10 +87,33 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.location = location;
         this.flagSubscriber = flagSubscriber;
         this.team = team;
+        this.name = name;
+        this.respawnTime = respawnTime;
+        this.respawnBlock = respawnBlock;
+        this.effects = effects;
+
+        this.willRespawn = false;
+        this.blockingRespawns = false;
 
         this.match = new WeakReference<Match>(TGM.get().getMatchManager().getMatch());
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.respawnModule = TGM.get().getModule(RespawnModule.class);
+
+        // No task necessary if json specifies instant flag respawns
+        if(this.respawnTime > 0){
+            task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+                if (this.willRespawn && (now() >= (this.timeDropped + this.respawnTime))) {
+                    this.willRespawn = false;
+                    placeFlag();
+                    playRespawnSound();
+                    if(this.team == null){
+                        Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
+                    } else {
+                        Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN + " has respawned.");
+                    }
+                }
+            }, 10L, 10L);
+        }
 
         TGM.registerEvents(this);
 
@@ -122,9 +163,37 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         return bannerItem;
     }
 
+    private long now() {
+        return new Date().getTime();
+    }
+
     private void refreshFlag() {
-        this.flagHolder = null;
-        placeFlag();
+        if (match.get().getMatchStatus() != MatchStatus.MID) return;
+        if (this.respawnTime <= 0) {
+            placeFlag();
+            playRespawnSound();
+            if(this.team == null){
+                Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
+            } else {
+                Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
+            }
+        } else {
+            this.timeDropped = now();
+            this.willRespawn = true;
+            if(this.team == null){
+                Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" will respawn in "+ ChatColor.BOLD + "" + ChatColor.WHITE + this.respawnTime/1000 + ChatColor.GREEN + " seconds.");
+            } else {
+                Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN +" will respawn in "+ ChatColor.BOLD + "" + ChatColor.WHITE + this.respawnTime/1000 + ChatColor.GREEN + " seconds.");
+            }
+        }
+    }
+
+    private void playRespawnSound() {
+        for (MatchTeam team : teamManagerModule.getTeams()) {
+            for (PlayerContext playerContext : team.getMembers()) {
+                playerContext.getPlayer().playSound(playerContext.getPlayer().getLocation(), Sound.ENTITY_ENDERMAN_AMBIENT, 1f, 1f);
+            }
+        }
     }
 
     private void placeFlag() {
@@ -153,7 +222,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        if (flagHolder != null) return;
+        if (willRespawn || flagHolder != null) return;
         MatchTeam playerTeam = teamManagerModule.getTeam(event.getPlayer());
         if (respawnModule.isDead(event.getPlayer()) ||
             !passesGeneralConditions(playerTeam) ||
@@ -163,39 +232,73 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.flagHolder = event.getPlayer();
         location.getBlock().setType(Material.AIR);
 
-        flagSubscriber.pickup(this, event.getPlayer());
+        if(this.respawnBlock && !this.blockingRespawns){
+            this.blockingRespawns = true;
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),false);
+            Bukkit.getPluginManager().callEvent(newEvent);
+        }
+        flagSubscriber.pickup(this, event.getPlayer(), effects);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         if (match.get().getMatchStatus() != MatchStatus.MID || event.getPlayer() != flagHolder) return;
+        if(this.respawnBlock && this.blockingRespawns){
+            this.blockingRespawns = false;
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            Bukkit.getPluginManager().callEvent(newEvent);
+        }
+        this.flagHolder = null;
+        flagSubscriber.drop(this, event.getPlayer(), null, effects);
         this.refreshFlag();
-        flagSubscriber.drop(this, event.getPlayer(), null);
     }
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
         if (match.get().getMatchStatus() != MatchStatus.MID || event.getPlayerContext().getPlayer() != flagHolder || event.getTeam().equals(event.getOldTeam())) return;
+        if(this.respawnBlock && this.blockingRespawns){
+            this.blockingRespawns = false;
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            Bukkit.getPluginManager().callEvent(newEvent);
+        }
+        this.flagHolder = null;
+        flagSubscriber.drop(this, event.getPlayerContext().getPlayer(), null, effects);
         this.refreshFlag();
-        flagSubscriber.drop(this, event.getPlayerContext().getPlayer(), null);
     }
 
     @EventHandler
     public void onTGMDeath(TGMPlayerDeathEvent event) {
         if (match.get().getMatchStatus() != MatchStatus.MID || event.getVictim() != flagHolder) return;
+        if(this.respawnBlock && this.blockingRespawns){
+            this.blockingRespawns = false;
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            Bukkit.getPluginManager().callEvent(newEvent);
+        }
+        this.flagHolder = null;
+        flagSubscriber.drop(this, event.getVictim(), event.getKiller(), effects);
         this.refreshFlag();
-        flagSubscriber.drop(this, event.getVictim(), event.getKiller());
     }
 
     public void unload() {
         flagHolder = null;
+
+        // No task was scheduled if json specifies instant flag respawns
+        if(this.respawnTime > 0){
+            task.cancel();
+        }
         TGM.unregisterEvents(this);
     }
 
     @Override
     public void redeem(Player player) {
+        if(this.respawnBlock && this.blockingRespawns){
+            this.blockingRespawns = false;
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            Bukkit.getPluginManager().callEvent(newEvent);
+        }
+        this.flagHolder = null;
+        flagSubscriber.capture(this, player, effects);
         this.refreshFlag();
-        flagSubscriber.capture(this, player);
     }
 
     @Override
@@ -217,9 +320,23 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         Location location = Parser.convertLocation(world, flagJson.get("location"));
 
         TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-        MatchTeam team = teamManagerModule.getTeamById(flagJson.get("team").getAsString());
+        MatchTeam team = flagJson.has("team") ? teamManagerModule.getTeamById(flagJson.get("team").getAsString()) : null;
 
-        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team);
+        String name = flagJson.has("name") ? flagJson.get("name").getAsString() : "Flag";
+
+        // Defined in json in seconds, TGM converts to ms for internal use
+        long respawnTime = flagJson.has("respawn-time") ? flagJson.get("respawn-time").getAsLong() * 1000 : 0;
+
+        boolean respawnBlock = flagJson.has("respawn-block") ? flagJson.get("respawn-block").getAsBoolean() : false;
+
+        List<PotionEffect> effects = new ArrayList<>();
+        if (flagJson.has("effects")) {
+            for (JsonElement effect : flagJson.get("effects").getAsJsonArray()) {
+                effects.add(EffectDeserializer.parse(effect.getAsJsonObject()));
+            }
+        }
+
+        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime, respawnBlock, effects);
     }
 
 }

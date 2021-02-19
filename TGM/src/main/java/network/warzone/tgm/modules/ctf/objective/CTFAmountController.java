@@ -7,12 +7,16 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static network.warzone.tgm.util.ColorConverter.format;
 
 /**
  * Created by yikes on 12/15/2019
@@ -27,20 +31,21 @@ public class CTFAmountController extends CTFController {
     }
 
     @Override
-    public void pickup(MatchFlag flag, Player stealer) {
-        super.pickup(flag, stealer);
+    public void pickup(MatchFlag flag, Player stealer, List<PotionEffect> effects) {
+        stealer.sendTitle(format("&aYou are carrying &f&l"+flag.getName()), format("&eBring it back to your base!"), 0, 100, 20);
+        super.pickup(flag, stealer, effects);
         updateAllScoreboards();
     }
 
     @Override
-    public void drop(MatchFlag flag, Player stealer, Player attacker) {
-        super.drop(flag, stealer, attacker);
+    public void drop(MatchFlag flag, Player stealer, Player attacker, List<PotionEffect> effects) {
+        super.drop(flag, stealer, attacker, effects);
         updateAllScoreboards();
     }
 
     @Override
-    public void capture(MatchFlag flag, Player capturer) {
-        super.capture(flag, capturer);
+    public void capture(MatchFlag flag, Player capturer, List<PotionEffect> effects) {
+        super.capture(flag, capturer, effects);
         MatchTeam capturingTeam = teamManagerModule.getTeam(capturer);
         int currentScore = teamScores.getOrDefault(capturingTeam, 0);
         teamScores.put(capturingTeam, ++currentScore);
@@ -80,7 +85,8 @@ public class CTFAmountController extends CTFController {
             if (flag.getFlagHolder() == null) continue;
             if (!addedAnyFlags) addedAnyFlags = true;
             MatchTeam team = teamManagerModule.getTeam(flag.getFlagHolder());
-            scoreboard.add(flag.getTeam().getColor() +
+            ChatColor flagOwnerColor = flag.getTeam() == null ? ChatColor.WHITE : flag.getTeam().getColor();
+            scoreboard.add(flagOwnerColor +
                     CTFModule.RIGHT_ARROW + " " + team.getColor() + flag.getFlagHolder().getName(), ++positionOnScoreboard);
         }
         if (addedAnyFlags) scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
