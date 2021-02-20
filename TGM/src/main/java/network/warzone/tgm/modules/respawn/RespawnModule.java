@@ -10,6 +10,7 @@ import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.death.DeathInfo;
+import network.warzone.tgm.modules.flag.FlagRespawnBlockEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -45,7 +46,8 @@ public class RespawnModule extends MatchModule implements Listener {
     private List<RespawnRule> respawnRules;
     private Map<Player, RespawnGoal> respawning;
     @Getter private List<RespawnService> respawnServices;
-
+    private Map<MatchTeam,Integer> respawnRestrictions;
+    private TeamManagerModule teamManagerModule;
 
     private BukkitTask task;
 
@@ -53,7 +55,13 @@ public class RespawnModule extends MatchModule implements Listener {
         this.respawnRules = new ArrayList<>();
         this.respawning = new HashMap<>();
         this.respawnServices = new ArrayList<>();
-        TeamManagerModule teamManagerModule = match.getModule(TeamManagerModule.class);
+        this.respawnRestrictions = new HashMap<>();
+
+        teamManagerModule = match.getModule(TeamManagerModule.class);
+        List<MatchTeam> allTeams = teamManagerModule.getTeams();
+        for (MatchTeam team : allTeams) {
+            this.respawnRestrictions.put(team,0);
+        }
 
         JsonObject mapInfo = match.getMapContainer().getMapInfo().getJsonObject();
         if (mapInfo.has("respawn")) {
@@ -83,6 +91,18 @@ public class RespawnModule extends MatchModule implements Listener {
         if (event.getDeathInfo().playerTeam.isSpectator()) return;
         RespawnRule rule = getRule(event.getDeathInfo().playerTeam);
         setDead(event.getVictim(), rule, event.getDeathInfo());
+    }
+
+    @EventHandler
+    public void onFlagRestriction(FlagRespawnBlockEvent event) {
+        MatchTeam team = event.getAffectedTeam();
+        boolean canRespawn = event.isCanRespawn();
+        int previousRestriction = respawnRestrictions.get(team);
+        if(canRespawn){
+            respawnRestrictions.put(team,Math.max(0,previousRestriction-1));
+        } else {
+            respawnRestrictions.put(team,previousRestriction+1);
+        }
     }
 
     @EventHandler
@@ -168,8 +188,9 @@ public class RespawnModule extends MatchModule implements Listener {
                     RespawnGoal goal = respawnEntry.getValue();
 
                     boolean shouldRespawn = shouldRespawn(player);
-                    sendTitle(player, goal, shouldRespawn);
-                    if (getTimeLeft(goal) > 0 || !shouldRespawn || (goal.getRule().isConfirm() && !goal.isConfirmed())) {
+                    int restrictions = respawnRestrictions.get(teamManagerModule.getTeam(player));
+                    sendTitle(player, goal, shouldRespawn, restrictions);
+                    if (restrictions > 0 || getTimeLeft(goal) > 0 || !shouldRespawn || (goal.getRule().isConfirm() && !goal.isConfirmed())) {
                         continue;
                     }
                     toRespawn.add(player);
@@ -182,7 +203,7 @@ public class RespawnModule extends MatchModule implements Listener {
         }, 0L, 1L);
     }
 
-    private void sendTitle(Player player, RespawnGoal goal, boolean shouldRespawn) {
+    private void sendTitle(Player player, RespawnGoal goal, boolean shouldRespawn, int restrictions) {
         long timeLeft = getTimeLeft(goal);
         if (!shouldRespawn) {
             if (timeLeft >= -40 && timeLeft <= 0) player.sendTitle(format("&c&lYOU DIED"),
@@ -198,6 +219,10 @@ public class RespawnModule extends MatchModule implements Listener {
             } else {
                 player.sendTitle(format("&c&lRESPAWN"), format("&7Punch to respawn"), 0, 20, 0);
             }
+            return;
+        }
+        if (restrictions > 0 && timeLeft <= 0) {
+            player.sendTitle(format("&a&lWaiting..."), format("&eYou will respawn when the flag is dropped."), 0, 20, 0);
             return;
         }
         player.sendTitle(format("&c&lYOU DIED"),

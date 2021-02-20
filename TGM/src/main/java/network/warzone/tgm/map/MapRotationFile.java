@@ -30,7 +30,7 @@ public class MapRotationFile {
 
     public MapContainer cycle(boolean initial) {
         if (rotation.getMaps().size() == 0) return null;
-        current = (current + (initial ? 0 : 1)) % rotation.getMaps().size();
+        current = Math.max(0, (current + (initial ? 0 : 1)) % rotation.getMaps().size());
 
         if (!rotation.isDefault() && current == rotation.getMaps().size() - 1) {
             MapContainer nextMap = rotation.getMaps().get(current);

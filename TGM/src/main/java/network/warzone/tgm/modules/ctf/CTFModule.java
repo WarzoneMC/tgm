@@ -30,7 +30,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
     private List<MatchBase> matchBases = new ArrayList<>();
     private List<MatchFlag> matchFlags = new ArrayList<>();
 
-    public static final String RIGHT_ARROW = "\u2192"; // →
+    public static final String RIGHT_ARROW = "\u2794"; // ➔
 
     @Override
     public void load(Match match) {
@@ -64,6 +64,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
         ItemRemoveModule itemRemoveModule = TGM.get().getModule(ItemRemoveModule.class);
         itemRemoveModule.addAll(ItemUtils.allBannerTypes());
 
+
         // If Objective is amount, bases are required for flags to be captured
         if (objective == CTFObjective.AMOUNT) {
             RegionManagerModule regionManagerModule = TGM.get().getModule(RegionManagerModule.class);
@@ -74,7 +75,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
                 MatchTeam matchTeam = teamManagerModule.getTeamById(baseObject.get("team").getAsString());
                 List<MatchFlag> flags = new ArrayList<>();
                 for (MatchFlag flag : matchFlags) {
-                    if (flag.getTeam().equals(matchTeam)) continue;
+                    if (flag.getTeam() != null && flag.getTeam().equals(matchTeam)) continue;
                     flags.add(flag);
                 }
                 matchBases.add(new MatchBase(baseRegion, matchTeam, flags));
