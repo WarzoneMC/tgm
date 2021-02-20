@@ -254,11 +254,11 @@ public class DTMModule extends MatchModule implements Listener {
             int percentage = monument.getHealthPercentage();
 
             if (percentage > 70) {
-                return "  " + ChatColor.GREEN.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
+                return ChatColor.GREEN + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
             } else if (percentage > 40) {
-                return "  " + ChatColor.YELLOW.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
+                return ChatColor.YELLOW + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
             } else {
-                return "  " + ChatColor.RED.toString() + percentage + "% " + ChatColor.WHITE + monument.getName();
+                return ChatColor.RED + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
             }
         } else {
             return ChatColor.WHITE + "  " + ChatColor.STRIKETHROUGH + monument.getName();
