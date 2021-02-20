@@ -172,8 +172,14 @@ public class CycleCommands {
                     return;
                 }
             }
-            sender.sendMessage(ChatColor.GREEN + "Cycling in " + time + " seconds.");
             TGM.get().getModule(CycleCountdown.class).start(time);
+            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.cycle")).collect(Collectors.toSet())) {
+                if (time == 0) {
+                    player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " cycled the map");
+                    continue;
+                }
+                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the cycle countdown to " + ChatColor.YELLOW + time + ChatColor.GRAY + " second" + (time == 1 ? "" : "s"));
+            }
         } else {
             sender.sendMessage(ChatColor.RED + "A match is currently in progress.");
         }
@@ -197,6 +203,13 @@ public class CycleCommands {
             if (!soloStart)
                 sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
             TGM.get().getModule(StartCountdown.class).start((soloStart) ? 0 : time);
+            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.start")).collect(Collectors.toSet())) {
+                if (time == 0) {
+                    player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " started the match");
+                    continue;
+                }
+                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the start countdown to " + ChatColor.YELLOW + time + ChatColor.GRAY + " second" + (time == 1 ? "" : "s"));
+            }
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -213,15 +226,16 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "Unable to find team \"" + cmd.getJoinedStrings(0) + "\"");
                     return;
                 }
-                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 TGM.get().getMatchManager().endMatch(matchTeam);
             } else {
-                sender.sendMessage(ChatColor.GREEN + "Ending match...");
                 if (cmd.hasFlag('f')) {
                     TGM.get().getMatchManager().endMatch(null);
                 } else {
                     TGM.get().getModule(TimeModule.class).endMatch();
                 }
+            }
+            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.end")).collect(Collectors.toSet())) {
+                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " ended the match");
             }
         } else {
             sender.sendMessage(ChatColor.RED + "No match in progress.");
@@ -234,7 +248,9 @@ public class CycleCommands {
         for (Countdown countdown : TGM.get().getModules(Countdown.class)) {
             countdown.cancel();
         }
-        sender.sendMessage(ChatColor.GREEN + "Countdowns cancelled.");
+        for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.cancel")).collect(Collectors.toSet())) {
+            player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " cancelled the countdowns");
+        }
     }
 
     @Command(aliases = {"setnext", "sn"}, desc = "Set the next map.", anyFlags = true, flags = "s")
