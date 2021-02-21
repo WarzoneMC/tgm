@@ -224,19 +224,10 @@ public class FFAModule extends MatchModule implements Listener {
                 lines.remove(0);
             }
 
-            if (this.blitzMode) {
-                if (!iterator.hasNext()) {
-                    lines.add(ChatColor.YELLOW + player + ChatColor.GRAY + ": " + ChatColor.WHITE + score);
-                } else {
-                    lines.add(this.playersTeam.getColor() + player + "" + ChatColor.GRAY + ": " + ChatColor.WHITE + score);
-                }
-            }
-            else {
-                if (!iterator.hasNext()) {
-                    lines.add(ChatColor.YELLOW + player + ChatColor.GRAY + ": " + ChatColor.RESET + score);
-                } else {
-                    lines.add(this.playersTeam.getColor() + player + ChatColor.GRAY + ": " + ChatColor.RESET + score);
-                }
+            if (!iterator.hasNext()) {
+                lines.add(ChatColor.WHITE.toString() + " " + score + " " + ChatColor.YELLOW + player);
+            } else {
+                lines.add(ChatColor.WHITE.toString() + " " + score + " " + this.playersTeam.getColor() + player);
             }
         }
         int i = 2;
