@@ -161,7 +161,7 @@ public class BlitzModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam, int size) {
-        return "  " + ChatColor.RESET + size + ChatColor.GRAY + " Alive";
+        return ChatColor.WHITE + "  " + size + ChatColor.GRAY + " Alive";
     }
 
     private void showLives(Player player) {
