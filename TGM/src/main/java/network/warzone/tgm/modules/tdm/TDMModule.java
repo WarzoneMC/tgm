@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Getter
 public class TDMModule extends MatchModule implements Listener {
-    
+
     private WeakReference<Match> match;
     private PointsModule pointsModule;
     private TeamManagerModule teamManager;
@@ -98,7 +98,7 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        return "  " + ChatColor.RESET + pointsModule.getPoints(matchTeam) + ChatColor.GRAY + "/" + pointsModule.getTarget(matchTeam) + ChatColor.WHITE + " Kills";
+        return ChatColor.WHITE + "  " + pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + pointsModule.getTarget(matchTeam) + ChatColor.WHITE + " Kills";
     }
 
     private void incrementPoints(MatchTeam matchTeam, int amount) {
