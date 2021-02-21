@@ -6,6 +6,7 @@ import network.warzone.tgm.util.Strings;
 import org.bukkit.DyeColor;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -26,17 +27,25 @@ public class BannerPatternsDeserializer implements JsonDeserializer<List<Pattern
                     String in = element.getAsString();
                     String[] args = in.split(":");
                     DyeColor dyeColor = DyeColor.valueOf(Strings.getTechnicalName(args[0]));
-                    PatternType patternType = PatternType.valueOf(Strings.getTechnicalName(args[1]));
-                    if (patterns == null) patternType = PatternType.getByIdentifier(args[1]);
-                    patterns.add(new Pattern(dyeColor, patternType));
+                    PatternType patternType;
+                    if (EnumUtils.isValidEnum(PatternType.class, Strings.getTechnicalName(args[1]))) {
+                        patternType = PatternType.valueOf(Strings.getTechnicalName(args[1]));
+                    } else {
+                        patternType = PatternType.getByIdentifier(args[1]);
+                    }
+                    if (patternType != null) patterns.add(new Pattern(dyeColor, patternType));
                 } catch (Exception ignored) {}
             } else if (element.isJsonObject()) {
                 try {
                     JsonObject jsonObject = element.getAsJsonObject();
                     DyeColor dyeColor = DyeColor.valueOf(Strings.getTechnicalName(jsonObject.get("color").getAsString()));
-                    PatternType patternType = PatternType.valueOf(Strings.getTechnicalName(jsonObject.get("type").getAsString()));
-                    if (patterns == null) patternType = PatternType.getByIdentifier(jsonObject.get("type").getAsString());
-                    patterns.add(new Pattern(dyeColor, patternType));
+                    PatternType patternType;
+                    if (EnumUtils.isValidEnum(PatternType.class, Strings.getTechnicalName(jsonObject.get("type").getAsString()))) {
+                        patternType = PatternType.valueOf(Strings.getTechnicalName(jsonObject.get("type").getAsString()));
+                    } else {
+                        patternType = PatternType.getByIdentifier(jsonObject.get("type").getAsString());
+                    }
+                    if (patternType != null) patterns.add(new Pattern(dyeColor, patternType));
                 } catch (Exception ignored) {}
             }
         }
