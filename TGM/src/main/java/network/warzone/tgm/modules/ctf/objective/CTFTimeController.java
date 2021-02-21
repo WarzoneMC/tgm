@@ -101,7 +101,7 @@ public class CTFTimeController extends CTFController implements TimeLimitService
         scoreboard.removeAll(ScoreboardManagerModule.getReservedExclusions());
         int spaceCount = 1;
         int positionOnScoreboard = 1;
-        scoreboard.add("Time Left: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
+        scoreboard.add(ChatColor.WHITE + "Time Left: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
         for (MatchTeam team : teamManagerModule.getTeams()) {
             if (team.isSpectator()) continue;
             scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
