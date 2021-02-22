@@ -146,7 +146,7 @@ public class KOTHModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        return pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsModule.getTarget(matchTeam) + " " + matchTeam.getColor() + matchTeam.getAlias();
+        return ChatColor.WHITE.toString() + pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + pointsModule.getTarget(matchTeam) + " " + matchTeam.getColor() + matchTeam.getAlias();
     }
 
     private String getControlPointScoreboardLine(ControlPoint controlPoint) {
@@ -154,13 +154,13 @@ public class KOTHModule extends MatchModule implements Listener {
             if (controlPoint.getController() == null) {
                 return controlPoint.getProgressingTowardsTeam().getColor().toString() + controlPoint.getPercent() + "% " + ChatColor.WHITE + controlPoint.getDefinition().getName();
             } else {
-                return controlPoint.getPercent() + "% " + controlPoint.getController().getColor() + controlPoint.getDefinition().getName();
+                return ChatColor.WHITE.toString() + controlPoint.getPercent() + "% " + controlPoint.getController().getColor() + controlPoint.getDefinition().getName();
             }
         } else {
             if (controlPoint.getController() == null) {
-                return ControlPoint.SYMBOL_CP_INCOMPLETE + " " + controlPoint.getDefinition().getName();
+                return ChatColor.WHITE.toString() + ControlPoint.SYMBOL_CP_INCOMPLETE + " " + controlPoint.getDefinition().getName();
             } else {
-                return ControlPoint.SYMBOL_CP_COMPLETE + " " + controlPoint.getController().getColor() + controlPoint.getDefinition().getName();
+                return ChatColor.WHITE.toString() + ControlPoint.SYMBOL_CP_COMPLETE + " " + controlPoint.getController().getColor() + controlPoint.getDefinition().getName();
             }
         }
     }

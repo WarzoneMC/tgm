@@ -75,8 +75,8 @@ public class CTFAmountController extends CTFController {
         int positionOnScoreboard = 1;
         for (MatchTeam team : teamManagerModule.getTeams()) {
             if (team.isSpectator()) continue;
-            scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
-            scoreboard.add(getTeamPoints(team) + "/" + captureAmount + " captures", ++positionOnScoreboard);
+            if (positionOnScoreboard != 1) scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
+            scoreboard.add(ChatColor.WHITE.toString() + getTeamPoints(team) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + captureAmount + ChatColor.WHITE.toString() + " Captures", ++positionOnScoreboard);
             scoreboard.add(team.getColor() + team.getAlias(), ++positionOnScoreboard);
         }
         scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
