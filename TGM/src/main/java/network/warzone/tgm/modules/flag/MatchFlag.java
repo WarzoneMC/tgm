@@ -51,6 +51,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 public class MatchFlag extends PlayerRedeemable implements Listener {
@@ -68,11 +69,13 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private boolean willRespawn;
     private long timeDropped;
     private boolean blockingRespawns; // Whether this flag is currently blocking a team from respawning (based on the match state).
+    private List<Location> respawnLocations;
 
     private FlagSubscriber flagSubscriber;
     private MatchTeam team;
     private Player flagHolder;
     private MatchTeam teamHolder;
+    private Random rng;
 
     private Region protectiveRegion;
 
@@ -80,7 +83,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private TeamManagerModule teamManagerModule;
     private RespawnModule respawnModule;
 
-    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name, long respawnTime, boolean respawnBlock, List<PotionEffect> effects) {
+    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name, long respawnTime, boolean respawnBlock, List<Location> respawnLocations, List<PotionEffect> effects) {
 
         this.bannerPatterns = bannerPatterns;
         this.bannerType = bannerType;
@@ -91,11 +94,13 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.name = name;
         this.respawnTime = respawnTime;
         this.respawnBlock = respawnBlock;
+        this.respawnLocations = respawnLocations;
         this.effects = effects;
 
         this.willRespawn = false;
         this.blockingRespawns = false;
         this.teamHolder = null;
+        this.rng = respawnLocations == null ? null : new Random();
 
         this.match = new WeakReference<Match>(TGM.get().getMatchManager().getMatch());
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
@@ -199,6 +204,9 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     }
 
     private void placeFlag() {
+        if (respawnLocations != null && match.get().getMatchStatus() == MatchStatus.MID) {
+            location = respawnLocations.get(rng.nextInt(respawnLocations.size()));
+        }
         Block block = location.getBlock();
         block.setType(generateMaterial(), false);
 
@@ -337,6 +345,15 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
         boolean respawnBlock = flagJson.has("respawn-block") ? flagJson.get("respawn-block").getAsBoolean() : false;
 
+        List<Location> respawnLocations = null;
+        if (flagJson.has("respawn-locations")) {
+            respawnLocations = new ArrayList<>();
+            System.out.println(flagJson.get("respawn-locations").getAsJsonArray().toString());
+            for (JsonElement post : flagJson.get("respawn-locations").getAsJsonArray()) {
+                respawnLocations.add(Parser.convertLocation(world, post));
+            }
+        }
+
         List<PotionEffect> effects = new ArrayList<>();
         if (flagJson.has("effects")) {
             for (JsonElement effect : flagJson.get("effects").getAsJsonArray()) {
@@ -344,7 +361,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             }
         }
 
-        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime, respawnBlock, effects);
+        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime, respawnBlock, respawnLocations, effects);
     }
 
 }
