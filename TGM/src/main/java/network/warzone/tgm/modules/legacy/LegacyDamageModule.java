@@ -60,7 +60,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
 
             // Strength
             PotionEffect strengthEffect = player.getPotionEffect(PotionEffectType.INCREASE_DAMAGE);
-            // -1 -> 0 in next part so strenth mod is 0 if no strength.
+            // -1 -> 0 in next part so strength modifier is 0 if no strength.
             int amplifier = strengthEffect != null ? strengthEffect.getAmplifier() : -1;
 
             // 0 -> 1, 1 -> 2
