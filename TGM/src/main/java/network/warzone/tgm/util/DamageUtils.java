@@ -12,7 +12,8 @@ import java.util.stream.Collectors;
 public class DamageUtils {
 
     private static EnumMap<Material, Double> damages;
-    private static Boolean enabled;
+    private static boolean enabled;
+    private static boolean loaded;
 
     static {
         if (isEnabled()) {
@@ -40,9 +41,10 @@ public class DamageUtils {
     }
 
     public static boolean isEnabled() {
-        if (enabled == null) {
+        if (!loaded) {
             ConfigurationSection legacyConfig = TGM.get().getConfig().getConfigurationSection("legacy");
             enabled = legacyConfig != null && legacyConfig.getBoolean("damage");
+            loaded = true;
         }
         return enabled;
     }

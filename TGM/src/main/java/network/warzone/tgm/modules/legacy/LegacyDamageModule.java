@@ -29,7 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class LegacyDamageModule extends MatchModule implements Listener {
 
-    private Boolean mapOverride;
+    private boolean mapOverride;
 
     @Override
     public void load(Match match) {
@@ -38,7 +38,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
 
         JsonObject matchLegacyConfig = matchConfig.get("legacy").getAsJsonObject();
         if (matchLegacyConfig.has("damage")) mapOverride = matchLegacyConfig.get("damage").getAsBoolean();
-        else mapOverride = null;
+        else mapOverride = DamageUtils.isEnabled();
     }
 
     @EventHandler(priority= EventPriority.LOWEST) // Make sure this event is called before the knockback
@@ -101,8 +101,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
     }
 
     private boolean isEnabled() {
-        if (mapOverride != null) return mapOverride;
-        return DamageUtils.isEnabled();
+        return mapOverride;
     }
 
 

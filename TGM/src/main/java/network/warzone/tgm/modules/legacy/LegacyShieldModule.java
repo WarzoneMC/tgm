@@ -18,7 +18,7 @@ public class LegacyShieldModule extends MatchModule implements Listener {
     private static double projectileReductionFactor;
     private static double genericReductionFactor;
 
-    private Boolean mapOverride;
+    private boolean mapOverride;
 
     static {
         ConfigurationSection legacyConfig = TGM.get().getConfig().getConfigurationSection("legacy");
@@ -38,7 +38,7 @@ public class LegacyShieldModule extends MatchModule implements Listener {
 
         JsonObject matchLegacyConfig = matchConfig.get("legacy").getAsJsonObject();
         if (matchLegacyConfig.has("shield")) mapOverride = matchLegacyConfig.get("shield").getAsBoolean();
-        else mapOverride = null;
+        else mapOverride = globalEnabled;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -58,8 +58,7 @@ public class LegacyShieldModule extends MatchModule implements Listener {
     }
 
     private boolean isEnabled() {
-        if (mapOverride != null) return mapOverride;
-        return  globalEnabled;
+        return mapOverride;
     }
 
 }

@@ -39,7 +39,7 @@ public class LegacyArmorModule extends MatchModule implements Listener {
 
     private static final boolean globalEnabled;
 
-    private Boolean mapOverride;
+    private boolean mapOverride;
 
     static {
         ConfigurationSection legacyConfig = TGM.get().getConfig().getConfigurationSection("legacy");
@@ -53,7 +53,7 @@ public class LegacyArmorModule extends MatchModule implements Listener {
 
         JsonObject matchLegacyConfig = matchConfig.get("legacy").getAsJsonObject();
         if (matchLegacyConfig.has("damage")) mapOverride = matchLegacyConfig.get("armor").getAsBoolean();
-        else mapOverride = null;
+        else mapOverride = globalEnabled;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -109,8 +109,7 @@ public class LegacyArmorModule extends MatchModule implements Listener {
     }
 
     private boolean isEnabled() {
-        if (mapOverride != null) return mapOverride;
-        return globalEnabled;
+        return mapOverride;
     }
 
     private enum EnchantmentType {
