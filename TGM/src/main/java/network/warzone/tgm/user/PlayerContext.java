@@ -4,14 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Objects;
 
 /**
  * Created by luke on 4/27/17.
@@ -22,24 +26,42 @@ public class PlayerContext {
     private static final List<PlayerLevel> levels = new ArrayList<>();
 
     static {
-        levels.add(new PlayerLevel((lvl) -> lvl < 10, ChatColor.of("#BBBAD3")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 20, ChatColor.of("#AAC1FF")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 30, ChatColor.of("#B1AAFF")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 40, ChatColor.of("#AAE1FF")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 50, ChatColor.of("#AAFFFF")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 60, ChatColor.of("#96FFBC")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 70, ChatColor.of("#ABFFA5")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 80, ChatColor.of("#D9FFAA")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 90, ChatColor.of("#FFFFAA")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 100, ChatColor.of("#FFD9AA")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 120, ChatColor.of("#FFAAAA")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 140, ChatColor.of("#FFAAC9")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 160, ChatColor.of("#FF96DA")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 180, ChatColor.of("#FF66FF")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 200, ChatColor.of("#E266FF")));
-        levels.add(new PlayerLevel((lvl) -> lvl < 220, ChatColor.of("#C966FF")));
-        // fallback
-        levels.add(new PlayerLevel((lvl) -> true, ChatColor.of("#9E66FF")));
+        loadConfig();
+
+        TGM.registerEvents(new Listener() {
+            @EventHandler
+            public void onConfigLoad(TGMConfigReloadEvent event) {
+                loadConfig();
+            }
+        });
+    }
+
+    private static void loadConfig() {
+        levels.clear();
+        ConfigurationSection section = TGM.get().getConfig().getConfigurationSection("chat.levels");
+        if (section == null) {
+            levels.add(new PlayerLevel(0, ChatColor.GRAY)); // Fallback
+            return;
+        }
+        for (String key : section.getKeys(false)) {
+            try {
+                int minLevel = Integer.parseInt(key);
+                ChatColor color = ChatColor.of(Objects.requireNonNull(section.getString(key)));
+                levels.add(new PlayerLevel(minLevel, color));
+            } catch (Exception e) {
+                TGM.get().getLogger().warning("Failed to register level color for key '" + key + "': " + e.getMessage());
+            }
+        }
+        levels.sort((a, b) -> b.minimumLevel - a.minimumLevel);
+    }
+
+    public static ChatColor getColor(int lvl) {
+        for (PlayerLevel levelEntry : levels) {
+            if (lvl >= levelEntry.minimumLevel) {
+                return levelEntry.levelColor;
+            }
+        }
+        return ChatColor.GRAY; // Fallback
     }
 
     public PlayerContext(Player player, UserProfile userProfile) {
@@ -83,14 +105,7 @@ public class PlayerContext {
 
     public String getLevelString(boolean original) {
         int level = getUserProfile(original).getLevel();
-        for (PlayerLevel levelEntry : levels) {
-            if (levelEntry.check.test(level)) {
-                return "" + levelEntry.levelColor + "[" + level + "]"; 
-            }
-        }
-
-        // will not be reached due to fallback entry
-        return null;
+        return "" + getColor(level) + "[" + level + "]";
     }
 
     public void updateRank(Rank r) {
@@ -117,7 +132,7 @@ public class PlayerContext {
 
     @AllArgsConstructor @Getter
     private static class PlayerLevel {
-        private final Predicate<Integer> check;
+        private final int minimumLevel;
         private final ChatColor levelColor;
     }
 }
