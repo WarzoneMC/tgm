@@ -100,7 +100,7 @@ public class MatchResultModule extends MatchModule implements Listener {
         player.setAllowFlight(true);
         player.setVelocity(player.getVelocity().setY(1.0)); // Weeee!
         player.setFlying(true);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 5, true, false), true);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 1000000, 5, true, false));
     }
 
     @EventHandler(priority = EventPriority.LOW)

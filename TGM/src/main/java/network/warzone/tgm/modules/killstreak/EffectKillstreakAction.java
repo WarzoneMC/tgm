@@ -14,7 +14,7 @@ class EffectKillstreakAction implements KillstreakAction {
     @Override
     public void apply(Player killer) {
         for (PotionEffect potionEffect : potionEffects) {
-            killer.addPotionEffect(new PotionEffect(potionEffect.getType(), potionEffect.getDuration() * 20, potionEffect.getAmplifier(), potionEffect.isAmbient(), potionEffect.hasParticles(), false), true);
+            killer.addPotionEffect(new PotionEffect(potionEffect.getType(), potionEffect.getDuration() * 20, potionEffect.getAmplifier(), potionEffect.isAmbient(), potionEffect.hasParticles(), false));
         }
     }
 }
