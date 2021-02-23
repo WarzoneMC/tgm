@@ -6,13 +6,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.EnumMap;
 import java.util.stream.Collectors;
 
 public class DamageUtils {
 
-    private static Map<String, Double> damages;
+    private static EnumMap<Material, Double> damages;
     private static Boolean enabled;
 
     static {
@@ -22,7 +21,18 @@ public class DamageUtils {
             if (damagesConfig != null) {
                 damages = damagesConfig.getKeys(false).stream()
                         .filter(s -> damagesConfig.isDouble(s) || damagesConfig.isInt(s))
-                        .collect(Collectors.toMap(key -> key, damagesConfig::getDouble));
+                        .collect(
+                                Collectors.toMap(
+                                        Material::valueOf,
+                                        damagesConfig::getDouble,
+                                        (keyA, keyB) -> {
+                                            throw new IllegalArgumentException(
+                                                    String.format("Duplicate item damage definition in config.yml. (%s, %s)", keyA, keyB)
+                                            );
+                                        },
+                                        () -> new EnumMap<>(Material.class)
+                                )
+                        );
             } else {
                 loadDefaultDamages();
             }
@@ -38,11 +48,11 @@ public class DamageUtils {
     }
 
     public static double getDamage(Material m) {
-        return damages.getOrDefault(getFormattedName(m), -1.0);
+        return damages.getOrDefault(m, -1.0);
     }
 
     public static boolean hasEntry(Material m) {
-        return damages.containsKey(getFormattedName(m));
+        return damages.containsKey(m);
     }
 
     public static boolean isCriticalHit(Player p) {
@@ -60,45 +70,38 @@ public class DamageUtils {
         return level >= 1 ? level * 1.25 : 0;
     }
 
-    private static String getFormattedName(Material m) {
-        return m.name()
-                .replace("GOLDEN", "GOLD")
-                .replace("WOODEN", "WOOD")
-                .replace("SHOVEL", "SPADE");
-    }
-
     private static void loadDefaultDamages() {
-        damages = new HashMap<>() {{
-            put("GOLD_AXE", 4.0);
-            put("WOOD_AXE", 4.0);
-            put("STONE_AXE", 5.0);
-            put("IRON_AXE", 6.0);
-            put("DIAMOND_AXE", 7.0);
-            put("NETHERITE_AXE", 8.0);
-            put("GOLD_SPADE", 2.0);
-            put("WOOD_SPADE", 2.0);
-            put("STONE_SPADE", 3.0);
-            put("IRON_SPADE", 4.0);
-            put("DIAMOND_SPADE", 5.0);
-            put("NETHERITE_SPADE", 6.0);
-            put("GOLD_SWORD", 5.0);
-            put("WOOD_SWORD", 5.0);
-            put("STONE_SWORD", 6.0);
-            put("IRON_SWORD", 7.0);
-            put("DIAMOND_SWORD", 8.0);
-            put("NETHERITE_SWORD", 9.0);
-            put("GOLD_PICKAXE", 3.0);
-            put("WOOD_PICKAXE", 3.0);
-            put("STONE_PICKAXE", 4.0);
-            put("IRON_PICKAXE", 5.0);
-            put("DIAMOND_PICKAXE", 6.0);
-            put("NETHERITE_PICKAXE", 7.0);
-            put("GOLD_HOE", 1.0);
-            put("WOOD_HOE", 1.0);
-            put("STONE_HOE", 1.0);
-            put("IRON_HOE", 1.0);
-            put("DIAMOND_HOE", 1.0);
-            put("NETHERITE_HOE", 1.0);
+        damages = new EnumMap<Material, Double>(Material.class) {{
+            put(Material.GOLDEN_AXE, 4.0);
+            put(Material.WOODEN_AXE, 4.0);
+            put(Material.STONE_AXE, 5.0);
+            put(Material.IRON_AXE, 6.0);
+            put(Material.DIAMOND_AXE, 7.0);
+            put(Material.NETHERITE_AXE, 8.0);
+            put(Material.GOLDEN_SHOVEL, 2.0);
+            put(Material.WOODEN_SHOVEL, 2.0);
+            put(Material.STONE_SHOVEL, 3.0);
+            put(Material.IRON_SHOVEL, 4.0);
+            put(Material.DIAMOND_SHOVEL, 5.0);
+            put(Material.NETHERITE_SHOVEL, 6.0);
+            put(Material.GOLDEN_SWORD, 5.0);
+            put(Material.WOODEN_SWORD, 5.0);
+            put(Material.STONE_SWORD, 6.0);
+            put(Material.IRON_SWORD, 7.0);
+            put(Material.DIAMOND_SWORD, 8.0);
+            put(Material.NETHERITE_SWORD, 9.0);
+            put(Material.GOLDEN_PICKAXE, 3.0);
+            put(Material.WOODEN_PICKAXE, 3.0);
+            put(Material.STONE_PICKAXE, 4.0);
+            put(Material.IRON_PICKAXE, 5.0);
+            put(Material.DIAMOND_PICKAXE, 6.0);
+            put(Material.NETHERITE_PICKAXE, 7.0);
+            put(Material.GOLDEN_HOE, 1.0);
+            put(Material.WOODEN_HOE, 1.0);
+            put(Material.STONE_HOE, 1.0);
+            put(Material.IRON_HOE, 1.0);
+            put(Material.DIAMOND_HOE, 1.0);
+            put(Material.NETHERITE_HOE, 1.0);
         }};
     }
 
