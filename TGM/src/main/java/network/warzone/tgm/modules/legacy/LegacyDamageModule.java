@@ -69,7 +69,7 @@ public class LegacyDamageModule extends MatchModule implements Listener {
             double strengthModifier = strengthLevel * 3;
             weaponDamage += strengthModifier;
 
-            // Critical - no change between 1.8 and 1.9+ (technically 1.8 you can do crit while sprinting- might look into that?)
+            // Critical - add crits while sprinting (removed in 1.9)
             if (DamageUtils.isPseudoCriticalHit(player)) weaponDamage *= 1.5;
             if (!DamageUtils.isCriticalHit(player) && DamageUtils.isPseudoCriticalHit(player)) {
                 ThreadLocalRandom rand = ThreadLocalRandom.current();
