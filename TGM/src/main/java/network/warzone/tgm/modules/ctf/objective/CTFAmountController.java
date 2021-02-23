@@ -76,14 +76,16 @@ public class CTFAmountController extends CTFController {
         for (MatchTeam team : teamManagerModule.getTeams()) {
             if (team.isSpectator()) continue;
             if (positionOnScoreboard != 1) scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
-            scoreboard.add(ChatColor.WHITE.toString() + getTeamPoints(team) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + captureAmount + ChatColor.WHITE.toString() + " Captures", ++positionOnScoreboard);
+            scoreboard.add(ChatColor.WHITE.toString() + "  " + getTeamPoints(team) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + captureAmount + ChatColor.WHITE.toString() + " Captures", ++positionOnScoreboard);
             scoreboard.add(team.getColor() + team.getAlias(), ++positionOnScoreboard);
         }
-        scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
         boolean addedAnyFlags = false;
         for (MatchFlag flag : allFlags) {
             if (flag.getFlagHolder() == null) continue;
-            if (!addedAnyFlags) addedAnyFlags = true;
+            if (!addedAnyFlags) {
+                scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
+                addedAnyFlags = true;
+            }
             MatchTeam team = teamManagerModule.getTeam(flag.getFlagHolder());
             ChatColor flagOwnerColor = flag.getTeam() == null ? ChatColor.WHITE : flag.getTeam().getColor();
             scoreboard.add(flagOwnerColor +
