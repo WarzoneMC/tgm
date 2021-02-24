@@ -70,11 +70,13 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private long timeDropped;
     private boolean blockingRespawns; // Whether this flag is currently blocking a team from respawning (based on the match state).
     private List<Location> respawnLocations;
+    private long secondsUntilRespawn;
 
     private FlagSubscriber flagSubscriber;
-    private MatchTeam team;
-    private Player flagHolder;
-    private MatchTeam teamHolder;
+    private MatchTeam team; // Team that owns the flag (defends it)
+    private MatchTeam capturer; // Team that has to capture this flag
+    private Player flagHolder; // Player currently holding the flag
+    private MatchTeam teamHolder; // Team currently holding the flag
     private Random rng;
 
     private Region protectiveRegion;
@@ -99,17 +101,31 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
         this.willRespawn = false;
         this.blockingRespawns = false;
+        this.capturer = null;
         this.teamHolder = null;
         this.rng = respawnLocations == null ? null : new Random();
+        this.secondsUntilRespawn = 0;
 
         this.match = new WeakReference<Match>(TGM.get().getMatchManager().getMatch());
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.respawnModule = TGM.get().getModule(RespawnModule.class);
 
+        List<MatchTeam> teams = teamManagerModule.getTeams();
+        // If there are only 2 playing teams, determine the capturer
+        if(team != null && teams.size() == 3){
+            for(MatchTeam loadedTeam : teams){
+                if(!loadedTeam.equals(team) && !loadedTeam.isSpectator()){
+                    capturer = loadedTeam;
+                    break;
+                }
+            }
+        }
+
         // No task necessary if json specifies instant flag respawns
         if(this.respawnTime > 0){
             task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-                if (this.willRespawn && (now() >= (this.timeDropped + this.respawnTime))) {
+                secondsUntilRespawn = ((this.timeDropped + this.respawnTime) - now()) / (long)1000;
+                if (this.willRespawn && secondsUntilRespawn <= 0) {
                     this.willRespawn = false;
                     placeFlag();
                     playRespawnSound();
