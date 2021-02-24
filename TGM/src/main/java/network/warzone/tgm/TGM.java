@@ -165,6 +165,15 @@ public class TGM extends JavaPlugin {
         return true;
     }
 
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        try {
+            return this.commands.complete(alias, args, sender, sender);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static void registerEvents(Listener listener) {
         Bukkit.getPluginManager().registerEvents(listener, TGM.get());
     }
