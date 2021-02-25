@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.knockback;
+package network.warzone.tgm.modules.legacy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +30,7 @@ import static java.lang.Math.PI;
 /**
  * Complete override for the vanilla knockback system.
  */
-public class KnockbackModule extends MatchModule implements Listener {
+public class LegacyKnockbackModule extends MatchModule implements Listener {
 
     private static final Set<EntityDamageEvent.DamageCause> CAUSES = new HashSet<>();
 
@@ -58,16 +58,16 @@ public class KnockbackModule extends MatchModule implements Listener {
     }
 
     private static void loadValues() {
-        enabled = TGM.get().getConfig().getBoolean("custom-knockback.enabled", false);
-        knockBackFriction = TGM.get().getConfig().getDouble("custom-knockback.friction");
-        knockBackHorizontal = TGM.get().getConfig().getDouble("custom-knockback.horizontal");
-        knockBackVertical = TGM.get().getConfig().getDouble("custom-knockback.vertical");
-        knockBackVerticalLimit = TGM.get().getConfig().getDouble("custom-knockback.vertical-limit");
-        knockBackExtraHorizontal = TGM.get().getConfig().getDouble("custom-knockback.horizontal-extra");
-        knockBackExtraVertical = TGM.get().getConfig().getDouble("custom-knockback.vertical-extra");
-        knockBackBowBase = TGM.get().getConfig().getDouble("custom-knockback.bow-base");
-        knockBackBowVertical = TGM.get().getConfig().getDouble("custom-knockback.bow-vertical");
-        knockBackPunchMultiplier = TGM.get().getConfig().getDouble("custom-knockback.punch-multiplier");
+        enabled = TGM.get().getConfig().getBoolean("legacy.knockback", false);
+        knockBackFriction = TGM.get().getConfig().getDouble("legacy.custom-knockback.friction");
+        knockBackHorizontal = TGM.get().getConfig().getDouble("legacy.custom-knockback.horizontal");
+        knockBackVertical = TGM.get().getConfig().getDouble("legacy.custom-knockback.vertical");
+        knockBackVerticalLimit = TGM.get().getConfig().getDouble("legacy.custom-knockback.vertical-limit");
+        knockBackExtraHorizontal = TGM.get().getConfig().getDouble("legacy.custom-knockback.horizontal-extra");
+        knockBackExtraVertical = TGM.get().getConfig().getDouble("legacy.custom-knockback.vertical-extra");
+        knockBackBowBase = TGM.get().getConfig().getDouble("legacy.custom-knockback.bow-base");
+        knockBackBowVertical = TGM.get().getConfig().getDouble("legacy.custom-knockback.bow-vertical");
+        knockBackPunchMultiplier = TGM.get().getConfig().getDouble("legacy.custom-knockback.punch-multiplier");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

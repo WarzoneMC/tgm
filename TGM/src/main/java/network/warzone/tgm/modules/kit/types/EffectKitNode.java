@@ -14,6 +14,6 @@ public class EffectKitNode implements KitNode {
 
     @Override
     public void apply(Player player, MatchTeam matchTeam) {
-        player.addPotionEffect(potionEffect, true);
+        player.addPotionEffect(potionEffect);
     }
 }

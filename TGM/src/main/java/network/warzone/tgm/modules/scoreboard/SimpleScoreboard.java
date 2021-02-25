@@ -146,6 +146,16 @@ public class SimpleScoreboard {
 
         if (text.length() > 16) {
             String prefixColor = ChatColor.getLastColors(prefix);
+            ChatColor finalColor = null;
+            if (prefixColor.length() >= 2) {
+                
+                // can be null
+                finalColor = ChatColor.getByChar(prefixColor.substring(1,2));
+            }
+            if (finalColor != null) {
+                team.setColor(finalColor);
+            }
+
             String suffix = iterator.next();
 
             if (prefix.endsWith(String.valueOf(ChatColor.COLOR_CHAR))) {
@@ -180,7 +190,7 @@ public class SimpleScoreboard {
         removed.stream().forEach((remove) -> {
             for (String s : scoreboard.getEntries()) {
                 Score score = obj.getScore(s);
-                
+
                 if (score == null) continue;
                 if (score.getScore() != remove) continue;
 

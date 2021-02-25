@@ -51,6 +51,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 public class MatchFlag extends PlayerRedeemable implements Listener {
@@ -68,10 +69,15 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private boolean willRespawn;
     private long timeDropped;
     private boolean blockingRespawns; // Whether this flag is currently blocking a team from respawning (based on the match state).
+    private List<Location> respawnLocations;
+    private long secondsUntilRespawn;
 
     private FlagSubscriber flagSubscriber;
-    private MatchTeam team;
-    private Player flagHolder;
+    private MatchTeam team; // Team that owns the flag (defends it)
+    private MatchTeam capturer; // Team that has to capture this flag
+    private Player flagHolder; // Player currently holding the flag
+    private MatchTeam teamHolder; // Team currently holding the flag
+    private Random rng;
 
     private Region protectiveRegion;
 
@@ -79,7 +85,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     private TeamManagerModule teamManagerModule;
     private RespawnModule respawnModule;
 
-    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name, long respawnTime, boolean respawnBlock, List<PotionEffect> effects) {
+    public MatchFlag(List<Pattern> bannerPatterns, String bannerType, String rotation, Location location, FlagSubscriber flagSubscriber, MatchTeam team, String name, long respawnTime, boolean respawnBlock, List<Location> respawnLocations, List<PotionEffect> effects) {
 
         this.bannerPatterns = bannerPatterns;
         this.bannerType = bannerType;
@@ -90,19 +96,36 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         this.name = name;
         this.respawnTime = respawnTime;
         this.respawnBlock = respawnBlock;
+        this.respawnLocations = respawnLocations;
         this.effects = effects;
 
         this.willRespawn = false;
         this.blockingRespawns = false;
+        this.capturer = null;
+        this.teamHolder = null;
+        this.rng = respawnLocations == null ? null : new Random();
+        this.secondsUntilRespawn = 0;
 
         this.match = new WeakReference<Match>(TGM.get().getMatchManager().getMatch());
         this.teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
         this.respawnModule = TGM.get().getModule(RespawnModule.class);
 
+        List<MatchTeam> teams = teamManagerModule.getTeams();
+        // If there are only 2 playing teams, determine the capturer
+        if(team != null && teams.size() == 3){
+            for(MatchTeam loadedTeam : teams){
+                if(!loadedTeam.equals(team) && !loadedTeam.isSpectator()){
+                    capturer = loadedTeam;
+                    break;
+                }
+            }
+        }
+
         // No task necessary if json specifies instant flag respawns
         if(this.respawnTime > 0){
             task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-                if (this.willRespawn && (now() >= (this.timeDropped + this.respawnTime))) {
+                secondsUntilRespawn = ((this.timeDropped + this.respawnTime) - now()) / (long)1000;
+                if (this.willRespawn && secondsUntilRespawn <= 0) {
                     this.willRespawn = false;
                     placeFlag();
                     playRespawnSound();
@@ -197,6 +220,9 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     }
 
     private void placeFlag() {
+        if (respawnLocations != null && match.get().getMatchStatus() == MatchStatus.MID) {
+            location = respawnLocations.get(rng.nextInt(respawnLocations.size()));
+        }
         Block block = location.getBlock();
         block.setType(generateMaterial(), false);
 
@@ -230,11 +256,12 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         else if (event.getFrom().distanceSquared(location) > 1) return;
 
         this.flagHolder = event.getPlayer();
+        this.teamHolder = teamManagerModule.getTeam(this.flagHolder);
         location.getBlock().setType(Material.AIR);
 
         if(this.respawnBlock && !this.blockingRespawns){
             this.blockingRespawns = true;
-            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),false);
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(this.teamHolder,false);
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         flagSubscriber.pickup(this, event.getPlayer(), effects);
@@ -245,11 +272,12 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         if (match.get().getMatchStatus() != MatchStatus.MID || event.getPlayer() != flagHolder) return;
         if(this.respawnBlock && this.blockingRespawns){
             this.blockingRespawns = false;
-            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(this.teamHolder,true);
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
         flagSubscriber.drop(this, event.getPlayer(), null, effects);
+        this.teamHolder = null;
         this.refreshFlag();
     }
 
@@ -258,11 +286,12 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         if (match.get().getMatchStatus() != MatchStatus.MID || event.getPlayerContext().getPlayer() != flagHolder || event.getTeam().equals(event.getOldTeam())) return;
         if(this.respawnBlock && this.blockingRespawns){
             this.blockingRespawns = false;
-            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(this.teamHolder,true);
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
         flagSubscriber.drop(this, event.getPlayerContext().getPlayer(), null, effects);
+        this.teamHolder = null;
         this.refreshFlag();
     }
 
@@ -271,16 +300,18 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         if (match.get().getMatchStatus() != MatchStatus.MID || event.getVictim() != flagHolder) return;
         if(this.respawnBlock && this.blockingRespawns){
             this.blockingRespawns = false;
-            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(this.teamHolder,true);
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
         flagSubscriber.drop(this, event.getVictim(), event.getKiller(), effects);
+        this.teamHolder = null;
         this.refreshFlag();
     }
 
     public void unload() {
         flagHolder = null;
+        teamHolder = null;
 
         // No task was scheduled if json specifies instant flag respawns
         if(this.respawnTime > 0){
@@ -293,11 +324,12 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
     public void redeem(Player player) {
         if(this.respawnBlock && this.blockingRespawns){
             this.blockingRespawns = false;
-            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(teamManagerModule.getTeam(this.flagHolder),true);
+            FlagRespawnBlockEvent newEvent = new FlagRespawnBlockEvent(this.teamHolder,true);
             Bukkit.getPluginManager().callEvent(newEvent);
         }
         this.flagHolder = null;
         flagSubscriber.capture(this, player, effects);
+        this.teamHolder = null;
         this.refreshFlag();
     }
 
@@ -329,6 +361,15 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
 
         boolean respawnBlock = flagJson.has("respawn-block") ? flagJson.get("respawn-block").getAsBoolean() : false;
 
+        List<Location> respawnLocations = null;
+        if (flagJson.has("respawn-locations")) {
+            respawnLocations = new ArrayList<>();
+            System.out.println(flagJson.get("respawn-locations").getAsJsonArray().toString());
+            for (JsonElement post : flagJson.get("respawn-locations").getAsJsonArray()) {
+                respawnLocations.add(Parser.convertLocation(world, post));
+            }
+        }
+
         List<PotionEffect> effects = new ArrayList<>();
         if (flagJson.has("effects")) {
             for (JsonElement effect : flagJson.get("effects").getAsJsonArray()) {
@@ -336,7 +377,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             }
         }
 
-        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime, respawnBlock, effects);
+        return new MatchFlag(bannerPatterns, bannerType, bannerRotation, location, flagSubscriber, team, name, respawnTime, respawnBlock, respawnLocations, effects);
     }
 
 }

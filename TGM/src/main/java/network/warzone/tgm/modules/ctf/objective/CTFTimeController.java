@@ -57,7 +57,7 @@ public class CTFTimeController extends CTFController implements TimeLimitService
     @Override
     public void drop(MatchFlag flag, Player stealer, Player attacker, List<PotionEffect> effects) {
         super.drop(flag, stealer, attacker, effects);
-        currentFlagHolders.remove(teamManagerModule.getTeam(stealer));
+        currentFlagHolders.remove(flag.getTeamHolder());
         updateAllScoreboards(getFormattedTime());
     }
 
@@ -101,18 +101,20 @@ public class CTFTimeController extends CTFController implements TimeLimitService
         scoreboard.removeAll(ScoreboardManagerModule.getReservedExclusions());
         int spaceCount = 1;
         int positionOnScoreboard = 1;
-        scoreboard.add("Time Left: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
+        scoreboard.add(ChatColor.WHITE + "Time Left: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
         for (MatchTeam team : teamManagerModule.getTeams()) {
             if (team.isSpectator()) continue;
             scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
-            scoreboard.add(ChatColor.LIGHT_PURPLE.toString() + getTeamPoints(team) + " points", ++positionOnScoreboard);
+            scoreboard.add(ChatColor.LIGHT_PURPLE.toString() + "  " + getTeamPoints(team) + " points", ++positionOnScoreboard);
             scoreboard.add(team.getColor() + team.getAlias(), ++positionOnScoreboard);
         }
-        scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
         boolean addedAnyFlags = false;
         for (MatchFlag flag : allFlags) {
             if (flag.getFlagHolder() == null) continue;
-            if (!addedAnyFlags) addedAnyFlags = true;
+            if (!addedAnyFlags) {
+                scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
+                addedAnyFlags = true;
+            }
             MatchTeam team = teamManagerModule.getTeam(flag.getFlagHolder());
             ChatColor flagOwnerColor = flag.getTeam() == null ? ChatColor.WHITE : flag.getTeam().getColor();
             scoreboard.add(flagOwnerColor +

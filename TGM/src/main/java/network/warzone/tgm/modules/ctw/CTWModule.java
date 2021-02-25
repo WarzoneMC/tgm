@@ -53,11 +53,11 @@ public class CTWModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
-        JsonObject dtmJson = match.getMapContainer().getMapInfo().getJsonObject().get("ctw").getAsJsonObject();
+        JsonObject ctwJson = match.getMapContainer().getMapInfo().getJsonObject().get("ctw").getAsJsonObject();
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.scoreboardManagerModule = match.getModule(ScoreboardManagerModule.class);
 
-        for (JsonElement woolElement : dtmJson.getAsJsonArray("wools")) {
+        for (JsonElement woolElement : ctwJson.getAsJsonArray("wools")) {
             JsonObject woolObject = woolElement.getAsJsonObject();
 
             String name = woolObject.get("name").getAsString();
@@ -287,16 +287,16 @@ public class CTWModule extends MatchModule implements Listener {
     private String getScoreboardString(WoolObjective woolObjective) {
         WoolStatus woolStatus = woolObjective.getStatus();
         if (woolStatus == WoolStatus.COMPLETED) {
-            return "  " + woolObjective.getColor() + SYMBOL_WOOL_COMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
+            return woolObjective.getColor() + "  " + SYMBOL_WOOL_COMPLETE + ChatColor.WHITE + " " + woolObjective.getName() + " Wool";
         } else if (woolStatus == WoolStatus.TOUCHED) {
-            return "  " + woolObjective.getColor() + SYMBOL_WOOL_TOUCHED + ChatColor.WHITE + " " + woolObjective.getName();
+            return woolObjective.getColor() + "  " + SYMBOL_WOOL_TOUCHED + ChatColor.WHITE + " " + woolObjective.getName() + " Wool";
         } else {
-            return "  " + woolObjective.getColor() + SYMBOL_WOOL_INCOMPLETE + ChatColor.WHITE + " " + woolObjective.getName();
+            return woolObjective.getColor() + "  " + SYMBOL_WOOL_INCOMPLETE + ChatColor.WHITE + " " + woolObjective.getName() + " Wool";
         }
     }
 
     private String getScoreboardString(List<WoolObjective> woolObjectives) {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result = new StringBuilder(ChatColor.WHITE.toString());
         for (WoolObjective woolObjective : woolObjectives) {
             WoolStatus woolStatus = woolObjective.getStatus();
             if (woolStatus == WoolStatus.COMPLETED) {

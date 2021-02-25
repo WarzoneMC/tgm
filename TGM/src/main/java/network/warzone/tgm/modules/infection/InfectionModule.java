@@ -149,7 +149,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     public void processSecond(int elapsed) {
         int diff = (length * 60) - elapsed;
         if (diff < 0) diff = 0;
-        timeScoreboardValue = ChatColor.WHITE + "Time left: " + ChatColor.AQUA + Strings.formatTime(diff);
+        timeScoreboardValue = ChatColor.WHITE + "Time Left: " + ChatColor.AQUA + Strings.formatTime(diff) + ChatColor.WHITE;
         for (SimpleScoreboard simpleScoreboard : scoreboardManagerController.getScoreboards().values())
             refreshOnlyDynamicScoreboard(simpleScoreboard);
     }
@@ -175,7 +175,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     private void refreshOnlyDynamicScoreboard(SimpleScoreboard board) {
         if (board == null) return;
         teamAliveScoreboardLines.forEach((id, i) -> board.add(
-                "  " + ChatColor.YELLOW + teamManager.getTeamById(id).getMembers().size() + ChatColor.WHITE + " alive", i));
+                ChatColor.WHITE + "  " + teamManager.getTeamById(id).getMembers().size() + ChatColor.GRAY + " Alive", i));
         board.add(timeScoreboardValue, timeScoreboardLine);
         board.update();
     }

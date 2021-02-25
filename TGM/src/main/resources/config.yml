@@ -27,6 +27,28 @@ chat:
     # Message that will be displayed to players when the chat is muted if they do not have permission to bypass the chat mute.
     # Default: "&cChat is currently disabled."
     muted: "&cChat is currently disabled."
+  # Display color for player levels show in chat and tab list.
+  # Format: <minimumLevel>: <color>
+  # Note: Supports HEX colors for 1.16+ and legacy color names (https://javadoc.io/doc/net.md-5/bungeecord-chat/latest/net/md_5/bungee/api/ChatColor.html)
+  levels:
+    1: "#BBBAD3"
+    10: "#AAC1FF"
+    20: "#B1AAFF"
+    30: "#AAE1FF"
+    40: "#AAFFFF"
+    50: "#96FFBC"
+    60: "#ABFFA5"
+    70: "#D9FFAA"
+    80: "#FFFFAA"
+    90: "#FFD9AA"
+    100: "#FFAAAA"
+    120: "#FFAAC9"
+    140: "#FF96DA"
+    160: "#FF66FF"
+    180: "#E266FF"
+    200: "#C966FF"
+    220: "#9E66FF"
+    240: "DARK_GREEN"
 map:
   # If players will be placed in to survival after the game is ended
   # Any player in survival mode may break blocks during post game
@@ -85,18 +107,27 @@ server:
   # Text displayed after the match time on the tablist header.
   # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
-# Configurable knockback values.
-custom-knockback:
-  enabled: true
-  friction: 2.1
-  horizontal: 0.425
-  vertical: 0.25
-  vertical-limit: 0.39
-  horizontal-extra: 0.5
-  vertical-extra: 0.1
-  bow-base: 0.345
-  bow-vertical: 0.35
-  punch-multiplier: 1
+# Legacy Features
+legacy:
+  damage: true
+  knockback: true
+  armor: true
+  shield: true
+  shield-reduction:
+    generic: 0.5
+    projectile: 0.5
+  # Configurable knockback values
+  custom-knockback:
+    friction: 2.1
+    horizontal: 0.425
+    vertical: 0.25
+    vertical-limit: 0.39
+    horizontal-extra: 0.5
+    vertical-extra: 0.1
+    bow-base: 0.345
+    bow-vertical: 0.35
+    punch-multiplier: 1
+
 heapdump:
   # Upload heap dump to a Bytebin server (https://github.com/lucko/bytebin). If enabled, heap dumps will not remain within
   # the server files.
