@@ -26,17 +26,26 @@ public class BannerPatternsDeserializer implements JsonDeserializer<List<Pattern
                     String in = element.getAsString();
                     String[] args = in.split(":");
                     DyeColor dyeColor = DyeColor.valueOf(Strings.getTechnicalName(args[0]));
-                    PatternType patternType = PatternType.valueOf(Strings.getTechnicalName(args[1]));
-                    if (patterns == null) patternType = PatternType.getByIdentifier(args[1]);
-                    patterns.add(new Pattern(dyeColor, patternType));
+                    PatternType patternType;
+                    try {
+                        patternType = PatternType.valueOf(Strings.getTechnicalName(args[1]));
+                    } catch (IllegalArgumentException ignored) {
+                        patternType = PatternType.getByIdentifier(args[1]);
+                    }
+                    if (patternType != null) patterns.add(new Pattern(dyeColor, patternType));
                 } catch (Exception ignored) {}
             } else if (element.isJsonObject()) {
                 try {
                     JsonObject jsonObject = element.getAsJsonObject();
                     DyeColor dyeColor = DyeColor.valueOf(Strings.getTechnicalName(jsonObject.get("color").getAsString()));
-                    PatternType patternType = PatternType.valueOf(Strings.getTechnicalName(jsonObject.get("type").getAsString()));
-                    if (patterns == null) patternType = PatternType.getByIdentifier(jsonObject.get("type").getAsString());
-                    patterns.add(new Pattern(dyeColor, patternType));
+                    String type = jsonObject.get("type").getAsString();
+                    PatternType patternType;
+                    try {
+                        patternType = PatternType.valueOf(Strings.getTechnicalName(type));
+                    } catch (IllegalArgumentException ignored) {
+                        patternType = PatternType.getByIdentifier(type);
+                    }
+                    if (patternType != null) patterns.add(new Pattern(dyeColor, patternType));
                 } catch (Exception ignored) {}
             }
         }
