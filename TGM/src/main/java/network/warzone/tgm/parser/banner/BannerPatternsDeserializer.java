@@ -6,7 +6,6 @@ import network.warzone.tgm.util.Strings;
 import org.bukkit.DyeColor;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.EnumUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -28,9 +27,9 @@ public class BannerPatternsDeserializer implements JsonDeserializer<List<Pattern
                     String[] args = in.split(":");
                     DyeColor dyeColor = DyeColor.valueOf(Strings.getTechnicalName(args[0]));
                     PatternType patternType;
-                    if (EnumUtils.isValidEnum(PatternType.class, Strings.getTechnicalName(args[1]))) {
+                    try {
                         patternType = PatternType.valueOf(Strings.getTechnicalName(args[1]));
-                    } else {
+                    } catch (IllegalArgumentException ignored) {
                         patternType = PatternType.getByIdentifier(args[1]);
                     }
                     if (patternType != null) patterns.add(new Pattern(dyeColor, patternType));
@@ -39,11 +38,12 @@ public class BannerPatternsDeserializer implements JsonDeserializer<List<Pattern
                 try {
                     JsonObject jsonObject = element.getAsJsonObject();
                     DyeColor dyeColor = DyeColor.valueOf(Strings.getTechnicalName(jsonObject.get("color").getAsString()));
+                    String type = jsonObject.get("type").getAsString();
                     PatternType patternType;
-                    if (EnumUtils.isValidEnum(PatternType.class, Strings.getTechnicalName(jsonObject.get("type").getAsString()))) {
-                        patternType = PatternType.valueOf(Strings.getTechnicalName(jsonObject.get("type").getAsString()));
-                    } else {
-                        patternType = PatternType.getByIdentifier(jsonObject.get("type").getAsString());
+                    try {
+                        patternType = PatternType.valueOf(Strings.getTechnicalName(type));
+                    } catch (IllegalArgumentException ignored) {
+                        patternType = PatternType.getByIdentifier(type);
                     }
                     if (patternType != null) patterns.add(new Pattern(dyeColor, patternType));
                 } catch (Exception ignored) {}
