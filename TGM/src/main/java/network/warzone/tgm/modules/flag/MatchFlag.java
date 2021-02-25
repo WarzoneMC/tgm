@@ -346,7 +346,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
      * @return Deserialized MatchFlag instance
      */
     public static MatchFlag deserialize(JsonObject flagJson, FlagSubscriber flagSubscriber, World world) {
-        List<Pattern> bannerPatterns = BannerPatternsDeserializer.parse(flagJson.get("patterns"));
+        List<Pattern> bannerPatterns = flagJson.has("patterns") ? BannerPatternsDeserializer.parse(flagJson.get("patterns")) : new ArrayList<>();
         String bannerType = flagJson.get("type").getAsString();
         String bannerRotation = flagJson.has("rotation") ? flagJson.get("rotation").getAsString() : "EAST";
         Location location = Parser.convertLocation(world, flagJson.get("location"));
