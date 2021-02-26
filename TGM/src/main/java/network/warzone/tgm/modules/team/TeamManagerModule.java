@@ -24,7 +24,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter @Setter
