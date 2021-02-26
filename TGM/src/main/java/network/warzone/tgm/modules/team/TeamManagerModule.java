@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter @Setter
@@ -147,15 +148,16 @@ public class TeamManagerModule extends MatchModule implements Listener {
             return found;
         }
 
+        String lowered = input.toLowerCase();
         if (found == null) {
             for (MatchTeam matchTeam : teams) {
-                if (matchTeam.getId().startsWith(input)) {
+                if (matchTeam.getId().toLowerCase().startsWith(lowered)) {
                     return matchTeam;
                 }
             }
 
             for (MatchTeam matchTeam : teams) {
-                if (matchTeam.getAlias().startsWith(input)) {
+                if (matchTeam.getAlias().toLowerCase().startsWith(lowered)) {
                     return matchTeam;
                 }
             }
