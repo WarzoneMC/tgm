@@ -124,7 +124,7 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     public MatchTeam getTeamByAlias(String alias) {
         for (MatchTeam matchTeam : teams) {
-            if (matchTeam.getId().equalsIgnoreCase(alias)) {
+            if (matchTeam.getAlias().equalsIgnoreCase(alias)) {
                 return matchTeam;
             }
         }
