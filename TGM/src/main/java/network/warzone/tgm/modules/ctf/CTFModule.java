@@ -44,8 +44,8 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
 
         // Based on Objective, determine controller and apply other effects
         JsonObject optionObject = ctfJson.get("options").getAsJsonObject();
+        TimeModule timeModule = TGM.get().getModule(TimeModule.class);
         if (objective == CTFObjective.TIME) {
-            TimeModule timeModule = TGM.get().getModule(TimeModule.class);
             int timeLimit = optionObject.get("time").getAsInt();
             timeModule.setTimeLimited(true);
             timeModule.setTimeLimit(timeLimit);
@@ -53,7 +53,9 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
             timeModule.setTimeLimitService((TimeLimitService) this.controller);
         } else if (objective == CTFObjective.AMOUNT) {
             int captureAmount = optionObject.get("captures").getAsInt();
-            this.controller = new CTFAmountController(this, matchFlags, captureAmount);
+            CTFAmountController amountController = new CTFAmountController(this, matchFlags, captureAmount);
+            this.controller = amountController;
+            timeModule.setTimeLimitService(() -> amountController.getWinning());
         }
 
         // Deserialize flags json into MatchFlag instances
