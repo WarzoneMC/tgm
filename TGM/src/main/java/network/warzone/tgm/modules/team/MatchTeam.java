@@ -6,6 +6,7 @@ import lombok.Setter;
 import network.warzone.tgm.map.SpawnPoint;
 import network.warzone.tgm.modules.kit.Kit;
 import network.warzone.tgm.user.PlayerContext;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -20,12 +21,12 @@ import java.util.List;
 public class MatchTeam {
 
     private final String id;
-    @Setter private String alias;
+    private String alias;
     private ChatColor color;
     private GameMode gamemode;
     private final boolean spectator;
-    @Setter private int max;
-    @Setter private int min;
+    private int max;
+    private int min;
     @Setter private boolean friendlyFire;
     private final List<PlayerContext> members = new ArrayList<>();
 
@@ -57,6 +58,21 @@ public class MatchTeam {
 
     public void addSpawnPoint(SpawnPoint spawnPoint) {
         this.spawnPoints.add(spawnPoint);
+    }
+
+    public void setMax(int max) {
+        this.max = max;
+        Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(this));
+    }
+
+    public void setMin(int min) {
+        this.min = min;
+        Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(this));
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+        Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(this));
     }
 
     @Override

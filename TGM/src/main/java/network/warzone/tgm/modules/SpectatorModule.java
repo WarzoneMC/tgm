@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Players;
@@ -208,6 +209,11 @@ public class SpectatorModule extends MatchModule implements Listener {
     @EventHandler
     public void onTeamJoin(TeamChangeEvent event) {
         if (event.isCancelled()) return;
+        updateMenu();
+    }
+
+    @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
         updateMenu();
     }
 
