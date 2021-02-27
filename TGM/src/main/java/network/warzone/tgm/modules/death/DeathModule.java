@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
@@ -46,15 +47,27 @@ public class DeathModule extends MatchModule implements Listener {
         players = null;
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onQuitLowest(PlayerQuitEvent event) {
+        handleCombatLog(event.getPlayer().getPlayer(), teamManagerModule.getTeam(event.getPlayer()));
+    }
+
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         players.remove(event.getPlayer().getUniqueId());
         notDead(event.getPlayer());
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onTeamChangeLowest(TeamChangeEvent event) {
+        if (event.isForced()) return;
+        handleCombatLog(event.getPlayerContext().getPlayer(), event.getOldTeam());
+    }
+
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
         notDead(event.getPlayerContext().getPlayer());
+        players.remove(event.getPlayerContext().getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -71,9 +84,6 @@ public class DeathModule extends MatchModule implements Listener {
             Player p = (Player) event.getEntity();
             DeathInfo deathInfo = getPlayer((Player) event.getEntity());
 
-            deathInfo.playerName = deathInfo.player.getName();
-            deathInfo.playerTeam = teamManagerModule.getTeam(deathInfo.player);
-            deathInfo.playerLocation = deathInfo.player.getLocation();
             deathInfo.cause = event.getCause();
 
             if (event instanceof EntityDamageByEntityEvent) {
@@ -117,7 +127,12 @@ public class DeathModule extends MatchModule implements Listener {
     public DeathInfo getPlayer(Player player) {
         UUID playerUUID = player.getUniqueId();
         if (!players.containsKey(playerUUID)) {
-            players.put(playerUUID, new DeathInfo(player));
+            DeathInfo deathInfo = new DeathInfo(player);
+            deathInfo.playerName = deathInfo.player.getName();
+            deathInfo.playerTeam = teamManagerModule.getTeam(deathInfo.player);
+            deathInfo.playerLocation = deathInfo.player.getLocation();
+            deathInfo.cause = EntityDamageEvent.DamageCause.CUSTOM;
+            players.put(playerUUID, deathInfo);
         }
 
         return players.get(playerUUID);
@@ -151,6 +166,13 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     private void onRespawn(TGMPlayerRespawnEvent event) {
         notDead(event.getPlayer());
+    }
+
+    public void handleCombatLog(Player player, MatchTeam team) {
+        if (isDead(player) || team == null || team.isSpectator()) return;
+        DeathInfo info = getPlayer(player);
+        info.playerTeam = team;
+        onDeath(player, info);
     }
 
     private void setDead(Player player) {

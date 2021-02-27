@@ -88,7 +88,7 @@ public class RespawnModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onDeath(TGMPlayerDeathEvent event) {
-        if (event.getDeathInfo().playerTeam.isSpectator()) return;
+        if (teamManagerModule.getTeam(event.getVictim()).isSpectator()) return;
         RespawnRule rule = getRule(event.getDeathInfo().playerTeam);
         setDead(event.getVictim(), rule, event.getDeathInfo());
     }
