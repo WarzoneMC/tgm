@@ -4,6 +4,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.util.Location;
 import network.warzone.tgm.user.PlayerContext;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -103,6 +104,16 @@ public class Players {
             org.bukkit.Location loc2 = location(p2);
             return Integer.compare((int) loc.distance(loc1), (int) loc.distance(loc2));
         });
+    }
+
+    public static boolean isFallingIntoVoid(Player player) {
+        org.bukkit.Location location = player.getLocation().clone();
+        if (location.getY() < 0) return true;
+        for (; location.getY() >= 0; location.add(0, -1, 0)) {
+            Material material = player.getWorld().getBlockAt(location).getType();
+            if (material.isSolid()) return false;
+        }
+        return true;
     }
 
 }

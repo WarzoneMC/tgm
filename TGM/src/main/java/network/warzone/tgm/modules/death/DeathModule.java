@@ -1,6 +1,8 @@
 package network.warzone.tgm.modules.death;
 
 import lombok.NoArgsConstructor;
+import network.warzone.tgm.TGM;
+import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
@@ -9,6 +11,7 @@ import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
+import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
@@ -38,13 +41,25 @@ public class DeathModule extends MatchModule implements Listener {
     private HashMap<UUID, Boolean> dead = new HashMap<>();
     private TeamManagerModule teamManagerModule;
 
+    private long combatCooldown = 0; // Millis
+
     public void load(Match match) {
         this.match = new WeakReference<Match>(match);
         teamManagerModule = match.getModule(TeamManagerModule.class);
+        loadConfig();
+    }
+
+    public void loadConfig() {
+        this.combatCooldown = TGM.get().getConfig().getLong("combat.cooldown");
     }
 
     public void unload() {
         players = null;
+    }
+
+    @EventHandler
+    public void onConfigReload(TGMConfigReloadEvent event) {
+        loadConfig();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -54,8 +69,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        players.remove(event.getPlayer().getUniqueId());
-        notDead(event.getPlayer());
+        handleLeave(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -66,8 +80,30 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        notDead(event.getPlayerContext().getPlayer());
-        players.remove(event.getPlayerContext().getPlayer().getUniqueId());
+        handleLeave(event.getPlayerContext().getPlayer());
+    }
+
+    public void handleCombatLog(Player player, MatchTeam team) {
+        if (isDead(player) || team == null || team.isSpectator()) return;
+        DeathInfo info = getPlayer(player);
+        info.playerTeam = team;
+        if (Players.isFallingIntoVoid(player)) {
+            info.cause = EntityDamageEvent.DamageCause.VOID;
+            onDeath(player, info);
+        } else if (isCombatLogging(info)) {
+            info.cause = EntityDamageEvent.DamageCause.ENTITY_ATTACK;
+            info.playerLocation = player.getLocation();
+            onDeath(player, info);
+        }
+    }
+
+    private void handleLeave(Player player) {
+        notDead(player);
+        players.remove(player.getUniqueId());
+    }
+
+    private boolean isCombatLogging(DeathInfo info) {
+        return info.stampKill > -1 && System.currentTimeMillis() - info.stampKill < combatCooldown;
     }
 
     @EventHandler
@@ -84,6 +120,7 @@ public class DeathModule extends MatchModule implements Listener {
             Player p = (Player) event.getEntity();
             DeathInfo deathInfo = getPlayer((Player) event.getEntity());
 
+            deathInfo.playerLocation = deathInfo.player.getLocation();
             deathInfo.cause = event.getCause();
 
             if (event instanceof EntityDamageByEntityEvent) {
@@ -139,7 +176,7 @@ public class DeathModule extends MatchModule implements Listener {
     }
 
     private void onDeath(Player player, DeathInfo deathInfo) {
-        if (deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 30) deathInfo.killer = null;
+        if (deathInfo.stampKill > 0 && System.currentTimeMillis() - deathInfo.stampKill >= 1000 * 15) deathInfo.killer = null;
         setDead(player);
         Bukkit.getPluginManager().callEvent(new TGMPlayerDeathEvent(
                 deathInfo.player,
@@ -153,7 +190,7 @@ public class DeathModule extends MatchModule implements Listener {
         deathInfo.killer = null;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
         if (match.get().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) return;
         for (ItemStack stack : event.getDrops()) {
@@ -166,13 +203,6 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler
     private void onRespawn(TGMPlayerRespawnEvent event) {
         notDead(event.getPlayer());
-    }
-
-    public void handleCombatLog(Player player, MatchTeam team) {
-        if (isDead(player) || team == null || team.isSpectator()) return;
-        DeathInfo info = getPlayer(player);
-        info.playerTeam = team;
-        onDeath(player, info);
     }
 
     private void setDead(Player player) {

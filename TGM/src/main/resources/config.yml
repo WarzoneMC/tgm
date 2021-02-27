@@ -138,3 +138,8 @@ heapdump:
   # Directory where heap dumps will be stored.
   # Default: dumps
   dir: "dumps"
+
+combat:
+  # Time in milliseconds a player must remain undamaged by another player to not count as a kill by the attacker.
+  # Default: 10000 (10 seconds)
+  cooldown: 10000
