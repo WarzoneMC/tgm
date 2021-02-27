@@ -160,15 +160,30 @@ public class CTFAmountController extends CTFController implements TimeSubscriber
         updateAllScoreboards(elapsed);
     }
 
-    private void checkGameOver() {
+    @Override
+    public MatchTeam getWinnerTeam() {
         MatchTeam teamWhoWon = null;
+        int maxPoints = -1;
         for (Map.Entry<MatchTeam, Integer> entry : teamScores.entrySet()) {
-            if (entry.getValue() >= captureAmount) {
+            if (teamWhoWon == null) {
                 teamWhoWon = entry.getKey();
-                break;
+                maxPoints = entry.getValue();
+            } else {
+                if (entry.getValue() >= captureAmount) {
+                    teamWhoWon = entry.getKey();
+                    break;
+                }
+                if (entry.getValue() >= maxPoints) {
+                    teamWhoWon = entry.getKey();
+                }
             }
         }
-        if (teamWhoWon == null) return;
+        return teamWhoWon;
+    }
+
+    private void checkGameOver() {
+        MatchTeam teamWhoWon = getWinnerTeam();
+        if (teamWhoWon == null || getTeamPoints(teamWhoWon) < captureAmount) return;
         super.gameOver(teamWhoWon);
     }
 }

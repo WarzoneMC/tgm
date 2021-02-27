@@ -7,7 +7,6 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.time.TimeSubscriber;
 import network.warzone.tgm.util.Strings;
@@ -25,7 +24,7 @@ import static network.warzone.tgm.util.ColorConverter.format;
 /**
  * Created by yikes on 12/15/2019
  */
-public class CTFTimeController extends CTFController implements TimeLimitService, TimeSubscriber {
+public class CTFTimeController extends CTFController implements TimeSubscriber {
     private Map<MatchTeam, Integer> teamScores = new HashMap<>();
     private Set<MatchTeam> currentFlagHolders = new HashSet<>();
     private TimeModule timeModule;
