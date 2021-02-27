@@ -20,6 +20,8 @@ import network.warzone.tgm.map.RotationDeserializer;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.GameRuleModule;
+import network.warzone.tgm.modules.itemremove.ItemRemoveInfo;
+import network.warzone.tgm.modules.itemremove.ItemRemoveInfoDeserializer;
 import network.warzone.tgm.modules.killstreak.Killstreak;
 import network.warzone.tgm.modules.killstreak.KillstreakDeserializer;
 import network.warzone.tgm.nickname.NickManager;
@@ -88,6 +90,7 @@ public class TGM extends JavaPlugin {
                 .registerTypeAdapter(MapInfo.class, new MapInfoDeserializer())
                 .registerTypeAdapter(Killstreak.class, new KillstreakDeserializer())
                 .registerTypeAdapter(Rotation.class, new RotationDeserializer())
+                .registerTypeAdapter(ItemRemoveInfo.class, new ItemRemoveInfoDeserializer())
                 // Bukkit
                 .registerTypeAdapter(ItemStack.class, new ItemDeserializer())
                 .registerTypeAdapter(PotionEffect.class, new EffectDeserializer())
