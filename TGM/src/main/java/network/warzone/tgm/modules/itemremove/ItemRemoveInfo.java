@@ -5,7 +5,7 @@ import lombok.Data;
 import org.bukkit.Material;
 
 /**
- * Created by Jorge on 02/27/2021
+ * Created by MSH on 03/25/2020
  */
 @AllArgsConstructor @Data
 public class ItemRemoveInfo {
