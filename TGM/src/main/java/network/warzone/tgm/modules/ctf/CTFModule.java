@@ -50,13 +50,11 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
             timeModule.setTimeLimited(true);
             timeModule.setTimeLimit(timeLimit);
             this.controller = new CTFTimeController(this, matchFlags, timeLimit);
-            timeModule.setTimeLimitService((TimeLimitService) this.controller);
         } else if (objective == CTFObjective.AMOUNT) {
             int captureAmount = optionObject.get("captures").getAsInt();
-            CTFAmountController amountController = new CTFAmountController(this, matchFlags, captureAmount);
-            this.controller = amountController;
-            timeModule.setTimeLimitService(() -> amountController.getWinning());
+            this.controller = new CTFAmountController(this, matchFlags, captureAmount);
         }
+        timeModule.setTimeLimitService((TimeLimitService) this.controller);
 
         // Deserialize flags json into MatchFlag instances
         World world = match.getWorld();

@@ -6,6 +6,7 @@ import network.warzone.tgm.modules.flag.MatchFlag;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.time.TimeLimitService;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,7 +24,7 @@ import java.util.List;
  * Also more than likely handles scoreboard
  * Created by yikes on 12/15/2019
  */
-public abstract class CTFController implements FlagSubscriber, Listener {
+public abstract class CTFController implements FlagSubscriber, Listener, TimeLimitService {
     private CTFControllerSubscriber subscriber;
     protected List<MatchFlag> allFlags;
     protected TeamManagerModule teamManagerModule;
@@ -90,6 +91,9 @@ public abstract class CTFController implements FlagSubscriber, Listener {
     public void unload() {
         TGM.unregisterEvents(this);
     }
+
+    @Override
+    public abstract MatchTeam getWinnerTeam();
 
     public final void gameOver(MatchTeam team) {
         subscriber.gameOver(team);
