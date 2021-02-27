@@ -30,7 +30,7 @@ public class SphereRegion implements Region {
 
     @Override
     public boolean contains(Location location) {
-        return center.distance(location) <= radius;
+        return center.distanceSquared(location) <= radius * radius;
     }
 
     @Override

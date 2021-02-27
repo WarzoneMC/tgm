@@ -101,7 +101,7 @@ public class Players {
             org.bukkit.Location loc = location(player);
             org.bukkit.Location loc1 = location(p1);
             org.bukkit.Location loc2 = location(p2);
-            return Integer.compare((int) loc.distance(loc1), (int) loc.distance(loc2));
+            return Integer.compare((int) loc.distanceSquared(loc1), (int) loc.distanceSquared(loc2));
         });
     }
 
