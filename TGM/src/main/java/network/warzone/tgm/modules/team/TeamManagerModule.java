@@ -124,7 +124,7 @@ public class TeamManagerModule extends MatchModule implements Listener {
 
     public MatchTeam getTeamByAlias(String alias) {
         for (MatchTeam matchTeam : teams) {
-            if (matchTeam.getId().equalsIgnoreCase(alias)) {
+            if (matchTeam.getAlias().equalsIgnoreCase(alias)) {
                 return matchTeam;
             }
         }
@@ -147,15 +147,16 @@ public class TeamManagerModule extends MatchModule implements Listener {
             return found;
         }
 
+        String lowered = input.toLowerCase();
         if (found == null) {
             for (MatchTeam matchTeam : teams) {
-                if (matchTeam.getId().startsWith(input)) {
+                if (matchTeam.getId().toLowerCase().startsWith(lowered)) {
                     return matchTeam;
                 }
             }
 
             for (MatchTeam matchTeam : teams) {
-                if (matchTeam.getAlias().startsWith(input)) {
+                if (matchTeam.getAlias().toLowerCase().startsWith(lowered)) {
                     return matchTeam;
                 }
             }
