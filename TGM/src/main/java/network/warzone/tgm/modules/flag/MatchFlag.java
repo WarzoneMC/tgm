@@ -364,7 +364,6 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         List<Location> respawnLocations = null;
         if (flagJson.has("respawn-locations")) {
             respawnLocations = new ArrayList<>();
-            System.out.println(flagJson.get("respawn-locations").getAsJsonArray().toString());
             for (JsonElement post : flagJson.get("respawn-locations").getAsJsonArray()) {
                 respawnLocations.add(Parser.convertLocation(world, post));
             }
