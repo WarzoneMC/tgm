@@ -227,7 +227,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
                 player.setFlying(true);
             }
-        } else if (event.getFrom().distance(event.getTo()) > 0) {
+        } else if (event.getFrom().distanceSquared(event.getTo()) > 0) {
             lastMovement.put(player.getUniqueId(), System.currentTimeMillis());
         }
     }

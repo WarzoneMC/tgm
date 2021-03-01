@@ -51,7 +51,7 @@ public class HemisphereRegion implements Region {
     }
     @Override
     public boolean contains(Location location) {
-        return hemisphereFace.hemisphereDirectionEvaluation.contains(focalPoint, location) && focalPoint.distance(location) <= radius;
+        return hemisphereFace.hemisphereDirectionEvaluation.contains(focalPoint, location) && focalPoint.distanceSquared(location) <= radius * radius;
     }
 
     @Override
