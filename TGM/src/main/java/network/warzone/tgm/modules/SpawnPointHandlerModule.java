@@ -33,14 +33,16 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private SpectatorModule spectatorModule;
     private GameClassModule gameClassModule;
     private KitEditorModule kitEditorModule;
+    private StatsModule statsModule;
 
     @Override
     public void load(Match match) {
-        this.match = new WeakReference<Match>(match);
+        this.match = new WeakReference<>(match);
         this.teamManagerModule = match.getModule(TeamManagerModule.class);
         this.spectatorModule = match.getModule(SpectatorModule.class);
-        this.gameClassModule = TGM.get().getModule(GameClassModule.class);
+        this.gameClassModule = match.getModule(GameClassModule.class);
         this.kitEditorModule = match.getModule(KitEditorModule.class);
+        this.statsModule = match.getModule(StatsModule.class);
     }
 
     @EventHandler
@@ -112,6 +114,9 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 }
                 playerContext.getPlayer().setFireTicks(-20); // Weird lava bug
             }, 1L); // Delay by 1 tick to prevent missing armor points bug
+        if (statsModule != null) {
+            statsModule.setTGMLevel(playerContext);
+        }
     }
 
     @Override
