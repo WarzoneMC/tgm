@@ -82,6 +82,10 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
+    public void createReport(ReportCreateRequest reportCreateRequest) {
+    }
+
+    @Override
     public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
         return null;
     }

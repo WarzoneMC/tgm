@@ -46,6 +46,8 @@ public interface TeamClient {
 
     RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest);
 
+    void createReport(ReportCreateRequest reportCreateRequest);
+
     IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest);
 
     PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest);
