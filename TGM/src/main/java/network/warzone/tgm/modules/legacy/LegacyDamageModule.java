@@ -33,12 +33,13 @@ public class LegacyDamageModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
+        mapOverride = DamageUtils.isEnabled();
+
         JsonObject matchConfig = match.getMapContainer().getMapInfo().getJsonObject();
         if (!matchConfig.has("legacy")) return;
 
         JsonObject matchLegacyConfig = matchConfig.get("legacy").getAsJsonObject();
         if (matchLegacyConfig.has("damage")) mapOverride = matchLegacyConfig.get("damage").getAsBoolean();
-        else mapOverride = DamageUtils.isEnabled();
     }
 
     @EventHandler(priority= EventPriority.LOWEST) // Make sure this event is called before the knockback

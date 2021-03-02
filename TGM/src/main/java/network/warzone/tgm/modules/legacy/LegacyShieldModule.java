@@ -33,12 +33,13 @@ public class LegacyShieldModule extends MatchModule implements Listener {
 
     @Override
     public void load(Match match) {
+        mapOverride = globalEnabled;
+
         JsonObject matchConfig = match.getMapContainer().getMapInfo().getJsonObject();
         if (!matchConfig.has("legacy")) return;
 
         JsonObject matchLegacyConfig = matchConfig.get("legacy").getAsJsonObject();
         if (matchLegacyConfig.has("shield")) mapOverride = matchLegacyConfig.get("shield").getAsBoolean();
-        else mapOverride = globalEnabled;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
