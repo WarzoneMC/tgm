@@ -5,7 +5,6 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.util.DamageUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
