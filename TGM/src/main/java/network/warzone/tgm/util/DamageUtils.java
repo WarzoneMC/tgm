@@ -13,39 +13,12 @@ public class DamageUtils {
 
     private static EnumMap<Material, Double> damages;
     private static boolean enabled;
-    private static boolean loaded;
 
     static {
-        if (isEnabled()) {
-            ConfigurationSection damagesConfig = TGM.get().getConfig().getConfigurationSection("legacy.damages");
-
-            if (damagesConfig != null) {
-                damages = damagesConfig.getKeys(false).stream()
-                        .filter(s -> damagesConfig.isDouble(s) || damagesConfig.isInt(s))
-                        .collect(
-                                Collectors.toMap(
-                                        Material::valueOf,
-                                        damagesConfig::getDouble,
-                                        (keyA, keyB) -> {
-                                            throw new IllegalArgumentException(
-                                                    String.format("Duplicate item damage definition in config.yml. (%s, %s)", keyA, keyB)
-                                            );
-                                        },
-                                        () -> new EnumMap<>(Material.class)
-                                )
-                        );
-            } else {
-                loadDefaultDamages();
-            }
-        }
+        loadConfig();
     }
 
     public static boolean isEnabled() {
-        if (!loaded) {
-            ConfigurationSection legacyConfig = TGM.get().getConfig().getConfigurationSection("legacy");
-            enabled = legacyConfig != null && legacyConfig.getBoolean("damage");
-            loaded = true;
-        }
         return enabled;
     }
 
@@ -70,6 +43,34 @@ public class DamageUtils {
 
     public static double getOldSharpnessDamage(int level) {
         return level >= 1 ? level * 1.25 : 0;
+    }
+
+    public static void loadConfig() {
+        ConfigurationSection legacyConfig = TGM.get().getConfig().getConfigurationSection("legacy");
+        enabled = legacyConfig != null && legacyConfig.getBoolean("damage");
+
+        if (!enabled) return;
+
+        ConfigurationSection damagesConfig = TGM.get().getConfig().getConfigurationSection("legacy.damages");
+
+        if (damagesConfig != null) {
+            damages = damagesConfig.getKeys(false).stream()
+                    .filter(s -> damagesConfig.isDouble(s) || damagesConfig.isInt(s))
+                    .collect(
+                            Collectors.toMap(
+                                    Material::valueOf,
+                                    damagesConfig::getDouble,
+                                    (keyA, keyB) -> {
+                                        throw new IllegalArgumentException(
+                                                String.format("Duplicate item damage definition in config.yml. (%s, %s)", keyA, keyB)
+                                        );
+                                    },
+                                    () -> new EnumMap<>(Material.class)
+                            )
+                    );
+        } else {
+            loadDefaultDamages();
+        }
     }
 
     private static void loadDefaultDamages() {
