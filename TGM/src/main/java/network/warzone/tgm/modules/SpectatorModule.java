@@ -10,6 +10,7 @@ import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Players;
@@ -212,6 +213,11 @@ public class SpectatorModule extends MatchModule implements Listener {
     }
 
     @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
+        updateMenu();
+    }
+
+    @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
@@ -221,7 +227,7 @@ public class SpectatorModule extends MatchModule implements Listener {
                 player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
                 player.setFlying(true);
             }
-        } else if (event.getFrom().distance(event.getTo()) > 0) {
+        } else if (event.getFrom().distanceSquared(event.getTo()) > 0) {
             lastMovement.put(player.getUniqueId(), System.currentTimeMillis());
         }
     }

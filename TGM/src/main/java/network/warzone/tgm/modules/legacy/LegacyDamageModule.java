@@ -1,14 +1,12 @@
 package network.warzone.tgm.modules.legacy;
 
 import com.google.gson.JsonObject;
-import network.warzone.tgm.TGM;
+import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.util.DamageUtils;
-import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -17,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -31,14 +28,20 @@ public class LegacyDamageModule extends MatchModule implements Listener {
 
     private boolean mapOverride;
 
+    @EventHandler
+    public void onConfigReload(TGMConfigReloadEvent event) {
+        DamageUtils.loadConfig();
+    }
+
     @Override
     public void load(Match match) {
+        mapOverride = DamageUtils.isEnabled();
+
         JsonObject matchConfig = match.getMapContainer().getMapInfo().getJsonObject();
         if (!matchConfig.has("legacy")) return;
 
         JsonObject matchLegacyConfig = matchConfig.get("legacy").getAsJsonObject();
         if (matchLegacyConfig.has("damage")) mapOverride = matchLegacyConfig.get("damage").getAsBoolean();
-        else mapOverride = DamageUtils.isEnabled();
     }
 
     @EventHandler(priority= EventPriority.LOWEST) // Make sure this event is called before the knockback

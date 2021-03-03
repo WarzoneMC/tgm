@@ -461,7 +461,6 @@ public class CycleCommands {
                     }
                     sender.sendMessage(ChatColor.GREEN + "Renamed " + matchTeam.getColor() + matchTeam.getAlias() + ChatColor.GREEN + " to " + matchTeam.getColor() + cmd.getString(2));
                     matchTeam.setAlias(cmd.getString(2));
-                    Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(matchTeam));
                 } else {
                     sender.sendMessage(ChatColor.RED + "/team alias (team) (name)");
                 }
@@ -500,7 +499,6 @@ public class CycleCommands {
                     }
                     matchTeam.setMin(min);
                     matchTeam.setMax(max);
-                    Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(matchTeam));
                     sender.sendMessage(ChatColor.GREEN + "Set " + matchTeam.getColor() + matchTeam.getAlias() + ChatColor.GREEN + " size limits to " + min + "-" + max);
                 } else {
                     sender.sendMessage(ChatColor.RED + "/team size (team) (min) (max)");

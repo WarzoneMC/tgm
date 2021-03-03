@@ -241,6 +241,14 @@ public class HttpClient implements TeamClient {
         }
     }
 
+    public void createReport(ReportCreateRequest reportCreateRequest) {
+        try {
+            unirest.post(config.getBaseUrl() + "/mc/report/create").header("x-access-token", config.getAuthToken()).body(reportCreateRequest).asJson();
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+    }
+
     public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
         try {
             HttpResponse<IssuePunishmentResponse> response = unirest.post(config.getBaseUrl() + "/mc/player/issue_punishment")
