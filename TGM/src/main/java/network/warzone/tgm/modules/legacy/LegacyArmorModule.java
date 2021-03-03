@@ -2,8 +2,10 @@ package network.warzone.tgm.modules.legacy;
 
 import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.util.DamageUtils;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.ConfigurationSection;
@@ -37,13 +39,22 @@ public class LegacyArmorModule extends MatchModule implements Listener {
             EntityDamageEvent.DamageCause.LIGHTNING
     );
 
-    private static final boolean globalEnabled;
+    private static boolean globalEnabled;
 
     private boolean mapOverride;
 
     static {
+        loadConfig();
+    }
+
+    public static void loadConfig() {
         ConfigurationSection legacyConfig = TGM.get().getConfig().getConfigurationSection("legacy");
         globalEnabled = legacyConfig != null && legacyConfig.getBoolean("armor");
+    }
+
+    @EventHandler
+    public void onConfigReload(TGMConfigReloadEvent event) {
+        loadConfig();
     }
 
     @Override

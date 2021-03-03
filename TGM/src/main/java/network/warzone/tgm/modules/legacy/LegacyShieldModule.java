@@ -2,8 +2,10 @@ package network.warzone.tgm.modules.legacy;
 
 import com.google.gson.JsonObject;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.util.DamageUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,13 +16,17 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 public class LegacyShieldModule extends MatchModule implements Listener {
 
-    private static final boolean globalEnabled;
+    private static boolean globalEnabled;
     private static double projectileReductionFactor;
     private static double genericReductionFactor;
 
     private boolean mapOverride;
 
     static {
+        loadConfig();
+    }
+
+    private static void loadConfig() {
         ConfigurationSection legacyConfig = TGM.get().getConfig().getConfigurationSection("legacy");
         globalEnabled = legacyConfig != null && legacyConfig.getBoolean("shield");
 
@@ -29,6 +35,11 @@ public class LegacyShieldModule extends MatchModule implements Listener {
             projectileReductionFactor = shieldConfig.getDouble("projectile");
             genericReductionFactor = shieldConfig.getDouble("generic");
         }
+    }
+
+    @EventHandler
+    public void onConfigReload(TGMConfigReloadEvent event) {
+        loadConfig();
     }
 
     @Override
