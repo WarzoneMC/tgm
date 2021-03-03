@@ -63,7 +63,7 @@ public class LegacyArmorModule extends MatchModule implements Listener {
         if (!matchConfig.has("legacy")) return;
 
         JsonObject matchLegacyConfig = matchConfig.get("legacy").getAsJsonObject();
-        if (matchLegacyConfig.has("damage")) mapOverride = matchLegacyConfig.get("armor").getAsBoolean();
+        if (matchLegacyConfig.has("armor")) mapOverride = matchLegacyConfig.get("armor").getAsBoolean();
     }
 
     @EventHandler(priority = EventPriority.LOW)
