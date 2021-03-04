@@ -13,8 +13,10 @@ import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.itemstack.ItemFactory;
+import network.warzone.tgm.util.itemstack.ItemFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -26,10 +28,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -64,7 +63,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onQuitLowest(PlayerQuitEvent event) {
-        handleCombatLog(event.getPlayer().getPlayer(), teamManagerModule.getTeam(event.getPlayer()));
+        handleCombatLog(event.getPlayer().getPlayer(), teamManagerModule.getTeam(event.getPlayer()), false);
     }
 
     @EventHandler
@@ -74,8 +73,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onTeamChangeLowest(TeamChangeEvent event) {
-        if (event.isForced()) return;
-        handleCombatLog(event.getPlayerContext().getPlayer(), event.getOldTeam());
+        handleCombatLog(event.getPlayerContext().getPlayer(), event.getOldTeam(), event.isForced());
     }
 
     @EventHandler
@@ -83,17 +81,23 @@ public class DeathModule extends MatchModule implements Listener {
         handleLeave(event.getPlayerContext().getPlayer());
     }
 
-    public void handleCombatLog(Player player, MatchTeam team) {
+    public void handleCombatLog(Player player, MatchTeam team, boolean forced) {
         if (isDead(player) || team == null || team.isSpectator()) return;
         DeathInfo info = getPlayer(player);
         info.playerTeam = team;
-        if (Players.isFallingIntoVoid(player)) {
+        if (!forced && Players.isFallingIntoVoid(player)) {
             info.cause = EntityDamageEvent.DamageCause.VOID;
             onDeath(player, info);
-        } else if (isCombatLogging(info)) {
-            info.cause = EntityDamageEvent.DamageCause.ENTITY_ATTACK;
+        } else if (!forced && isCombatLogging(info)) {
             info.playerLocation = player.getLocation();
             onDeath(player, info);
+        } else { // No death but drop items
+            if (match.get() == null) return;
+            List<ItemStack> drops = new ArrayList<>(Arrays.asList(player.getInventory().getContents()));
+            Objects.requireNonNull(match.get()).getModules().stream()
+                    .filter(module -> module instanceof ItemFilter)
+                    .forEach(module -> ((ItemFilter) module).filter(drops));
+            dropItems(player.getLocation(), drops);
         }
     }
 
@@ -193,11 +197,13 @@ public class DeathModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     private void onPlayerDeath(TGMPlayerDeathEvent event) {
         if (match.get().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) return;
-        for (ItemStack stack : event.getDrops()) {
-            if (stack != null) {
-                event.getVictim().getWorld().dropItemNaturally(event.getDeathLocation(), stack);
-            }
-        }
+        dropItems(event.getDeathInfo().playerLocation, event.getDrops());
+    }
+
+    private void dropItems(Location location, List<ItemStack> drops) {
+        drops.stream()
+                .filter(Objects::nonNull)
+                .forEach(drop -> location.getWorld().dropItemNaturally(location, drop));
     }
 
     @EventHandler

@@ -8,6 +8,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.Strings;
+import network.warzone.tgm.util.itemstack.ItemFilter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Removes item entities that match a material type on spawn.
  */
-public class ItemRemoveModule extends MatchModule implements Listener {
+public class ItemRemoveModule extends MatchModule implements Listener, ItemFilter {
 
     private final Set<ItemRemoveInfo> removed = new HashSet<>();
 
@@ -84,24 +85,26 @@ public class ItemRemoveModule extends MatchModule implements Listener {
         removed.clear();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOW)
     public void onDeath(TGMPlayerDeathEvent event) {
+        filter(event.getDrops());
+    }
+
+    @Override
+    public void filter(List<ItemStack> items) {
         if (removeAll) {
-            event.getDrops().clear();
+            items.clear();
             return;
         }
         List<ItemStack> toRemove = new ArrayList<>();
-        for (ItemStack itemStack : event.getDrops()) {
+        for (ItemStack itemStack : items) {
             if (itemStack != null) {
                 ItemRemoveInfo info = getInfo(itemStack.getType());
                 if (info == null || !info.isPreventingDeathDrop()) continue;
                 toRemove.add(itemStack);
             }
         }
-
-        for (ItemStack itemStack : toRemove) {
-            event.getDrops().remove(itemStack);
-        }
+        items.removeAll(toRemove);
     }
 
     @EventHandler

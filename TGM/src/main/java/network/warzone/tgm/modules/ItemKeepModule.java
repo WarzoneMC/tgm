@@ -8,6 +8,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.util.Strings;
+import network.warzone.tgm.util.itemstack.ItemFilter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,9 +28,9 @@ import java.util.*;
  *
  * To keep all items, use the keepInventory game rule ({@link GameRuleModule}).
  */
-public class ItemKeepModule extends MatchModule implements Listener {
+public class ItemKeepModule extends MatchModule implements Listener, ItemFilter {
 
-    private final Set<Material> items = new HashSet<>();
+    private final Set<Material> materials = new HashSet<>();
 
     private final Map<Player, List<ItemStack>> queued = new HashMap<>();
 
@@ -42,7 +43,7 @@ public class ItemKeepModule extends MatchModule implements Listener {
                     if (!jsonElement.isJsonPrimitive()) {
                         continue;
                     }
-                    items.add(Material.valueOf(Strings.getTechnicalName(jsonElement.getAsString())));
+                    materials.add(Material.valueOf(Strings.getTechnicalName(jsonElement.getAsString())));
                 } catch (Exception e) {
                     TGM.get().getPlayerManager().broadcastToAdmins(ChatColor.RED + "[JSON] Unknown material in itemkeep module: \"" + jsonElement.getAsString() + "\"");
                 }
@@ -50,19 +51,22 @@ public class ItemKeepModule extends MatchModule implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onDeath(TGMPlayerDeathEvent event) {
-        List<ItemStack> queuedItems = new ArrayList<>();
-        for (ItemStack drop : event.getDrops()) {
-            if (drop == null) {
-                continue;
-            }
-            if (items.contains(drop.getType())) {
-                queuedItems.add(drop);
-            }
-        }
+        List<ItemStack> queuedItems = new ArrayList<>(event.getDrops());
+        filter(event.getDrops());
+        queuedItems.removeAll(event.getDrops());
         this.queued.put(event.getVictim(), queuedItems);
-        event.getDrops().removeAll(queuedItems);
+    }
+
+    @Override
+    public void filter(List<ItemStack> items) {
+        List<ItemStack> queuedItems = new ArrayList<>();
+        for (ItemStack drop : items) {
+            if (drop == null) continue;
+            if (materials.contains(drop.getType())) queuedItems.add(drop);
+        }
+        items.removeAll(queuedItems);
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

@@ -107,6 +107,7 @@ public class Players {
     }
 
     public static boolean isFallingIntoVoid(Player player) {
+        if (player.getVelocity().lengthSquared() <= 0.006146560239257815) return false; // Motionless
         org.bukkit.Location location = player.getLocation().clone();
         if (location.getY() < 0) return true;
         for (; location.getY() >= 0; location.add(0, -1, 0)) {
