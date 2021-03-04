@@ -299,18 +299,18 @@ public class FFAModule extends MatchModule implements Listener {
     }
 
     private MatchTeam setupTeam(String player) {
-        if (this.teamManagerModule.getTeamByAlias("winner") == null) {
+        if (this.teamManagerModule.getTeamById("winner") == null) {
             this.teamManagerModule.addTeam(new MatchTeam("winner", player, ChatColor.YELLOW, GameMode.SURVIVAL, false, 0, 1, true));
             TGM.get().getPlayerManager().getPlayers().forEach(playerContext ->
                 this.scoreboardManagerModule.registerScoreboardTeam(
                         this.scoreboardManagerModule.getScoreboard(playerContext.getPlayer()),
-                        this.teamManagerModule.getTeamByAlias("winner"),
+                        this.teamManagerModule.getTeamById("winner"),
                         playerContext
                 )
             );
         }
 
-        MatchTeam winnerTeam = this.teamManagerModule.getTeamByAlias("winner");
+        MatchTeam winnerTeam = this.teamManagerModule.getTeamById("winner");
         winnerTeam.setAlias(player != null ? player : "None");
 
         if (player != null && Bukkit.getPlayer(player) != null) {
