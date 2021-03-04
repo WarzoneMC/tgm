@@ -165,6 +165,12 @@ public class KOTHModule extends MatchModule implements Listener {
         }
     }
 
+    @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
+        MatchTeam team = event.getMatchTeam();
+        if (!team.isSpectator()) updateScoreboardTeamLine(team);
+    }
+
     @Override
     public void disable() {
         for (ControlPoint controlPoint : controlPoints) {
