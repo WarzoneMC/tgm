@@ -17,6 +17,7 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.time.TimeSubscriber;
@@ -165,6 +166,14 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         return this.humans;
     }
 
+    private void refreshScoreboardAlias(MatchTeam matchTeam) {
+        for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+            int line = teamAliveScoreboardLines.get(matchTeam.getId());
+            simpleScoreboard.remove(line + 1);
+            simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), line + 1);
+            simpleScoreboard.update();
+        }
+    }
 
     private void refreshScoreboard(SimpleScoreboard board) {
         if (board == null) return;
@@ -222,6 +231,12 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         timeScoreboardValue = ChatColor.WHITE + "Time: " + ChatColor.AQUA + "0:00";
         teamScoreboardLines.put(positionOnScoreboard, StringUtils.repeat(" ", spaceCount));
         defaultScoreboardLoaded = true;
+    }
+
+    @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
+        MatchTeam team = event.getMatchTeam();
+        if (!team.isSpectator()) refreshScoreboardAlias(team);
     }
 
     @EventHandler

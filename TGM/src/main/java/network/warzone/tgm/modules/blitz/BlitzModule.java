@@ -15,6 +15,7 @@ import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
@@ -150,6 +151,16 @@ public class BlitzModule extends MatchModule implements Listener {
         }
     }
 
+    public void updateScoreboardAliasLine(MatchTeam matchTeam) {
+        if (!teamScoreboardLines.containsKey(matchTeam)) return;
+        for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+            int line = teamScoreboardLines.get(matchTeam);
+            simpleScoreboard.remove(line + 1);
+            simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), line + 1);
+            simpleScoreboard.update();
+        }
+    }
+
     public void updateScoreboardTeamLine(MatchTeam matchTeam, int size) {
         if (!teamScoreboardLines.containsKey(matchTeam)) return;
         for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
@@ -162,6 +173,12 @@ public class BlitzModule extends MatchModule implements Listener {
 
     private String getTeamScoreLine(MatchTeam matchTeam, int size) {
         return ChatColor.WHITE + "  " + size + ChatColor.GRAY + " Alive";
+    }
+
+    @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
+        MatchTeam team = event.getMatchTeam();
+        if (!team.isSpectator()) updateScoreboardAliasLine(team);
     }
 
     private void showLives(Player player) {

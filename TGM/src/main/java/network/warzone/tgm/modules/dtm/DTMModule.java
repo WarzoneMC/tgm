@@ -168,7 +168,7 @@ public class DTMModule extends MatchModule implements Listener {
             if(matchTeam.isSpectator()) continue;
 
             for (Monument monument : this.monuments) {
-                if (monument.getOwners().contains(matchTeam)) {
+                if (!monument.getOwners().contains(matchTeam)) {
                     if (this.monumentScoreboardLines.containsKey(monument)) {
                         this.monumentScoreboardLines.get(monument).add(i);
                     } else {
@@ -250,19 +250,14 @@ public class DTMModule extends MatchModule implements Listener {
     }
 
     private String getScoreboardString(Monument monument) {
-        if (monument.isAlive()) {
-            int percentage = monument.getHealthPercentage();
-
-            if (percentage > 70) {
-                return ChatColor.GREEN + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
-            } else if (percentage > 40) {
-                return ChatColor.YELLOW + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
-            } else {
-                return ChatColor.RED + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
-            }
-        } else {
-            return ChatColor.WHITE + "  " + ChatColor.STRIKETHROUGH + monument.getName();
+        int percentage = 100 - monument.getHealthPercentage();
+        ChatColor healthColor = ChatColor.YELLOW;
+        if (percentage <= 0) {
+            healthColor = ChatColor.RED;
+        } else if (percentage >= 100) {
+            healthColor = ChatColor.GREEN;
         }
+        return healthColor + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
     }
 
     private List<Monument> getAliveMonuments(MatchTeam matchTeam) {

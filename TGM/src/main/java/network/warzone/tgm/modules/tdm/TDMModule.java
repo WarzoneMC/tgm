@@ -11,6 +11,7 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.ChatColor;
@@ -106,6 +107,15 @@ public class TDMModule extends MatchModule implements Listener {
         updateScoreboardTeamLine(matchTeam);
     }
 
+    private void updateScoreboardAliasLine(MatchTeam matchTeam) {
+        for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
+            int line = teamScoreboardLines.get(matchTeam.getId());
+            simpleScoreboard.remove(line + 1);
+            simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), line + 1);
+            simpleScoreboard.update();
+        }
+    }
+
     private void updateScoreboardTeamLine(MatchTeam matchTeam) {
         for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
             int line = teamScoreboardLines.get(matchTeam.getId());
@@ -113,6 +123,12 @@ public class TDMModule extends MatchModule implements Listener {
             simpleScoreboard.add(getTeamScoreLine(matchTeam), line);
             simpleScoreboard.update();
         }
+    }
+
+    @EventHandler
+    public void onTeamUpdate(TeamUpdateEvent event) {
+        MatchTeam team = event.getMatchTeam();
+        if (!team.isSpectator()) updateScoreboardAliasLine(team);
     }
 
     @EventHandler
