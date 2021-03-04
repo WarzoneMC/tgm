@@ -11,21 +11,20 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.chat.ChatChannel;
+import network.warzone.tgm.chat.ChatConstant;
+import network.warzone.tgm.chat.ChatListener;
 import network.warzone.tgm.config.TGMConfigReloadEvent;
 import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.map.MapContainer;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
-import network.warzone.tgm.modules.chat.ChatChannel;
-import network.warzone.tgm.modules.chat.ChatConstant;
-import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.countdown.*;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.team.TeamUpdateEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;
 import network.warzone.tgm.user.PlayerContext;
@@ -546,7 +545,7 @@ public class CycleCommands {
             return;
         }
 
-        ChatModule.getChannels().put(player.getUniqueId().toString(), channel);
+        ChatListener.getChannels().put(player.getUniqueId().toString(), channel);
         player.sendMessage(ColorConverter.filterString("&7You've been added to the channel &c&l" + channel.name() + "&7."));
     }
 
@@ -558,7 +557,7 @@ public class CycleCommands {
         }
         if (cmd.argsLength() > 0) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
-            TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, cmd.getJoinedStrings(0));
+            TGM.get().getChatListener().sendTeamChat(playerContext, cmd.getJoinedStrings(0));
         }
     }
 

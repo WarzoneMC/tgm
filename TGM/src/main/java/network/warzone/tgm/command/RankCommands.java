@@ -9,7 +9,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.chat.ChatModule;
+import network.warzone.tgm.chat.ChatListener;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.*;
@@ -37,7 +37,7 @@ public class RankCommands {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
             prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
         }
-        ChatModule.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
+        ChatListener.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
     }
 
     @Command(aliases = {"rank", "ranks"}, desc = "Rank management command.", min = 1, usage = "(player|list|info|create|delete|edit|permissions)")

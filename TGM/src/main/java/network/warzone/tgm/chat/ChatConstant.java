@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.chat;
+package network.warzone.tgm.chat;
 
 import net.md_5.bungee.api.ChatColor;
 

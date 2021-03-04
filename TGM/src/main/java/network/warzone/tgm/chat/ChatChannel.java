@@ -1,4 +1,4 @@
-package network.warzone.tgm.modules.chat;
+package network.warzone.tgm.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

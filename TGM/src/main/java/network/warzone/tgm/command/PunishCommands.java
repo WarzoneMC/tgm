@@ -7,7 +7,7 @@ import cl.bgmp.minecraft.util.commands.exceptions.CommandException;
 import cl.bgmp.minecraft.util.commands.exceptions.CommandPermissionsException;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.chat.ChatConstant;
+import network.warzone.tgm.chat.ChatConstant;
 import network.warzone.tgm.modules.reports.Report;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.user.PlayerContext;

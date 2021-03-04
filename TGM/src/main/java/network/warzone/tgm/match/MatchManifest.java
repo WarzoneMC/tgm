@@ -3,7 +3,6 @@ package network.warzone.tgm.match;
 import com.google.gson.JsonObject;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
-import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.countdown.CountdownManagerModule;
 import network.warzone.tgm.modules.damage.DamageControlModule;
 import network.warzone.tgm.modules.damage.EntityDamageModule;
@@ -79,7 +78,6 @@ public abstract class MatchManifest {
         modules.add(new DeathMessageModule());
         modules.add(new BuildHeightLimitModule());
         modules.add(new FilterManagerModule());
-        modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
         modules.add(new ScreenManagerModule());
         modules.add(new PointsModule());

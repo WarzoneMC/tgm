@@ -1,22 +1,21 @@
-package network.warzone.tgm.modules.chat;
+package network.warzone.tgm.chat;
 
 import lombok.Getter;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.match.Match;
-import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.event.MatchPostLoadEvent;
+import network.warzone.tgm.match.event.MatchUnloadEvent;
 import network.warzone.tgm.modules.StatsModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.user.PlayerContext;
-import network.warzone.warzoneapi.models.Chat;
 import network.warzone.warzoneapi.models.Punishment;
 import network.warzone.warzoneapi.models.UserProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,19 +27,28 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.*;
 
 @Getter
-public class ChatModule extends MatchModule implements Listener {
+public class ChatListener implements Listener {
 
     private static final List<String> blockedCmds = Arrays.asList("t ", "w ", "r ", "reply", "minecraft:w", "tell", "minecraft:tell", "minecraft:t ", "msg", "minecraft:msg");
 
     private TeamManagerModule teamManagerModule;
-    private TimeModule timeModule;
-    private final List<Chat> chatLog = new ArrayList<>();
+    private StatsModule statsModule;
     private static final Map<String, ChatChannel> channels = new HashMap<>();
 
-    @Override
-    public void load(Match match) {
-        teamManagerModule = match.getModule(TeamManagerModule.class);
-        timeModule = match.getModule(TimeModule.class);
+    public ChatListener() {
+        TGM.registerEvents(this);
+    }
+
+    @EventHandler
+    public void onLoad(MatchPostLoadEvent event) {
+        teamManagerModule = event.getMatch().getModule(TeamManagerModule.class);
+        statsModule = event.getMatch().getModule(StatsModule.class);
+    }
+
+    @EventHandler
+    public void onCycle(MatchUnloadEvent event) {
+        teamManagerModule = null;
+        statsModule = null;
     }
 
     public static Map<String, ChatChannel> getChannels() {
@@ -67,8 +75,10 @@ public class ChatModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onChat(AsyncPlayerChatEvent event) {
         // Run this code if the chat is currently muted
-        if (!TGM.get().getConfig().getBoolean("chat.enabled") && !event.getPlayer().hasPermission("tgm.chat.bypass")) {
-            event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', TGM.get().getConfig().getString("chat.messages.muted")));
+        FileConfiguration config = TGM.get().getConfig();
+        if (!config.getBoolean("chat.enabled") && !event.getPlayer().hasPermission("tgm.chat.bypass")) {
+            String message = Objects.requireNonNull(config.getString("chat.messages.muted"));
+            event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
             event.setCancelled(true);
             return;
         }
@@ -87,8 +97,8 @@ public class ChatModule extends MatchModule implements Listener {
 
         ChatChannel channel = channels.get(event.getPlayer().getUniqueId().toString());
 
-        if(channel == ChatChannel.TEAM) {
-            TGM.get().getModule(ChatModule.class).sendTeamChat(playerContext, event.getMessage());
+        if(teamManagerModule != null && channel == ChatChannel.TEAM) {
+            this.sendTeamChat(playerContext, event.getMessage());
             event.setCancelled(true);
             return;
         }
@@ -103,13 +113,16 @@ public class ChatModule extends MatchModule implements Listener {
         }
 
         if (channel == ChatChannel.ALL) {
-            MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
+            ChatColor teamColor;
+            if (teamManagerModule == null) teamColor = ChatColor.AQUA;
+            else teamColor = teamManagerModule.getTeam(event.getPlayer()).getColor();
             UserProfile userProfile = playerContext.getUserProfile();
             String prefix = userProfile.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', userProfile.getPrefix().trim()) + " " : "";
             StringBuilder format = new StringBuilder();
-            if (!TGM.get().getModule(StatsModule.class).isStatsDisabled()) format.append(playerContext.getLevelString()).append(" ");
+            if (statsModule == null || !statsModule.isStatsDisabled())
+                format.append(playerContext.getLevelString()).append(" ");
             format.append(prefix)
-                    .append(matchTeam.getColor())
+                    .append(teamColor)
                     .append(event.getPlayer().getName());
             if (!playerContext.isNicked() && userProfile.getActiveTag() != null && !"".equals(userProfile.getActiveTag()))
                 format.append(ChatColor.GRAY)
@@ -182,11 +195,6 @@ public class ChatModule extends MatchModule implements Listener {
             member.getPlayer().sendMessage(matchTeam.getColor() + "[" + matchTeam.getAlias() + "] "
                     + playerContext.getPlayer().getName() + ChatColor.WHITE + ": " + message);
         }
-        //if (!matchTeam.isSpectator()) chatLog.add(new Chat(playerContext.getUserProfile().getId().toString(), playerContext.getPlayer().getName(), playerContext.getPlayer().getUniqueId().toString(), message, matchTeam.getId(), timeModule.getTimeElapsed(), true));
     }
 
-    @Override
-    public void unload() {
-        chatLog.clear();
-    }
 }

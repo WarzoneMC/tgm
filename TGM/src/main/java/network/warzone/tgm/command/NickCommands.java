@@ -5,7 +5,7 @@ import cl.bgmp.minecraft.util.commands.annotations.Command;
 import cl.bgmp.minecraft.util.commands.annotations.CommandPermissions;
 import cl.bgmp.minecraft.util.commands.exceptions.CommandNumberFormatException;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.chat.ChatConstant;
+import network.warzone.tgm.chat.ChatConstant;
 import network.warzone.tgm.nickname.Nick;
 import network.warzone.tgm.nickname.NickManager;
 import network.warzone.tgm.nickname.NickedUserProfile;

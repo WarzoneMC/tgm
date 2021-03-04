@@ -4,10 +4,9 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.map.ParsedTeam;
-import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
+import network.warzone.tgm.match.event.MatchLoadEvent;
 import network.warzone.tgm.modules.StatsModule;
-import network.warzone.tgm.modules.chat.ChatModule;
 import network.warzone.tgm.modules.death.DeathInfo;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -115,7 +114,7 @@ public class ApiManager implements Listener {
                         matchInProgress.getMap(),
                         event.getMatch().getStartedTime(),
                         event.getMatch().getFinishedTime(),
-                        TGM.get().getModule(ChatModule.class).getChatLog(),
+                        new ArrayList<>(),
                         winners,
                         losers,
                         event.getWinningTeam() != null ? event.getWinningTeam().getId() : null,

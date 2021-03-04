@@ -5,6 +5,10 @@ import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.map.MapContainer;
+import network.warzone.tgm.match.event.MatchLoadEvent;
+import network.warzone.tgm.match.event.MatchPostLoadEvent;
+import network.warzone.tgm.match.event.MatchPostUnloadEvent;
+import network.warzone.tgm.match.event.MatchUnloadEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
@@ -46,7 +50,11 @@ public class Match {
          * Core managers initialize off of MatchLoadEvent
          * so we call it first.
          */
-        Bukkit.getPluginManager().callEvent(new MatchLoadEvent(this));
+        try {
+            Bukkit.getPluginManager().callEvent(new MatchLoadEvent(this));
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
 
         //now load all the modules.
         int listenerCount = 0;
@@ -75,7 +83,11 @@ public class Match {
 
         Bukkit.getLogger().info("Loaded " + modules.size() + " modules (" + listenerCount + " listeners)");
 
-        Bukkit.getPluginManager().callEvent(new MatchPostLoadEvent(this));
+        try {
+            Bukkit.getPluginManager().callEvent(new MatchPostLoadEvent(this));
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -108,12 +120,22 @@ public class Match {
      * This is the last call before the world is unloaded.
      */
     public void unload() {
+        try {
+            Bukkit.getPluginManager().callEvent(new MatchUnloadEvent(this));
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
         for (MatchModule module : modules) {
             if (module instanceof Listener) {
                 HandlerList.unregisterAll((Listener) module);
             }
 
             module.unload();
+        }
+        try {
+            Bukkit.getPluginManager().callEvent(new MatchPostUnloadEvent(this));
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
         }
     }
 

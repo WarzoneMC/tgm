@@ -11,6 +11,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.api.ApiManager;
 import network.warzone.tgm.broadcast.BroadcastManager;
+import network.warzone.tgm.chat.ChatListener;
 import network.warzone.tgm.command.*;
 import network.warzone.tgm.join.JoinManager;
 import network.warzone.tgm.map.MapInfo;
@@ -63,6 +64,7 @@ public class TGM extends JavaPlugin {
 
     private MatchManager matchManager;
     private PlayerManager playerManager;
+    private ChatListener chatListener;
     private JoinManager joinManager;
     private ApiManager apiManager;
     private NickManager nickManager;
@@ -120,6 +122,7 @@ public class TGM extends JavaPlugin {
         matchManager.getMapRotation().refresh();
 
         playerManager = new PlayerManager();
+        chatListener = new ChatListener();
         joinManager = new JoinManager();
         apiManager = new ApiManager();
         broadcastManager = new BroadcastManager();
