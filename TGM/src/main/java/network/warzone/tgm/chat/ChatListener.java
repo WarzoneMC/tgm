@@ -105,7 +105,7 @@ public class ChatListener implements Listener {
 
         if(channel == ChatChannel.STAFF) {
             String prefix;
-            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            prefix = playerContext.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
 
             sendStaffMessage(prefix, event.getPlayer().getName(), event.getMessage());
             event.setCancelled(true);
@@ -116,11 +116,11 @@ public class ChatListener implements Listener {
             ChatColor teamColor;
             if (teamManagerModule == null) teamColor = ChatColor.AQUA;
             else teamColor = teamManagerModule.getTeam(event.getPlayer()).getColor();
-            UserProfile userProfile = playerContext.getUserProfile();
-            String prefix = userProfile.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', userProfile.getPrefix().trim()) + " " : "";
+            String prefix = playerContext.getPrefix() != null ? ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
             StringBuilder format = new StringBuilder();
             if (statsModule == null || !statsModule.isStatsDisabled())
                 format.append(playerContext.getLevelString()).append(" ");
+            UserProfile userProfile = playerContext.getUserProfile();
             format.append(prefix)
                     .append(teamColor)
                     .append(event.getPlayer().getName());
@@ -138,7 +138,7 @@ public class ChatListener implements Listener {
     }
 
     public static void sendStaffMessage(String prefix, String sender, String message) {
-        String result = ChatColor.DARK_RED + "[STAFF] " + prefix + ChatColor.GRAY + sender + ": " + ChatColor.GREEN + message;
+        String result = ChatColor.DARK_RED + "[STAFF] " + ChatColor.RESET + prefix + ChatColor.GRAY + sender + ": " + ChatColor.GREEN + message;
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
         }

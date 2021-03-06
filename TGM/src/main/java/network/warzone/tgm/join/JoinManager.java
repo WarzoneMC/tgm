@@ -159,8 +159,8 @@ public class JoinManager implements Listener {
         }
 
         String joinMsg;
-        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && playerContext.getUserProfile().getPrefix() != null) {
-            String prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+        if (event.getPlayer().hasPermission("tgm.donator.joinmsg") && !playerContext.getUserProfile().isStaff() && playerContext.getPrefix() != null) {
+            String prefix = playerContext.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
             joinMsg = ChatColor.GOLD + prefix + playerContext.getDisplayName() + ChatColor.GOLD + " joined.";
             Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_YES, 1f, 1f));
         } else joinMsg = ChatColor.GRAY + playerContext.getDisplayName() + " joined.";

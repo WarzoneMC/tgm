@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.config.TGMConfigReloadEvent;
+import network.warzone.tgm.util.Plugins;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
 import network.warzone.warzoneapi.models.UserProfile;
@@ -128,6 +129,18 @@ public class PlayerContext {
             getUserProfile().getRanksLoaded().forEach(rank -> Ranks.addPermissions(player, rank.getPermissions()));
         }
 
+    }
+
+    public String getPrefix() {
+        return getPrefix(false);
+    }
+
+    public String getPrefix(boolean original) {
+        String prefix = getUserProfile(original).getPrefix();
+        if (prefix != null) return prefix;
+        if (isNicked() && !original || !Plugins.isVaultPresent()) return null;
+        prefix = Plugins.Vault.getPrefix(this.player);
+        return prefix == null || prefix.isEmpty() ? null : prefix;
     }
 
     @AllArgsConstructor @Getter

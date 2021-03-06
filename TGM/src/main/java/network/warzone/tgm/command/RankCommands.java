@@ -35,7 +35,7 @@ public class RankCommands {
         String prefix = "";
         if (sender instanceof Player) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
-            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            prefix = playerContext.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
         }
         ChatListener.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
     }
