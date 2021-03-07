@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.visibility;
 
 import lombok.Getter;
+import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -14,14 +15,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-@Getter
+import java.util.function.Function;
+
+@Getter @Setter
 public class VisibilityModule extends MatchModule implements Listener {
+    @Getter @Setter
+    private static Function<Match, VisibilityController> visibilityControllerProvider =
+            match -> new VisibilityControllerImpl(match.getModule(SpectatorModule.class));
 
     private VisibilityController visibilityController;
 
     @Override
     public void load(Match match) {
-        visibilityController = new VisibilityControllerImpl(match.getModule(SpectatorModule.class));
+        visibilityController = visibilityControllerProvider.apply(match);
         refreshAllPlayers();
     }
 

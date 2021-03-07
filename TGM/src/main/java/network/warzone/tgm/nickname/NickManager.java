@@ -8,12 +8,13 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.server.v1_16_R3.*;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.SpectatorModule;
+import network.warzone.tgm.match.Match;
+import network.warzone.tgm.match.event.MatchPostLoadEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.visibility.VisibilityController;
-import network.warzone.tgm.modules.visibility.VisibilityControllerImpl;
+import network.warzone.tgm.modules.visibility.VisibilityModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.GameProfileUtil;
 import network.warzone.warzoneapi.models.MojangProfile;
@@ -25,6 +26,9 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -32,9 +36,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class NickManager {
+public class NickManager implements Listener {
 
-    private final VisibilityController visibilityController;
+    private VisibilityController visibilityController;
 
     @Getter
     private final List<Nick> nicks = new ArrayList<>();
@@ -42,7 +46,7 @@ public class NickManager {
     private final ProfileCache profileCache = ProfileCache.getInstance();
 
     public NickManager() {
-        visibilityController = new VisibilityControllerImpl(TGM.get().getModule(SpectatorModule.class));
+        TGM.registerEvents(this);
     }
 
     public void create(PlayerContext context, NickDetails details) {
@@ -70,6 +74,11 @@ public class NickManager {
         });
     }
 
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onMatchLoad(MatchPostLoadEvent event) {
+        visibilityController = getVisibilityController(event.getMatch());
+    }
+
     public void update(PlayerContext context, Consumer<Nick> action) {
         getNicks(context).forEach(action);
     }
@@ -77,9 +86,7 @@ public class NickManager {
     public void apply(PlayerContext context, boolean force) {
         nicks.removeIf(nick -> nick.getUuid().equals(context.getPlayer().getUniqueId()) && nick.isApplied());
         if (!force) {
-            update(context, nick -> {
-                nick.setApplied(true);
-            });
+            update(context, nick -> nick.setApplied(true));
         } else {
             update(context, nick -> {
                 nick.setApplied(true);
@@ -218,7 +225,7 @@ public class NickManager {
                 craftHandle.updateCommands();
                 p.updateInventory();
                 entityOther.updateAbilities();
-            } else if (visibilityController.canSee(p, toExclude)) {
+            } else if (visibilityController == null || visibilityController.canSee(p, toExclude)) {
                 // Remove the old player.
                 entityOther.playerConnection.sendPacket(playerInfoRemovePacket);
                 entityOther.playerConnection.sendPacket(entityDestroyPacket);
@@ -301,6 +308,10 @@ public class NickManager {
         if (details.getLosses() != null) profile.setLosses(details.getLosses());
         if (details.getObjectives() != null) profile.setWool_destroys(details.getObjectives());
         if (details.getFrozen() != null) profile.setFrozen(details.getFrozen());
+    }
+
+    private VisibilityController getVisibilityController(Match match) {
+        return match.getModule(VisibilityModule.class).getVisibilityController();
     }
 
     @Getter @Setter @AllArgsConstructor
