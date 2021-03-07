@@ -17,16 +17,24 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.function.Function;
 
-@Getter @Setter
+@Getter
 public class VisibilityModule extends MatchModule implements Listener {
-    @Getter @Setter
+    @Getter
     private static Function<Match, VisibilityController> visibilityControllerProvider =
             match -> new VisibilityControllerImpl(match.getModule(SpectatorModule.class));
 
+    public static void setVisibilityControllerProvider(Function<Match, VisibilityController> newProvider) {
+        visibilityControllerProvider = newProvider;
+        VisibilityModule module = TGM.get().getModule(VisibilityModule.class);
+        if (module != null) module.load(module.match);
+    }
+
+    private Match match;
     private VisibilityController visibilityController;
 
     @Override
     public void load(Match match) {
+        this.match = match;
         visibilityController = visibilityControllerProvider.apply(match);
         refreshAllPlayers();
     }
