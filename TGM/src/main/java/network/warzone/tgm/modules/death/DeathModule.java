@@ -82,6 +82,8 @@ public class DeathModule extends MatchModule implements Listener {
     }
 
     public void handleCombatLog(Player player, MatchTeam team, boolean forced) {
+        Match match = this.match.get();
+        if (match == null || match.getMatchStatus() != MatchStatus.MID) return;
         if (isDead(player) || team == null || team.isSpectator()) return;
         DeathInfo info = getPlayer(player);
         info.playerTeam = team;
@@ -92,9 +94,8 @@ public class DeathModule extends MatchModule implements Listener {
             info.playerLocation = player.getLocation();
             onDeath(player, info);
         } else { // No death but drop items
-            if (match.get() == null) return;
             List<ItemStack> drops = new ArrayList<>(Arrays.asList(player.getInventory().getContents()));
-            Objects.requireNonNull(match.get()).getModules().stream()
+            match.getModules().stream()
                     .filter(module -> module instanceof ItemFilter)
                     .forEach(module -> ((ItemFilter) module).filter(drops));
             dropItems(player.getLocation(), drops);
