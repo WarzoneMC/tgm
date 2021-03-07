@@ -129,7 +129,7 @@ public class BlitzModule extends MatchModule implements Listener {
         List<MatchTeam> teams = teamManagerModule.getTeams();
 
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
-        simpleScoreboard.setTitle(ChatColor.AQUA + "Players");
+        simpleScoreboard.setTitle(ChatColor.AQUA + "Blitz");
 
         int i = 2;
         for (MatchTeam matchTeam : teams) {

@@ -85,7 +85,7 @@ public class TDMModule extends MatchModule implements Listener {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
 
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
-
+        simpleScoreboard.setTitle(ChatColor.AQUA + "Team Deathmatch");
         int i = 2;
         for (MatchTeam matchTeam : teams) {
             if (matchTeam.isSpectator()) continue;

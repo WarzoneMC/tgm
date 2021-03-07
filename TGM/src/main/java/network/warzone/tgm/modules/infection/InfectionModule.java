@@ -192,7 +192,9 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
         if(!defaultScoreboardLoaded) defaultScoreboard();
-        refreshScoreboard(event.getSimpleScoreboard());
+        SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
+        simpleScoreboard.setTitle(ChatColor.AQUA + "Infection");
+        refreshScoreboard(simpleScoreboard);
     }
 
 

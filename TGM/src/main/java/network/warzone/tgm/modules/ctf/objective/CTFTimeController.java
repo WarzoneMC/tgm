@@ -89,7 +89,9 @@ public class CTFTimeController extends CTFController implements TimeSubscriber {
 
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
-        updateScoreboard(event.getSimpleScoreboard());
+        SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
+        simpleScoreboard.setTitle(ChatColor.AQUA + "King of the Flag");
+        updateScoreboard(simpleScoreboard);
     }
 
     private void updateScoreboard(SimpleScoreboard scoreboard) {

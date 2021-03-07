@@ -68,6 +68,8 @@ public class CTFAmountController extends CTFController implements TimeSubscriber
 
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
+        SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
+        simpleScoreboard.setTitle(ChatColor.AQUA + "Capture the Flag");
         if (!typedScoreboard) {
             typedScoreboard = true;
             this.fancyScoreboard = true;
@@ -83,7 +85,7 @@ public class CTFAmountController extends CTFController implements TimeSubscriber
                 }
             }
         }
-        updateScoreboard(event.getSimpleScoreboard(), 0);
+        updateScoreboard(simpleScoreboard, 0);
     }
 
     private void updateAllScoreboards(int elapsed) {
