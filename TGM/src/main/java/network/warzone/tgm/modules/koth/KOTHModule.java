@@ -127,7 +127,7 @@ public class KOTHModule extends MatchModule implements Listener {
     public void onScoreboardInit(ScoreboardInitEvent event) {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
-
+        simpleScoreboard.setTitle(ChatColor.AQUA + "King of the Hill");
         int j = 2;
         for (ControlPoint controlPoint : controlPoints) {
             controlPointScoreboardLines.put(controlPoint.getDefinition(), j);

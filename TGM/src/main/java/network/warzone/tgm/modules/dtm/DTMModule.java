@@ -161,7 +161,8 @@ public class DTMModule extends MatchModule implements Listener {
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
-
+        SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
+        simpleScoreboard.setTitle(ChatColor.AQUA + "Destroy the Monument");
         int spaceCount = 1;
         int i = 2;
         for (MatchTeam matchTeam : teams) {
@@ -177,14 +178,14 @@ public class DTMModule extends MatchModule implements Listener {
                         this.monumentScoreboardLines.put(monument, list);
                     }
 
-                    event.getSimpleScoreboard().add(getScoreboardString(monument), i++);
+                    simpleScoreboard.add(getScoreboardString(monument), i++);
                 }
             }
-            event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
+            simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
             this.teamScoreboardLines.put(matchTeam.getId(), i++);
 
             if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
+                simpleScoreboard.add(StringUtils.repeat(" ", spaceCount++), i++);
             }
         }
     }

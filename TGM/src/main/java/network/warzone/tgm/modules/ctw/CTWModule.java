@@ -185,6 +185,8 @@ public class CTWModule extends MatchModule implements Listener {
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
         List<MatchTeam> teams = this.teamManagerModule.getTeams();
+        SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
+        simpleScoreboard.setTitle(ChatColor.AQUA + "Capture the Wool");
         int spaceCount = 1;
         int i = 2;
         if (!compactLayout) {
@@ -201,14 +203,14 @@ public class CTWModule extends MatchModule implements Listener {
                             woolScoreboardLines.put(woolObjective, list);
                         }
 
-                        event.getSimpleScoreboard().add(getScoreboardString(woolObjective), i++);
+                        simpleScoreboard.add(getScoreboardString(woolObjective), i++);
                     }
                 }
-                event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
+                simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                 teamScoreboardLines.put(matchTeam.getId(), i++);
 
                 if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                    event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
+                    simpleScoreboard.add(StringUtils.repeat(" ", spaceCount++), i++);
                 }
             }
         } else {
@@ -227,12 +229,12 @@ public class CTWModule extends MatchModule implements Listener {
                         }
                     }
                 }
-                event.getSimpleScoreboard().add(getScoreboardString(wools), i++);
-                event.getSimpleScoreboard().add(getTeamScoreboardString(matchTeam), i);
+                simpleScoreboard.add(getScoreboardString(wools), i++);
+                simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                 teamScoreboardLines.put(matchTeam.getId(), i++);
 
                 if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                    event.getSimpleScoreboard().add(StringUtils.repeat(" ", spaceCount++), i++);
+                    simpleScoreboard.add(StringUtils.repeat(" ", spaceCount++), i++);
                 }
             }
         }

@@ -71,8 +71,8 @@ public class FFAModule extends MatchModule implements Listener {
             }
         }
         if (this.title == null) {
-            if (!this.blitzMode) this.title = "&bFFA - " + this.killLimit + " Kill" + (this.killLimit != 1 ? "s" : "");
-            else this.title = "&bFFA - " + this.lives + " Li" + (this.lives != 1 ? "ves" : "fe");
+            if (!this.blitzMode) this.title = "&bFree for All - " + this.killLimit + " Kill" + (this.killLimit != 1 ? "s" : "");
+            else this.title = "&bFree for All - " + this.lives + " Li" + (this.lives != 1 ? "ves" : "fe");
         }
 
         this.title = this.title.replace("%killLimit%", String.valueOf(this.killLimit)).replace("%lives%", String.valueOf(this.lives));
