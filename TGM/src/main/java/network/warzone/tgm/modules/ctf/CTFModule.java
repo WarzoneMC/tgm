@@ -86,7 +86,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
     }
 
     @Override
-    public void disable() {
+    public void unload() {
         for (MatchFlag matchFlag : matchFlags) matchFlag.unload();
         for (MatchBase matchBase : matchBases) matchBase.unload();
         controller.unload();
