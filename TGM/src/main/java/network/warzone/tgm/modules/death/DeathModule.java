@@ -111,7 +111,7 @@ public class DeathModule extends MatchModule implements Listener {
         return info.stampKill > -1 && System.currentTimeMillis() - info.stampKill < combatCooldown;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamage(EntityDamageEvent event) {
         if (this.match.get().getMatchStatus() == MatchStatus.POST) {
             event.setCancelled(true);
