@@ -8,7 +8,9 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.map.ParsedTeam;
 import network.warzone.tgm.match.Match;
+import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.user.PlayerContext;
@@ -98,6 +100,13 @@ public class TeamManagerModule extends MatchModule implements Listener {
             matchTeam.removePlayer(playerContext);
             if (oldTeam != null) oldTeam.addPlayer(playerContext);
         }
+
+        if (getAmountParticipating() == 0) {
+            MatchManager matchManager = TGM.get().getMatchManager();
+            if (matchManager.getMatch() != null && matchManager.getMatch().getMatchStatus() == MatchStatus.MID) {
+                matchManager.endMatch(null);
+            }
+        }
     }
 
     @EventHandler
@@ -110,6 +119,13 @@ public class TeamManagerModule extends MatchModule implements Listener {
         MatchTeam matchTeam = getTeam(player);
         if (matchTeam != null) {
             matchTeam.removePlayer(playerContext);
+        }
+
+        if (getAmountParticipating() == 0) {
+            MatchManager matchManager = TGM.get().getMatchManager();
+            if (matchManager.getMatch() != null && matchManager.getMatch().getMatchStatus() == MatchStatus.MID) {
+                matchManager.endMatch(null);
+            }
         }
     }
 
