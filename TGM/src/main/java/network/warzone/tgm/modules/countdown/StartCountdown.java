@@ -6,12 +6,14 @@ import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
+import network.warzone.tgm.modules.team.event.TeamUpdateMinimumEvent;
 import network.warzone.tgm.util.BossBarUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.event.EventHandler;
 
 import java.util.List;
 
@@ -39,6 +41,11 @@ public class StartCountdown extends BossBarCountdown {
         BossBar bossBar = Bukkit.createBossBar("", BarColor.GREEN, BarStyle.SOLID);
         bossBar.setVisible(false);
         return bossBar;
+    }
+
+    @EventHandler
+    public void onTeamMinUpdate(TeamUpdateMinimumEvent event) {
+        requiredPlayers = getRequiredPlayers();
     }
 
     @Override
