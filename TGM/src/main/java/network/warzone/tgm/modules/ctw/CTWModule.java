@@ -15,7 +15,7 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.team.event.TeamUpdateAliasEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.wool.WoolObjective;
 import network.warzone.tgm.modules.wool.WoolObjectiveService;
@@ -251,7 +251,7 @@ public class CTWModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onTeamUpdate(TeamUpdateEvent event) {
+    public void onTeamUpdate(TeamUpdateAliasEvent event) {
         Set<String> teamIds = this.teamScoreboardLines.keySet();
         Set<MatchTeam> teams = teamIds.stream().map(id -> this.teamManagerModule.getTeamById(id)).collect(Collectors.toSet());
 

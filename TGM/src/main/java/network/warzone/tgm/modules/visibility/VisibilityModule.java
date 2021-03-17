@@ -1,7 +1,6 @@
 package network.warzone.tgm.modules.visibility;
 
 import lombok.Getter;
-import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
