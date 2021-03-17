@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter @Setter
 public class TeamManagerModule extends MatchModule implements Listener {
@@ -198,6 +199,10 @@ public class TeamManagerModule extends MatchModule implements Listener {
             }
         }
         return null;
+    }
+
+    public List<MatchTeam> getTeamsParticipating() {
+        return teams.stream().filter(t -> !t.isSpectator()).collect(Collectors.toList());
     }
 
     public MatchTeam getSmallestTeam() {

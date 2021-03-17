@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
+import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.BossBarUtil;
 import org.bukkit.Bukkit;
@@ -12,10 +13,12 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 
-public class StartCountdown extends BossBarCountdown {
+import java.util.List;
 
-    public static int START_TIME = TGM.get().getConfig().getInt("map.start-countdown");
-    public static final int REQUIRED_PLAYERS = 2;
+public class StartCountdown extends BossBarCountdown {
+    @Getter
+    protected int startTime = 20;
+    protected int requiredPlayers = 2;
 
     @Getter private TeamManagerModule teamManagerModule;
 
@@ -25,8 +28,10 @@ public class StartCountdown extends BossBarCountdown {
 
     @Override
     public void load(Match match) {
+        startTime = TGM.get().getConfig().getInt("map.start-countdown", 20);
         teamManagerModule = match.getModule(TeamManagerModule.class);
-        start(START_TIME);
+        start(startTime);
+        requiredPlayers = getRequiredPlayers();
     }
 
     @Override
@@ -41,13 +46,23 @@ public class StartCountdown extends BossBarCountdown {
         getBossBar().setVisible(true);
     }
 
+    protected int getRequiredPlayers() {
+        List<MatchTeam> teams = teamManagerModule.getTeamsParticipating();
+        return Math.max(
+                teams.size(),
+                teams.stream()
+                        .mapToInt(MatchTeam::getMin)
+                        .sum()
+        );
+    }
+
     @Override
     protected void onTick() {
         if (isCancelled()) return;
 
         int amountParticipating = teamManagerModule.getAmountParticipating();
-        if (amountParticipating < REQUIRED_PLAYERS) {
-            int needed = REQUIRED_PLAYERS - amountParticipating;
+        if (amountParticipating < requiredPlayers) {
+            int needed = requiredPlayers - amountParticipating;
             getBossBar().setProgress(1);
             getBossBar().setTitle(ChatColor.RED + "Waiting for " + ChatColor.AQUA + needed +
                     ChatColor.RED + " more player" + (needed == 1 ? "" : "s") + " to join");

@@ -187,9 +187,11 @@ public class CycleCommands {
     @Command(aliases = {"start"}, desc = "Start the match.")
     @CommandPermissions({"tgm.start"})
     public static void start(CommandContext cmd, CommandSender sender) {
-        MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
+        Match match = TGM.get().getMatchManager().getMatch();
+        MatchStatus matchStatus = match.getMatchStatus();
         if (matchStatus == MatchStatus.PRE) {
-            int time = StartCountdown.START_TIME;
+            StartCountdown startCountdown = TGM.get().getModule(StartCountdown.class);
+            int time = startCountdown.getStartTime();
             if (cmd.argsLength() > 0) {
                 try {
                     time = cmd.getInteger(0);
@@ -201,7 +203,7 @@ public class CycleCommands {
             boolean soloStart = Bukkit.getOnlinePlayers().size() <= 1;
             if (!soloStart)
                 sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
-            TGM.get().getModule(StartCountdown.class).start((soloStart) ? 0 : time);
+            startCountdown.start((soloStart) ? 0 : time);
             for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.start")).collect(Collectors.toSet())) {
                 if (time == 0) {
                     player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " started the match");
