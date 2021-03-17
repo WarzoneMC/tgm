@@ -5,7 +5,7 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.tasked.TaskedModule;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.util.InventoryUtil;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;

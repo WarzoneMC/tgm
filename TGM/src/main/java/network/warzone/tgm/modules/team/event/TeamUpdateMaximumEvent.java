@@ -2,7 +2,6 @@ package network.warzone.tgm.modules.team.event;
 
 import lombok.Getter;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamUpdateEvent;
 
 /**
  * Created by Jorge on 03/17/2021

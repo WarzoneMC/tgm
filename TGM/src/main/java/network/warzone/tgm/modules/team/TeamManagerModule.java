@@ -13,6 +13,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

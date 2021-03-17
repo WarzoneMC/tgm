@@ -6,7 +6,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.death.DeathInfo;
 import network.warzone.tgm.modules.death.DeathModule;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.*;
