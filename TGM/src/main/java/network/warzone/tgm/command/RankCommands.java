@@ -15,6 +15,7 @@ import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -47,9 +48,40 @@ public class RankCommands {
         ChatListener.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
     }
 
-    @Command(aliases = {"tsc", "togglestaffchat", "togglestaffc"}, desc = "Toggle staff chat notifications")
+    @Command(aliases = {"tsc", "togglestaffchat", "togglestaffc"}, max = 1, desc = "Toggle staff chat notifications")
     @CommandPermissions({"tgm.staffchat"})
     public static void togglestaffchat(CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() == 1) {
+            if (!cmd.getString(0).equalsIgnoreCase("list")) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " [list]");
+                return;
+            }
+
+            List<UUID> disabledStaffChats = ChatListener.getDisabledStaffChats();
+            if (disabledStaffChats.size() == 0) {
+                sender.sendMessage(ChatColor.YELLOW + "Nobody has staff chat disabled.");
+                return;
+            }
+
+            StringBuilder stringBuilder = new StringBuilder(ChatColor.YELLOW + "Players with disabled staff chat:");
+
+            for (UUID uuid : disabledStaffChats) {
+                Player player = Bukkit.getPlayer(uuid);
+                String result;
+
+                if (player != null) {
+                    result = player.getName();
+                } else {
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                    result = offlinePlayer.getName() + " " + ChatColor.GRAY + "(OFFLINE)";
+                }
+                stringBuilder.append("\n").append(ChatColor.WHITE).append("- ").append(ChatColor.GOLD).append(result);
+            }
+
+            sender.sendMessage(stringBuilder.toString());
+            return;
+        }
+
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Only players can toggle staff chat.");
             return;
