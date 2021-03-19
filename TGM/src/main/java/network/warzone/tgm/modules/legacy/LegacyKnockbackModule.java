@@ -74,6 +74,7 @@ public class LegacyKnockbackModule extends MatchModule implements Listener {
     public void onEntityDamage(EntityDamageByEntityEvent event) {
         if (!enabled) return;
         if (!(event.getEntity() instanceof Player)) return;
+        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) return; // Temp fix
         Player player = (Player) event.getEntity();
         this.queued.put(player, new EntityDamageByEntityContext(
                 event,
@@ -84,7 +85,12 @@ public class LegacyKnockbackModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerVelocity(PlayerVelocityEvent event) {
         if (!enabled) return;
-        EntityDamageByEntityContext context = this.queued.get(event.getPlayer());
+        if (event.getPlayer().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL) {
+            // Temp fix
+            event.setCancelled(true);
+            return; 
+        }
+        EntityDamageByEntityContext context = this.queued.remove(event.getPlayer());
         if (context == null) return;
         EntityDamageByEntityEvent edEvent = context.getEvent();
         if (CAUSES.contains(edEvent.getCause())) {
@@ -98,7 +104,6 @@ public class LegacyKnockbackModule extends MatchModule implements Listener {
             }
             // Else: Other projectiles (snowball, eggs, etc) get vanilla knockback
         }
-        this.queued.remove(event.getPlayer());
     }
 
     @EventHandler
