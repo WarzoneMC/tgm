@@ -34,10 +34,38 @@ public class RankCommands {
     public static void staffchat(CommandContext cmd, CommandSender sender) {
         String prefix = "";
         if (sender instanceof Player) {
-            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
+            Player player = (Player) sender;
+
+            if (ChatListener.getDisabledStaffChats().contains(player.getUniqueId())) {
+                player.sendMessage(ChatColor.RED + "You currently have staff chat disabled.");
+                return;
+            }
+
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
             prefix = playerContext.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
         }
         ChatListener.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
+    }
+
+    @Command(aliases = {"tsc", "togglestaffchat", "togglestaffc"}, desc = "Toggle staff chat notifications")
+    @CommandPermissions({"tgm.staffchat"})
+    public static void togglestaffchat(CommandContext cmd, CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can toggle staff chat.");
+            return;
+        }
+
+        Player player = (Player) sender;
+
+        boolean disabled = ChatListener.getDisabledStaffChats().contains(player.getUniqueId());
+
+        if (disabled) {
+            ChatListener.getDisabledStaffChats().remove(player.getUniqueId());
+        } else {
+            ChatListener.getDisabledStaffChats().add(player.getUniqueId());
+        }
+
+        player.sendMessage(ChatColor.GREEN + (disabled ? "Enabled staff chat." : "Disabled staff chat."));
     }
 
     @Command(aliases = {"rank", "ranks"}, desc = "Rank management command.", min = 1, usage = "(player|list|info|create|delete|edit|permissions)")
