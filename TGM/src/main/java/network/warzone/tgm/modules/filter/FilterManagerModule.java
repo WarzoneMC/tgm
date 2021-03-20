@@ -66,6 +66,7 @@ public class FilterManagerModule extends MatchModule {
         else if ("usebow".equals(type))         filterTypes.add(UseBowFilterType.parse(match, jsonObject));
         else if ("useshear".equals(type))       filterTypes.add(UseShearFilterType.parse(match, jsonObject));
         else if ("leave".equals(type))          filterTypes.add(LeaveFilterType.parse(match, jsonObject));
+        else if ("blockinteract".equals(type))  filterTypes.add(BlockInteractFilterType.parse(match, jsonObject));
         else if ("blockexplode".equals(type))   filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
         else if ("blockplace".equals(type))     filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
         else if ("blockbreak".equals(type))     filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));

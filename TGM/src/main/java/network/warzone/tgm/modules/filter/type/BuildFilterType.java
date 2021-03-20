@@ -204,5 +204,4 @@ public class BuildFilterType implements FilterType, Listener {
         boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
         return new BuildFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }
-
 }
