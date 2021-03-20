@@ -47,8 +47,13 @@ public class LegacyDamageModule extends MatchModule implements Listener {
     @EventHandler(priority= EventPriority.LOWEST) // Make sure this event is called before the knockback
     public void onDamage(EntityDamageByEntityEvent event) {
         if (!isEnabled()) return;
+        
+        if (event.getDamager() instanceof Arrow) {
+            event.setDamage(event.getDamage() / 1.2);
+            return;
+        }
 
-        if ((event.getDamager() instanceof Player)) {
+        if (event.getDamager() instanceof Player) {
             Player player = (Player) event.getDamager();
 
             ItemStack weaponItem = player.getInventory().getItemInMainHand();
@@ -98,8 +103,6 @@ public class LegacyDamageModule extends MatchModule implements Listener {
             weaponDamage += sharpnessDamage;
 
             event.setDamage(weaponDamage);
-        } else if (event.getDamager() instanceof Arrow) {
-            event.setDamage(event.getDamage() / 1.3);
         }
     }
 
