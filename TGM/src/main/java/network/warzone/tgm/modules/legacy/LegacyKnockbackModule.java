@@ -85,7 +85,8 @@ public class LegacyKnockbackModule extends MatchModule implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerVelocity(PlayerVelocityEvent event) {
         if (!enabled) return;
-        if (event.getPlayer().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL) {
+        EntityDamageEvent e = event.getPlayer().getLastDamageCause();
+        if (e != null && e.getCause() == EntityDamageEvent.DamageCause.FALL) {
             // Temp fix
             event.setCancelled(true);
             return; 
