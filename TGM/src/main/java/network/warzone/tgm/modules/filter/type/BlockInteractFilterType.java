@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
 import network.warzone.tgm.modules.filter.FilterResult;
@@ -19,16 +20,14 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jorge on 10/02/2019
- */
 @AllArgsConstructor @Getter
-public class BlockPlaceFilterType implements FilterType, Listener {
+public class BlockInteractFilterType implements FilterType, Listener {
 
     private final List<MatchTeam> teams;
     private final List<Region> regions;
@@ -38,13 +37,15 @@ public class BlockPlaceFilterType implements FilterType, Listener {
     private final boolean inverted;
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onBlockPlaceEvent(BlockPlaceEvent event) {
+    public void onBlockPlaceEvent(PlayerInteractEvent event) {
+        if (event.getClickedBlock() == null) return;
+
         for (Region region : regions) {
-            if (contains(region, event.getBlockPlaced().getLocation())) {
+            if (contains(region, event.getClickedBlock().getLocation())) {
                 for (MatchTeam matchTeam : teams) {
                     if (matchTeam.containsPlayer(event.getPlayer())) {
                         FilterResult filterResult = evaluator.evaluate(event.getPlayer());
-                        if (!canPlace(event, filterResult)) {
+                        if (!canInteract(event, filterResult)) {
                             event.setCancelled(true);
                             if (message != null) event.getPlayer().sendMessage(message);
                         }
@@ -59,17 +60,18 @@ public class BlockPlaceFilterType implements FilterType, Listener {
         return (!inverted && region.contains(location)) || (inverted && !region.contains(location));
     }
 
-    private boolean canPlace(BlockPlaceEvent event, FilterResult filterResult) {
+    @SuppressWarnings("ConstantConditions") // null check already passed
+    private boolean canInteract(PlayerInteractEvent event, FilterResult filterResult) {
         if (filterResult == FilterResult.ALLOW) {
             if (blocks == null || blocks.isEmpty()) return true;
-            return blocks.contains(event.getBlockPlaced().getType());
+            return blocks.contains(event.getClickedBlock().getType());
         } else {
             if (blocks == null || blocks.isEmpty()) return false;
-            return !blocks.contains(event.getBlockPlaced().getType());
+            return !blocks.contains(event.getClickedBlock().getType());
         }
     }
 
-    public static BlockPlaceFilterType parse(Match match, JsonObject jsonObject) {
+    public static BlockInteractFilterType parse(Match match, JsonObject jsonObject) {
         List<MatchTeam> matchTeams = match.getModule(TeamManagerModule.class).getTeams(jsonObject.get("teams").getAsJsonArray());
         List<Region> regions = new ArrayList<>();
         List<Material> blocks = new ArrayList<>();
@@ -91,6 +93,6 @@ public class BlockPlaceFilterType implements FilterType, Listener {
         FilterEvaluator filterEvaluator = FilterManagerModule.initEvaluator(match, jsonObject);
         String message = jsonObject.has("message") ? ChatColor.translateAlternateColorCodes('&', jsonObject.get("message").getAsString()) : null;
         boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
-        return new BlockPlaceFilterType(matchTeams, regions, filterEvaluator, message, blocks, inverted);
+        return new BlockInteractFilterType(matchTeams, regions, filterEvaluator, message, blocks, inverted);
     }
 }
