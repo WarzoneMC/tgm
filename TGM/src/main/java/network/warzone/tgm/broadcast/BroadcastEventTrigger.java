@@ -3,7 +3,7 @@ package network.warzone.tgm.broadcast;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchResultEvent;
 import network.warzone.tgm.match.event.MatchLoadEvent;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

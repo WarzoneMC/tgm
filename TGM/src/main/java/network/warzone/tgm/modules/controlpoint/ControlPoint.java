@@ -8,7 +8,7 @@ import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionSave;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Blocks;
 import network.warzone.tgm.util.ColorConverter;

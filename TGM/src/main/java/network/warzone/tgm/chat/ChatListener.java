@@ -25,6 +25,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 public class ChatListener implements Listener {
@@ -34,6 +35,7 @@ public class ChatListener implements Listener {
     private TeamManagerModule teamManagerModule;
     private StatsModule statsModule;
     private static final Map<String, ChatChannel> channels = new HashMap<>();
+    @Getter private static final List<UUID> disabledStaffChats = new ArrayList<>();
 
     public ChatListener() {
         TGM.registerEvents(this);
@@ -139,8 +141,9 @@ public class ChatListener implements Listener {
 
     public static void sendStaffMessage(String prefix, String sender, String message) {
         String result = ChatColor.DARK_RED + "[STAFF] " + ChatColor.RESET + prefix + ChatColor.GRAY + sender + ": " + ChatColor.GREEN + message;
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("tgm.staffchat")) player.sendMessage(result);
+        for (Player player : Bukkit.getOnlinePlayers().stream().filter(
+                (player) -> player.hasPermission("tgm.staffchat") && !disabledStaffChats.contains(player.getUniqueId())).collect(Collectors.toSet())) {
+            player.sendMessage(result);
         }
         Bukkit.getConsoleSender().sendMessage(result);
     }

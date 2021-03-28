@@ -24,6 +24,7 @@ import java.util.List;
  */
 @AllArgsConstructor @Getter
 public class BlockExplodeFilterType implements FilterType, Listener {
+
     private final List<Region> regions;
     private final FilterEvaluator evaluator;
     private final boolean inverted;

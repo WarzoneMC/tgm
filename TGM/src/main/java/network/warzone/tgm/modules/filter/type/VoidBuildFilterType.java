@@ -93,5 +93,4 @@ public class VoidBuildFilterType implements FilterType, Listener {
         boolean inverted = jsonObject.has("inverted") && jsonObject.get("inverted").getAsBoolean();
         return new VoidBuildFilterType(matchTeams, regions, filterEvaluator, message, inverted);
     }
-
 }

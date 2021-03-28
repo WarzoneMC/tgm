@@ -8,9 +8,9 @@ import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.team.event.TeamUpdateEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
 import network.warzone.tgm.util.Players;
@@ -69,9 +69,9 @@ public class SpectatorModule extends MatchModule implements Listener {
     public SpectatorModule() {
         this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
 
-        compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.YELLOW + "Teleport Tool");
-        teamSelectionItem = ItemFactory.createItem(Material.NETHER_STAR, ChatColor.YELLOW + "Team Selection");
-        teleportMenuItem = ItemFactory.createItem(Material.CLOCK, ChatColor.YELLOW + "Player Teleport");
+        compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.BLUE.toString() + ChatColor.BOLD.toString() + "Teleport Tool");
+        teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "Team Selection");
+        teleportMenuItem = ItemFactory.createItem(Material.CLOCK, ChatColor.AQUA.toString() + ChatColor.BOLD.toString() + "Player Teleport");
 
         leatherHelmet = new ItemStack(Material.LEATHER_HELMET);
         LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
@@ -132,12 +132,12 @@ public class SpectatorModule extends MatchModule implements Listener {
         playerContext.getPlayer().setCollidable(false);
 
         playerContext.getPlayer().getInventory().setHelmet(leatherHelmet);
-        playerContext.getPlayer().getInventory().setItem(2, compassItem);
-        playerContext.getPlayer().getInventory().setItem(4, teamSelectionItem);
-        playerContext.getPlayer().getInventory().setItem(6, teleportMenuItem);
-        // Inventory slot 8 is reserved for the kitEditorItem in KitLoaderModule
+        playerContext.getPlayer().getInventory().setItem(0, compassItem);
+        playerContext.getPlayer().getInventory().setItem(2, teamSelectionItem);
+        playerContext.getPlayer().getInventory().setItem(8, teleportMenuItem);
+        // Inventory slot 6 is reserved for the kitEditorItem in KitLoaderModule
 
-        playerContext.getPlayer().getInventory().setHeldItemSlot(4);
+        playerContext.getPlayer().getInventory().setHeldItemSlot(2);
     }
 
     private void updateTeamMenuItem(MatchTeam matchTeam, int i) {
@@ -315,7 +315,7 @@ public class SpectatorModule extends MatchModule implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         if (isSpectating(event.getPlayer())) {

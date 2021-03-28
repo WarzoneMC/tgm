@@ -12,7 +12,7 @@ import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.kit.classes.GameClass;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
 import network.warzone.tgm.user.PlayerContext;

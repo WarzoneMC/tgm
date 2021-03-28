@@ -11,7 +11,7 @@ import network.warzone.tgm.modules.region.CuboidRegion;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.parser.banner.BannerPatternsDeserializer;
 import network.warzone.tgm.parser.effect.EffectDeserializer;

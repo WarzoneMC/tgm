@@ -2,7 +2,7 @@ package network.warzone.tgm.modules.countdown;
 
 import lombok.Getter;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Placeholders;
 import org.bukkit.Bukkit;

@@ -1,8 +1,9 @@
-package network.warzone.tgm.modules.team;
+package network.warzone.tgm.modules.team.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

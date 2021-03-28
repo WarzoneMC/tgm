@@ -11,7 +11,7 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.PlayerJoinTeamAttemptEvent;

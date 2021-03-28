@@ -11,7 +11,7 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.team.event.TeamUpdateAliasEvent;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.ChatColor;
@@ -126,7 +126,7 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     @EventHandler
-    public void onTeamUpdate(TeamUpdateEvent event) {
+    public void onTeamUpdate(TeamUpdateAliasEvent event) {
         MatchTeam team = event.getMatchTeam();
         if (!team.isSpectator()) updateScoreboardAliasLine(team);
     }

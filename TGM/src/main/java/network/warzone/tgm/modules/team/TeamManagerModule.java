@@ -13,6 +13,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,6 +28,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter @Setter
 public class TeamManagerModule extends MatchModule implements Listener {
@@ -198,6 +200,10 @@ public class TeamManagerModule extends MatchModule implements Listener {
             }
         }
         return null;
+    }
+
+    public List<MatchTeam> getTeamsParticipating() {
+        return teams.stream().filter(t -> !t.isSpectator()).collect(Collectors.toList());
     }
 
     public MatchTeam getSmallestTeam() {

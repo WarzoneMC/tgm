@@ -1,12 +1,11 @@
 package network.warzone.tgm.modules.visibility;
 
 import lombok.Getter;
-import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.SpectatorModule;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

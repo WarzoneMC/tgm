@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.map.SpawnPoint;
 import network.warzone.tgm.modules.kit.Kit;
+import network.warzone.tgm.modules.team.event.TeamUpdateAliasEvent;
+import network.warzone.tgm.modules.team.event.TeamUpdateMaximumEvent;
+import network.warzone.tgm.modules.team.event.TeamUpdateMinimumEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -61,18 +64,21 @@ public class MatchTeam {
     }
 
     public void setMax(int max) {
+        int old = this.max;
         this.max = max;
-        Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(this));
+        Bukkit.getPluginManager().callEvent(new TeamUpdateMaximumEvent(this, old, max));
     }
 
     public void setMin(int min) {
+        int old = this.min;
         this.min = min;
-        Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(this));
+        Bukkit.getPluginManager().callEvent(new TeamUpdateMinimumEvent(this, old, min));
     }
 
     public void setAlias(String alias) {
+        String old = this.alias;
         this.alias = alias;
-        Bukkit.getPluginManager().callEvent(new TeamUpdateEvent(this));
+        Bukkit.getPluginManager().callEvent(new TeamUpdateAliasEvent(this, old, alias));
     }
 
     @Override

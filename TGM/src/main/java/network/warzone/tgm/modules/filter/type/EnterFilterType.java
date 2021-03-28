@@ -24,6 +24,7 @@ import java.util.List;
 
 @AllArgsConstructor @Getter
 public class EnterFilterType implements FilterType, Listener {
+
     private final List<MatchTeam> teams;
     private final List<Region> regions;
     private final FilterEvaluator evaluator;

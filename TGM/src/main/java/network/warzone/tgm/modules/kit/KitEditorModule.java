@@ -8,7 +8,7 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.itemstack.ItemFactory;
@@ -33,7 +33,7 @@ public class KitEditorModule extends MatchModule implements Listener {
     @Getter private HashMap<UUID, KitEditorMenu> editorMenus;
 
     public KitEditorModule() {
-        kitEditorItem = ItemFactory.createItem(Material.CHEST, ChatColor.YELLOW + "Kit Editor");
+        kitEditorItem = ItemFactory.createItem(Material.CHEST, ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "Custom Layouts");
     }
 
     public void load() {
@@ -50,7 +50,7 @@ public class KitEditorModule extends MatchModule implements Listener {
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (!matchTeam.isSpectator()) continue;
             for (PlayerContext player : matchTeam.getMembers()) {
-                player.getPlayer().getInventory().clear(8);
+                player.getPlayer().getInventory().clear(6);
             }
         }
 
@@ -65,7 +65,7 @@ public class KitEditorModule extends MatchModule implements Listener {
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (!matchTeam.isSpectator()) continue;
             for (PlayerContext player : matchTeam.getMembers()) {
-                player.getPlayer().getInventory().setItem(8, kitEditorItem);
+                player.getPlayer().getInventory().setItem(6, kitEditorItem);
             }
         }
     }

@@ -32,7 +32,7 @@ public class UseShearFilterType implements FilterType, Listener {
     private final List<Region> regions;
     private final FilterEvaluator evaluator;
     private final String message;
-    private final  boolean inverted;
+    private final boolean inverted;
 
     @EventHandler
     public void onShear(PlayerShearEntityEvent e) {

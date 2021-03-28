@@ -16,8 +16,8 @@ import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
 import network.warzone.tgm.modules.scoreboard.SimpleScoreboard;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
-import network.warzone.tgm.modules.team.TeamUpdateEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamUpdateAliasEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.modules.time.TimeSubscriber;
@@ -236,7 +236,7 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     }
 
     @EventHandler
-    public void onTeamUpdate(TeamUpdateEvent event) {
+    public void onTeamUpdate(TeamUpdateAliasEvent event) {
         MatchTeam team = event.getMatchTeam();
         if (!team.isSpectator()) refreshScoreboardAlias(team);
     }

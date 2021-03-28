@@ -7,7 +7,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;

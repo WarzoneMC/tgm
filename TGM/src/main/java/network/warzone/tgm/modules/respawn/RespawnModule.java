@@ -12,7 +12,7 @@ import network.warzone.tgm.match.*;
 import network.warzone.tgm.modules.death.DeathInfo;
 import network.warzone.tgm.modules.flag.FlagRespawnBlockEvent;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
 import network.warzone.tgm.player.event.TGMPlayerRespawnEvent;
