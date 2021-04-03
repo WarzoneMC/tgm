@@ -16,6 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 /**
@@ -30,8 +32,9 @@ public class StatsModule extends MatchModule implements Listener{
 
     @Override
     public void load(Match match) {
-        if (match.getMapContainer().getMapInfo().getJsonObject().has("stats")) {
-            JsonObject statsObj = (JsonObject) match.getMapContainer().getMapInfo().getJsonObject().get("stats");
+        JsonObject mapInfo = match.getMapContainer().getMapInfo().getJsonObject();
+        if (mapInfo.has("stats")) {
+            JsonObject statsObj = (JsonObject) mapInfo.get("stats");
             if (statsObj.has("disable")) statsDisabled = statsObj.get("disable").getAsBoolean();
             if (statsObj.has("notifydisable")) notifyDisable = statsObj.get("notifydisable").getAsBoolean();
             if (statsObj.has("showlevel")) showLevel = statsObj.get("showlevel").getAsBoolean();
@@ -51,6 +54,20 @@ public class StatsModule extends MatchModule implements Listener{
         if (!shouldSetExperience()) return;
         context.getPlayer().setLevel(context.getUserProfile().getLevel());
         context.getPlayer().setExp((float) Levels.getLevelProgress(context.getUserProfile()));
+    }
+
+    @EventHandler
+    public void onAnvil(PrepareAnvilEvent event) {
+        if (showLevel) {
+            event.setResult(null);
+        }
+    }
+
+    @EventHandler
+    public void onEnchant(EnchantItemEvent event) {
+        if (showLevel) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
