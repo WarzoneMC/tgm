@@ -56,7 +56,7 @@ public class StartCountdown extends BossBarCountdown {
     protected int getRequiredPlayers() {
         List<MatchTeam> teams = teamManagerModule.getTeamsParticipating();
         return Math.max(
-                teams.size(),
+                2,
                 teams.stream()
                         .mapToInt(MatchTeam::getMin)
                         .sum()
