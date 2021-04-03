@@ -1,6 +1,7 @@
 package network.warzone.tgm.modules.respawn;
 
 import com.destroystokyo.paper.event.player.PlayerReadyArrowEvent;
+import com.destroystokyo.paper.event.player.PlayerStartSpectatingEntityEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -147,6 +148,13 @@ public class RespawnModule extends MatchModule implements Listener {
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event) {
         if (isDead(event.getPlayer()) && event.getCause() == PlayerTeleportEvent.TeleportCause.SPECTATE) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onSpectate(PlayerStartSpectatingEntityEvent event) {
+        if (isDead(event.getPlayer())) {
             event.setCancelled(true);
         }
     }
