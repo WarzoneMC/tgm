@@ -258,6 +258,12 @@ public class DTMModule extends MatchModule implements Listener {
         } else if (percentage >= 100) {
             healthColor = ChatColor.GREEN;
         }
+
+        if (monument.getMaxHealth() == 1) {
+            if (percentage <= 0) healthColor = ChatColor.WHITE;
+            return ChatColor.GRAY + "  - " + healthColor + monument.getName();
+        }
+
         return healthColor + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
     }
 
