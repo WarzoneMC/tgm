@@ -190,10 +190,12 @@ public class CTWModule extends MatchModule implements Listener {
         int spaceCount = 1;
         int i = 2;
         if (!compactLayout) {
-            for (MatchTeam matchTeam : teams) {
+            for (int j = teams.size() - 1; j >= 0; j--) {
+                MatchTeam matchTeam = teams.get(j);
                 if (matchTeam.isSpectator()) continue;
 
-                for (WoolObjective woolObjective : wools) {
+                for (int k = wools.size() - 1; k >= 0; k--) {
+                    WoolObjective woolObjective = wools.get(k);
                     if (woolObjective.getOwner().equals(matchTeam)) {
                         if (woolScoreboardLines.containsKey(woolObjective)) {
                             woolScoreboardLines.get(woolObjective).add(i);
@@ -209,16 +211,20 @@ public class CTWModule extends MatchModule implements Listener {
                 simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                 teamScoreboardLines.put(matchTeam.getId(), i++);
 
-                if (teams.indexOf(matchTeam) < teams.size() - 1) {
+                if (j > 1) {
                     simpleScoreboard.add(StringUtils.repeat(" ", spaceCount++), i++);
                 }
             }
         } else {
-            for (MatchTeam matchTeam : teams) {
+            for (int j = teams.size() - 1; j >= 0; j--) {
+                MatchTeam matchTeam = teams.get(j);
+
                 if (matchTeam.isSpectator()) continue;
 
                 List<WoolObjective> wools = getTeamWoolObjectives(matchTeam);
-                for (WoolObjective woolObjective : wools) {
+                for (int k = wools.size() - 1; k >= 0; k--) {
+                    WoolObjective woolObjective = wools.get(k);
+
                     if (woolObjective.getOwner().equals(matchTeam)) {
                         if (woolScoreboardLines.containsKey(woolObjective)) {
                             woolScoreboardLines.get(woolObjective).add(i);
@@ -233,7 +239,7 @@ public class CTWModule extends MatchModule implements Listener {
                 simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
                 teamScoreboardLines.put(matchTeam.getId(), i++);
 
-                if (teams.indexOf(matchTeam) < teams.size() - 1) {
+                if (j > 1) {
                     simpleScoreboard.add(StringUtils.repeat(" ", spaceCount++), i++);
                 }
             }

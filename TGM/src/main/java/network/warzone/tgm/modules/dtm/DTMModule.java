@@ -165,10 +165,12 @@ public class DTMModule extends MatchModule implements Listener {
         simpleScoreboard.setTitle(ChatColor.AQUA + "Destroy the Monument");
         int spaceCount = 1;
         int i = 2;
-        for (MatchTeam matchTeam : teams) {
+        for (int j = teams.size() - 1; j >= 0; j--) {
+            MatchTeam matchTeam = teams.get(j);
             if(matchTeam.isSpectator()) continue;
 
-            for (Monument monument : this.monuments) {
+            for (int k = this.monuments.size() - 1; k >= 0; k--) {
+                Monument monument = this.monuments.get(k);
                 if (!monument.getOwners().contains(matchTeam)) {
                     if (this.monumentScoreboardLines.containsKey(monument)) {
                         this.monumentScoreboardLines.get(monument).add(i);
@@ -184,7 +186,7 @@ public class DTMModule extends MatchModule implements Listener {
             simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
             this.teamScoreboardLines.put(matchTeam.getId(), i++);
 
-            if (teams.indexOf(matchTeam) < teams.size() - 1) {
+            if (j > 1) {
                 simpleScoreboard.add(StringUtils.repeat(" ", spaceCount++), i++);
             }
         }
