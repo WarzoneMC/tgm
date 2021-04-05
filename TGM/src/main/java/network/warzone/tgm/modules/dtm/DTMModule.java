@@ -41,6 +41,9 @@ import static org.bukkit.SoundCategory.AMBIENT;
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
+    private static final String SYMBOL_MONUMENT_INCOMPLETE = "\u2715"; // ✕
+    private static final String SYMBOL_MONUMENT_COMPLETE = "\u2714"; // ✔
+
     @Getter private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
     private final HashMap<String, Integer> teamScoreboardLines = new HashMap<>();
@@ -259,9 +262,11 @@ public class DTMModule extends MatchModule implements Listener {
             healthColor = ChatColor.GREEN;
         }
 
-        if (monument.getMaxHealth() == 1) {
-            if (percentage <= 0) healthColor = ChatColor.WHITE;
-            return ChatColor.GRAY + "  - " + healthColor + monument.getName();
+        if (monument.getMaxHealth() == 1 || percentage >= 100) {
+            String symbol = ChatColor.GREEN + SYMBOL_MONUMENT_COMPLETE;
+            if (percentage <= 0) symbol = ChatColor.RED + SYMBOL_MONUMENT_INCOMPLETE;
+
+            return ChatColor.GRAY + "  " + symbol + " " + ChatColor.WHITE + monument.getName();
         }
 
         return healthColor + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
