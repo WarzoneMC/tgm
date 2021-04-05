@@ -124,6 +124,7 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
         // No task necessary if json specifies instant flag respawns
         if(this.respawnTime > 0){
             task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+                if (match.get().getMatchStatus() != MatchStatus.MID) return;
                 secondsUntilRespawn = ((this.timeDropped + this.respawnTime) - now()) / (long)1000;
                 if (this.willRespawn && secondsUntilRespawn <= 0) {
                     this.willRespawn = false;
