@@ -282,7 +282,7 @@ public class CycleCommands {
 
             boolean announceToEveryone = !cmd.hasFlag('s');
             for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> announceToEveryone || player.hasPermission("tgm.setnext")).collect(Collectors.toSet())) {
-                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
+                player.sendMessage((announceToEveryone ? "" : ChatColor.GRAY + "[SILENT] ") + ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
                         ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
             }
         } else {
