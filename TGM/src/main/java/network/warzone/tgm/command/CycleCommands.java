@@ -42,10 +42,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CycleCommands {
@@ -504,6 +501,22 @@ public class CycleCommands {
                 } else {
                     sender.sendMessage(ChatColor.RED + "/team size (team) (min) (max)");
                 }
+            } else if (cmd.getString(0).equalsIgnoreCase("shuffle")) {
+                List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams().stream().filter(matchTeam ->
+                        !matchTeam.isSpectator()
+                ).distinct().collect(Collectors.toList());
+
+                List<Player> players = Bukkit.getOnlinePlayers().stream().filter(player ->
+                        !TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator()
+                ).distinct().collect(Collectors.toList());
+
+                Collections.shuffle(teams);
+                Collections.shuffle(players);
+
+                for (int i = 0; i < players.size(); i++) {
+                    attemptJoinTeam(players.get(i), teams.get(i % teams.size()), true, true);
+                }
+                sender.sendMessage(ChatColor.GREEN + "Shuffled teams.");
             } else {
                 sender.sendMessage(ChatColor.RED + "/team alias|force|size");
             }
