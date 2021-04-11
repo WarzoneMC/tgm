@@ -43,7 +43,7 @@ public class SpawnPointLoaderModule extends MatchModule {
             if (spawnJson.has("coords")) {
                 spawnPoint = new LocationSpawnPoint(Parser.convertLocation(match.getWorld(), spawnJson.get("coords")));
             } else if (spawnJson.has("region")) {
-                Region region = match.getModule(RegionManagerModule.class).getRegion(match, spawnJson.getAsJsonObject("region"));
+                Region region = match.getModule(RegionManagerModule.class).getRegion(match, spawnJson.get("region"));
 
                 if (spawnJson.has("face-coordinates")) {
                     spawnPoint = new RelativeRegionSpawnPoint(region, Parser.convertLocation(match.getWorld(), spawnJson.get("face-coordinates")));
