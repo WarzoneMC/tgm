@@ -18,6 +18,8 @@ public class CylinderRegion implements Region {
     private final Location min;
     private final Location max;
 
+    private final CuboidRegion bound;
+
     public CylinderRegion(Location base, double radius, double height) {
         this.base = base;
         this.radius = radius;
@@ -25,6 +27,8 @@ public class CylinderRegion implements Region {
 
         this.min = new Location(base.getWorld(), base.getX() - radius, base.getY(), base.getZ() - radius);
         this.max = new Location(base.getWorld(), base.getX() + radius, base.getY() + height, base.getZ() + radius);
+
+        this.bound = new CuboidRegion(this.min, this.max);
     }
 
     @Override
@@ -42,6 +46,17 @@ public class CylinderRegion implements Region {
     @Override
     public Location getCenter() {
         return base;
+    }
+
+    @Override
+    public Location getRandomLocation() {
+        Location location = bound.getRandomLocation();
+
+        while (!contains(location)) {
+            location = bound.getRandomLocation();
+        }
+
+        return location;
     }
 
     @Override

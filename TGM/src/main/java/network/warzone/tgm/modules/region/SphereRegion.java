@@ -20,12 +20,16 @@ public class SphereRegion implements Region {
     private final Location min;
     private final Location max;
 
+    private final CuboidRegion bound;
+
     public SphereRegion(Location center, double radius) {
         this.center = center;
         this.radius = radius;
 
         this.min = new Location(center.getWorld(), center.getX() - radius, center.getY() - radius, center.getZ() - radius);
         this.max = new Location(center.getWorld(), center.getX() + radius, center.getY() + radius, center.getZ() + radius);
+
+        this.bound = new CuboidRegion(this.min, this.max);
     }
 
     @Override
@@ -38,9 +42,21 @@ public class SphereRegion implements Region {
         return contains(block.getLocation());
     }
 
+
     @Override
     public Location getCenter() {
         return this.center;
+    }
+
+    @Override
+    public Location getRandomLocation() {
+        Location location = bound.getRandomLocation();
+
+        while (!contains(location)) {
+            location = bound.getRandomLocation();
+        }
+
+        return location;
     }
 
     @Override

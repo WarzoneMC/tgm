@@ -3,7 +3,7 @@ package network.warzone.tgm.modules;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
-import network.warzone.tgm.map.SpawnPoint;
+import network.warzone.tgm.map.spawnpoints.SpawnPoint;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;

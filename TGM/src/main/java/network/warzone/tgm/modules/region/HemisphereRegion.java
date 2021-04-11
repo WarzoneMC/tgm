@@ -17,6 +17,8 @@ public class HemisphereRegion implements Region {
     private final Location max;
     private HemisphereFace hemisphereFace;
 
+    private final CuboidRegion bound;
+
     public HemisphereRegion(Location focalPoint, double radius, HemisphereFace hemisphereFace) {
        this.focalPoint = focalPoint;
        this.radius = radius;
@@ -48,6 +50,8 @@ public class HemisphereRegion implements Region {
                this.max = new Location(focalPoint.getWorld(), focalPoint.getX() + radius, focalPoint.getY() + radius, focalPoint.getZ() - radius);
                break;
        }
+
+       this.bound = new CuboidRegion(this.min, this.max);
     }
     @Override
     public boolean contains(Location location) {
@@ -62,6 +66,17 @@ public class HemisphereRegion implements Region {
     @Override
     public Location getCenter() {
         return this.focalPoint;
+    }
+
+    @Override
+    public Location getRandomLocation() {
+        Location location = bound.getRandomLocation();
+
+        while (!contains(location)) {
+            location = bound.getRandomLocation();
+        }
+
+        return location;
     }
 
     @Override
