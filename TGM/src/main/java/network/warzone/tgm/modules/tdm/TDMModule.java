@@ -99,7 +99,14 @@ public class TDMModule extends MatchModule implements Listener {
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        return ChatColor.WHITE + "  " + pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + pointsModule.getTarget(matchTeam) + ChatColor.WHITE + " Kills";
+        int points = pointsModule.getPoints(matchTeam);
+        int target = pointsModule.getTarget(matchTeam);
+
+        boolean showTarget = target > 0;
+
+        return ChatColor.WHITE + "  " + points +
+                (showTarget ? ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + target : "") +
+                ChatColor.WHITE + " kill" + (showTarget || points != 1 ? "s" : "");
     }
 
     private void incrementPoints(MatchTeam matchTeam, int amount) {

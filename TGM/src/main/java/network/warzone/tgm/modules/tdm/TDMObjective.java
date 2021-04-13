@@ -20,6 +20,5 @@ public enum TDMObjective {
      */
     DEATHS("Deaths");
 
-    private String name;
-
+    private final String name;
 }
