@@ -518,10 +518,10 @@ public class CycleCommands {
                 }
                 sender.sendMessage(ChatColor.GREEN + "Shuffled teams.");
             } else {
-                sender.sendMessage(ChatColor.RED + "/team alias|force|size");
+                sender.sendMessage(ChatColor.RED + "/team alias|force|size|shuffle");
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "/team alias|force|size");
+            sender.sendMessage(ChatColor.RED + "/team alias|force|size|shuffle");
         }
     }
 
