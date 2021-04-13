@@ -118,6 +118,14 @@ public class CTWModule extends MatchModule implements Listener {
                     if (getIncompleteWools(matchTeam).isEmpty()) {
                         TGM.get().getMatchManager().endMatch(matchTeam);
                     }
+
+                    if (TGM.get().getApiManager().isStatsDisabled()) return;
+
+                    PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+                    playerContext.getUserProfile().addWoolDestroy();
+                    Bukkit.getPluginManager().callEvent(new PlayerXPEvent(playerContext, UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP() - UserProfile.XP_PER_WOOL_BREAK, playerContext.getUserProfile().getXP()));
+                    Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> TGM.get().getTeamClient().destroyWool(new DestroyWoolRequest(player.getUniqueId())));
+
                 }
 
                  @Override
