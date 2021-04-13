@@ -12,7 +12,7 @@ public class Rotation {
     @Getter private final boolean isDefault;
     @Getter private final RotationRequirement requirements;
     private final List<String> mapNames;
-    private List<MapContainer> baseMaps;
+    private final List<MapContainer> baseMaps;
     private List<MapContainer> activeMaps;
     private final boolean shuffle;
 
