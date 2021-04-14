@@ -102,7 +102,8 @@ public class CTFAmountController extends CTFController implements TimeSubscriber
             int spaceCount = 1;
             int positionOnScoreboard = 1;
             List<MatchTeam> capturingTeams = new ArrayList<>();
-            for (MatchFlag flag : allFlags) {
+            for (int k = allFlags.size() - 1; k >= 0; k--) {
+                MatchFlag flag = allFlags.get(k);
                 MatchTeam team = flag.getTeam();
                 MatchTeam capturer = flag.getCapturer();
                 capturingTeams.add(capturer);
@@ -128,20 +129,23 @@ public class CTFAmountController extends CTFController implements TimeSubscriber
                 scoreboard.add(capturer.getColor() + capturer.getAlias(), ++positionOnScoreboard);
                 scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
             }
-            for (MatchTeam team : capturingTeams) {
+            for (int j = capturingTeams.size() - 1; j >= 0; j--) {
+                MatchTeam team = capturingTeams.get(j);
                 scoreboard.add(ChatColor.WHITE.toString() + getTeamPoints(team) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + captureAmount + " " + team.getColor() + team.getAlias(), ++positionOnScoreboard);
             }
         } else {
             int spaceCount = 1;
             int positionOnScoreboard = 1;
-            for (MatchTeam team : teamManagerModule.getTeams()) {
+            for (int j = teamManagerModule.getTeams().size() - 1; j >= 0; j--) {
+                MatchTeam team = teamManagerModule.getTeams().get(j);
                 if (team.isSpectator()) continue;
                 if (positionOnScoreboard != 1) scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
                 scoreboard.add(ChatColor.WHITE.toString() + "  " + getTeamPoints(team) + ChatColor.DARK_GRAY.toString() + "/" + ChatColor.GRAY.toString() + captureAmount + ChatColor.WHITE.toString() + " Captures", ++positionOnScoreboard);
                 scoreboard.add(team.getColor() + team.getAlias(), ++positionOnScoreboard);
             }
             boolean addedAnyFlags = false;
-            for (MatchFlag flag : allFlags) {
+            for (int k = allFlags.size() - 1; k >= 0; k--) {
+                MatchFlag flag = allFlags.get(k);
                 if (flag.getFlagHolder() == null) continue;
                 if (!addedAnyFlags) {
                     scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
