@@ -42,7 +42,7 @@ public class RankCommands {
         }
 
         if (onlineStaff.isEmpty()) {
-            sender.sendMessage(ChatColor.GREEN + "There are no staff members online.");
+            sender.sendMessage(ChatColor.RED + "There are no staff members online.");
             return;
         }
 
