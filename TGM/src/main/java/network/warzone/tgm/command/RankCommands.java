@@ -19,16 +19,88 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 2/23/2018.
  */
 public class RankCommands {
+
+    @Command(aliases = {"viewstaff", "staff"}, desc = "View online staff members")
+    @CommandPermissions({"tgm.viewstaff"})
+    public static void viewstaff(CommandContext cmd, CommandSender sender) {
+        List<PlayerContext> onlineStaff = new ArrayList<>();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+
+            if (playerContext.getUserProfile().isStaff()) {
+                onlineStaff.add(playerContext);
+            }
+        }
+
+        if (onlineStaff.isEmpty()) {
+            sender.sendMessage(ChatColor.GREEN + "There are no staff members online.");
+            return;
+        }
+
+        LinkedHashMap<Rank, List<PlayerContext>> onlineRanks = new LinkedHashMap<>();
+
+        for (PlayerContext playerContext : onlineStaff) {
+            Rank rank = playerContext.getUserProfile().getHighestRank();
+            if (rank == null) continue;
+            if (rank.getPrefix() == null) continue;
+
+            Rank existingRank = null;
+            for (Rank comparableRank : onlineRanks.keySet()) {
+                if (rank.getId().equals(comparableRank.getId())) {
+                    existingRank = comparableRank;
+                    break;
+                }
+            }
+
+            if (existingRank != null) {
+                onlineRanks.get(existingRank).add(playerContext);
+            } else {
+                onlineRanks.put(rank, new ArrayList<>(Collections.singletonList(playerContext)));
+            }
+        }
+
+        onlineRanks = onlineRanks.entrySet().stream().sorted((o1, o2) -> {
+            if (o1.getKey().getPriority() == o2.getKey().getPriority()) return 0;
+            return o1.getKey().getPriority() < o2.getKey().getPriority() ? 1 : -1;
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+
+        StringBuilder stringBuilder = new StringBuilder(ChatColor.GOLD + "Online Staff (" + onlineStaff.size() + "):");
+
+        for (Rank rank : onlineRanks.keySet()) {
+            List<PlayerContext> rankPlayers = onlineRanks.get(rank);
+
+            stringBuilder.append("\n");
+            stringBuilder.append(ChatColor.RESET);
+            stringBuilder.append(ChatColor.DARK_GRAY);
+            stringBuilder.append("[");
+            stringBuilder.append(rankPlayers.size());
+            stringBuilder.append("] ");
+            stringBuilder.append(ChatColor.translateAlternateColorCodes('&', rank.getPrefix().trim()));
+            stringBuilder.append(ChatColor.GRAY);
+            stringBuilder.append(" - ");
+            stringBuilder.append(ChatColor.RESET);
+
+            for (int i = 0; i < rankPlayers.size(); i++) {
+                if (i > 0) {
+                    stringBuilder.append(ChatColor.GRAY);
+                    stringBuilder.append(", ");
+                }
+                stringBuilder.append(ChatColor.WHITE);
+                stringBuilder.append(rankPlayers.get(i).getUserProfile().getName());
+            }
+        }
+
+        sender.sendMessage(stringBuilder.toString());
+    }
 
     @Command(aliases = {"sc", "staffchat", "staffc"}, desc = "Staff chat", min = 1, usage = "(message)")
     @CommandPermissions({"tgm.staffchat"})
