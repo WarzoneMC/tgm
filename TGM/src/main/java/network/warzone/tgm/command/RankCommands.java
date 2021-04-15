@@ -10,6 +10,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.chat.ChatListener;
+import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.*;
@@ -87,8 +88,9 @@ public class RankCommands {
             stringBuilder.append(rankPlayers.size());
             stringBuilder.append("] ");
             stringBuilder.append(ChatColor.translateAlternateColorCodes('&', rank.getPrefix().trim()));
+            stringBuilder.append(" ");
             stringBuilder.append(ChatColor.GRAY);
-            stringBuilder.append(" - ");
+            stringBuilder.append("- ");
             stringBuilder.append(ChatColor.RESET);
 
             for (int i = 0; i < rankPlayers.size(); i++) {
@@ -98,6 +100,12 @@ public class RankCommands {
                 }
                 stringBuilder.append(ChatColor.WHITE);
                 stringBuilder.append(rankPlayers.get(i).getUserProfile().getName());
+
+                if (rankPlayers.get(i).isAFK()) {
+                    stringBuilder.append(" ");
+                    stringBuilder.append(ChatColor.GRAY);
+                    stringBuilder.append("[AFK]");
+                }
             }
         }
 

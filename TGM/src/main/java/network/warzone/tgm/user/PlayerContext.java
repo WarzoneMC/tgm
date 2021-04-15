@@ -5,6 +5,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.config.TGMConfigReloadEvent;
+import network.warzone.tgm.modules.SpectatorModule;
 import network.warzone.tgm.util.Plugins;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.Rank;
@@ -98,6 +99,10 @@ public class PlayerContext {
 
     public boolean isNicked() {
         return TGM.get().getNickManager().isNicked(this);
+    }
+
+    public boolean isAFK() {
+        return TGM.get().getModule(SpectatorModule.class).isAFK(this);
     }
 
     public String getLevelString() {
