@@ -33,10 +33,12 @@ public class RankCommands {
     public static void viewstaff(CommandContext cmd, CommandSender sender) {
         List<PlayerContext> onlineStaff = new ArrayList<>();
 
+        boolean skipNickedStaff = !sender.hasPermission("tgm.command.whois");
         for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
 
             if (playerContext.getUserProfile().isStaff()) {
+                if (skipNickedStaff && playerContext.isNicked()) continue;
                 onlineStaff.add(playerContext);
             }
         }
