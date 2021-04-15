@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class RankCommands {
 
     @Command(aliases = {"viewstaff", "staff"}, desc = "View online staff members")
-    @CommandPermissions({"tgm.viewstaff"})
     public static void viewstaff(CommandContext cmd, CommandSender sender) {
         List<PlayerContext> onlineStaff = new ArrayList<>();
 
