@@ -59,9 +59,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     private final ItemStack leatherHelmet;
 
-    private static final int AFK_THRESHOLD = 5 * 60; // in seconds
+    private int afkTimerRunnable;
 
-    private final List<UUID> afkPlayers = new ArrayList<>();
     private final Map<UUID, Long> lastMovement = new HashMap<>();
 
     private RespawnModule respawnModule;
@@ -78,23 +77,6 @@ public class SpectatorModule extends MatchModule implements Listener {
         LeatherArmorMeta leatherHelmetMeta = (LeatherArmorMeta) leatherHelmet.getItemMeta();
         leatherHelmetMeta.setColor(Color.fromRGB(85, 255, 255));
         leatherHelmet.setItemMeta(leatherHelmetMeta);
-
-        Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!lastMovement.containsKey(player.getUniqueId())) continue;
-                long moved = lastMovement.get(player.getUniqueId());
-
-                if (System.currentTimeMillis() > moved + (AFK_THRESHOLD * 1000)) {
-                    if (!afkPlayers.contains(player.getUniqueId())) {
-                        afkPlayers.add(player.getUniqueId());
-                        if (isSpectating(player)) continue;
-                        teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators, true, false);
-                    }
-                } else {
-                    afkPlayers.remove(player.getUniqueId());
-                }
-            }
-        }, 20, 20);
     }
 
     @Override
@@ -125,6 +107,18 @@ public class SpectatorModule extends MatchModule implements Listener {
          * Update the item values every second to keep player counts accurate.
          */
         updateMenu();
+
+        afkTimerRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (isSpectating(player) || !lastMovement.containsKey(player.getUniqueId())) continue;
+                long moved = lastMovement.get(player.getUniqueId());
+                if (moved == 0) continue;
+                if (System.currentTimeMillis() > moved + (5 * 60 * 1000)) {
+                    teamManagerModule.joinTeam(TGM.get().getPlayerManager().getPlayerContext(player), this.spectators, true, false);
+                    lastMovement.remove(player.getUniqueId());
+                }
+            }
+        }, 10 * 20, 10 * 20).getTaskId();
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {
@@ -212,18 +206,6 @@ public class SpectatorModule extends MatchModule implements Listener {
         return matchStatus != MatchStatus.MID || spectators.containsPlayer(player) || respawnModule != null && respawnModule.isDead(player);
     }
 
-    public boolean isAFK(UUID uuid) {
-        return afkPlayers.contains(uuid);
-    }
-
-    public boolean isAFK(Player player) {
-        return isAFK(player.getUniqueId());
-    }
-
-    public boolean isAFK(PlayerContext playerContext) {
-        return isAFK(playerContext.getPlayer().getUniqueId());
-    }
-
     @EventHandler
     public void onTeamJoin(TeamChangeEvent event) {
         if (event.isCancelled()) return;
@@ -239,16 +221,14 @@ public class SpectatorModule extends MatchModule implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getFrom().distanceSquared(event.getTo()) > 0) {
-            lastMovement.put(player.getUniqueId(), System.currentTimeMillis());
-        }
-
         if (isSpectating(player)) {
             if (event.getTo().getY() <= -5.0) {
                 player.setAllowFlight(true);
                 player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
                 player.setFlying(true);
             }
+        } else if (event.getFrom().distanceSquared(event.getTo()) > 0) {
+            lastMovement.put(player.getUniqueId(), System.currentTimeMillis());
         }
     }
 
@@ -468,7 +448,6 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        afkPlayers.remove(event.getPlayer().getUniqueId());
         lastMovement.remove(event.getPlayer().getUniqueId());
         updateMenu();
     }
@@ -493,6 +472,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
+        Bukkit.getScheduler().cancelTask(afkTimerRunnable);
+        lastMovement.clear();
         teamSelectionMenu.disable();
     }
 
