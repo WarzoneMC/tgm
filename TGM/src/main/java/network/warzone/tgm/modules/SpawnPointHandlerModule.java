@@ -130,6 +130,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
+                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
                 } else if (reset) {
                     gameClassModule.performSwitch(playerContext.getPlayer());
                     GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
@@ -145,6 +146,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
+                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
                 } else if (reset) {
                     if (KitEditorModule.isEnabled() && KitEditorModule.isKitEditable() && kitEditorModule.getEditorMenus().containsKey(playerContext.getPlayer().getUniqueId())) {
                         KitEditorMenu kitEditorMenu = kitEditorModule.getEditorMenus().get(playerContext.getPlayer().getUniqueId());
