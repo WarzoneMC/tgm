@@ -13,6 +13,7 @@ import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.event.TeamUpdateEvent;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.ColorConverter;
+import network.warzone.tgm.util.InventoryUtil;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.itemstack.ItemFactory;
 import network.warzone.tgm.util.menu.KitEditorMenu;
@@ -51,7 +52,7 @@ public class SpectatorModule extends MatchModule implements Listener {
     private TeamManagerModule teamManagerModule;
 
     private MatchTeam spectators;
-    private final PublicMenu teamSelectionMenu;
+    private PublicMenu teamSelectionMenu;
 
     private final ItemStack compassItem;
     private final ItemStack teamSelectionItem;
@@ -67,7 +68,6 @@ public class SpectatorModule extends MatchModule implements Listener {
     private KitEditorModule kitEditorModule;
 
     public SpectatorModule() {
-        this.teamSelectionMenu = new PublicMenu(ChatColor.UNDERLINE + "Team Selection", 9);
 
         compassItem = ItemFactory.createItem(Material.COMPASS, ChatColor.BLUE.toString() + ChatColor.BOLD.toString() + "Teleport Tool");
         teamSelectionItem = ItemFactory.createItem(Material.LEATHER_HELMET, ChatColor.GREEN.toString() + ChatColor.BOLD.toString() + "Team Selection");
@@ -87,17 +87,25 @@ public class SpectatorModule extends MatchModule implements Listener {
         this.spectators = teamManagerModule.getSpectators();
         this.kitEditorModule = match.getModule(KitEditorModule.class);
 
+        this.teamSelectionMenu = new PublicMenu(
+                ChatColor.UNDERLINE + "Team Selection",
+                InventoryUtil.calculateSize(
+                        5,
+                        this.teamManagerModule.getTeamsParticipating().size()
+                )
+        );
+
         /**
          * Only assign the menu actions once. No need to update these every second.
          */
         teamSelectionMenu.setItem(0, null, (player, event) -> player.performCommand("join"));
 
-        int slot = 2;
+        int count = 0;
         for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
             if (matchTeam.isSpectator()) {
                 teamSelectionMenu.setItem(8, null, (player, event) -> player.performCommand("join spectators"));
             } else {
-                teamSelectionMenu.setItem(slot++, null, (player, event) -> player.performCommand("join " + matchTeam.getId()));
+                teamSelectionMenu.setItem(InventoryUtil.calculateSlot(5, count++), null, (player, event) -> player.performCommand("join " + matchTeam.getId()));
             }
         }
 
@@ -168,12 +176,12 @@ public class SpectatorModule extends MatchModule implements Listener {
     private void updateMenu() {
         int totalMatchSize = 0;
         int totalMatchMaxSize = 0;
-        int i = 2;
+        int i = 0;
         for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
             if (!matchTeam.isSpectator()) {
                 totalMatchSize += matchTeam.getMembers().size();
                 totalMatchMaxSize += matchTeam.getMax();
-                updateTeamMenuItem(matchTeam, i++);
+                updateTeamMenuItem(matchTeam, InventoryUtil.calculateSlot(5, i++));
             } else {
                 updateSpectatorMenuItem(matchTeam);
             }
