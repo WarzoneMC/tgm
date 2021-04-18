@@ -113,7 +113,7 @@ public class KOTHModule extends MatchModule implements Listener {
             ControlPoint controlPoint = controlPoints.get(index);
             MatchTeam controller = controlPoint.getController();
 
-            if (controller != matchTeam || controlPoint.getPercent() < 100) {
+            if (controller != matchTeam) {
                 highestCapturePointIndex = index;
                 break;
             }
