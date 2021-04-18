@@ -41,7 +41,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTGMDeath(TGMPlayerDeathEvent event) {
-        DeathInfo deathInfo = deathModule.getPlayer(event.getVictim());
+        DeathInfo deathInfo = event.getDeathInfo();
 
         if (deathInfo.playerTeam.isSpectator()) return; //stupid spectators
 
