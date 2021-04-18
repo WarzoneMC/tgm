@@ -1,6 +1,8 @@
 package network.warzone.tgm.modules.portal;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.region.Region;
@@ -16,7 +18,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import java.util.List;
 
 @AllArgsConstructor
-public class PortalModule extends MatchModule implements Listener {
+public class Portal implements Listener {
+    @Getter @Setter
+    private boolean active;
     private Type type;
     private Region from;
     private Location to;
@@ -25,6 +29,7 @@ public class PortalModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
+        if (!active) return;
         if (from == null) return;
         if (from.getBlocks().contains(event.getTo().getBlock()) && !from.getBlocks().contains(event.getFrom().getBlock())) {
             if (!teams.isEmpty()) {

@@ -1,5 +1,7 @@
 package network.warzone.tgm.modules.koth;
 
+import com.google.common.base.Preconditions;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
@@ -9,6 +11,8 @@ import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.modules.controlpoint.ControlPoint;
 import network.warzone.tgm.modules.controlpoint.ControlPointDefinition;
 import network.warzone.tgm.modules.points.PointsModule;
+import network.warzone.tgm.modules.portal.Portal;
+import network.warzone.tgm.modules.portal.PortalManagerModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
@@ -18,6 +22,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.event.TeamUpdateAliasEvent;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.warzoneapi.models.Team;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,6 +38,7 @@ public class KOTHModule extends MatchModule implements Listener {
 
     private final List<ControlPoint> controlPoints = new ArrayList<>();
     private PointsModule pointsModule;
+    private KOTHObjective kothObjective = KOTHObjective.POINTS;
 
     private final HashMap<ControlPointDefinition, Integer> controlPointScoreboardLines = new HashMap<>();
 
@@ -53,11 +59,27 @@ public class KOTHModule extends MatchModule implements Listener {
             if (capturePointJson.has("points")) {
                 swap = capturePointJson.get("points").getAsInt();
             }
+            MatchTeam owner = null;
+            if (capturePointJson.has("owner")) {
+                owner = TGM.get().getModule(TeamManagerModule.class).getTeamById(capturePointJson.get("owner").getAsString());
+            }
             final int pointsPerHold = swap;
             final String name = capturePointJson.get("name").getAsString();
 
-            ControlPointDefinition definition = new ControlPointDefinition(name, timeToCap, pointsPerHold);
-            ControlPoint controlPoint = new ControlPoint(definition, region, new KOTHControlPointService(this, match, definition));
+            HashMap<MatchTeam, Portal> portals = null;
+            if (capturePointJson.has("portals")) {
+                portals = new HashMap<>();
+                JsonObject jsonPortals = capturePointJson.getAsJsonObject("portals");
+
+                for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeamsParticipating()) {
+                    if (jsonPortals.has(matchTeam.getId())) {
+                        portals.put(matchTeam, TGM.get().getModule(PortalManagerModule.class).getPortal(match, jsonPortals.get(matchTeam.getId())));
+                    }
+                }
+            }
+
+            ControlPointDefinition definition = new ControlPointDefinition(name, owner, timeToCap, pointsPerHold, portals);
+            ControlPoint controlPoint = new ControlPoint(this, definition, region, new KOTHControlPointService(this, match, definition));
 
             controlPoints.add(controlPoint);
         }
@@ -66,10 +88,95 @@ public class KOTHModule extends MatchModule implements Listener {
             controlPoint.enable();
         }
 
-        pointsModule = match.getModule(PointsModule.class);
-        pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
+        if (match.getMapContainer().getMapInfo().getJsonObject().has("points")) {
+            kothObjective = KOTHObjective.POINTS;
+            pointsModule = match.getModule(PointsModule.class);
+            pointsModule.addService(matchTeam -> TGM.get().getMatchManager().endMatch(matchTeam));
+            TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getHighestPointsTeam);
+        } else {
+            Preconditions.checkArgument(TGM.get().getModule(TeamManagerModule.class).getTeams().size() == 3, "Capture Point gametype must have exactly 2 teams");
+            kothObjective = KOTHObjective.CAPTURES;
+            TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getMostCapturesTeam);
+        }
+    }
 
-        TGM.get().getModule(TimeModule.class).setTimeLimitService(() -> getHighestPointsTeam());
+    public boolean isCapturable(ControlPoint toCapture, MatchTeam matchTeam) {
+        if (kothObjective != KOTHObjective.CAPTURES) return true;
+
+        MatchTeam initialOwner = controlPoints.get(0).getDefinition().getInitialOwner();
+        boolean reversed = matchTeam != initialOwner;
+
+        int highestCapturePointIndex = -1;
+        for (int i = 0; i < controlPoints.size(); i++) {
+            int index = reversed ? controlPoints.size() - 1 - i : i;
+
+            ControlPoint controlPoint = controlPoints.get(index);
+            MatchTeam controller = controlPoint.getController();
+
+            if (controller != matchTeam || controlPoint.getPercent() < 100) {
+                highestCapturePointIndex = index;
+                break;
+            }
+        }
+
+        int controlPointIndex = -1;
+        for (int i = 0; i < controlPoints.size(); i++) {
+            if (toCapture.equals(controlPoints.get(i))) {
+                controlPointIndex = i;
+                break;
+            }
+        }
+
+        return highestCapturePointIndex == controlPointIndex;
+    }
+
+    private MatchTeam getMostCapturesTeam() {
+        TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+
+        HashMap<String, Integer> progress = new HashMap<>();
+
+        for (int i = 1; i < teamManagerModule.getTeams().size(); i++) {
+            progress.put(teamManagerModule.getTeams().get(i).getId(), 0);
+        }
+
+        for (ControlPoint controlPoint : controlPoints) {
+            MatchTeam controller;
+
+            if (controlPoint.getController() == null) {
+                if (controlPoint.getProgressingTowardsTeam() == null) continue;
+                if (controlPoint.getPercent() <= 0) continue;
+                controller = controlPoint.getProgressingTowardsTeam();
+            } else {
+                controller = controlPoint.getController();
+            }
+
+            for (String id : progress.keySet()) {
+                if (controller.getId().equalsIgnoreCase(id)) {
+                    progress.put(id, progress.get(id) + controlPoint.getPercent());
+                    break;
+                }
+            }
+        }
+
+        Map.Entry<String, Integer> highest = null;
+        for (Map.Entry<String, Integer> entry : progress.entrySet()) {
+            if (highest == null) {
+                highest = entry;
+                continue;
+            }
+
+            if (entry.getValue() > highest.getValue()) {
+                highest = entry;
+            }
+        }
+
+        if (highest != null) {
+            final Map.Entry<String, Integer> entry = highest;
+            int amount = (int) progress.entrySet().stream().filter(en -> entry.getValue().equals(en.getValue())).count();
+            if (amount > 1) return null;
+            else return TGM.get().getModule(TeamManagerModule.class).getTeamById(entry.getKey());
+        }
+        return null;
     }
 
     private MatchTeam getHighestPointsTeam() {
@@ -91,7 +198,6 @@ public class KOTHModule extends MatchModule implements Listener {
         }
         return null;
     }
-
 
     public void incrementPoints(MatchTeam matchTeam, int amount) {
         pointsModule.incrementPoints(matchTeam, amount);
@@ -127,7 +233,13 @@ public class KOTHModule extends MatchModule implements Listener {
     public void onScoreboardInit(ScoreboardInitEvent event) {
         List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams();
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
-        simpleScoreboard.setTitle(ChatColor.AQUA + "King of the Hill");
+
+        if (kothObjective == KOTHObjective.POINTS) {
+            simpleScoreboard.setTitle(ChatColor.AQUA + "King of the Hill");
+        } else {
+            simpleScoreboard.setTitle(ChatColor.AQUA + "Capture Points");
+        }
+
         int i = 2;
         for (int k = controlPoints.size() - 1; k >= 0; k--) {
             ControlPoint controlPoint = controlPoints.get(k);
@@ -136,6 +248,8 @@ public class KOTHModule extends MatchModule implements Listener {
             i++;
         }
         simpleScoreboard.add(" ", i);
+
+        if (kothObjective == KOTHObjective.CAPTURES) return;
 
         for (int j = teams.size() - 1; j >= 0; j--) {
             MatchTeam matchTeam = teams.get(j);
