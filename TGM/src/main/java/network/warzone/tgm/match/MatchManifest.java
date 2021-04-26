@@ -22,7 +22,7 @@ import network.warzone.tgm.modules.legacy.LegacyDamageModule;
 import network.warzone.tgm.modules.legacy.LegacyKnockbackModule;
 import network.warzone.tgm.modules.legacy.LegacyShieldModule;
 import network.warzone.tgm.modules.points.PointsModule;
-import network.warzone.tgm.modules.portal.PortalLoaderModule;
+import network.warzone.tgm.modules.portal.PortalManagerModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.reports.ReportsModule;
 import network.warzone.tgm.modules.respawn.RespawnModule;
@@ -94,7 +94,7 @@ public abstract class MatchManifest {
         modules.add(new KillstreakModule());
         modules.add(new ReportsModule());
         modules.add(new StatsModule());
-        modules.add(new PortalLoaderModule());
+        modules.add(new PortalManagerModule());
         modules.add(new LaunchPadLoaderModule());
         modules.add(new WorldBorderModule());
         modules.add(new LegacyKnockbackModule());

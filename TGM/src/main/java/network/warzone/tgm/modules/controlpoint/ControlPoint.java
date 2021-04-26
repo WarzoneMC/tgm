@@ -4,8 +4,9 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
+import network.warzone.tgm.modules.koth.KOTHModule;
+import network.warzone.tgm.modules.koth.KOTHObjective;
 import network.warzone.tgm.modules.region.Region;
-import network.warzone.tgm.modules.region.RegionSave;
 import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.event.TeamChangeEvent;
@@ -34,6 +35,8 @@ import java.util.Set;
  */
 @Getter
 public class ControlPoint implements Listener {
+    private final KOTHModule kothModule;
+
     public static final ChatColor COLOR_NEUTRAL_TEAM = ChatColor.WHITE;
 
     public static final String SYMBOL_CP_INCOMPLETE = "\u29be";     // ⦾
@@ -44,7 +47,6 @@ public class ControlPoint implements Listener {
     private final ControlPointDefinition definition;
 
     private final Region region;
-    private final RegionSave regionSave;
     private final ControlPointService controlPointService;
 
     private final Set<Player> playersOnPoint = Sets.newHashSet();
@@ -58,12 +60,20 @@ public class ControlPoint implements Listener {
 
     private int runnableId = -1;
 
-    public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
+    public ControlPoint(KOTHModule kothModule, ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
+        this.kothModule = kothModule;
         this.definition = controlPointDefinition;
         this.region = region;
         this.controlPointService = controlPointService;
 
-        regionSave = new RegionSave(region);
+        if (definition.getInitialOwner() != null) {
+            MatchTeam intialOwner = definition.getInitialOwner();
+            initialCapture = false;
+            progress = definition.getMaxProgress();
+            controller = intialOwner;
+            progressingTowardsTeam = intialOwner;
+            renderBlocks(intialOwner, true);
+        }
     }
 
     public boolean isInProgress() {
@@ -137,6 +147,8 @@ public class ControlPoint implements Listener {
             if (most != null && mostCount == 0) {
                 handleCap(most);
             } else {
+                if (kothModule.getKothObjective() == KOTHObjective.CAPTURES) return;
+
                 if (controller != null) {
                     controlPointService.holding(controller);
                 }
@@ -147,6 +159,8 @@ public class ControlPoint implements Listener {
     }
 
     private void handleCap(MatchTeam matchTeam) {
+        if (!kothModule.isCapturable(this, matchTeam)) return;
+
         boolean isInitial = initialCapture;
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
@@ -175,11 +189,11 @@ public class ControlPoint implements Listener {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
                     if (initialCapture) initialCapture = false;
-                } else {
+                } else if (kothModule.getKothObjective() == KOTHObjective.POINTS) {
                     controlPointService.holding(matchTeam);
                 }
             } else { //hill isn't at 100%, but the owning team should still get points.
-                if (controller != null) {
+                if (controller != null && kothModule.getKothObjective() == KOTHObjective.POINTS) {
                     controlPointService.holding(controller);
                 }
             }
@@ -215,6 +229,5 @@ public class ControlPoint implements Listener {
         HandlerList.unregisterAll(this);
 
         playersOnPoint.clear();
-        regionSave.clear();
     }
 }
