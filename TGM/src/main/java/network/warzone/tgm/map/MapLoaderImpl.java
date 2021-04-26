@@ -34,9 +34,7 @@ public class MapLoaderImpl implements MapLoader {
                     }
                 } else {
                     //recursively loop through directories
-                    for (MapContainer mapContainer : loadMaps(child)) {
-                        maps.add(mapContainer);
-                    }
+                    maps.addAll(loadMaps(child));
                 }
             }
         }
