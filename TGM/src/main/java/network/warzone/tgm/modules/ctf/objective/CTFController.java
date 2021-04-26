@@ -59,7 +59,7 @@ public abstract class CTFController implements FlagSubscriber, Listener, TimeLim
         for (PotionEffect effect : effects) {
             stealer.removePotionEffect(effect.getType());
         }
-        MatchTeam team = teamManagerModule.getTeam(stealer);
+        MatchTeam team = flag.getTeamHolder();
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
         if (flag.getTeam() == null) {

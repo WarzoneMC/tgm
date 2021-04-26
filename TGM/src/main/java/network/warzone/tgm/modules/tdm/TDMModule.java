@@ -87,19 +87,27 @@ public class TDMModule extends MatchModule implements Listener {
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
         simpleScoreboard.setTitle(ChatColor.AQUA + "Team Deathmatch");
         int i = 2;
-        for (MatchTeam matchTeam : teams) {
+        for (int j = teams.size() - 1; j >= 0; j--) {
+            MatchTeam matchTeam = teams.get(j);
             if (matchTeam.isSpectator()) continue;
             simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam), i);
             teamScoreboardLines.put(matchTeam.getId(), i++);
             simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i++);
-            if (teams.indexOf(matchTeam) < teams.size() - 1) {
+            if (j > 1) {
                 simpleScoreboard.add(matchTeam.getColor() + " ", i++);
             }
         }
     }
 
     private String getTeamScoreLine(MatchTeam matchTeam) {
-        return ChatColor.WHITE + "  " + pointsModule.getPoints(matchTeam) + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + pointsModule.getTarget(matchTeam) + ChatColor.WHITE + " Kills";
+        int points = pointsModule.getPoints(matchTeam);
+        int target = pointsModule.getTarget(matchTeam);
+
+        boolean showTarget = target > 0;
+
+        return ChatColor.WHITE + "  " + points +
+                (showTarget ? ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + target : "") +
+                ChatColor.WHITE + " kill" + (showTarget || points != 1 ? "s" : "");
     }
 
     private void incrementPoints(MatchTeam matchTeam, int amount) {

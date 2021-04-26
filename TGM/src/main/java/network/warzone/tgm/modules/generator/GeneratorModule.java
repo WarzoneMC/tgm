@@ -77,7 +77,9 @@ public class GeneratorModule extends MatchModule implements TaskedModule {
     @Override
     public void disable() {
         for (Generator generator : generators) {
-            generator.getGeneratorUpgrader().unload();
+            if (generator.getGeneratorUpgrader() != null) {
+                generator.getGeneratorUpgrader().unload();
+            }
         }
         matchStarted = false;
         generators = null;

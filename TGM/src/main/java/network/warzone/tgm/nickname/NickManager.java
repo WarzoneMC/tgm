@@ -199,7 +199,7 @@ public class NickManager implements Listener {
 
         DataWatcherObject<Byte> dataWatcherObject;
         try {
-            Field field = EntityHuman.class.getDeclaredField("bp");
+            Field field = EntityHuman.class.getDeclaredField("bi");
             field.setAccessible(true);
             dataWatcherObject = (DataWatcherObject<Byte>) field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {

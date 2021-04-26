@@ -128,4 +128,15 @@ public class InventoryUtil {
         }
     }
 
+    public static int calculateSize(int columns, int amount) {
+        int rows = (int) Math.ceil((amount * 1.0) / columns);
+        return Math.max(9, rows * 9);
+    }
+
+    public static int calculateSlot(int columns, int count) {
+        int y = (int) Math.floor((count * 1.0) / columns);
+        int x = count % columns;
+        return (y * 9) + x + 2;
+    }
+
 }

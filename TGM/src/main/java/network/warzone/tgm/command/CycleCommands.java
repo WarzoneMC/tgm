@@ -42,10 +42,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CycleCommands {
@@ -172,13 +169,17 @@ public class CycleCommands {
                 }
             }
             TGM.get().getModule(CycleCountdown.class).start(time);
-            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.cycle")).collect(Collectors.toSet())) {
-                if (time == 0) {
-                    player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " cycled the map");
-                    continue;
-                }
-                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the cycle countdown to " + ChatColor.YELLOW + time + ChatColor.GRAY + " second" + (time == 1 ? "" : "s"));
+            String broadcast;
+            if (time == 0) {
+                broadcast = ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " cycled the map";
+            } else {
+                broadcast = ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the cycle countdown to " +
+                        ChatColor.YELLOW + time + ChatColor.GRAY + " second" + (time == 1 ? "" : "s");
             }
+            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.cycle")).collect(Collectors.toSet())) {
+                player.sendMessage(broadcast);
+            }
+            Bukkit.getConsoleSender().sendMessage(broadcast);
         } else {
             sender.sendMessage(ChatColor.RED + "A match is currently in progress.");
         }
@@ -204,13 +205,17 @@ public class CycleCommands {
             if (!soloStart)
                 sender.sendMessage(ChatColor.GREEN + "Match will start in " + time + " second" + (time == 1 ? "" : "s") + ".");
             startCountdown.start((soloStart) ? 0 : time);
-            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.start")).collect(Collectors.toSet())) {
-                if (time == 0) {
-                    player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " started the match");
-                    continue;
-                }
-                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the start countdown to " + ChatColor.YELLOW + time + ChatColor.GRAY + " second" + (time == 1 ? "" : "s"));
+            String broadcast;
+            if (time == 0) {
+                broadcast = ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " started the match";
+            } else {
+                broadcast = ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the start countdown to " +
+                        ChatColor.YELLOW + time + ChatColor.GRAY + " second" + (time == 1 ? "" : "s");
             }
+            for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.start")).collect(Collectors.toSet())) {
+                player.sendMessage(broadcast);
+            }
+            Bukkit.getConsoleSender().sendMessage(broadcast);
         } else {
             sender.sendMessage(ChatColor.RED + "The match cannot be started at this time.");
         }
@@ -235,9 +240,11 @@ public class CycleCommands {
                     TGM.get().getModule(TimeModule.class).endMatch();
                 }
             }
+            String broadcast = ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " ended the match";
             for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.end")).collect(Collectors.toSet())) {
-                player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " ended the match");
+                player.sendMessage(broadcast);
             }
+            Bukkit.getConsoleSender().sendMessage(broadcast);
         } else {
             sender.sendMessage(ChatColor.RED + "No match in progress.");
         }
@@ -249,9 +256,11 @@ public class CycleCommands {
         for (Countdown countdown : TGM.get().getModules(Countdown.class)) {
             countdown.cancel();
         }
+        String broadcast = ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " cancelled the countdowns";
         for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.cancel")).collect(Collectors.toSet())) {
-            player.sendMessage(ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " cancelled the countdowns");
+            player.sendMessage(broadcast);
         }
+        Bukkit.getConsoleSender().sendMessage(broadcast);
     }
 
     @Command(aliases = {"setnext", "sn"}, desc = "Set the next map.", anyFlags = true, flags = "s")
@@ -280,11 +289,14 @@ public class CycleCommands {
 
             TGM.get().getMatchManager().setForcedNextMap(found);
 
+            String broadcast = (announceToEveryone ? "" : ChatColor.GRAY + "[SILENT] ") + ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
+                        ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")";
+
             boolean announceToEveryone = !cmd.hasFlag('s');
             for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> announceToEveryone || player.hasPermission("tgm.setnext")).collect(Collectors.toSet())) {
-                player.sendMessage((announceToEveryone ? "" : ChatColor.GRAY + "[SILENT] ") + ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
-                        ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")");
+                player.sendMessage(broadcast);
             }
+            Bukkit.getConsoleSender().sendMessage(broadcast);
         } else {
             sender.sendMessage(ChatColor.RED + "/sn [-s] <map_name>");
         }
@@ -504,11 +516,23 @@ public class CycleCommands {
                 } else {
                     sender.sendMessage(ChatColor.RED + "/team size (team) (min) (max)");
                 }
+            } else if (cmd.getString(0).equalsIgnoreCase("shuffle")) {
+                List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeamsParticipating();
+
+                List<Player> players = teams.stream().flatMap(team -> team.getMembers().stream()).map(PlayerContext::getPlayer).collect(Collectors.toList());
+
+                Collections.shuffle(teams);
+                Collections.shuffle(players);
+
+                for (int i = 0; i < players.size(); i++) {
+                    attemptJoinTeam(players.get(i), teams.get(i % teams.size()), true, true);
+                }
+                sender.sendMessage(ChatColor.GREEN + "Shuffled teams.");
             } else {
-                sender.sendMessage(ChatColor.RED + "/team alias|force|size");
+                sender.sendMessage(ChatColor.RED + "/team alias|force|size|shuffle");
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "/team alias|force|size");
+            sender.sendMessage(ChatColor.RED + "/team alias|force|size|shuffle");
         }
     }
 
@@ -517,7 +541,11 @@ public class CycleCommands {
     public static void loadmaps(CommandContext cmd, CommandSender sender) {
         TGM.get().getMatchManager().getMapLibrary().refreshMaps();
         TGM.get().getMatchManager().getMapRotation().refresh();
-        sender.sendMessage(ChatColor.GREEN + "Refreshed map library and rotation.");
+        String broadcast = ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " refreshed the map library and rotation";
+        for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> player.hasPermission("tgm.loadmaps")).collect(Collectors.toSet())) {
+            player.sendMessage(broadcast);
+        }
+        Bukkit.getConsoleSender().sendMessage(broadcast);
         // Attempt to cycle to a new match, if a match does not yet exist after loading maps
         if (TGM.get().getMatchManager().getMatch() == null) TGM.get().getMatchManager().cycleNextMatch();
     }

@@ -57,6 +57,7 @@ public abstract class MatchManifest {
     public List<MatchModule> allocateCoreModules(JsonObject mapJson) {
         List<MatchModule> modules = new ArrayList<>();
 
+        modules.add(new ExploitPreventionModule());
         modules.add(new TeamJoinNotificationsModule());
         modules.add(new TeamManagerModule());
         modules.add(new SpectatorModule());

@@ -41,6 +41,9 @@ import static org.bukkit.SoundCategory.AMBIENT;
 @Getter
 public class DTMModule extends MatchModule implements Listener {
 
+    private static final String SYMBOL_MONUMENT_INCOMPLETE = "\u2715"; // ✕
+    private static final String SYMBOL_MONUMENT_COMPLETE = "\u2714"; // ✔
+
     @Getter private final List<Monument> monuments = new ArrayList<>();
     private final HashMap<Monument, List<Integer>> monumentScoreboardLines = new HashMap<>();
     private final HashMap<String, Integer> teamScoreboardLines = new HashMap<>();
@@ -165,10 +168,12 @@ public class DTMModule extends MatchModule implements Listener {
         simpleScoreboard.setTitle(ChatColor.AQUA + "Destroy the Monument");
         int spaceCount = 1;
         int i = 2;
-        for (MatchTeam matchTeam : teams) {
+        for (int j = teams.size() - 1; j >= 0; j--) {
+            MatchTeam matchTeam = teams.get(j);
             if(matchTeam.isSpectator()) continue;
 
-            for (Monument monument : this.monuments) {
+            for (int k = this.monuments.size() - 1; k >= 0; k--) {
+                Monument monument = this.monuments.get(k);
                 if (!monument.getOwners().contains(matchTeam)) {
                     if (this.monumentScoreboardLines.containsKey(monument)) {
                         this.monumentScoreboardLines.get(monument).add(i);
@@ -184,7 +189,7 @@ public class DTMModule extends MatchModule implements Listener {
             simpleScoreboard.add(getTeamScoreboardString(matchTeam), i);
             this.teamScoreboardLines.put(matchTeam.getId(), i++);
 
-            if (teams.indexOf(matchTeam) < teams.size() - 1) {
+            if (j > 1) {
                 simpleScoreboard.add(StringUtils.repeat(" ", spaceCount++), i++);
             }
         }
@@ -258,6 +263,14 @@ public class DTMModule extends MatchModule implements Listener {
         } else if (percentage >= 100) {
             healthColor = ChatColor.GREEN;
         }
+
+        if (monument.getMaxHealth() == 1 || percentage >= 100) {
+            String symbol = ChatColor.GREEN + SYMBOL_MONUMENT_COMPLETE;
+            if (percentage <= 0) symbol = ChatColor.RED + SYMBOL_MONUMENT_INCOMPLETE;
+
+            return ChatColor.GRAY + "  " + symbol + " " + ChatColor.WHITE + monument.getName();
+        }
+
         return healthColor + "  " + percentage + "% " + ChatColor.WHITE + monument.getName();
     }
 

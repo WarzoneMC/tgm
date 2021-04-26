@@ -219,7 +219,8 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
         teamAliveScoreboardLines.clear();
         int positionOnScoreboard = 1;
         int spaceCount = 1;
-        for (MatchTeam team : teamManager.getTeams()) {
+        for (int j = teamManager.getTeams().size() - 1; j >= 0; j--) {
+            MatchTeam team = teamManager.getTeams().get(j);
             if (team.isSpectator()) continue;
             teamScoreboardLines.put(positionOnScoreboard, StringUtils.repeat(" ", spaceCount++));
             positionOnScoreboard++;

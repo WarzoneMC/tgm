@@ -8,6 +8,7 @@ import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchManager;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.MatchStatus;
+import network.warzone.tgm.modules.flag.FlagRespawnBlockEvent;
 import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.kit.classes.GameClass;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
@@ -19,12 +20,18 @@ import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Players;
 import network.warzone.tgm.util.menu.KitEditorMenu;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.GameRule;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import java.lang.ref.WeakReference;
+import java.util.*;
+
+import static network.warzone.tgm.util.ColorConverter.format;
 
 @Getter
 public class SpawnPointHandlerModule extends MatchModule implements Listener {
@@ -35,6 +42,10 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private KitEditorModule kitEditorModule;
     private StatsModule statsModule;
 
+    private Map<PlayerContext,MatchTeam> spawning;
+    private Map<MatchTeam,Integer> respawnRestrictions;
+    private BukkitTask task;
+
     @Override
     public void load(Match match) {
         this.match = new WeakReference<>(match);
@@ -43,17 +54,36 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         this.gameClassModule = match.getModule(GameClassModule.class);
         this.kitEditorModule = match.getModule(KitEditorModule.class);
         this.statsModule = match.getModule(StatsModule.class);
+
+        this.spawning = new HashMap<>();
+        this.respawnRestrictions = new HashMap<>();
+        List<MatchTeam> allTeams = teamManagerModule.getTeams();
+        for (MatchTeam team : allTeams) {
+            this.respawnRestrictions.put(team,0);
+        }
     }
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
         if (event.isCancelled()) return;
+        MatchTeam team = event.getTeam();
         if (TGM.get().getMatchManager().getMatch().getMatchStatus() == MatchStatus.MID) {
-            spawnPlayer(event.getPlayerContext(), event.getTeam(), true, true);
+            int restrictions = respawnRestrictions.get(team);
+            if (restrictions > 0) {
+                PlayerContext context = event.getPlayerContext();
+                this.spawning.put(context, team);
+                Player player = context.getPlayer();
+                player.setAllowFlight(true);
+                player.setFlying(true);
+                player.setGameMode(GameMode.SPECTATOR);
+                player.setVelocity(new Vector());
+                return;
+            }
+            spawnPlayer(event.getPlayerContext(), team, true, true);
         }
         //player is joining the server
         else if (event.getOldTeam() == null) {
-            spawnPlayer(event.getPlayerContext(), event.getTeam(), true, true);
+            spawnPlayer(event.getPlayerContext(), team, true, true);
         }
         //player is swapping teams pre/post match.
         //else {
@@ -67,6 +97,18 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
 
         spawnPlayer(playerContext, matchTeam, true, false);
+    }
+
+    @EventHandler
+    public void onFlagRestriction(FlagRespawnBlockEvent event) {
+        MatchTeam team = event.getAffectedTeam();
+        boolean canRespawn = event.isCanRespawn();
+        int previousRestriction = respawnRestrictions.get(team);
+        if(canRespawn){
+            respawnRestrictions.put(team,Math.max(0,previousRestriction-1));
+        } else {
+            respawnRestrictions.put(team,previousRestriction+1);
+        }
     }
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport, boolean firstSpawn) {
@@ -88,6 +130,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 if (gameClassModule.getCurrentClass(playerContext.getPlayer()) == null) gameClassModule.setCurrentClass(playerContext.getPlayer(), gameClassModule.getDefaultClass());
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
+                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
                 } else if (reset) {
                     gameClassModule.performSwitch(playerContext.getPlayer());
                     GameClass gameClass = gameClassModule.getGameClass(gameClassModule.getCurrentClass(playerContext.getPlayer()));
@@ -103,6 +146,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
                 if (matchTeam.isSpectator()) {
                     spectatorModule.applySpectatorKit(playerContext);
+                    matchTeam.getKits().forEach(kit -> kit.apply(playerContext.getPlayer(), matchTeam));
                 } else if (reset) {
                     if (KitEditorModule.isEnabled() && KitEditorModule.isKitEditable() && kitEditorModule.getEditorMenus().containsKey(playerContext.getPlayer().getUniqueId())) {
                         KitEditorMenu kitEditorMenu = kitEditorModule.getEditorMenus().get(playerContext.getPlayer().getUniqueId());
@@ -121,6 +165,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
     @Override
     public void enable() {
+        // There is no possibility of respawn restrictions at match start
         for (MatchTeam matchTeam : TGM.get().getModule(TeamManagerModule.class).getTeams()) {
             if (!matchTeam.isSpectator()) {
                 for (PlayerContext player : matchTeam.getMembers()) {
@@ -128,6 +173,34 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
                 }
             }
         }
+
+        task = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
+            for (Map.Entry<PlayerContext, MatchTeam> spawnEntry : this.spawning.entrySet()) {
+                try {
+                    PlayerContext player = spawnEntry.getKey();
+                    MatchTeam team = spawnEntry.getValue();
+
+                    if (!teamManagerModule.getTeam(player.getPlayer()).equals(team)) {
+                        this.spawning.remove(player);
+                        continue;
+                    }
+
+                    int restrictions = respawnRestrictions.get(team);
+                    if (restrictions > 0) {
+                        player.getPlayer().sendTitle(format("&a&lWaiting..."), format("&eYou will spawn when the flag is dropped."), 0, 20, 0);
+                        continue;
+                    }
+                    this.spawning.remove(player);
+                    spawnPlayer(player, team, true, true);
+                } catch (Exception ignored) {
+                }
+            }
+        }, 0L, 1L);
+    }
+
+    @Override
+    public void disable() {
+        task.cancel();
     }
 
     public SpawnPoint getTeamSpawn(MatchTeam matchTeam) {

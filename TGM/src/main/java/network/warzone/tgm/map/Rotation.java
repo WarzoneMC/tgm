@@ -4,7 +4,6 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,16 +11,16 @@ public class Rotation {
     @Getter private final String name;
     @Getter private final boolean isDefault;
     @Getter private final RotationRequirement requirements;
-    private final Collection<String> mapNames;
-    private List<MapContainer> baseMaps;
+    private final List<String> mapNames;
+    private final List<MapContainer> baseMaps;
     private List<MapContainer> activeMaps;
     private final boolean shuffle;
 
-    public Rotation(final String name, final boolean isDefault, final RotationRequirement requirements, List<MapContainer> baseMaps, Collection<String> mapNames) {
+    public Rotation(final String name, final boolean isDefault, final RotationRequirement requirements, List<MapContainer> baseMaps, List<String> mapNames) {
         this(name, isDefault, requirements, baseMaps, mapNames, false);
     }
 
-    public Rotation(final String name, final boolean isDefault, final RotationRequirement requirements, List<MapContainer> baseMaps, Collection<String> mapNames, final boolean shuffle) {
+    public Rotation(final String name, final boolean isDefault, final RotationRequirement requirements, List<MapContainer> baseMaps, List<String> mapNames, final boolean shuffle) {
         this.name = name;
         this.isDefault = isDefault;
         this.requirements = requirements;
@@ -59,16 +58,15 @@ public class Rotation {
 
         // If the map name list is null, add all Maps. This will only apply for the default rotation.
         // Deserialized rotations will have a non-null (but possibly empty) collection for mapNames
-        boolean addAll = this.mapNames == null;
 
-        for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
-            if (addAll) {
-                this.baseMaps.add(mapContainer);
-                continue;
-            }
+        if (this.mapNames == null) {
+            this.baseMaps.addAll(TGM.get().getMatchManager().getMapLibrary().getMaps());
+        } else {
             for (String mapName : this.mapNames) {
-                if (mapContainer.getMapInfo().getName().equalsIgnoreCase(mapName)) {
-                    this.baseMaps.add(mapContainer);
+                for (MapContainer mapContainer : TGM.get().getMatchManager().getMapLibrary().getMaps()) {
+                    if (mapContainer.getMapInfo().getName().equalsIgnoreCase(mapName)) {
+                        this.baseMaps.add(mapContainer);
+                    }
                 }
             }
         }

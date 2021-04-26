@@ -56,6 +56,8 @@ public class BlitzModule extends MatchModule implements Listener {
 
     private final RespawnRule respawnRule = new RespawnRule(null, 3000, false, false, false);
 
+    private boolean compact = false;
+
     @Override
     public void load(Match match) {
         this.match = new WeakReference<Match>(match);
@@ -84,6 +86,8 @@ public class BlitzModule extends MatchModule implements Listener {
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getBiggestTeam);
         TGM.get().getModule(RespawnModule.class).setDefaultRule(respawnRule);
         TGM.get().getModule(RespawnModule.class).addRespawnService(this::isAlive);
+
+        this.compact = teamManagerModule.getTeamsParticipating().size() >= 6;
     }
 
     private MatchTeam getBiggestTeam() {
@@ -126,19 +130,25 @@ public class BlitzModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onScoreboardInit(ScoreboardInitEvent event) {
-        List<MatchTeam> teams = teamManagerModule.getTeams();
+        List<MatchTeam> teams = teamManagerModule.getTeamsParticipating();
 
         SimpleScoreboard simpleScoreboard = event.getSimpleScoreboard();
         simpleScoreboard.setTitle(ChatColor.AQUA + "Blitz");
 
         int i = 2;
-        for (MatchTeam matchTeam : teams) {
-            if (matchTeam.isSpectator()) continue;
-            simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(matchTeam, getAlivePlayers(matchTeam).size()), i);
-            teamScoreboardLines.put(matchTeam, i++);
-            simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i++);
-            if (teams.indexOf(matchTeam) < teams.size() - 1) {
-                simpleScoreboard.add(matchTeam.getColor() + " ", i++);
+        for (int j = teams.size() - 1; j >= 0; j--) {
+            MatchTeam matchTeam = teams.get(j);
+            int alive = getAlivePlayers(matchTeam).size();
+            if (this.compact) {
+                simpleScoreboard.add(getCompactLine(matchTeam, alive), i);
+                teamScoreboardLines.put(matchTeam, i++);
+            } else {
+                simpleScoreboard.add(matchTeam.getColor() + getTeamScoreLine(alive), i);
+                teamScoreboardLines.put(matchTeam, i++);
+                simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), i++);
+                if (j > 0) {
+                    simpleScoreboard.add(matchTeam.getColor() + " ", i++);
+                }
             }
         }
     }
@@ -155,9 +165,15 @@ public class BlitzModule extends MatchModule implements Listener {
         if (!teamScoreboardLines.containsKey(matchTeam)) return;
         for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
             int line = teamScoreboardLines.get(matchTeam);
-            simpleScoreboard.remove(line + 1);
-            simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), line + 1);
-            simpleScoreboard.update();
+            if (this.compact) {
+                simpleScoreboard.remove(line);
+                simpleScoreboard.add(getCompactLine(matchTeam, getAlivePlayers(matchTeam).size()), line);
+                simpleScoreboard.update();
+            } else {
+                simpleScoreboard.remove(++line);
+                simpleScoreboard.add(matchTeam.getColor() + matchTeam.getAlias(), line);
+                simpleScoreboard.update();
+            }
         }
     }
 
@@ -166,13 +182,18 @@ public class BlitzModule extends MatchModule implements Listener {
         for (SimpleScoreboard simpleScoreboard : TGM.get().getModule(ScoreboardManagerModule.class).getScoreboards().values()) {
             int line = teamScoreboardLines.get(matchTeam);
             simpleScoreboard.remove(line);
-            simpleScoreboard.add(getTeamScoreLine(matchTeam, size), line);
+            if (this.compact) simpleScoreboard.add(getCompactLine(matchTeam, size), line);
+            else simpleScoreboard.add(getTeamScoreLine(size), line);
             simpleScoreboard.update();
         }
     }
 
-    private String getTeamScoreLine(MatchTeam matchTeam, int size) {
-        return ChatColor.WHITE + "  " + size + ChatColor.GRAY + " Alive";
+    private String getCompactLine(MatchTeam matchTeam, int alive) {
+        return matchTeam.getColor() + matchTeam.getAlias() + getTeamScoreLine(alive);
+    }
+
+    private String getTeamScoreLine(int size) {
+        return ChatColor.WHITE + " " + size + ChatColor.GRAY + " Alive";
     }
 
     @EventHandler

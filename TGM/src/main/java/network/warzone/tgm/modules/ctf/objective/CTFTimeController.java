@@ -103,7 +103,8 @@ public class CTFTimeController extends CTFController implements TimeSubscriber {
         int spaceCount = 1;
         int positionOnScoreboard = 1;
         scoreboard.add(ChatColor.WHITE + "Time Left: " + ChatColor.GREEN + formattedRemainingTime, ++positionOnScoreboard);
-        for (MatchTeam team : teamManagerModule.getTeams()) {
+        for (int j = teamManagerModule.getTeams().size() - 1; j >= 0; j--) {
+            MatchTeam team = teamManagerModule.getTeams().get(j);
             if (team.isSpectator()) continue;
             scoreboard.add(StringUtils.repeat(" ", ++spaceCount), ++positionOnScoreboard);
             scoreboard.add(ChatColor.LIGHT_PURPLE.toString() + "  " + getTeamPoints(team) + " points", ++positionOnScoreboard);
