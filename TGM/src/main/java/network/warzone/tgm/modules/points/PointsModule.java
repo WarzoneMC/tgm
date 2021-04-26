@@ -51,7 +51,11 @@ public class PointsModule extends MatchModule {
         int updated = points.getOrDefault(matchTeam.getId(), 0) + amount;
         this.points.put(matchTeam.getId(), updated);
 
-        if (updated >= targets.get(matchTeam.getId())) {
+        int target = targets.getOrDefault(matchTeam.getId(), 0);
+
+        if (target <= 0) return;
+
+        if (updated >= target) {
             for (PointService pointService : services) {
                 pointService.reachedTarget(matchTeam);
             }
