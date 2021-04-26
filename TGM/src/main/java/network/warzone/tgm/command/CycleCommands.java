@@ -502,13 +502,9 @@ public class CycleCommands {
                     sender.sendMessage(ChatColor.RED + "/team size (team) (min) (max)");
                 }
             } else if (cmd.getString(0).equalsIgnoreCase("shuffle")) {
-                List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeams().stream().filter(matchTeam ->
-                        !matchTeam.isSpectator()
-                ).distinct().collect(Collectors.toList());
+                List<MatchTeam> teams = TGM.get().getModule(TeamManagerModule.class).getTeamsParticipating();
 
-                List<Player> players = Bukkit.getOnlinePlayers().stream().filter(player ->
-                        !TGM.get().getModule(TeamManagerModule.class).getTeam(player).isSpectator()
-                ).distinct().collect(Collectors.toList());
+                List<Player> players = teams.stream().flatMap(team -> team.getMembers().stream()).map(PlayerContext::getPlayer).collect(Collectors.toList());
 
                 Collections.shuffle(teams);
                 Collections.shuffle(players);
