@@ -289,10 +289,10 @@ public class CycleCommands {
 
             TGM.get().getMatchManager().setForcedNextMap(found);
 
+            boolean announceToEveryone = !cmd.hasFlag('s');
+
             String broadcast = (announceToEveryone ? "" : ChatColor.GRAY + "[SILENT] ") + ChatColor.YELLOW + sender.getName() + ChatColor.GRAY + " set the next map to " +
                         ChatColor.YELLOW + found.getMapInfo().getName() + ChatColor.GRAY + " (" + found.getMapInfo().getVersion() + ")";
-
-            boolean announceToEveryone = !cmd.hasFlag('s');
             for (Player player : Bukkit.getOnlinePlayers().stream().filter((player) -> announceToEveryone || player.hasPermission("tgm.setnext")).collect(Collectors.toSet())) {
                 player.sendMessage(broadcast);
             }
