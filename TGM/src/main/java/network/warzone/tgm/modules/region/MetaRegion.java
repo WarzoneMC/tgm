@@ -10,14 +10,15 @@ import org.bukkit.block.Block;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Jorge on 10/09/2019
  */
 @Getter
 public class MetaRegion implements Region {
-
     private List<Region> regions = new ArrayList<>();
+    private Random random;
 
     private World world;
     private int minX;
@@ -29,12 +30,14 @@ public class MetaRegion implements Region {
     private Location min;
     private Location max;
 
+
     public MetaRegion(JsonArray jsonArray) {
         for (JsonElement element : jsonArray) {
             this.regions.add(TGM.get().getModule(RegionManagerModule.class).getRegion(TGM.get().getMatchManager().getMatch(), element));
         }
         this.world = TGM.get().getMatchManager().getMatch().getWorld();
         calculateMinMax();
+        random = new Random();
     }
 
     @Override
@@ -53,6 +56,11 @@ public class MetaRegion implements Region {
     @Override
     public Location getCenter() {
         return new Location(world, (minX + maxX) / 2D, (minY + maxY) / 2D, (minZ + maxZ) / 2D);
+    }
+
+    @Override
+    public Location getRandomLocation() { // Every region gets the same chance, regardless of its volume
+        return getRegions().get(random.nextInt(getRegions().size())).getRandomLocation();
     }
 
     @Override

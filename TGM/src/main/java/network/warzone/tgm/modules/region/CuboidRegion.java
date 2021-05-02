@@ -9,10 +9,12 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 public class CuboidRegion implements Region {
     private final World world;
+    private final Random random;
 
     private double minX;
     private double minY;
@@ -27,6 +29,8 @@ public class CuboidRegion implements Region {
     public CuboidRegion(Location min, Location max) {
         Preconditions.checkArgument(min.getWorld() == max.getWorld(), "region location worlds must match");
         this.world = min.getWorld();
+        this.random = new Random();
+
         minX = Math.min(min.getX(), max.getX());
         maxX = Math.max(min.getX(), max.getX());
 
@@ -64,6 +68,14 @@ public class CuboidRegion implements Region {
     public Location getCenter() {
         Vector v = getMin().toVector().getMidpoint(getMax().toVector());
         return new Location(world, v.getX(), v.getY(), v.getZ());
+    }
+
+    @Override
+    public Location getRandomLocation() {
+        double x = getMinX() + (getMaxX() - getMinX()) * random.nextDouble();
+        double y = getMinY() + (getMaxY() - getMinY()) * random.nextDouble();
+        double z = getMinZ() + (getMaxZ() - getMinZ()) * random.nextDouble();
+        return new Location(world, x, y, z);
     }
 
     @Override

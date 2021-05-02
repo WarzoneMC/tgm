@@ -12,6 +12,8 @@ public interface Region {
 
     Location getCenter();
 
+    Location getRandomLocation();
+
     List<Block> getBlocks();
 
     Location getMin();

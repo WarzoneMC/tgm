@@ -3,7 +3,7 @@ package network.warzone.tgm.modules.team;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import network.warzone.tgm.map.SpawnPoint;
+import network.warzone.tgm.map.spawnpoints.SpawnPoint;
 import network.warzone.tgm.modules.kit.Kit;
 import network.warzone.tgm.modules.team.event.TeamUpdateAliasEvent;
 import network.warzone.tgm.modules.team.event.TeamUpdateMaximumEvent;
