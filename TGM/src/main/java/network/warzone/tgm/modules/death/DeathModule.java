@@ -37,7 +37,7 @@ public class DeathModule extends MatchModule implements Listener {
     private WeakReference<Match> match;
 
     private HashMap<UUID, DeathInfo> players = new HashMap<>();
-    private HashMap<UUID, Boolean> dead = new HashMap<>();
+    private Set<UUID> dead = new HashSet<>();
     private TeamManagerModule teamManagerModule;
 
     private long combatCooldown = 0; // Millis
@@ -68,7 +68,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        handleLeave(event.getPlayer());
+        resetPlayer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -78,7 +78,7 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
-        handleLeave(event.getPlayerContext().getPlayer());
+        resetPlayer(event.getPlayerContext().getPlayer());
     }
 
     public void handleCombatLog(Player player, MatchTeam team, boolean forced) {
@@ -102,7 +102,7 @@ public class DeathModule extends MatchModule implements Listener {
         }
     }
 
-    private void handleLeave(Player player) {
+    private void resetPlayer(Player player) {
         notDead(player);
         players.remove(player.getUniqueId());
     }
@@ -118,7 +118,7 @@ public class DeathModule extends MatchModule implements Listener {
             return;
         }
         if (event.getEntity() instanceof Player) {
-            if (this.dead.containsKey(event.getEntity().getUniqueId())) {
+            if (this.dead.contains(event.getEntity().getUniqueId())) {
                 event.setCancelled(true);
                 return;
             }
@@ -209,11 +209,11 @@ public class DeathModule extends MatchModule implements Listener {
 
     @EventHandler
     private void onRespawn(TGMPlayerRespawnEvent event) {
-        notDead(event.getPlayer());
+        resetPlayer(event.getPlayer());
     }
 
     private void setDead(Player player) {
-        this.dead.put(player.getUniqueId(), true);
+        this.dead.add(player.getUniqueId());
     }
 
     private void notDead(Player player) {
@@ -221,7 +221,7 @@ public class DeathModule extends MatchModule implements Listener {
     }
 
     public boolean isDead(Player player) {
-        return this.dead.containsKey(player.getUniqueId());
+        return this.dead.contains(player.getUniqueId());
     }
 
 }
