@@ -2,6 +2,7 @@ package network.warzone.tgm.modules;
 
 import lombok.Getter;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.gametype.GameType;
 import network.warzone.tgm.join.MatchJoinEvent;
 import network.warzone.tgm.map.MapInfo;
 import network.warzone.tgm.match.*;
@@ -116,6 +117,7 @@ public class SpectatorModule extends MatchModule implements Listener {
          */
         updateMenu();
 
+        if (this.match.get().getMapContainer().getMapInfo().getGametype() == GameType.Infected) return;
         afkTimerRunnable = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (isSpectating(player) || !lastMovement.containsKey(player.getUniqueId())) continue;
@@ -235,7 +237,8 @@ public class SpectatorModule extends MatchModule implements Listener {
                 player.setVelocity(player.getVelocity().setY(4.0)); // Get out of that void!
                 player.setFlying(true);
             }
-        } else if (event.getFrom().distanceSquared(event.getTo()) > 0) {
+        } else if (this.match.get().getMapContainer().getMapInfo().getGametype() != GameType.Infected &&
+                event.getFrom().distanceSquared(event.getTo()) > 0) {
             lastMovement.put(player.getUniqueId(), System.currentTimeMillis());
         }
     }
@@ -480,7 +483,8 @@ public class SpectatorModule extends MatchModule implements Listener {
 
     @Override
     public void unload() {
-        Bukkit.getScheduler().cancelTask(afkTimerRunnable);
+        if (this.match.get().getMapContainer().getMapInfo().getGametype() != GameType.Infected)
+            Bukkit.getScheduler().cancelTask(afkTimerRunnable);
         lastMovement.clear();
         teamSelectionMenu.disable();
     }
