@@ -248,4 +248,13 @@ public class TeamManagerModule extends MatchModule implements Listener {
         }
         return teams;
     }
+
+    public boolean isSpectating(PlayerContext player) {
+        return isSpectating(player.getPlayer());
+    }
+
+    public boolean isSpectating(Player player) {
+        MatchTeam team = this.getTeam(player);
+        return team == null || team.isSpectator();
+    }
 }

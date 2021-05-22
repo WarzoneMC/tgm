@@ -194,10 +194,12 @@ public class ChatListener implements Listener {
 
     public void sendTeamChat(PlayerContext playerContext, String message) {
         MatchTeam matchTeam = teamManagerModule.getTeam(playerContext.getPlayer());
-        for (PlayerContext member : matchTeam.getMembers()) {
-            member.getPlayer().sendMessage(matchTeam.getColor() + "[" + matchTeam.getAlias() + "] "
-                    + playerContext.getPlayer().getName() + ChatColor.WHITE + ": " + message);
-        }
+        String result = matchTeam.getColor() + "[" + matchTeam.getAlias() + "] "
+                + playerContext.getPlayer().getName() + ChatColor.WHITE + ": " + message;
+        Bukkit.getOnlinePlayers().stream()
+                .filter(p -> matchTeam.getMembers().contains(p) ||
+                        (p.hasPermission("tgm.team.spy") && teamManagerModule.isSpectating(p)))
+                .forEach(p -> p.sendMessage(result));
     }
 
 }
