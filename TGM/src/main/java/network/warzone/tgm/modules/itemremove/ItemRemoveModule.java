@@ -140,6 +140,10 @@ public class ItemRemoveModule extends MatchModule implements Listener, ItemFilte
         add(Material.LIME_WOOL);
         add(Material.MAGENTA_WOOL);
         add(Material.ORANGE_WOOL);
+        add(Material.YELLOW_WOOL);
+        add(Material.PINK_WOOL);
+        add(Material.RED_WOOL);
+        add(Material.PURPLE_WOOL);
     }
 
 }
