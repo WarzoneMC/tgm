@@ -6,8 +6,6 @@ import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.itemremove.ItemRemoveInfo;
-import network.warzone.tgm.modules.itemremove.ItemRemoveModule;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardInitEvent;
@@ -129,16 +127,6 @@ public class CTWModule extends MatchModule implements Listener {
                  }
 
             });
-        }
-
-        ItemRemoveModule module = TGM.get().getModule(ItemRemoveModule.class);
-
-        //load wools
-        for (WoolObjective woolObjective : this.wools) {
-            woolObjective.load();
-            if (module != null) {
-                module.add(new ItemRemoveInfo(woolObjective.getBlock()));
-            }
         }
 
         if (this.wools.size() > 6) this.compactLayout = true;
