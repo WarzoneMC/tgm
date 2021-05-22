@@ -129,6 +129,11 @@ public class CTWModule extends MatchModule implements Listener {
             });
         }
 
+        //load wools
+        for (WoolObjective woolObjective : this.wools) {
+            woolObjective.load();
+        }
+
         if (this.wools.size() > 6) this.compactLayout = true;
         TGM.get().getModule(TimeModule.class).setTimeLimitService(this::getWinningTeam);
     }
