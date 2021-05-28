@@ -19,10 +19,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
+import java.text.DecimalFormat;
+
 /**
  * Created by Jorge on 9/24/2017.
  */
 public class EntityDamageModule extends MatchModule implements Listener {
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.0");
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
@@ -46,7 +49,7 @@ public class EntityDamageModule extends MatchModule implements Listener {
             Player playerShooter = (Player) shooter;
             MatchTeam damagedTeam = TGM.get().getModule(TeamManagerModule.class).getTeam(damaged);
             if(damagedTeam == null) return;
-            if(!damagedTeam.isSpectator() && (damaged.getHealth() - event.getFinalDamage() >= 0)) playerShooter.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(damagedTeam.getColor() + damaged.getName() + ChatColor.DARK_GRAY + " [" + ChatColor.WHITE + ((int)damaged.getHealth() - (int) event.getFinalDamage()) + ChatColor.GRAY + "/" + damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() + ChatColor.DARK_GRAY + "]"));
+            if(!damagedTeam.isSpectator() && (damaged.getHealth() - event.getFinalDamage() >= 0)) playerShooter.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(damagedTeam.getColor() + damaged.getName() + ChatColor.DARK_GRAY + " [" + ChatColor.WHITE + DECIMAL_FORMAT.format(damaged.getHealth() - event.getFinalDamage()) + ChatColor.GRAY + "/" + DECIMAL_FORMAT.format(damaged.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()) + ChatColor.DARK_GRAY + "]"));
         }
     }
 
