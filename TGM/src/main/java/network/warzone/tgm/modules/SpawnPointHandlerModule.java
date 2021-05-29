@@ -42,6 +42,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private GameClassModule gameClassModule;
     private KitEditorModule kitEditorModule;
     private StatsModule statsModule;
+    private LegacyAttackSpeedModule legacyAttackSpeedModule;
 
     private Map<PlayerContext,MatchTeam> spawning;
     private Map<MatchTeam,Integer> respawnRestrictions;
@@ -55,6 +56,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         this.gameClassModule = match.getModule(GameClassModule.class);
         this.kitEditorModule = match.getModule(KitEditorModule.class);
         this.statsModule = match.getModule(StatsModule.class);
+        this.legacyAttackSpeedModule = match.getModule(LegacyAttackSpeedModule.class);
 
         this.spawning = new HashMap<>();
         this.respawnRestrictions = new HashMap<>();
@@ -114,7 +116,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport, boolean firstSpawn) {
         boolean reset = firstSpawn || !match.get().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
-        Players.reset(playerContext.getPlayer(), true, !reset, match.get().getModule(LegacyAttackSpeedModule.class).isEnabled());
+        Players.reset(playerContext.getPlayer(), true, !reset, legacyAttackSpeedModule.isEnabled());
 
         if (teleport) {
             MatchManager matchManager = TGM.get().getMatchManager();
