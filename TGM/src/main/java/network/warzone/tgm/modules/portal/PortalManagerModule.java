@@ -18,11 +18,13 @@ import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
 public class PortalManagerModule extends MatchModule {
-    private final HashMap<String, Portal> portals = new HashMap<>();
+    private final HashSet<Portal> allPortals = new HashSet<>();
+    private final HashMap<String, Portal> identifiablePortals = new HashMap<>();
 
     @Override
     public void load(Match match) {
@@ -35,13 +37,14 @@ public class PortalManagerModule extends MatchModule {
 
     @Override
     public void unload() {
-        portals.values().forEach(TGM::unregisterEvents);
-        portals.clear();
+        allPortals.forEach(TGM::unregisterEvents);
+        allPortals.clear();
+        identifiablePortals.clear();
     }
 
     public Portal getPortal(Match match, JsonElement jsonElement) {
         if (jsonElement.isJsonPrimitive()) {
-            return portals.get(jsonElement.getAsString());
+            return identifiablePortals.get(jsonElement.getAsString());
         } else {
             JsonObject json = jsonElement.getAsJsonObject();
 
@@ -71,9 +74,9 @@ public class PortalManagerModule extends MatchModule {
 
             Portal portal = new Portal(active, type, from, to, teams, sound);
             TGM.registerEvents(portal);
-
+            allPortals.add(portal);
             if (json.has("id")) {
-                portals.put(json.get("id").getAsString(), portal);
+                identifiablePortals.put(json.get("id").getAsString(), portal);
             }
 
             return portal;
