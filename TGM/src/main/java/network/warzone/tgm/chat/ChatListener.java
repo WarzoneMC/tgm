@@ -197,7 +197,7 @@ public class ChatListener implements Listener {
         String result = matchTeam.getColor() + "[" + matchTeam.getAlias() + "] "
                 + playerContext.getPlayer().getName() + ChatColor.WHITE + ": " + message;
         Bukkit.getOnlinePlayers().stream()
-                .filter(p -> matchTeam.getMembers().contains(p) ||
+                .filter(p -> matchTeam.containsPlayer(p) ||
                         (p.hasPermission("tgm.team.spy") && teamManagerModule.isSpectating(p)))
                 .forEach(p -> p.sendMessage(result));
     }
