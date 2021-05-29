@@ -35,6 +35,7 @@ public class PortalManagerModule extends MatchModule {
 
     @Override
     public void unload() {
+        portals.values().forEach(TGM::unregisterEvents);
         portals.clear();
     }
 
