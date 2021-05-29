@@ -109,6 +109,7 @@ server:
   tablist-name: "&f&lWARZONE"
 # Legacy Features
 legacy:
+  attack-speed: true
   damage: true
   knockback: true
   armor: true

@@ -21,7 +21,7 @@
         </repository>
         <repository>
             <id>maven.sk89q.io</id>
-            <url>http://maven.sk89q.com/repo/</url>
+            <url>https://maven.sk89q.com/repo/</url>
         </repository>
         <repository>
             <id>bgm</id>

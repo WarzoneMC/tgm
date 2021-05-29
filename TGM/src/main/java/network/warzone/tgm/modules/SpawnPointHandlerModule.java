@@ -12,6 +12,7 @@ import network.warzone.tgm.modules.flag.FlagRespawnBlockEvent;
 import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.kit.classes.GameClass;
 import network.warzone.tgm.modules.kit.classes.GameClassModule;
+import network.warzone.tgm.modules.legacy.LegacyAttackSpeedModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
@@ -41,6 +42,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
     private GameClassModule gameClassModule;
     private KitEditorModule kitEditorModule;
     private StatsModule statsModule;
+    private LegacyAttackSpeedModule legacyAttackSpeedModule;
 
     private Map<PlayerContext,MatchTeam> spawning;
     private Map<MatchTeam,Integer> respawnRestrictions;
@@ -54,6 +56,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
         this.gameClassModule = match.getModule(GameClassModule.class);
         this.kitEditorModule = match.getModule(KitEditorModule.class);
         this.statsModule = match.getModule(StatsModule.class);
+        this.legacyAttackSpeedModule = match.getModule(LegacyAttackSpeedModule.class);
 
         this.spawning = new HashMap<>();
         this.respawnRestrictions = new HashMap<>();
@@ -113,7 +116,7 @@ public class SpawnPointHandlerModule extends MatchModule implements Listener {
 
     public void spawnPlayer(PlayerContext playerContext, MatchTeam matchTeam, boolean teleport, boolean firstSpawn) {
         boolean reset = firstSpawn || !match.get().getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY);
-        Players.reset(playerContext.getPlayer(), true, !reset);
+        Players.reset(playerContext.getPlayer(), true, !reset, legacyAttackSpeedModule.isEnabled());
 
         if (teleport) {
             MatchManager matchManager = TGM.get().getMatchManager();
