@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public class Players {
 
-    public static void reset(Player player, boolean heal, boolean keepInv, boolean attackSpeed) {
+    public static void reset(Player player, boolean heal, boolean keepInv, boolean legacyAttackSpeed) {
         if (heal) {
             player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
             player.setFoodLevel(20);
@@ -64,7 +64,7 @@ public class Players {
             }
         }
 
-        if (attackSpeed)
+        if (legacyAttackSpeed)
             player.getAttribute(Attribute.GENERIC_ATTACK_SPEED).addModifier(new AttributeModifier(UUID.randomUUID(), "generic.attackSpeed", 24.000D, AttributeModifier.Operation.ADD_SCALAR));
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 1, 0)); // Weird lava bug
