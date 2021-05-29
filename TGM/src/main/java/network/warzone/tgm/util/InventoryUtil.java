@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.Collections;
  * Created by Jorge on 10/16/2019
  */
 public class InventoryUtil {
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.0");
 
     public static Inventory clone(Inventory i, String title) {
         Inventory inventory;
@@ -94,7 +96,7 @@ public class InventoryUtil {
         return ItemFactory.createItem(Material.APPLE, ChatColor.RED + "Player health", Arrays.asList(
                 ChatColor.GRAY + "Health: " + ChatColor.WHITE + ((int) player.getHealth()) + " / " + ((int) player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()),
                 ChatColor.GRAY + "Food: " + ChatColor.WHITE + player.getFoodLevel(),
-                ChatColor.GRAY + "Saturation: " + ChatColor.WHITE + player.getSaturation()
+                ChatColor.GRAY + "Saturation: " + ChatColor.WHITE + DECIMAL_FORMAT.format(player.getSaturation())
         ));
     }
 
