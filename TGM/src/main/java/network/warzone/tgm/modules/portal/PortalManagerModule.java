@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
+@ModuleData(load = ModuleLoadTime.EARLY) @Getter
 public class PortalManagerModule extends MatchModule {
     private final HashSet<Portal> allPortals = new HashSet<>();
     private final HashMap<String, Portal> identifiablePortals = new HashMap<>();
