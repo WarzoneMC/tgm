@@ -125,7 +125,11 @@ public class KOTHModule extends MatchModule implements Listener {
             }
         }
 
-        return highestCapturePointIndex == controlPointIndex;
+        if (!reversed) {
+            return highestCapturePointIndex >= controlPointIndex;
+        } else {
+            return highestCapturePointIndex <= controlPointIndex;
+        }
     }
 
     private MatchTeam getMostCapturesTeam() {
