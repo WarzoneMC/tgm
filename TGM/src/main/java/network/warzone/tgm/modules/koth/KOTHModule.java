@@ -21,6 +21,7 @@ import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.team.event.TeamUpdateAliasEvent;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.util.Strings;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,6 +35,8 @@ import java.util.stream.Collectors;
 @Getter
 public class KOTHModule extends MatchModule implements Listener {
 
+    public static ChatColor GLOBAL_NEUTRAL_COLOR = ChatColor.WHITE;
+
     private final List<ControlPoint> controlPoints = new ArrayList<>();
     private PointsModule pointsModule;
     private KOTHObjective kothObjective = KOTHObjective.POINTS;
@@ -45,6 +48,10 @@ public class KOTHModule extends MatchModule implements Listener {
     @Override
     public void load(Match match) {
         JsonObject kothJson = match.getMapContainer().getMapInfo().getJsonObject().get("koth").getAsJsonObject();
+
+        if (kothJson.has("neutral-color")) {
+            GLOBAL_NEUTRAL_COLOR = ChatColor.valueOf(Strings.getTechnicalName(kothJson.get("neutral-color").getAsString()));
+        }
 
         for (JsonElement capturePointElement : kothJson.getAsJsonArray("hills")) {
             JsonObject capturePointJson = capturePointElement.getAsJsonObject();
@@ -64,6 +71,11 @@ public class KOTHModule extends MatchModule implements Listener {
             final int pointsPerHold = swap;
             final String name = capturePointJson.get("name").getAsString();
 
+            ChatColor neutralColor = GLOBAL_NEUTRAL_COLOR;
+            if (capturePointJson.has("neutral-color")) {
+                neutralColor = ChatColor.valueOf(Strings.getTechnicalName(capturePointJson.get("neutral-color").getAsString()));
+            }
+
             HashMap<MatchTeam, Portal> portals = null;
             if (capturePointJson.has("portals")) {
                 portals = new HashMap<>();
@@ -76,7 +88,7 @@ public class KOTHModule extends MatchModule implements Listener {
                 }
             }
 
-            ControlPointDefinition definition = new ControlPointDefinition(name, owner, timeToCap, pointsPerHold, portals);
+            ControlPointDefinition definition = new ControlPointDefinition(name, owner, timeToCap, pointsPerHold, neutralColor, portals);
             ControlPoint controlPoint = new ControlPoint(this, definition, region, new KOTHControlPointService(this, match, definition));
 
             controlPoints.add(controlPoint);

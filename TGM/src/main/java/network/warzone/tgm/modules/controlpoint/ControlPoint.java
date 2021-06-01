@@ -37,8 +37,6 @@ import java.util.Set;
 public class ControlPoint implements Listener {
     private final KOTHModule kothModule;
 
-    public static final ChatColor COLOR_NEUTRAL_TEAM = ChatColor.WHITE;
-
     public static final String SYMBOL_CP_INCOMPLETE = "\u29be";     // ⦾
     public static final String SYMBOL_CP_COMPLETE = "\u29bf";       // ⦿
 
@@ -56,8 +54,6 @@ public class ControlPoint implements Listener {
     private int progress = 0;
     private MatchTeam progressingTowardsTeam = null;
 
-    private boolean initialCapture = true;
-
     private int runnableId = -1;
 
     public ControlPoint(KOTHModule kothModule, ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
@@ -68,12 +64,12 @@ public class ControlPoint implements Listener {
 
         if (definition.getInitialOwner() != null) {
             MatchTeam intialOwner = definition.getInitialOwner();
-            initialCapture = false;
             progress = definition.getMaxProgress();
             controller = intialOwner;
             progressingTowardsTeam = intialOwner;
-            renderBlocks(intialOwner, true);
         }
+
+        renderBlocks();
     }
 
     public boolean isInProgress() {
@@ -161,7 +157,6 @@ public class ControlPoint implements Listener {
     private void handleCap(MatchTeam matchTeam) {
         if (!kothModule.isCapturable(this, matchTeam)) return;
 
-        boolean isInitial = initialCapture;
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
             progress++;
@@ -183,12 +178,12 @@ public class ControlPoint implements Listener {
                 if (controller != null) {
                     controlPointService.lost(controller);
                     controller = null;
+                    kothModule.updateScoreboardControlPointLine(definition); // To output accurate information, this must be called after controller is set to null
                 }
             } else if (progress >= definition.getMaxProgress() && matchTeam.equals(progressingTowardsTeam)) {
                 if (controller == null) {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
-                    if (initialCapture) initialCapture = false;
                 } else if (kothModule.getKothObjective() == KOTHObjective.POINTS) {
                     controlPointService.holding(matchTeam);
                 }
@@ -199,28 +194,25 @@ public class ControlPoint implements Listener {
             }
         }
 
-        renderBlocks(matchTeam, isInitial);
+        renderBlocks();
     }
 
     public int getPercent() {
         return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
-    private void renderBlocks(MatchTeam matchTeam, boolean isInitial) {
-        ChatColor color1 = progressingTowardsTeam.getColor();
-        ChatColor color2 = matchTeam.equals(controller) ? controller.getColor() : (isInitial ? ChatColor.RESET : ChatColor.WHITE);
+    private void renderBlocks() {
+        ChatColor neutralColor = definition.getNeutralColor();
+        ChatColor color = progressingTowardsTeam != null ? progressingTowardsTeam.getColor() : neutralColor;
         Location center = region.getCenter();
-        double x = center.getX();
-        double z = center.getZ();
         double percent = Math.toRadians(getPercent() * 3.6);
         for (Block block : region.getBlocks()) {
             if (!Blocks.isVisualMaterial(block.getType())) continue;
-            double dx = block.getX() - x;
-            double dz = block.getZ() - z;
+            double dx = block.getX() - center.getX();
+            double dz = block.getZ() - center.getZ();
             double angle = Math.atan2(dz, dx);
             if (angle < 0) angle += 2 * Math.PI;
-            ChatColor color = angle < percent ? color1 : color2;
-            if (color != ChatColor.RESET) block.setType(ColorConverter.convertChatColorToColoredBlock(block.getType(), color));
+            block.setType(ColorConverter.convertChatColorToColoredBlock(block.getType(), angle < percent ? color : neutralColor));
         }
     }
 
