@@ -1,7 +1,7 @@
 package network.warzone.tgm.util;
 
-import net.minecraft.server.v1_16_R3.NBTTagList;
-import net.minecraft.server.v1_16_R3.NBTTagString;
+import net.minecraft.server.v1_17_R1.NBTTagList;
+import net.minecraft.server.v1_17_R1.NBTTagString;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.util.itemstack.Effects;
@@ -11,7 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -113,7 +113,7 @@ public class InventoryUtil {
             meta.setColor(Color.BLUE);
             meta.addItemFlags(ItemFlag.values());
             itemStack.setItemMeta(meta);
-            net.minecraft.server.v1_16_R3.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+            net.minecraft.server.v1_17_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
             if (nmsItem.getTag() != null) {
                 NBTTagList nmsLore = new NBTTagList();
                 for (PotionEffect potionEffect : potionEffects) {
