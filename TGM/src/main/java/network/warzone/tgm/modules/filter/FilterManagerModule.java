@@ -33,6 +33,7 @@ public class FilterManagerModule extends MatchModule {
             for (JsonElement filterElement : match.get().getMapContainer().getMapInfo().getJsonObject().getAsJsonArray("filters")) {
                 JsonObject filterJson = filterElement.getAsJsonObject();
                 for (FilterType filterType : initFilter(match.get(), filterJson)) {
+                    filterType.load(this.match.get());
                     filterTypes.add(filterType);
                     if (filterType instanceof Listener) {
                         TGM.registerEvents((Listener) filterType);
@@ -46,6 +47,7 @@ public class FilterManagerModule extends MatchModule {
     public void disable() {
         for (FilterType filterType : filterTypes) {
             if (filterType instanceof Listener) {
+                filterType.unload();
                 HandlerList.unregisterAll((Listener) filterType);
             }
         }
@@ -61,16 +63,17 @@ public class FilterManagerModule extends MatchModule {
                 .replace("-", "")
                 .toLowerCase();
 
-        if ("build".equals(type))               filterTypes.add(BuildFilterType.parse(match, jsonObject));
-        else if ("enter".equals(type))          filterTypes.add(EnterFilterType.parse(match, jsonObject));
-        else if ("usebow".equals(type))         filterTypes.add(UseBowFilterType.parse(match, jsonObject));
-        else if ("useshear".equals(type))       filterTypes.add(UseShearFilterType.parse(match, jsonObject));
-        else if ("leave".equals(type))          filterTypes.add(LeaveFilterType.parse(match, jsonObject));
-        else if ("blockinteract".equals(type))  filterTypes.add(BlockInteractFilterType.parse(match, jsonObject));
-        else if ("blockexplode".equals(type))   filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
-        else if ("blockplace".equals(type))     filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
-        else if ("blockbreak".equals(type))     filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));
-        else if ("voidbuild".equals(type))      filterTypes.add(VoidBuildFilterType.parse(match, jsonObject));
+        if ("build".equals(type))                filterTypes.add(BuildFilterType.parse(match, jsonObject));
+        else if ("enter".equals(type))           filterTypes.add(EnterFilterType.parse(match, jsonObject));
+        else if ("usebow".equals(type))          filterTypes.add(UseBowFilterType.parse(match, jsonObject));
+        else if ("useshear".equals(type))        filterTypes.add(UseShearFilterType.parse(match, jsonObject));
+        else if ("leave".equals(type))           filterTypes.add(LeaveFilterType.parse(match, jsonObject));
+        else if ("blockinteract".equals(type))   filterTypes.add(BlockInteractFilterType.parse(match, jsonObject));
+        else if ("blockexplode".equals(type))    filterTypes.add(BlockExplodeFilterType.parse(match, jsonObject));
+        else if ("blockplace".equals(type))      filterTypes.add(BlockPlaceFilterType.parse(match, jsonObject));
+        else if ("blockbreak".equals(type))      filterTypes.add(BlockBreakFilterType.parse(match, jsonObject));
+        else if ("voidbuild".equals(type))       filterTypes.add(VoidBuildFilterType.parse(match, jsonObject));
+        else if ("renewableblocks".equals(type)) filterTypes.add(RenewableBlocksFilterType.parse(match, jsonObject));
 
         return filterTypes;
     }
