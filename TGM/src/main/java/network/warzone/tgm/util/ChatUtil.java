@@ -1,10 +1,10 @@
 package network.warzone.tgm.util;
 
-import net.minecraft.server.v1_16_R3.ChatMessageType;
-import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
-import net.minecraft.server.v1_16_R3.SystemUtils;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import net.minecraft.SystemUtils;
+import net.minecraft.network.chat.ChatMessageType;
+import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.protocol.game.PacketPlayOutChat;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -17,9 +17,9 @@ public class ChatUtil {
     public static void sendChatComponents(Player player, IChatBaseComponent[] components) {
         CraftPlayer obcPlayer = (CraftPlayer) player;
         for (IChatBaseComponent component : components) {
-            obcPlayer.getHandle().playerConnection.sendPacket(new PacketPlayOutChat(
+            obcPlayer.getHandle().b.sendPacket(new PacketPlayOutChat(
                 component,
-                ChatMessageType.CHAT,
+                ChatMessageType.a,
                 SystemUtils.b
             ));
         }
