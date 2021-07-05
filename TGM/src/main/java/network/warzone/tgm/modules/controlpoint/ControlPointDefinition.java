@@ -17,6 +17,7 @@ public class ControlPointDefinition {
     private final MatchTeam initialOwner;
     private final int maxProgress;
     private final int pointsPerTick;
+    private final int tickRate;
     private final ChatColor neutralColor;
 
     private final HashMap<MatchTeam, Portal> portals;
