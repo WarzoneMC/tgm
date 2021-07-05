@@ -1,7 +1,7 @@
 package network.warzone.tgm.util;
 
-import net.minecraft.server.v1_17_R1.NBTTagList;
-import net.minecraft.server.v1_17_R1.NBTTagString;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.util.itemstack.Effects;
@@ -113,7 +113,7 @@ public class InventoryUtil {
             meta.setColor(Color.BLUE);
             meta.addItemFlags(ItemFlag.values());
             itemStack.setItemMeta(meta);
-            net.minecraft.server.v1_17_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+            net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
             if (nmsItem.getTag() != null) {
                 NBTTagList nmsLore = new NBTTagList();
                 for (PotionEffect potionEffect : potionEffects) {
