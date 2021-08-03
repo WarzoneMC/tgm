@@ -64,6 +64,10 @@ public class KOTHModule extends MatchModule implements Listener {
             if (capturePointJson.has("points")) {
                 swap = capturePointJson.get("points").getAsInt();
             }
+            int rate = 10;
+            if (capturePointJson.has("rate")) {
+                rate = capturePointJson.get("rate").getAsInt();
+            }
             MatchTeam owner = null;
             if (capturePointJson.has("owner")) {
                 owner = TGM.get().getModule(TeamManagerModule.class).getTeamById(capturePointJson.get("owner").getAsString());
@@ -88,7 +92,7 @@ public class KOTHModule extends MatchModule implements Listener {
                 }
             }
 
-            ControlPointDefinition definition = new ControlPointDefinition(name, owner, timeToCap, pointsPerHold, neutralColor, portals);
+            ControlPointDefinition definition = new ControlPointDefinition(name, owner, timeToCap, pointsPerHold, rate, neutralColor, portals);
             ControlPoint controlPoint = new ControlPoint(this, definition, region, new KOTHControlPointService(this, match, definition));
 
             controlPoints.add(controlPoint);

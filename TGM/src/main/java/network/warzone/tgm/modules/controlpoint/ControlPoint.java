@@ -40,8 +40,6 @@ public class ControlPoint implements Listener {
     public static final String SYMBOL_CP_INCOMPLETE = "\u29be";     // ⦾
     public static final String SYMBOL_CP_COMPLETE = "\u29bf";       // ⦿
 
-    public static final long TICK_RATE = 10;
-
     private final ControlPointDefinition definition;
 
     private final Region region;
@@ -149,7 +147,7 @@ public class ControlPoint implements Listener {
                     controlPointService.holding(controller);
                 }
             }
-        }, TICK_RATE, TICK_RATE).getTaskId();
+        }, definition.getTickRate(), definition.getTickRate()).getTaskId();
 
         TGM.registerEvents(this);
     }
