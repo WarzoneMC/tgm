@@ -18,7 +18,7 @@ public class TimeModule extends MatchModule {
     private long startedTimeStamp = 0;
     private long endedTimeStamp = 0;
 
-    private List<Broadcast> broadcasts = new ArrayList<>();
+    private List<MatchBroadcast> matchBroadcasts = new ArrayList<>();
     private List<TimeSubscriber> timeSubscribers = new ArrayList<>();
 
     @Setter private boolean timeLimited = false;
@@ -52,7 +52,7 @@ public class TimeModule extends MatchModule {
                     int interval = broadcast.get("interval").getAsInt();
                     List<Integer> exclude = new ArrayList<>();
                     if (broadcast.has("exclude") && broadcast.get("exclude").isJsonArray()) broadcast.get("exclude").getAsJsonArray().forEach(jsonElement -> exclude.add(jsonElement.getAsInt()));
-                    broadcasts.add(new Broadcast(message, commands, interval, repeat, exclude));
+                    matchBroadcasts.add(new MatchBroadcast(message, commands, interval, repeat, exclude));
                 }
             }
         }
@@ -66,8 +66,8 @@ public class TimeModule extends MatchModule {
             for (TimeSubscriber module : timeSubscribers) {
                 module.processSecond(time);
             }
-            for (Broadcast broadcast : broadcasts) {
-                broadcast.run(time);
+            for (MatchBroadcast matchBroadcast : matchBroadcasts) {
+                matchBroadcast.run(time);
             }
             if (isTimeLimited() && time >= timeLimit) {
                 endMatch();
@@ -89,7 +89,7 @@ public class TimeModule extends MatchModule {
         setTimeLimited(false);
         Bukkit.getScheduler().cancelTask(taskID);
 
-        broadcasts.clear();
+        matchBroadcasts.clear();
     }
 
     /**

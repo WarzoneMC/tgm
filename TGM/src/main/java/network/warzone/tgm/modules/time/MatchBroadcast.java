@@ -15,7 +15,7 @@ import static net.kyori.adventure.text.Component.text;
  */
 
 @AllArgsConstructor @Getter
-public class Broadcast {
+public class MatchBroadcast {
 
     private String message;
     private List<String> commands;
