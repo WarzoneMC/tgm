@@ -33,6 +33,8 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static net.kyori.adventure.text.Component.text;
+
 /**
  * Created by Jorge on 3/2/2018.
  */
@@ -158,7 +160,7 @@ public class FFAModule extends MatchModule implements Listener {
             removeLife(event.getVictim());
             if (!isAlive(event.getVictim())) {
                 MatchTeam team = this.teamManagerModule.getTeam(event.getVictim());
-                Bukkit.broadcastMessage(team.getColor() + event.getVictim().getName() + ChatColor.RED + " has been eliminated!");
+                Bukkit.broadcast(text(team.getColor() + event.getVictim().getName() + ChatColor.RED + " has been eliminated!"));
                 event.getVictim().sendTitle("", ChatColor.RED + "You have been eliminated.", 10, 20, 10);
             }
         } else {

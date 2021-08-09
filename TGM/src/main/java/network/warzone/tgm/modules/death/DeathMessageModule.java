@@ -19,6 +19,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.*;
 
+import static net.kyori.adventure.text.Component.text;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class DeathMessageModule extends MatchModule implements Listener {
@@ -55,7 +56,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
 
     public static void broadcastDeathMessage(Player dead, Player killer, String message, Object... args) {
         message = ColorConverter.format(String.format(message, args));
-        Bukkit.broadcastMessage(message);
+        Bukkit.broadcast(text(message));
     }
 
 

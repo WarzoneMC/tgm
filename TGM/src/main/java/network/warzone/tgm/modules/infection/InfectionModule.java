@@ -43,6 +43,8 @@ import org.bukkit.scheduler.BukkitTask;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import static net.kyori.adventure.text.Component.text;
+
 /**
  * Created by Draem on 7/31/2017.
  */
@@ -264,7 +266,8 @@ public class InfectionModule extends MatchModule implements Listener, TimeSubscr
     }
 
     public void broadcastMessage(String msg) {
-        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg)));
+//        Bukkit.getOnlinePlayers().forEach(player -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg)));
+        Bukkit.broadcast(text(ChatColor.translateAlternateColorCodes('&', msg)));
     }
 
     @EventHandler

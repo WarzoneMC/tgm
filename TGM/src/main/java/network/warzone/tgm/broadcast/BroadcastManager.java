@@ -22,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import static net.kyori.adventure.text.Component.text;
+
 /**
  * Created by Jorge on 4/14/2018.
  */
@@ -258,7 +260,7 @@ public class BroadcastManager {
     }
 
     public void broadcastRaw(String message) {
-        Bukkit.broadcastMessage(format(message));
+        Bukkit.broadcast(text(format(message)));
     }
 
     public void broadcastRaw(Player player, String message) {

@@ -18,6 +18,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import static net.kyori.adventure.text.Component.text;
+
 /**
  * Created by MatrixTunnel on 10/3/2017.
  */
@@ -48,10 +50,10 @@ public class KillstreakModule extends MatchModule implements Listener {
 
         if (deathInfo.killer == null) {
             if (players.getOrDefault(deathInfo.player.getUniqueId().toString(), 0) >= 5) {
-                Bukkit.broadcastMessage(ColorConverter.filterString(
+                Bukkit.broadcast(text(ColorConverter.filterString(
                         deathInfo.playerTeam.getColor().toString() + deathInfo.playerName + "&7" + (deathInfo.playerName.endsWith("s") ? "'" : "'s") +
                                 " kill streak of &c&l" + players.get(deathInfo.player.getUniqueId().toString()) + "&r&7 was shutdown"
-                ));
+                )));
             }
 
             players.put(deathInfo.player.getUniqueId().toString(), 0);
@@ -66,10 +68,10 @@ public class KillstreakModule extends MatchModule implements Listener {
         players.put(killerUuid, players.getOrDefault(killerUuid, 0) + 1);
 
         if (players.get(killedUuid) != null && players.get(killedUuid) >= 5) {
-            Bukkit.broadcastMessage(ColorConverter.filterString(
+            Bukkit.broadcast(text(ColorConverter.filterString(
                     deathInfo.killerTeam.getColor().toString() + deathInfo.killerName + " &7shutdown " +
                             deathInfo.playerTeam.getColor().toString() + deathInfo.playerName + "&7" + (deathInfo.playerName.endsWith("s") ? "'" : "'s") + " kill streak of &c&l" + players.get(killedUuid)
-            ));
+            )));
 
         }
 
@@ -78,12 +80,12 @@ public class KillstreakModule extends MatchModule implements Listener {
         killstreaks.forEach(killstreak -> {
             if (!killstreak.isRepeat() && players.get(killerUuid) == killstreak.getCount() || killstreak.isRepeat() && players.get(killerUuid) % killstreak.getCount() == 0) {
                 if (killstreak.getMessage() != null && !killstreak.getMessage().isEmpty())
-                    Bukkit.broadcastMessage(ColorConverter.filterString(killstreak.getMessage())
+                    Bukkit.broadcast(text(ColorConverter.filterString(killstreak.getMessage())
                             .replace("%killername%", deathInfo.killerName)
                             .replace("%killercolor%", deathInfo.killerTeam.getColor().toString())
                             .replace("%killedname%", deathInfo.playerName)
                             .replace("%count%", String.valueOf(killstreak.getCount()))
-                    );
+                    ));
 
                 killstreak.getActions().forEach(a -> a.apply(deathInfo.killer));
 

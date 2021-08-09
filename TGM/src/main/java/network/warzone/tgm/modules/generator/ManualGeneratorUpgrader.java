@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static net.kyori.adventure.text.Component.text;
+
 public class ManualGeneratorUpgrader extends GeneratorUpgrader {
     private Iterator<ManualGeneratorUpgrade> manualGeneratorUpgrades;
     private ManualGeneratorUpgrade upcomingUpgrade;
@@ -30,7 +32,7 @@ public class ManualGeneratorUpgrader extends GeneratorUpgrader {
     private void applyUpgrade() {
         if (upcomingUpgrade.getItem() != null) hostGenerator.setItem(upcomingUpgrade.getItem());
         if (upcomingUpgrade.getInterval() > 0) hostGenerator.setInterval(upcomingUpgrade.getInterval());
-        if (upcomingUpgrade.getBroadcast() != null) Bukkit.broadcastMessage(parseCurrentBroadcast(upcomingUpgrade.getBroadcast()));
+        if (upcomingUpgrade.getBroadcast() != null) Bukkit.broadcast(text(parseCurrentBroadcast(upcomingUpgrade.getBroadcast())));
         if (upcomingUpgrade.getHoloContent() != null && hostGenerator.getGeneratorHologram() != null) hostGenerator.getGeneratorHologram().setBaseContent(upcomingUpgrade.getHoloContent());
     }
 

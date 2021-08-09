@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
+import static net.kyori.adventure.text.Component.text;
 import static org.bukkit.SoundCategory.AMBIENT;
 
 @AllArgsConstructor @Getter
@@ -37,8 +38,8 @@ public class KOTHControlPointService implements ControlPointService {
 
     @Override
     public void captured(MatchTeam matchTeam) {
-        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
-                " took control of " + ChatColor.AQUA + ChatColor.BOLD + definition.getName());
+        Bukkit.broadcast(text(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
+                " took control of " + ChatColor.AQUA + ChatColor.BOLD + definition.getName()));
 
         for (MatchTeam team : match.getModule(TeamManagerModule.class).getTeams()) {
             for (PlayerContext playerContext : team.getMembers()) {
@@ -72,8 +73,8 @@ public class KOTHControlPointService implements ControlPointService {
 
     @Override
     public void lost(MatchTeam matchTeam) {
-        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
-                " lost control of " + ChatColor.AQUA + ChatColor.BOLD + definition.getName());
+        Bukkit.broadcast(text(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
+                " lost control of " + ChatColor.AQUA + ChatColor.BOLD + definition.getName()));
 
         if (kothModule.getKothObjective() == KOTHObjective.CAPTURES) {
             if (definition.getPortals() != null && definition.getPortals().containsKey(matchTeam)) {
