@@ -34,7 +34,12 @@ public class MatchBroadcast {
     }
 
     private void dispatch(int time) {
-        Bukkit.broadcast(text(ChatColor.translateAlternateColorCodes('&', message).replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time))));
+        if (message != null)
+            Bukkit.broadcast(text(
+                    ChatColor.translateAlternateColorCodes('&', message)
+                            .replace("%time%", String.valueOf(time))
+                            .replace("%time_formatted%", Strings.formatTime(time))
+            ));
         commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time))));
     }
 
