@@ -143,7 +143,7 @@ public class ApiManager implements Listener {
                 MapLoadResponse mapLoadResponse = TGM.get().getTeamClient().loadmap(new Map(mapInfo.getName(), mapInfo.getVersion(), mapInfo.getAuthors(), mapInfo.getGametype().toString(), teams));
                 Bukkit.getLogger().info("Received load map response. Id: " + mapLoadResponse.getMap() + " [" + mapLoadResponse.isInserted() + "]");
                 matchInProgress = TGM.get().getTeamClient().loadMatch(new MatchLoadRequest(mapLoadResponse.getMap()));
-                Bukkit.getLogger().info("Match successfully loaded [" + matchInProgress.getMap() + "]");
+                Bukkit.getLogger().info("Match successfully loaded [" + matchInProgress.getMap() + "] (Map: " + mapInfo.getName() + ")");
             });
 
             teams.clear();
