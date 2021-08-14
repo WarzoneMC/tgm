@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.kyori.adventure.text.Component.text;
-
 public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
     private List<ScheduledGeneratorUpgrade> scheduledGeneratorUpgrades;
     private HashMap<Integer, Integer> taskMap = new HashMap<>();
@@ -44,7 +42,7 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
     private void applyUpgrade(ScheduledGeneratorUpgrade scheduledGeneratorUpgrade) {
         if (scheduledGeneratorUpgrade.getItem() != null) hostGenerator.setItem(scheduledGeneratorUpgrade.getItem());
         if (scheduledGeneratorUpgrade.getInterval() > 0) hostGenerator.setInterval(scheduledGeneratorUpgrade.getInterval());
-        if (scheduledGeneratorUpgrade.getBroadcast() != null) Bukkit.broadcast(text(parseCurrentBroadcast(scheduledGeneratorUpgrade.getBroadcast())));
+        if (scheduledGeneratorUpgrade.getBroadcast() != null) Bukkit.broadcastMessage(parseCurrentBroadcast(scheduledGeneratorUpgrade.getBroadcast()));
         if (scheduledGeneratorUpgrade.getHoloContent() != null && hostGenerator.getGeneratorHologram() != null) hostGenerator.getGeneratorHologram().setBaseContent(scheduledGeneratorUpgrade.getHoloContent());
     }
 

@@ -19,8 +19,6 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.List;
 
-import static net.kyori.adventure.text.Component.text;
-
 /**
  * Controls different objectives of CTF as a FlagSubscriber
  * Also more than likely handles scoreboard
@@ -47,11 +45,11 @@ public abstract class CTFController implements FlagSubscriber, Listener, TimeLim
         }
         MatchTeam team = teamManagerModule.getTeam(stealer);
         if (flag.getTeam() == null) {
-            Bukkit.broadcast(text(team.getColor() + stealer.getName() + ChatColor.WHITE + " picked up " + ChatColor.BOLD + flag.getName()));
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " picked up " + ChatColor.BOLD + flag.getName());
         } else {
-            Bukkit.broadcast(text(team.getColor() + stealer.getName() + ChatColor.WHITE
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
                     + " picked up " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName()));
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
         }
         playSoundForTeam(team);
     }
@@ -65,11 +63,11 @@ public abstract class CTFController implements FlagSubscriber, Listener, TimeLim
         if (team == null) team = teamManagerModule.getSpectators();
         if (team == null) return;
         if (flag.getTeam() == null) {
-            Bukkit.broadcast(text(team.getColor() + stealer.getName() + ChatColor.WHITE + " dropped " + ChatColor.BOLD + flag.getName()));
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE + " dropped " + ChatColor.BOLD + flag.getName());
         } else {
-            Bukkit.broadcast(text(team.getColor() + stealer.getName() + ChatColor.WHITE
+            Bukkit.broadcastMessage(team.getColor() + stealer.getName() + ChatColor.WHITE
                     + " dropped " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName()));
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
         }
     }
 
@@ -81,11 +79,11 @@ public abstract class CTFController implements FlagSubscriber, Listener, TimeLim
         }
         MatchTeam capturerTeam = teamManagerModule.getTeam(capturer);
         if (flag.getTeam() == null) {
-            Bukkit.broadcast(text(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE + " captured " + ChatColor.BOLD + flag.getName()));
+            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE + " captured " + ChatColor.BOLD + flag.getName());
         } else {
-            Bukkit.broadcast(text(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE
+            Bukkit.broadcastMessage(capturerTeam.getColor() + capturer.getName() + ChatColor.WHITE
                     + " captured " + flag.getTeam().getColor() + ChatColor.BOLD + flag.getTeam().getAlias()
-                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName()));
+                    + ChatColor.WHITE + "'s " + ChatColor.BOLD + flag.getName());
         }
         playSoundForTeam(capturerTeam);
     }

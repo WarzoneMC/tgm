@@ -34,8 +34,6 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.kyori.adventure.text.Component.text;
-
 /**
  * Created by Jorge on 10/7/2017.
  */
@@ -225,7 +223,7 @@ public class BlitzModule extends MatchModule implements Listener {
             MatchTeam team = teamManagerModule.getTeam(player);
             updateScoreboardTeamLine(team, getAlivePlayers(team).size());
 
-            Bukkit.broadcast(text(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!"));
+            Bukkit.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
             player.sendTitle("", ChatColor.RED + "You have been eliminated.", 10, 20, 10);
 
         } else {

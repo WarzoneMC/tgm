@@ -8,8 +8,6 @@ import org.bukkit.ChatColor;
 
 import java.util.List;
 
-import static net.kyori.adventure.text.Component.text;
-
 /**
  * Created by Jorge on 10/21/2017.
  */
@@ -34,12 +32,7 @@ public class MatchBroadcast {
     }
 
     private void dispatch(int time) {
-        if (message != null)
-            Bukkit.broadcast(text(
-                    ChatColor.translateAlternateColorCodes('&', message)
-                            .replace("%time%", String.valueOf(time))
-                            .replace("%time_formatted%", Strings.formatTime(time))
-            ));
+        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', message).replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time)));
         commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time))));
     }
 

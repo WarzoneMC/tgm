@@ -36,7 +36,6 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.kyori.adventure.text.Component.text;
 import static org.bukkit.SoundCategory.AMBIENT;
 
 @Getter
@@ -92,7 +91,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    Bukkit.broadcast(text(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName));
+                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
 
@@ -120,7 +119,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    Bukkit.broadcast(text(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName));
+                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
                     for (MatchTeam owner : monument.getOwners()) {

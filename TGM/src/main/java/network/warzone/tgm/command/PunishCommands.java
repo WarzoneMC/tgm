@@ -5,7 +5,6 @@ import cl.bgmp.minecraft.util.commands.annotations.Command;
 import cl.bgmp.minecraft.util.commands.annotations.CommandPermissions;
 import cl.bgmp.minecraft.util.commands.exceptions.CommandException;
 import cl.bgmp.minecraft.util.commands.exceptions.CommandPermissionsException;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.chat.*;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.chat.ChatConstant;
@@ -32,8 +31,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Pattern;
-
-import static net.kyori.adventure.text.Component.text;
 
 public class PunishCommands {
 
@@ -403,17 +400,17 @@ public class PunishCommands {
             if (TGM.get().getConfig().getBoolean("chat.enabled")) {
                 TGM.get().getConfig().set("chat.enabled", false);
                 TGM.get().saveConfig();
-                Bukkit.broadcast(text(sender.getName() + " muted the chat.", NamedTextColor.DARK_AQUA));
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
             } else {
                 TGM.get().getConfig().set("chat.enabled", true);
                 TGM.get().saveConfig();
-                Bukkit.broadcast(text(sender.getName() + " unmuted the chat.", NamedTextColor.DARK_AQUA));
+                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
             }
         } else if (action.equalsIgnoreCase("clear")) {
             for (int i = 0; i < 100; i++) {
-                Bukkit.broadcast(text("\n"));
+                Bukkit.broadcastMessage("\n");
             }
-            Bukkit.broadcast(text(sender.getName() + " cleared the chat.", NamedTextColor.DARK_AQUA));
+            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
         }
     }
 

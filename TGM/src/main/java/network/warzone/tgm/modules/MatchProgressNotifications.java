@@ -1,11 +1,8 @@
 package network.warzone.tgm.modules;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import network.warzone.tgm.match.MatchModule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-
-import static net.kyori.adventure.text.Component.text;
 
 
 /**
@@ -25,7 +22,7 @@ public class MatchProgressNotifications extends MatchModule {
 
     @Override
     public void enable() {
-        Bukkit.broadcast(text("The match has started!", NamedTextColor.GREEN));
+        Bukkit.broadcastMessage(ChatColor.GREEN + "The match has started!");
     }
 
 }

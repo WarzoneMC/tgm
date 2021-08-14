@@ -32,7 +32,6 @@ import org.bukkit.event.Listener;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.kyori.adventure.text.Component.text;
 import static org.bukkit.SoundCategory.AMBIENT;
 
 @Getter
@@ -80,8 +79,8 @@ public class CTWModule extends MatchModule implements Listener {
                     if (firstTouch) {
                         updateOnScoreboard(woolObjective);
 
-                        Bukkit.broadcast(text(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                                " picked up " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName()));
+                        Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                                " picked up " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                             for (PlayerContext playerContext : otherTeam.getMembers()) {
@@ -99,8 +98,8 @@ public class CTWModule extends MatchModule implements Listener {
                 public void place(Player player, MatchTeam matchTeam, Block block) {
                     updateOnScoreboard(woolObjective);
 
-                    Bukkit.broadcast(text(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                            " placed " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName()));
+                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                            " placed " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
                         for (PlayerContext playerContext : otherTeam.getMembers()) {
@@ -123,8 +122,8 @@ public class CTWModule extends MatchModule implements Listener {
                  public void drop(Player player, MatchTeam matchTeam, boolean broadcast) {
                     updateOnScoreboard(woolObjective);
 
-                     if (broadcast) Bukkit.broadcast(text(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
-                             " dropped " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName()));
+                     if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                             " dropped " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
                  }
 
             });
