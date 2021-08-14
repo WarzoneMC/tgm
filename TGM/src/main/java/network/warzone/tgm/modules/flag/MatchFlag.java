@@ -131,9 +131,9 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
                     placeFlag();
                     playRespawnSound();
                     if(this.team == null){
-                        Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
+                        TGM.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
                     } else {
-                        Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN + " has respawned.");
+                        TGM.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN + " has respawned.");
                     }
                 }
             }, 10L, 10L);
@@ -197,17 +197,17 @@ public class MatchFlag extends PlayerRedeemable implements Listener {
             placeFlag();
             playRespawnSound();
             if(this.team == null){
-                Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
+                TGM.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
             } else {
-                Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
+                TGM.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN +" has respawned.");
             }
         } else {
             this.timeDropped = now();
             this.willRespawn = true;
             if(this.team == null){
-                Bukkit.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" will respawn in "+ ChatColor.BOLD + "" + ChatColor.WHITE + this.respawnTime/1000 + ChatColor.GREEN + " seconds.");
+                TGM.broadcastMessage(ChatColor.BOLD + this.name + ChatColor.GREEN +" will respawn in "+ ChatColor.BOLD + "" + ChatColor.WHITE + this.respawnTime/1000 + ChatColor.GREEN + " seconds.");
             } else {
-                Bukkit.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN +" will respawn in "+ ChatColor.BOLD + "" + ChatColor.WHITE + this.respawnTime/1000 + ChatColor.GREEN + " seconds.");
+                TGM.broadcastMessage(this.team.getColor() + "" + ChatColor.BOLD + this.team.getAlias() + ChatColor.WHITE + "'s " + ChatColor.BOLD + this.name + ChatColor.GREEN +" will respawn in "+ ChatColor.BOLD + "" + ChatColor.WHITE + this.respawnTime/1000 + ChatColor.GREEN + " seconds.");
             }
         }
     }

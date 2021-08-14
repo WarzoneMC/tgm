@@ -196,4 +196,11 @@ public class TGM extends JavaPlugin {
         return matchManager.getMatch().getModules(clazz);
     }
 
+    public static void broadcastMessage(String message) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(message);
+        }
+        Bukkit.getConsoleSender().sendMessage(message);
+    }
+
 }

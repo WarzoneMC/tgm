@@ -91,7 +91,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
+                    TGM.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " damaged " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
 
@@ -119,7 +119,7 @@ public class DTMModule extends MatchModule implements Listener {
                     block.setType(Material.AIR);
 
                     MatchTeam matchTeam = teamManagerModule.getTeam(player);
-                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
+                    TGM.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE + " destroyed " + monument.getOwners().get(0).getColor() + ChatColor.BOLD + unformattedName);
                     playFireworkEffect(matchTeam.getColor(), block.getLocation());
 
                     for (MatchTeam owner : monument.getOwners()) {

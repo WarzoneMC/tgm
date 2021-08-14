@@ -223,7 +223,7 @@ public class BlitzModule extends MatchModule implements Listener {
             MatchTeam team = teamManagerModule.getTeam(player);
             updateScoreboardTeamLine(team, getAlivePlayers(team).size());
 
-            Bukkit.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
+            TGM.broadcastMessage(team.getColor() + player.getName() + ChatColor.RED + " has been eliminated!");
             player.sendTitle("", ChatColor.RED + "You have been eliminated.", 10, 20, 10);
 
         } else {

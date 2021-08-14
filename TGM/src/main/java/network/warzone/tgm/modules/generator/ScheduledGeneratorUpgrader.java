@@ -42,7 +42,7 @@ public class ScheduledGeneratorUpgrader extends GeneratorUpgrader {
     private void applyUpgrade(ScheduledGeneratorUpgrade scheduledGeneratorUpgrade) {
         if (scheduledGeneratorUpgrade.getItem() != null) hostGenerator.setItem(scheduledGeneratorUpgrade.getItem());
         if (scheduledGeneratorUpgrade.getInterval() > 0) hostGenerator.setInterval(scheduledGeneratorUpgrade.getInterval());
-        if (scheduledGeneratorUpgrade.getBroadcast() != null) Bukkit.broadcastMessage(parseCurrentBroadcast(scheduledGeneratorUpgrade.getBroadcast()));
+        if (scheduledGeneratorUpgrade.getBroadcast() != null) TGM.broadcastMessage(parseCurrentBroadcast(scheduledGeneratorUpgrade.getBroadcast()));
         if (scheduledGeneratorUpgrade.getHoloContent() != null && hostGenerator.getGeneratorHologram() != null) hostGenerator.getGeneratorHologram().setBaseContent(scheduledGeneratorUpgrade.getHoloContent());
     }
 
