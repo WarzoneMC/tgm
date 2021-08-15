@@ -99,18 +99,18 @@ public class SpectatorModule extends MatchModule implements Listener {
         /**
          * Only assign the menu actions once. No need to update these every second.
          */
-        teamSelectionMenu.setItem(0, null, (player, event) -> player.performCommand("join"));
+        teamSelectionMenu.setItem(0, null, (player, event) -> performTeamSelectionMenuCommand(player, "join"));
 
         int count = 0;
         for (MatchTeam matchTeam : teamManagerModule.getTeams()) {
             if (matchTeam.isSpectator()) {
-                teamSelectionMenu.setItem(8, null, (player, event) -> player.performCommand("join spectators"));
+                teamSelectionMenu.setItem(8, null, (player, event) -> performTeamSelectionMenuCommand(player, "join spectators"));
             } else {
-                teamSelectionMenu.setItem(InventoryUtil.calculateSlot(5, count++), null, (player, event) -> player.performCommand("join " + matchTeam.getId()));
+                teamSelectionMenu.setItem(InventoryUtil.calculateSlot(5, count++), null, (player, event) -> performTeamSelectionMenuCommand(player, "join " + matchTeam.getId()));
             }
         }
 
-        teamSelectionMenu.setItem(0, null, (player, event) -> player.performCommand("join"));
+        teamSelectionMenu.setItem(0, null, (player, event) -> performTeamSelectionMenuCommand(player, "join"));
 
         /**
          * Update the item values every second to keep player counts accurate.
@@ -129,6 +129,11 @@ public class SpectatorModule extends MatchModule implements Listener {
                 }
             }
         }, 10 * 20, 10 * 20).getTaskId();
+    }
+
+    private static void performTeamSelectionMenuCommand(Player player, String command) {
+        TGM.get().getLogger().info(player.getName() + " issued command through team selection menu: /" + command);
+        player.performCommand(command);
     }
 
     public void applySpectatorKit(PlayerContext playerContext) {

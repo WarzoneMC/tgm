@@ -400,17 +400,17 @@ public class PunishCommands {
             if (TGM.get().getConfig().getBoolean("chat.enabled")) {
                 TGM.get().getConfig().set("chat.enabled", false);
                 TGM.get().saveConfig();
-                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
+                TGM.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " muted the chat.");
             } else {
                 TGM.get().getConfig().set("chat.enabled", true);
                 TGM.get().saveConfig();
-                Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
+                TGM.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " unmuted the chat.");
             }
         } else if (action.equalsIgnoreCase("clear")) {
             for (int i = 0; i < 100; i++) {
-                Bukkit.broadcastMessage("\n");
+                TGM.broadcastMessage("\n");
             }
-            Bukkit.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
+            TGM.broadcastMessage(ChatColor.DARK_AQUA + sender.getName() + " cleared the chat.");
         }
     }
 

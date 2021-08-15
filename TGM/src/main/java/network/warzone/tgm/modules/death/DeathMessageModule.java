@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.death;
 
 import lombok.Getter;
 import lombok.Setter;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
@@ -55,7 +56,7 @@ public class DeathMessageModule extends MatchModule implements Listener {
 
     public static void broadcastDeathMessage(Player dead, Player killer, String message, Object... args) {
         message = ColorConverter.format(String.format(message, args));
-        Bukkit.broadcastMessage(message);
+        TGM.broadcastMessage(message);
     }
 
 

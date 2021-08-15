@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.time;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.util.Strings;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 
 @AllArgsConstructor @Getter
-public class Broadcast {
+public class MatchBroadcast {
 
     private String message;
     private List<String> commands;
@@ -32,7 +33,7 @@ public class Broadcast {
     }
 
     private void dispatch(int time) {
-        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', message).replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time)));
+        TGM.broadcastMessage(ChatColor.translateAlternateColorCodes('&', message).replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time)));
         commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%time%", String.valueOf(time)).replace("%time_formatted%", Strings.formatTime(time))));
     }
 

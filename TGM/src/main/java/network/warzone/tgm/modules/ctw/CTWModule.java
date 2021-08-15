@@ -79,7 +79,7 @@ public class CTWModule extends MatchModule implements Listener {
                     if (firstTouch) {
                         updateOnScoreboard(woolObjective);
 
-                        Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                        TGM.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
                                 " picked up " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                         for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
@@ -98,7 +98,7 @@ public class CTWModule extends MatchModule implements Listener {
                 public void place(Player player, MatchTeam matchTeam, Block block) {
                     updateOnScoreboard(woolObjective);
 
-                    Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                    TGM.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
                             " placed " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
 
                     for (MatchTeam otherTeam : teamManagerModule.getTeams()) {
@@ -122,7 +122,7 @@ public class CTWModule extends MatchModule implements Listener {
                  public void drop(Player player, MatchTeam matchTeam, boolean broadcast) {
                     updateOnScoreboard(woolObjective);
 
-                     if (broadcast) Bukkit.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
+                     if (broadcast) TGM.broadcastMessage(matchTeam.getColor() + player.getName() + ChatColor.WHITE +
                              " dropped " + woolObjective.getColor() + ChatColor.BOLD.toString() + woolObjective.getName());
                  }
 

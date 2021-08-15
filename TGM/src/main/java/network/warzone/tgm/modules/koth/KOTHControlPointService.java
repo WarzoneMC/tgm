@@ -37,7 +37,7 @@ public class KOTHControlPointService implements ControlPointService {
 
     @Override
     public void captured(MatchTeam matchTeam) {
-        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
+        TGM.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
                 " took control of " + ChatColor.AQUA + ChatColor.BOLD + definition.getName());
 
         for (MatchTeam team : match.getModule(TeamManagerModule.class).getTeams()) {
@@ -72,7 +72,7 @@ public class KOTHControlPointService implements ControlPointService {
 
     @Override
     public void lost(MatchTeam matchTeam) {
-        Bukkit.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
+        TGM.broadcastMessage(matchTeam.getColor() + ChatColor.BOLD.toString() + matchTeam.getAlias() + ChatColor.WHITE +
                 " lost control of " + ChatColor.AQUA + ChatColor.BOLD + definition.getName());
 
         if (kothModule.getKothObjective() == KOTHObjective.CAPTURES) {

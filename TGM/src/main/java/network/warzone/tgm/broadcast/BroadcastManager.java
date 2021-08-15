@@ -258,7 +258,9 @@ public class BroadcastManager {
     }
 
     public void broadcastRaw(String message) {
-        Bukkit.broadcastMessage(format(message));
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastRaw(player, message);
+        }
     }
 
     public void broadcastRaw(Player player, String message) {

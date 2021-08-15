@@ -20,10 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -56,26 +53,45 @@ public class JoinManager implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
-        UUID uuid = event.getUniqueId();
-        UserProfile userProfile = TGM.get().getTeamClient().login(new PlayerLogin(event.getName(), uuid.toString(), event.getAddress().getHostAddress()));
-
-        Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString() + " | ranks: " + userProfile.getRanksLoaded().size() + "/" + userProfile.getRanks().size() + " (loaded/total)");
-
-        //TODO Custom ban messages
-        Punishment punishment = userProfile.getLatestBan();
-        if (punishment != null) {
-            event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
-                    + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
-                    + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
-                    + ChatColor.AQUA + "Appeal at " + TGM.get().getConfig().getString("server.appeal") + "\n"
-                    + ChatColor.GRAY + "ID: " + punishment.getId().toString()
+        try {
+            UUID uuid = event.getUniqueId();
+            UserProfile userProfile = TGM.get().getTeamClient().login(
+                    new PlayerLogin(
+                            event.getName(),
+                            uuid.toString(),
+                            event.getAddress().getHostAddress()
+                    )
             );
-            event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-            return;
-        }
-        //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
+            if(userProfile == null) {
+                throw new RuntimeException("UserProfile is null");
+            }
+            TGM.get().getLogger().info(
+                    userProfile.getName() + " " +
+                    userProfile.getId().toString() + " | ranks: " +
+                    userProfile.getRanksLoaded().size() + "/" +
+                    userProfile.getRanks().size() + " (loaded/total)"
+            );
 
-        queuedJoins.add(new QueuedJoin(uuid, userProfile, System.currentTimeMillis()));
+            //TODO Custom ban messages
+            Punishment punishment = userProfile.getLatestBan();
+            if (punishment != null) {
+                event.setKickMessage(ChatColor.RED + "You have been banned from the server. Reason:\n"
+                        + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', punishment.getReason()) + "\n\n"
+                        + ChatColor.RED + "Ban expires: " + ChatColor.RESET + (punishment.getExpires() >= 0 ? new Date(punishment.getExpires()).toString() : "Never") + "\n"
+                        + ChatColor.AQUA + "Appeal at " + TGM.get().getConfig().getString("server.appeal") + "\n"
+                        + ChatColor.GRAY + "ID: " + punishment.getId().toString()
+                );
+                event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
+                return;
+            }
+            //Bukkit.getLogger().info(userProfile.getName() + " " + userProfile.getId().toString()); //Already logged above
+
+            queuedJoins.add(new QueuedJoin(uuid, userProfile, System.currentTimeMillis()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            event.setResult(PlayerPreLoginEvent.Result.KICK_OTHER);
+            event.setKickMessage(ChatColor.RED + "Unable to load user profile. Please try again.");
+        }
     }
 
     @EventHandler

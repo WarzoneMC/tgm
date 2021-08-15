@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.generator;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import network.warzone.tgm.TGM;
 import network.warzone.tgm.parser.item.ItemDeserializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -30,7 +31,7 @@ public class ManualGeneratorUpgrader extends GeneratorUpgrader {
     private void applyUpgrade() {
         if (upcomingUpgrade.getItem() != null) hostGenerator.setItem(upcomingUpgrade.getItem());
         if (upcomingUpgrade.getInterval() > 0) hostGenerator.setInterval(upcomingUpgrade.getInterval());
-        if (upcomingUpgrade.getBroadcast() != null) Bukkit.broadcastMessage(parseCurrentBroadcast(upcomingUpgrade.getBroadcast()));
+        if (upcomingUpgrade.getBroadcast() != null) TGM.broadcastMessage(parseCurrentBroadcast(upcomingUpgrade.getBroadcast()));
         if (upcomingUpgrade.getHoloContent() != null && hostGenerator.getGeneratorHologram() != null) hostGenerator.getGeneratorHologram().setBaseContent(upcomingUpgrade.getHoloContent());
     }
 
