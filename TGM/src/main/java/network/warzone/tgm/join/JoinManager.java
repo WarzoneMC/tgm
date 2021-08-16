@@ -53,11 +53,12 @@ public class JoinManager implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPreLogin(AsyncPlayerPreLoginEvent event) {
+        String name = event.getName();
+        UUID uuid = event.getUniqueId();
         try {
-            UUID uuid = event.getUniqueId();
             UserProfile userProfile = TGM.get().getTeamClient().login(
                     new PlayerLogin(
-                            event.getName(),
+                            name,
                             uuid.toString(),
                             event.getAddress().getHostAddress()
                     )
@@ -88,7 +89,11 @@ public class JoinManager implements Listener {
 
             queuedJoins.add(new QueuedJoin(uuid, userProfile, System.currentTimeMillis()));
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e instanceof RuntimeException) {
+                TGM.get().getLogger().warning("An error occured while retrieving UserProfile for " + name + " (" + uuid + "): " + e.getMessage());
+            } else {
+                e.printStackTrace();
+            }
             event.setResult(PlayerPreLoginEvent.Result.KICK_OTHER);
             event.setKickMessage(ChatColor.RED + "Unable to load user profile. Please try again.");
         }
