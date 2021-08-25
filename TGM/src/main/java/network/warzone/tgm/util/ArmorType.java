@@ -13,7 +13,10 @@ public enum ArmorType {
 
     public static ArmorType getArmorType(ItemStack itemStack) {
         Material material = itemStack.getType();
+        return getArmorType(material);
+    }
 
+    public static ArmorType getArmorType(Material material) {
         if (material.name().contains("_HELMET")) {
             return ArmorType.HELMET;
         } else if (material.name().contains("_CHESTPLATE")) {
@@ -25,9 +28,5 @@ public enum ArmorType {
         } else {
             return null;
         }
-    }
-
-    public static ArmorType getArmorType(Material material) {
-        return getArmorType(ItemFactory.createItem(material));
     }
 }

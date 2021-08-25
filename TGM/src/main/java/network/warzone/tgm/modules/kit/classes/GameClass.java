@@ -5,6 +5,7 @@ import network.warzone.tgm.modules.itemremove.ItemRemoveModule;
 import network.warzone.tgm.modules.kit.classes.abilities.Ability;
 import network.warzone.tgm.util.ArmorType;
 import network.warzone.tgm.util.ColorConverter;
+import network.warzone.tgm.util.itemstack.ItemUtils;
 import network.warzone.tgm.util.itemstack.Unbreakable;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,6 +17,7 @@ import java.util.*;
 
 public abstract class GameClass {
     private Set<Ability> abilities;
+
     protected HashMap<Integer, ItemStack> items = new HashMap<>();
 
     GameClass(Ability... abilities) {
@@ -34,7 +36,7 @@ public abstract class GameClass {
         for (Ability ability : abilities) ability.apply(player);
         for (int slot : this.items.keySet()) {
             ItemStack item = this.items.get(slot);
-            Unbreakable.setUnbreakable(item);
+            if (ItemUtils.UNBREAKABLE_MATERIALS.contains(item.getType())) Unbreakable.setUnbreakable(item);
 
 
             if (ArmorType.getArmorType(item) == ArmorType.HELMET) {

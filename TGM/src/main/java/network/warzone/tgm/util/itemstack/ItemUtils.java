@@ -3,6 +3,7 @@ package network.warzone.tgm.util.itemstack;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,12 +11,22 @@ import java.util.Set;
  * Created by luke on 11/15/15.
  */
 public class ItemUtils {
-    private static Set<Material> bannerMaterials = new HashSet<>();
+    public static final Set<Material> BANNER_MATERIALS = new HashSet<>();
+    public static final Set<Material> UNBREAKABLE_MATERIALS = new HashSet<>();
 
     static {
         for (Material material : Material.values()) {
             if (material.name().contains("_BANNER") && !material.name().contains("LEGACY"))
-                bannerMaterials.add(material);
+                BANNER_MATERIALS.add(material);
+        }
+
+        Set<String> unbreakableItemTypes = new HashSet<>(Arrays.asList("SWORD", "PICKAXE", "AXE", "SHOVEL", "HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS"));
+        for (Material material : Material.values()) {
+            final String materialName = material.name();
+            int underscore_position = materialName.lastIndexOf("_");
+            if (underscore_position == -1) continue;
+            String item_class = materialName.substring(underscore_position + 1);
+            if (unbreakableItemTypes.contains(item_class)) UNBREAKABLE_MATERIALS.add(material);
         }
     }
 
@@ -50,9 +61,5 @@ public class ItemUtils {
             stringBuilder.append(word);
         }
         return stringBuilder.toString().trim();
-    }
-
-    public static Set<Material> allBannerTypes() {
-        return bannerMaterials;
     }
 }
