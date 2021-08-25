@@ -64,7 +64,7 @@ public class CTFModule extends MatchModule implements CTFControllerSubscriber {
 
         // Don't allow flags to be dropped
         ItemRemoveModule itemRemoveModule = TGM.get().getModule(ItemRemoveModule.class);
-        itemRemoveModule.addAll(ItemUtils.allBannerTypes());
+        itemRemoveModule.addAll(ItemUtils.BANNER_MATERIALS);
 
 
         // If Objective is amount, bases are required for flags to be captured
