@@ -362,7 +362,7 @@ public class PunishCommands {
             }
         }
 
-        reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff.");
+        reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff. You can also report players in our Discord server if staff aren't available.");
     }
 
     @Command(aliases = {"reports"}, desc = "View reports", max = 1, usage = "[page]")
