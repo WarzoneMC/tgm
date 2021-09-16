@@ -1,6 +1,9 @@
 package network.warzone.tgm.util.itemstack;
 
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -34,6 +37,13 @@ public class ItemFactory {
         meta.setDisplayName(name);
         meta.setLore(null);
         item.setItemMeta(meta);
+
+        return item;
+    }
+
+    public static ItemStack createItem(Material material, String name, int amount) {
+        ItemStack item = createItem(material, name);
+        item.setAmount(amount);
 
         return item;
     }

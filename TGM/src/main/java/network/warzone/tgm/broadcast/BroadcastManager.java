@@ -3,10 +3,7 @@ package network.warzone.tgm.broadcast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import kong.unirest.*;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import org.bukkit.Bukkit;
@@ -47,9 +44,33 @@ public class BroadcastManager {
 
     @Getter private List<Broadcast> broadcasts = new ArrayList<>();
 
+    private UnirestInstance unirest;
+
     public BroadcastManager() {
         reload();
         new BroadcastEventTrigger(this);
+
+
+        Config unirestConfig = new Config();
+        unirestConfig.setObjectMapper(new ObjectMapper() {
+
+            public <T> T readValue(String s, Class<T> aClass) {
+                try {
+                    return TGM.get().getGson().fromJson(s, aClass);
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            public String writeValue(Object o) {
+                try {
+                    return TGM.get().getGson().toJson(o);
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        this.unirest = new UnirestInstance(unirestConfig);
     }
 
     private void retrieveBroadcasts() {
@@ -79,7 +100,7 @@ public class BroadcastManager {
     }
 
     private void readFromURL() throws UnirestException {
-        HttpResponse<JsonNode> broadcasts = Unirest.get(url).asObject(JsonNode.class);
+        HttpResponse<JsonNode> broadcasts = unirest.get(url).asObject(JsonNode.class);
         Gson gson = new Gson();
         if (this.broadcasts != null && !this.broadcasts.isEmpty()) this.broadcasts.clear();
         this.broadcasts = new ArrayList(Arrays.asList(gson.fromJson(broadcasts.getBody().toString(), Broadcast[].class)));
@@ -219,7 +240,7 @@ public class BroadcastManager {
         }
     }
 
-    List<Broadcast> getOnEvents(String name) {
+    protected List<Broadcast> getOnEvents(String name) {
         List<Broadcast> broadcasts = new ArrayList<>();
         for (String id : onEvents.getOrDefault(name, Collections.emptyList())) {
             Broadcast broadcast = getBroadcast(id);
@@ -237,7 +258,9 @@ public class BroadcastManager {
     }
 
     public void broadcastRaw(String message) {
-        Bukkit.broadcastMessage(format(message));
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            broadcastRaw(player, message);
+        }
     }
 
     public void broadcastRaw(Player player, String message) {

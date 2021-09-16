@@ -1,8 +1,8 @@
 package network.warzone.tgm.join;
 
-import network.warzone.tgm.user.PlayerContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -19,7 +19,7 @@ public class MatchJoinEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     @Getter
-    PlayerContext playerContext;
+    private PlayerContext playerContext;
 
     @Override
     public HandlerList getHandlers() {

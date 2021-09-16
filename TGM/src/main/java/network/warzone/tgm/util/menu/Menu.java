@@ -19,12 +19,11 @@ import java.util.HashMap;
 public abstract class Menu implements Listener {
 
     @Getter private Inventory inventory;
-    private String realTitle;
+
     private HashMap<Integer, MenuAction> actions = new HashMap<>();
 
     public Menu(String name, int slots) {
         this.inventory = Bukkit.createInventory(null, slots, name);
-        this.realTitle = name;
         TGM.registerEvents(this);
     }
 
@@ -38,8 +37,8 @@ public abstract class Menu implements Listener {
             event.setCancelled(true);
             Player player = (Player) event.getWhoClicked();
 
-            if (actions.containsKey(event.getSlot())) {
-                actions.get(event.getSlot()).run(player, event);
+            if (this.actions.containsKey(event.getSlot())) {
+                this.actions.get(event.getSlot()).run(player, event);
             }
         }
     }

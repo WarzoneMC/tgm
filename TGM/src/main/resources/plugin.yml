@@ -1,6 +1,7 @@
 name: TGM
 description: Team Game Manager
 main: network.warzone.tgm.TGM
-version: ${project.version}
-website: https://github.com/WarzoneMC/Warzone
+version: ${project.version}-${git.commit.id.abbrev}
+website: https://github.com/Warzone/TGM
 api-version: 1.13
+softdepend: [ProtocolSupport, WorldEdit, Vault]

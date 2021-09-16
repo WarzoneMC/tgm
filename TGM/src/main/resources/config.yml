@@ -1,21 +1,146 @@
 api:
+  # Toggle data linking to an API instance. https://github.com/Warzone/API
+  # Default: false
   enabled: false
-  url: https://api.warz.one
+  # URL that points to the API instance.
+  # Must not end in / .
+  url: https://api.warzone.network
+  # Authentication token to enable data linking between API instance and server
   auth: secret
   stats:
+    # Toggle user statistics linking. Does not affect match and server data linking.
+    # Default: true
     enabled: true
-rotation: Maps/rotation.txt
+# Location of the map rotation file.
+# Default: Maps/rotation.json
+rotation: Maps/rotation.json
+
 chat:
+  # Allow players to talk in chat. Can be toggled in-game with the `/chat mute` command and can be bypassed with the tgm.chat.bypass permission node.
+  # Default: true
   enabled: true
+  # Add a hover event for chat messages that displays the player statistics.
+  # Might cause unwanted behavior if other chat-related plugins are present.
+  # Default: true
   stats-hover: true
   messages:
-    muted: "&cChat is currently disabled. If you believe this is an error, please contact a staff member on our Discord."
+    # Message that will be displayed to players when the chat is muted if they do not have permission to bypass the chat mute.
+    # Default: "&cChat is currently disabled."
+    muted: "&cChat is currently disabled."
+  # Display color for player levels show in chat and tab list.
+  # Format: <minimumLevel>: <color>
+  # Note: Supports HEX colors for 1.16+ and legacy color names (https://javadoc.io/doc/net.md-5/bungeecord-chat/latest/net/md_5/bungee/api/ChatColor.html)
+  levels:
+    1: "#BBBAD3"
+    10: "#AAC1FF"
+    20: "#B1AAFF"
+    30: "#AAE1FF"
+    40: "#AAFFFF"
+    50: "#96FFBC"
+    60: "#ABFFA5"
+    70: "#D9FFAA"
+    80: "#FFFFAA"
+    90: "#FFD9AA"
+    100: "#FFAAAA"
+    120: "#FFAAC9"
+    140: "#FF96DA"
+    160: "#FF66FF"
+    180: "#E266FF"
+    200: "#C966FF"
+    220: "#9E66FF"
+    240: "DARK_GREEN"
 map:
+  # If players will be placed in to survival after the game is ended
+  # Any player in survival mode may break blocks during post game
+  post-block-break: false
+  # Retrieve map author names from the Mojang API using the UUIDs specified in the map.json.
+  # Recommended for production use only.
+  # Default: false
   get-names: false
+  # Store the game matches in the `matches` folder found in the server root directory.
+  # Default: false
+  save-matches: false
+  # When the match ends, how long to take to cycle to the next map.
+  # Default: 10
+  cycle-countdown: 10
+  # When the match starts, how long to take to start the match.
+  # Default: 20
+  start-countdown: 20
+  # Whether remote map sources should be updated on startup
+  update-remotes-on-startup: false
+  # Remote Map Sources
+  remotes:
+    official:
+      branch: master
+      destination: Maps
+      uri: https://github.com/Warzone/Maps.git
+  # Map repository location.
   sources:
   - Maps
+  # Set of conditions for players with the necessary permissions to be able to pick a team.
+  # To bypass these conditions use the permission node 'tgm.pickteam.bypass'.
+  team-picking-conditions:
+    # Minimum amount of players in the server to be able to pick a team.
+    # Set 0 to disable.
+    # Default: 0
+    min-players: 0
+    # Minimum amount of players per team to be able to pick a team.
+    # Set 0 to disable.
+    # Default: 3
+    min-playing: 3
+    # Skip conditions if API is not enabled or on maps where stat tracking has been disabled.
+    # Default: true
+    ignore-untracked: true
 server:
+  # Display name for the server object served by the API.
+  # Default: Warzone
   name: "Warzone"
+  # ID for the server object served by the API.
+  # Default: Warzone
   id: "warzone"
-  store: "https://tgmwarzone.tebex.io/"
+  # Message displayed on the last line of the scoreboards. Color codes accepted.
+  ip: "your.server.ip"
+  # Store link displayed when a player tries to join a specific team.
+  store: "https://warz.one/store"
+  # Appeal link displayed when a player is banned from the Server.
+  appeal: "https://warz.one/discord"
+  # Text displayed after the match time on the tablist header.
+  # Default: &f&lWARZONE
   tablist-name: "&f&lWARZONE"
+# Legacy Features
+legacy:
+  attack-speed: true
+  damage: true
+  knockback: true
+  armor: true
+  shield: true
+  shield-reduction:
+    generic: 0.5
+    projectile: 0.5
+  # Configurable knockback values
+  custom-knockback:
+    friction: 2.1
+    horizontal: 0.425
+    vertical: 0.25
+    vertical-limit: 0.39
+    horizontal-extra: 0.5
+    vertical-extra: 0.1
+    bow-base: 0.345
+    bow-vertical: 0.35
+    punch-multiplier: 1
+
+heapdump:
+  # Upload heap dump to a Bytebin server (https://github.com/lucko/bytebin). If enabled, heap dumps will not remain within
+  # the server files.
+  # Default: false
+  upload: false
+  # URL of the Bytebin server.
+  url: "http://localhost:8080"
+  # Directory where heap dumps will be stored.
+  # Default: dumps
+  dir: "dumps"
+
+combat:
+  # Time in milliseconds a player must remain undamaged by another player to not count as a kill by the attacker.
+  # Default: 10000 (10 seconds)
+  cooldown: 10000

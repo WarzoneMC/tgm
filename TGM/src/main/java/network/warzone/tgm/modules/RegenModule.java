@@ -18,8 +18,8 @@ import java.util.UUID;
 /**
  * Created by MatrixTunnel on 8/30/2017.
  *
- * https://github.com/gvlfm78/BukkitOldCombatMechanics/blob/master/src/main/java/gvlfm78/plugin/OldCombatMechanics/module/ModulePlayerRegen.java
- * @author gvlfm78 & Rayzr522
+ * https://github.com/kernitus/BukkitOldCombatMechanics/blob/master/src/main/java/kernitus/plugin/OldCombatMechanics/module/ModulePlayerRegen.java
+ * @author kernitus
  */
 public class RegenModule extends MatchModule implements Listener {
 
@@ -84,14 +84,10 @@ public class RegenModule extends MatchModule implements Listener {
         double realMax = Math.max(min, max);
 
         if (value < realMin) {
-            value = realMin;
+            return realMin;
+        } else {
+            return Math.min(value, realMax);
         }
-
-        if (value > realMax) {
-            value = realMax;
-        }
-
-        return value;
     }
 
 }

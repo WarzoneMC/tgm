@@ -18,11 +18,11 @@ public class TimeModule extends MatchModule {
     private long startedTimeStamp = 0;
     private long endedTimeStamp = 0;
 
-    private List<Broadcast> broadcasts = new ArrayList<>();
-    private List<TimeUpdate> dependents = new ArrayList<>();
+    private List<MatchBroadcast> matchBroadcasts = new ArrayList<>();
+    private List<TimeSubscriber> timeSubscribers = new ArrayList<>();
 
     @Setter private boolean timeLimited = false;
-    @Setter private int timeLimit = 20*60; // Default
+    @Setter private int timeLimit = 20*60; // Default (20 minutes)
     private MatchTeam defaultWinner = null;
     //@Getter private List<TimeLimitService> services = new ArrayList<>();
     @Setter private TimeLimitService timeLimitService;
@@ -40,18 +40,19 @@ public class TimeModule extends MatchModule {
             if (timeObject.has("defaultWinner")) defaultWinner = match.getModule(TeamManagerModule.class).getTeamById(timeObject.get("defaultWinner").getAsString());
             if (timeObject.has("broadcasts") && timeObject.get("broadcasts").isJsonArray()) {
                 for (JsonElement element : timeObject.getAsJsonArray("broadcasts")) {
+                    if (!element.isJsonObject()) continue;
                     JsonObject broadcast = (JsonObject) element;
-                    BroadcastTimeType type = BroadcastTimeType.valueOf(broadcast.get("type").getAsString().toUpperCase());
+                    boolean repeat = broadcast.get("repeat").getAsBoolean();
                     String message = broadcast.has("message") ? broadcast.get("message").getAsString() : null;
                     List<String> commands = new ArrayList<>();
                     for (JsonElement cmdElement : broadcast.get("commands").getAsJsonArray()) {
                         String command = cmdElement.getAsString();
                         commands.add(command);
                     }
-                    int interval = broadcast.get("value").getAsInt();
-                    List<Integer> excludedTimes = new ArrayList<>();
-                    if (broadcast.has("exclude") && broadcast.get("exclude").isJsonArray()) broadcast.get("exclude").getAsJsonArray().forEach(jsonElement -> excludedTimes.add(jsonElement.getAsInt()));
-                    broadcasts.add(new Broadcast(type, message, commands, interval, excludedTimes));
+                    int interval = broadcast.get("interval").getAsInt();
+                    List<Integer> exclude = new ArrayList<>();
+                    if (broadcast.has("exclude") && broadcast.get("exclude").isJsonArray()) broadcast.get("exclude").getAsJsonArray().forEach(jsonElement -> exclude.add(jsonElement.getAsInt()));
+                    matchBroadcasts.add(new MatchBroadcast(message, commands, interval, repeat, exclude));
                 }
             }
         }
@@ -62,16 +63,14 @@ public class TimeModule extends MatchModule {
         startedTimeStamp = System.currentTimeMillis();
         taskID = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             int time = (int) getTimeElapsed();
-            for(TimeUpdate module : dependents) {
+            for (TimeSubscriber module : timeSubscribers) {
                 module.processSecond(time);
             }
-            for (Broadcast broadcast : broadcasts) {
-                broadcast.run(time);
+            for (MatchBroadcast matchBroadcast : matchBroadcasts) {
+                matchBroadcast.run(time);
             }
-            if (isTimeLimited()) {
-                if (time >= timeLimit) {
-                    endMatch();
-                }
+            if (isTimeLimited() && time >= timeLimit) {
+                endMatch();
             }
         }, 20, 20).getTaskId();
     }
@@ -90,9 +89,12 @@ public class TimeModule extends MatchModule {
         setTimeLimited(false);
         Bukkit.getScheduler().cancelTask(taskID);
 
-        broadcasts.clear();
+        matchBroadcasts.clear();
     }
 
+    /**
+     * @return Time elapsed in seconds
+     */
     public double getTimeElapsed() {
         MatchStatus matchStatus = TGM.get().getMatchManager().getMatch().getMatchStatus();
         if (matchStatus == MatchStatus.MID) {

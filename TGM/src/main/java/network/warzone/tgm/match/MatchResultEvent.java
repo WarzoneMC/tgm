@@ -1,8 +1,8 @@
 package network.warzone.tgm.match;
 
-import network.warzone.tgm.modules.team.MatchTeam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.modules.team.MatchTeam;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 

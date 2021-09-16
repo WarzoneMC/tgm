@@ -1,17 +1,19 @@
 package network.warzone.tgm.map;
 
 import com.google.gson.*;
-import com.mashape.unirest.http.Unirest;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.gametype.GameType;
+import network.warzone.tgm.nickname.ProfileCache;
+import network.warzone.tgm.util.Strings;
 import network.warzone.warzoneapi.models.Author;
+import network.warzone.warzoneapi.models.MojangProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by luke on 4/27/17.
@@ -22,6 +24,7 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
         JsonObject json = jsonElement.getAsJsonObject();
         String name = json.get("name").getAsString();
         String version = json.get("version").getAsString();
+        String objective = json.has("objective") ? json.get("objective").getAsString() : null;
         List<Author> authors = new ArrayList<>();
         for (JsonElement authorJson : json.getAsJsonArray("authors")) {
             if (authorJson.isJsonPrimitive()) {
@@ -32,7 +35,14 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
                     Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                         if (author != null && author.getUuid() != null) {
                             try {
-                                author.setDisplayUsername(getCurrentName(author.getUuid()));
+                                MojangProfile profile = ProfileCache.getInstance().get(author.getUuid());
+                                if (profile == null) {
+                                    profile = TGM.get().getTeamClient().getMojangProfile(author.getUuid());
+                                    ProfileCache.getInstance().add(profile);
+                                }
+                                if (profile != null) {
+                                    author.setDisplayUsername(profile.getUsername());
+                                }
                             } catch (Exception e) {
                                 TGM.get().getLogger().warning("Could not retrieve current name for " + author.getUuid().toString() + " on map " + name);
                             }
@@ -48,23 +58,14 @@ public class MapInfoDeserializer implements JsonDeserializer<MapInfo> {
             String teamId = teamJson.get("id").getAsString();
             String teamName = teamJson.get("name").getAsString();
             ChatColor teamColor = ChatColor.valueOf(teamJson.get("color").getAsString().toUpperCase().replace(" ", "_"));
+            GameMode teamGamemode = teamJson.has("gamemode") ? GameMode.valueOf(Strings.getTechnicalName(teamJson.get("gamemode").getAsString())) : GameMode.SURVIVAL;
             int teamMax = teamJson.get("max").getAsInt();
             int teamMin = teamJson.get("min").getAsInt();
-            parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamMax, teamMin));
+            boolean friendlyFire = teamJson.has("friendlyFire") && teamJson.get("friendlyFire").getAsBoolean();
+            parsedTeams.add(new ParsedTeam(teamId, teamName, teamColor, teamGamemode, teamMax, teamMin, friendlyFire));
         }
 
-        return new MapInfo(name, version, authors, gameType, parsedTeams, json);
-    }
-
-    private static String getCurrentName(UUID uuid) throws Exception {
-        MojangProfile body = Unirest.get("https://api.ashcon.app/mojang/v2/user/" + uuid.toString())
-                .asObject(MojangProfile.class)
-                .getBody();
-        return body.username;
-    }
-
-    private static class MojangProfile {
-        private String username;
+        return new MapInfo(name, version, objective, authors, gameType, parsedTeams, json);
     }
 
 }

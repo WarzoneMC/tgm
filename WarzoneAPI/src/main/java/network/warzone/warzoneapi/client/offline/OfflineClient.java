@@ -28,8 +28,7 @@ public class OfflineClient implements TeamClient {
     public UserProfile login(PlayerLogin playerLogin) {
         List<String> ranks = new ArrayList<String>();
         return new UserProfile(new ObjectId(), playerLogin.getName(), playerLogin.getName().toLowerCase(),
-                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), ranks, new ArrayList<Rank>(),
-                0, 0, 0, 0, 0, new ArrayList<Punishment>(), false);
+                playerLogin.getUuid(), new Date().getTime(), new Date().getTime(), Collections.singletonList(playerLogin.getIp()), ranks, new ArrayList<Rank>(), 0, 0, 0, 0, 0, new ArrayList<>(), new ArrayList<>(), null, false);
     }
 
     @Override
@@ -63,7 +62,7 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest){
+    public RankUpdateResponse updateRank(String player, RankUpdateRequest.Action action, RankUpdateRequest rankUpdateRequest) {
         return null;
     };
 
@@ -83,6 +82,10 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
+    public void createReport(ReportCreateRequest reportCreateRequest) {
+    }
+
+    @Override
     public IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest) {
         return null;
     }
@@ -93,7 +96,7 @@ public class OfflineClient implements TeamClient {
     }
 
     @Override
-    public KillsLeaderboardResponse getKillsLeaderboard() { return new KillsLeaderboardResponse(); }
+    public LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion) { return new LeaderboardResponse(); }
 
     @Override
     public RevertPunishmentResponse revertPunishment(String id) {
@@ -109,4 +112,14 @@ public class OfflineClient implements TeamClient {
     public PlayerAltsResponse getAlts(String name) {
         return null;
     }
+
+    @Override
+    public PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action) {
+        return new PlayerTagsUpdateResponse(false, "", "", new ArrayList<>(), null);
+    }
+
+    public MojangProfile getMojangProfile(String username) {
+        return null;
+    }
+
 }

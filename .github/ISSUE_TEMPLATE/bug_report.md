@@ -10,6 +10,9 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Client version**
+The Minecraft client version in which the bug occurred.
+
 **To Reproduce**
 Steps to reproduce the bug:
 1. Go to '...'

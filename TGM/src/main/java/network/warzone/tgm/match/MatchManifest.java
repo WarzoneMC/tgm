@@ -1,20 +1,30 @@
 package network.warzone.tgm.match;
 
+import com.google.gson.JsonObject;
 import network.warzone.tgm.modules.*;
 import network.warzone.tgm.modules.border.WorldBorderModule;
-import network.warzone.tgm.modules.countdown.CycleCountdown;
-import network.warzone.tgm.modules.countdown.StartCountdown;
+import network.warzone.tgm.modules.countdown.CountdownManagerModule;
+import network.warzone.tgm.modules.damage.DamageControlModule;
+import network.warzone.tgm.modules.damage.EntityDamageModule;
+import network.warzone.tgm.modules.damage.FireworkDamageModule;
 import network.warzone.tgm.modules.death.DeathMessageModule;
 import network.warzone.tgm.modules.death.DeathModule;
 import network.warzone.tgm.modules.filter.FilterManagerModule;
+import network.warzone.tgm.modules.generator.GeneratorModule;
+import network.warzone.tgm.modules.itemremove.ItemRemoveModule;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
+import network.warzone.tgm.modules.kit.KitEditorModule;
 import network.warzone.tgm.modules.kit.KitLoaderModule;
-import network.warzone.tgm.modules.knockback.KnockbackModule;
+import network.warzone.tgm.modules.kit.classes.GameClassModule;
+import network.warzone.tgm.modules.launchpad.LaunchPadLoaderModule;
+import network.warzone.tgm.modules.legacy.*;
 import network.warzone.tgm.modules.points.PointsModule;
-import network.warzone.tgm.modules.portal.PortalLoaderModule;
+import network.warzone.tgm.modules.portal.PortalManagerModule;
 import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.reports.ReportsModule;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.scoreboard.ScoreboardManagerModule;
+import network.warzone.tgm.modules.screens.ScreenManagerModule;
 import network.warzone.tgm.modules.tasked.TaskedModuleManager;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
@@ -41,14 +51,16 @@ public abstract class MatchManifest {
      * if needed.
      * @return
      */
-    public List<MatchModule> allocateCoreModules() {
+    public List<MatchModule> allocateCoreModules(JsonObject mapJson) {
         List<MatchModule> modules = new ArrayList<>();
 
+        modules.add(new ExploitPreventionModule());
         modules.add(new TeamJoinNotificationsModule());
+        modules.add(new TeamManagerModule());
         modules.add(new SpectatorModule());
+        modules.add(new InventoryPreviewModule());
         modules.add(new SpawnPointHandlerModule());
         modules.add(new SpawnPointLoaderModule());
-        modules.add(new TeamManagerModule());
         modules.add(new VisibilityModule());
         modules.add(new TimeModule());
         modules.add(new TabListModule());
@@ -57,28 +69,41 @@ public abstract class MatchManifest {
         modules.add(new ScoreboardManagerModule());
         modules.add(new RegionManagerModule());
         modules.add(new TaskedModuleManager());
-        modules.add(new StartCountdown());
-        modules.add(new CycleCountdown());
+        modules.add(new CountdownManagerModule());
+        modules.add(new KitEditorModule());
         modules.add(new KitLoaderModule());
         modules.add(new DeathModule());
         modules.add(new DeathMessageModule());
+        modules.add(new BuildHeightLimitModule());
         modules.add(new FilterManagerModule());
-        modules.add(new ChatModule());
         modules.add(new DisabledCommandsModule());
+        modules.add(new ScreenManagerModule());
         modules.add(new PointsModule());
         modules.add(new LegacyDamageModule());
+        modules.add(new LegacyArmorModule());
+        modules.add(new LegacyShieldModule());
+        modules.add(new LegacyAttackSpeedModule());
         modules.add(new EntityDamageModule());
         modules.add(new FireworkDamageModule());
         modules.add(new GameRuleModule());
         modules.add(new ItemRemoveModule());
+        modules.add(new ItemKeepModule());
         modules.add(new RegenModule());
         modules.add(new KillstreakModule());
         modules.add(new ReportsModule());
         modules.add(new StatsModule());
-        modules.add(new PortalLoaderModule());
+        modules.add(new PortalManagerModule());
+        modules.add(new LaunchPadLoaderModule());
         modules.add(new WorldBorderModule());
-        modules.add(new KnockbackModule());
+        modules.add(new LegacyKnockbackModule());
         modules.add(new MapCommandsModule());
+        modules.add(new DamageControlModule());
+        modules.add(new RespawnModule());
+        modules.add(new CraftingModule());
+
+        if (GameClassModule.isUsingClasses(mapJson)) modules.add(new GameClassModule());
+        if (GeneratorModule.hasGenerators(mapJson)) modules.add(new GeneratorModule());
+
         return modules;
     }
 }

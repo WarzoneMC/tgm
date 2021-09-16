@@ -2,7 +2,7 @@ package network.warzone.warzoneapi.client;
 
 import network.warzone.warzoneapi.models.*;
 
-import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by luke on 4/27/17.
@@ -46,6 +46,8 @@ public interface TeamClient {
 
     RankManageResponse editPermissions(RankPermissionsUpdateRequest.Action action, RankPermissionsUpdateRequest permissionsUpdateRequest);
 
+    void createReport(ReportCreateRequest reportCreateRequest);
+
     IssuePunishmentResponse issuePunishment(IssuePunishmentRequest issuePunishmentRequest);
 
     PunishmentsListResponse getPunishments(PunishmentsListRequest punishmentsListRequest);
@@ -56,6 +58,14 @@ public interface TeamClient {
 
     PlayerAltsResponse getAlts(String name);
 
-    KillsLeaderboardResponse getKillsLeaderboard();
+    PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action);
+
+    LeaderboardResponse getLeaderboard(LeaderboardCriterion leaderboardCriterion);
+
+    MojangProfile getMojangProfile(String username);
+
+    default MojangProfile getMojangProfile(UUID uuid) {
+        return getMojangProfile(uuid.toString());
+    }
 
 }

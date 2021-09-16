@@ -12,6 +12,10 @@ import java.util.UUID;
 @Getter @AllArgsConstructor
 public class Author {
 
+    private final UUID uuid;
+    private final String username; // Fallback
+    @Setter private String displayUsername;
+
     public Author(UUID uuid) {
         this(uuid, null, null);
     }
@@ -20,7 +24,4 @@ public class Author {
         this(null, username, null);
     }
 
-    private final UUID uuid;
-    private final String username; // Fallback
-    @Setter private String displayUsername;
 }

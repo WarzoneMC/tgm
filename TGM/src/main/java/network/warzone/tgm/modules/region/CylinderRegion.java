@@ -9,12 +9,16 @@ import org.bukkit.util.NumberConversions;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class CylinderRegion implements Region {
-    @Getter private final Location base;
-    @Getter private final double radius, height;
+    private final Location base;
+    private final double radius;
+    private final double height;
 
     private final Location min;
     private final Location max;
+
+    private final CuboidRegion bound;
 
     public CylinderRegion(Location base, double radius, double height) {
         this.base = base;
@@ -23,18 +27,36 @@ public class CylinderRegion implements Region {
 
         this.min = new Location(base.getWorld(), base.getX() - radius, base.getY(), base.getZ() - radius);
         this.max = new Location(base.getWorld(), base.getX() + radius, base.getY() + height, base.getZ() + radius);
+
+        this.bound = new CuboidRegion(this.min, this.max);
     }
 
     @Override
     public boolean contains(Location location) {
-        return Math.sqrt(NumberConversions.square(base.getX() - location.getX()) + NumberConversions.square(base.getZ() - location.getZ())) <= radius &&
+        return NumberConversions.square(base.getX() - location.getX()) + NumberConversions.square(base.getZ() - location.getZ()) <= radius * radius &&
                 location.getY() >= base.getY() &&
                 location.getY() <= base.getY() + height;
     }
 
     @Override
+    public boolean contains(Block block) {
+        return contains(block.getLocation());
+    }
+
+    @Override
     public Location getCenter() {
         return base;
+    }
+
+    @Override
+    public Location getRandomLocation() {
+        Location location = bound.getRandomLocation();
+
+        while (!contains(location)) {
+            location = bound.getRandomLocation();
+        }
+
+        return location;
     }
 
     @Override

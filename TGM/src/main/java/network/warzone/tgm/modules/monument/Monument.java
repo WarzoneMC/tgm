@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
@@ -15,12 +16,14 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor @Getter
 public class Monument implements Listener {
 
+    private WeakReference<Match> match;
     private String name;
 
     private final List<MatchTeam> owners;
@@ -34,12 +37,28 @@ public class Monument implements Listener {
 
     private final List<MonumentService> services = new ArrayList<>();
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBlockBreak(BlockBreakEvent event) {
         if (region.contains(event.getBlock().getLocation())) {
             if (materials == null || materials.contains(event.getBlock().getType())) {
+                if (!canDamage(event.getPlayer())) {
+                    event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
+                }
+                event.setCancelled(true); // override filters (event gets ignored)
+            }
+        }
+    }
+
+    /*
+    Prevents filter messages
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockBreakHighest(BlockBreakEvent event) {
+        if (region.contains(event.getBlock().getLocation())) {
+            if (materials == null || materials.contains(event.getBlock().getType())) {
                 if (canDamage(event.getPlayer())) {
-                    if (TGM.get().getMatchManager().getMatch().getMatchStatus().equals(MatchStatus.MID)) {
+                    Match match = this.match.get();
+                    if (match != null && match.getMatchStatus().equals(MatchStatus.MID)) {
                         event.setCancelled(false); //override filters
                         event.getBlock().getDrops().clear();
 
@@ -57,9 +76,6 @@ public class Monument implements Listener {
                             }
                         }
                     }
-                } else {
-                    event.getPlayer().sendMessage(ChatColor.RED + "You cannot damage a monument you own.");
-                    event.setCancelled(true);
                 }
             }
         }

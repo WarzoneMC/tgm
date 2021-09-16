@@ -1,15 +1,15 @@
 package network.warzone.tgm.modules.scoreboard;
 
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.MatchModule;
 import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.player.event.PlayerXPEvent;
 import network.warzone.tgm.user.PlayerContext;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -20,6 +20,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -29,20 +31,29 @@ import java.util.UUID;
  * direct access to SimpleScoreboard objects through TGM.get().getModule(ScoreboardManagerModule.class)
  * to control scoreboards as needed.
  */
-@ModuleData(load = ModuleLoadTime.EARLIEST) @Getter
+@ModuleData(load = ModuleLoadTime.EARLIER) @Getter
 public class ScoreboardManagerModule extends MatchModule implements Listener {
 
     private HashMap<UUID, SimpleScoreboard> scoreboards = new HashMap<>();
+    @Getter private static Set<Integer> reservedExclusions;
+
+    static {
+        reservedExclusions = new HashSet<>();
+        // Server IP lines
+        reservedExclusions.add(1);
+        reservedExclusions.add(0);
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         updatePlayerTeam(event.getPlayerContext(), event.getOldTeam(), event.getTeam());
-        updatePlayerListName(event.getPlayerContext());
+        updatePlayerListName(event.getPlayerContext(), event.getTeam());
     }
 
     @EventHandler
     public void onPlayerXPEvent(PlayerXPEvent event) {
-        updatePlayerListName(event.getPlayerContext());
+        updatePlayerListName(event.getPlayerContext(), TGM.get().getModule(TeamManagerModule.class).getTeam(event.getPlayerContext().getPlayer()));
     }
 
     public void updatePlayerTeam(PlayerContext player, MatchTeam oldTeam, MatchTeam newTeam) {
@@ -65,8 +76,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         }
     }
 
-    public void updatePlayerListName(PlayerContext player) {
-        MatchTeam team = TGM.get().getModule(TeamManagerModule.class).getTeam(player.getPlayer());
+    public void updatePlayerListName(PlayerContext player, MatchTeam team) {
         String prefix = player.getLevelString();
         if (prefix != null) {
             String name = player.getPlayer().getName();
@@ -96,9 +106,10 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
 
         Bukkit.getPluginManager().callEvent(new ScoreboardInitEvent(playerContext.getPlayer(), simpleScoreboard));
 
+        simpleScoreboard.add(" ", 1);
+        simpleScoreboard.add(ChatColor.YELLOW + ChatColor.translateAlternateColorCodes('&', TGM.get().getConfig().getString("server.ip", "your.server.ip")), 0);
         simpleScoreboard.send(playerContext.getPlayer());
         scoreboards.put(playerContext.getPlayer().getUniqueId(), simpleScoreboard);
-
         simpleScoreboard.update();
 
         return simpleScoreboard;
@@ -110,7 +121,7 @@ public class ScoreboardManagerModule extends MatchModule implements Listener {
         team.setColor(matchTeam.getColor());
         team.setPrefix(matchTeam.getColor() + " "); // Hacky fix for team colors not showing up in older versions
         team.setCanSeeFriendlyInvisibles(false); // Fixes anti cheat entity visible when it shouldn't be
-        team.setAllowFriendlyFire(false);
+        team.setAllowFriendlyFire(matchTeam.isFriendlyFire());
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 
         for (PlayerContext player : matchTeam.getMembers()) {

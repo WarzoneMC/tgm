@@ -1,9 +1,9 @@
 package network.warzone.tgm.broadcast;
 
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.match.MatchLoadEvent;
 import network.warzone.tgm.match.MatchResultEvent;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.match.event.MatchLoadEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.user.PlayerContext;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,8 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import java.util.List;
 
 /**
  * Created by Jorge on 4/16/2018.
@@ -43,6 +41,7 @@ public class BroadcastEventTrigger implements Listener{
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onTeamJoin(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         if (event.getOldTeam() == null || event.getTeam().isSpectator()) return;
         trigger(event.getPlayerContext().getPlayer(), "onTeamJoin");
     }

@@ -4,17 +4,18 @@ import com.google.common.collect.Sets;
 import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.SpectatorModule;
+import network.warzone.tgm.modules.koth.KOTHModule;
+import network.warzone.tgm.modules.koth.KOTHObjective;
 import network.warzone.tgm.modules.region.Region;
-import network.warzone.tgm.modules.region.RegionSave;
+import network.warzone.tgm.modules.respawn.RespawnModule;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Blocks;
 import network.warzone.tgm.util.ColorConverter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,7 +24,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.util.BlockVector;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -35,17 +35,14 @@ import java.util.Set;
  */
 @Getter
 public class ControlPoint implements Listener {
-    public static final ChatColor COLOR_NEUTRAL_TEAM = ChatColor.WHITE;
+    private final KOTHModule kothModule;
 
     public static final String SYMBOL_CP_INCOMPLETE = "\u29be";     // ⦾
     public static final String SYMBOL_CP_COMPLETE = "\u29bf";       // ⦿
 
-    public static final long TICK_RATE = 10;
-
     private final ControlPointDefinition definition;
 
     private final Region region;
-    private final RegionSave regionSave;
     private final ControlPointService controlPointService;
 
     private final Set<Player> playersOnPoint = Sets.newHashSet();
@@ -55,16 +52,22 @@ public class ControlPoint implements Listener {
     private int progress = 0;
     private MatchTeam progressingTowardsTeam = null;
 
-    private boolean initialCapture = true;
-
     private int runnableId = -1;
 
-    public ControlPoint(ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
+    public ControlPoint(KOTHModule kothModule, ControlPointDefinition controlPointDefinition, Region region, ControlPointService controlPointService) {
+        this.kothModule = kothModule;
         this.definition = controlPointDefinition;
         this.region = region;
         this.controlPointService = controlPointService;
 
-        regionSave = new RegionSave(region);
+        if (definition.getInitialOwner() != null) {
+            MatchTeam intialOwner = definition.getInitialOwner();
+            progress = definition.getMaxProgress();
+            controller = intialOwner;
+            progressingTowardsTeam = intialOwner;
+        }
+
+        renderBlocks();
     }
 
     public boolean isInProgress() {
@@ -93,6 +96,7 @@ public class ControlPoint implements Listener {
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (event.isCancelled()) return;
         this.playersOnPoint.remove(event.getPlayerContext().getPlayer());
     }
 
@@ -104,6 +108,7 @@ public class ControlPoint implements Listener {
     public void enable() {
         HashMap<MatchTeam, Integer> holding = new HashMap<>();
 
+        RespawnModule respawnModule = TGM.get().getModule(RespawnModule.class);
         runnableId = Bukkit.getScheduler().runTaskTimer(TGM.get(), () -> {
             holding.clear();
 
@@ -111,6 +116,7 @@ public class ControlPoint implements Listener {
                 if (matchTeam.isSpectator()) continue;
 
                 for (Player player : playersOnPoint) {
+                    if (respawnModule.isDead(player)) continue; // Don't allow players in respawn
                     if (matchTeam.containsPlayer(player)) {
                         holding.put(matchTeam, holding.getOrDefault(matchTeam, 0) + 1);
                     }
@@ -135,23 +141,26 @@ public class ControlPoint implements Listener {
             if (most != null && mostCount == 0) {
                 handleCap(most);
             } else {
+                if (kothModule.getKothObjective() == KOTHObjective.CAPTURES) return;
+
                 if (controller != null) {
                     controlPointService.holding(controller);
                 }
             }
-        }, TICK_RATE, TICK_RATE).getTaskId();
+        }, definition.getTickRate(), definition.getTickRate()).getTaskId();
 
         TGM.registerEvents(this);
     }
 
     private void handleCap(MatchTeam matchTeam) {
-        boolean isInitial = initialCapture;
+        if (!kothModule.isCapturable(this, matchTeam)) return;
+
         if (progressingTowardsTeam == null) { //switch from neutral to progressing
             progressingTowardsTeam = matchTeam;
             progress++;
             controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
         } else {
-            if (matchTeam == progressingTowardsTeam) {
+            if (matchTeam.equals(progressingTowardsTeam)) {
                 if (progress < definition.getMaxProgress()) {
                     progress++; //don't go over the max cap number.
                     controlPointService.capturing(matchTeam, progress, definition.getMaxProgress(), true);
@@ -167,44 +176,41 @@ public class ControlPoint implements Listener {
                 if (controller != null) {
                     controlPointService.lost(controller);
                     controller = null;
+                    kothModule.updateScoreboardControlPointLine(definition); // To output accurate information, this must be called after controller is set to null
                 }
-            } else if (progress >= definition.getMaxProgress() && matchTeam == progressingTowardsTeam) {
+            } else if (progress >= definition.getMaxProgress() && matchTeam.equals(progressingTowardsTeam)) {
                 if (controller == null) {
                     controller = matchTeam;
                     controlPointService.captured(matchTeam);
-                    if (initialCapture) initialCapture = false;
-                } else {
+                } else if (kothModule.getKothObjective() == KOTHObjective.POINTS) {
                     controlPointService.holding(matchTeam);
                 }
             } else { //hill isn't at 100%, but the owning team should still get points.
-                if (controller != null) {
+                if (controller != null && kothModule.getKothObjective() == KOTHObjective.POINTS) {
                     controlPointService.holding(controller);
                 }
             }
         }
 
-        renderBlocks(matchTeam, isInitial);
+        renderBlocks();
     }
 
     public int getPercent() {
         return Math.min(100, Math.max(0, (progress * 100) / definition.getMaxProgress()));
     }
 
-    private void renderBlocks(MatchTeam matchTeam, boolean isInitial) {
-        ChatColor color1 = progressingTowardsTeam.getColor();
-        ChatColor color2 = controller != null && matchTeam == controller ? controller.getColor() : (isInitial ? ChatColor.RESET : ChatColor.WHITE);
+    private void renderBlocks() {
+        ChatColor neutralColor = definition.getNeutralColor();
+        ChatColor color = progressingTowardsTeam != null ? progressingTowardsTeam.getColor() : neutralColor;
         Location center = region.getCenter();
-        double x = center.getX();
-        double z = center.getZ();
         double percent = Math.toRadians(getPercent() * 3.6);
         for (Block block : region.getBlocks()) {
             if (!Blocks.isVisualMaterial(block.getType())) continue;
-            double dx = block.getX() - x;
-            double dz = block.getZ() - z;
+            double dx = block.getX() - center.getX();
+            double dz = block.getZ() - center.getZ();
             double angle = Math.atan2(dz, dx);
             if (angle < 0) angle += 2 * Math.PI;
-            ChatColor color = angle < percent ? color1 : color2;
-            if (color != ChatColor.RESET) block.setType(ColorConverter.convertChatColorToColoredBlock(block.getType(), color));
+            block.setType(ColorConverter.convertChatColorToColoredBlock(block.getType(), angle < percent ? color : neutralColor));
         }
     }
 
@@ -213,6 +219,5 @@ public class ControlPoint implements Listener {
         HandlerList.unregisterAll(this);
 
         playersOnPoint.clear();
-        regionSave.clear();
     }
 }

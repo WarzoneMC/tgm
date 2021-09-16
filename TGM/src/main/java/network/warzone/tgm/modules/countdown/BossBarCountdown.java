@@ -8,11 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public abstract class BossBarCountdown extends Countdown implements Listener {
-    @Getter private BossBar bossBar;
-
-    public BossBarCountdown() {
-        this.bossBar = initBossBar();
-    }
+    @Getter protected BossBar bossBar;
 
     public abstract BossBar initBossBar();
 

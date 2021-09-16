@@ -1,9 +1,9 @@
 package network.warzone.tgm.modules.kit.types;
 
-import network.warzone.tgm.modules.kit.KitNode;
-import network.warzone.tgm.modules.team.MatchTeam;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import network.warzone.tgm.modules.kit.KitNode;
+import network.warzone.tgm.modules.team.MatchTeam;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -14,6 +14,6 @@ public class EffectKitNode implements KitNode {
 
     @Override
     public void apply(Player player, MatchTeam matchTeam) {
-        player.addPotionEffect(potionEffect, true);
+        player.addPotionEffect(potionEffect);
     }
 }

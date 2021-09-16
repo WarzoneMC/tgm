@@ -1,5 +1,6 @@
 package network.warzone.warzoneapi.models;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -15,12 +16,14 @@ public class RankManageRequest {
     private String prefix;
     private List<String> permissions;
     private boolean staff;
+    @SerializedName("default")
+    private boolean def;
 
     public RankManageRequest(String name) {
         this.name = name;
     }
 
-    public static enum Action {
+    public enum Action {
         CREATE(),
         DELETE()
     }

@@ -2,6 +2,7 @@ package network.warzone.tgm.util;
 
 import lombok.Getter;
 
+import java.text.DecimalFormat;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -10,8 +11,8 @@ import java.time.temporal.ChronoUnit;
 @Getter
 public class TimeUnitPair {
 
-    int value;
-    ChronoUnit unit;
+    private int value;
+    private ChronoUnit unit;
 
     private String toString;
 
@@ -58,12 +59,12 @@ public class TimeUnitPair {
     }
 
     public static TimeUnitPair parse(String s) {
-        if (s.equalsIgnoreCase("permanent") ||
-                s.equalsIgnoreCase("perm") ||
-                s.equalsIgnoreCase("p") ||
-                s.equalsIgnoreCase("forever") ||
-                s.equalsIgnoreCase("f") ||
-                s.equalsIgnoreCase("-1")) return new TimeUnitPair(1, ChronoUnit.FOREVER);
+        if ("permanent".equalsIgnoreCase(s) ||
+                "perm".equalsIgnoreCase(s) ||
+                "p".equalsIgnoreCase(s) ||
+                "forever".equalsIgnoreCase(s) ||
+                "f".equalsIgnoreCase(s) ||
+                "-1".equalsIgnoreCase(s)) return new TimeUnitPair(1, ChronoUnit.FOREVER);
         ChronoUnit timeUnit;
 
         StringBuilder time = new StringBuilder();
@@ -82,6 +83,14 @@ public class TimeUnitPair {
         timeUnit = TimeUnitPair.getChronoUnit(unit);
         if (timeUnit == null) return null;
         return new TimeUnitPair(Integer.parseInt(time.toString()), timeUnit);
+    }
+
+    public static String formatToSeconds(double ticks) {
+        DecimalFormat df = new DecimalFormat("0.0");
+        double ticksPerSecond = 20;
+        double d = (ticks / ticksPerSecond);
+
+        return df.format(d);
     }
 
 }

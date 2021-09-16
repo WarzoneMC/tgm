@@ -2,6 +2,7 @@ package network.warzone.tgm.modules.points;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
@@ -9,7 +10,6 @@ import network.warzone.tgm.match.ModuleData;
 import network.warzone.tgm.match.ModuleLoadTime;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
-import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,9 +35,8 @@ public class PointsModule extends MatchModule {
                         targets.put(matchTeam.getId(), target);
                     }
                 }
-            } else {
-                //todo: per team target parsing
             }
+            //TODO: per team target parsing
         }
     }
 
@@ -52,7 +51,11 @@ public class PointsModule extends MatchModule {
         int updated = points.getOrDefault(matchTeam.getId(), 0) + amount;
         this.points.put(matchTeam.getId(), updated);
 
-        if (updated >= targets.get(matchTeam.getId())) {
+        int target = targets.getOrDefault(matchTeam.getId(), 0);
+
+        if (target <= 0) return;
+
+        if (updated >= target) {
             for (PointService pointService : services) {
                 pointService.reachedTarget(matchTeam);
             }

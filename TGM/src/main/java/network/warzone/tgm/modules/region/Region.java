@@ -8,7 +8,11 @@ import java.util.List;
 public interface Region {
     boolean contains(Location location);
 
+    boolean contains(Block block);
+
     Location getCenter();
+
+    Location getRandomLocation();
 
     List<Block> getBlocks();
 

@@ -1,14 +1,18 @@
 package network.warzone.tgm.modules.countdown;
 
-import network.warzone.tgm.match.MatchModule;
-import network.warzone.tgm.modules.tasked.TaskedModule;
 import lombok.Getter;
 import lombok.Setter;
+import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.match.ModuleData;
+import network.warzone.tgm.match.ModuleLoadTime;
+import network.warzone.tgm.modules.tasked.TaskedModule;
 
+@ModuleData(load = ModuleLoadTime.LATER)
 @Getter @Setter
 public abstract class Countdown extends MatchModule implements TaskedModule {
 
-    private double timeLeft, timeMax; //ticks
+    private double timeLeft; //ticks
+    private double timeMax; //ticks
 
     private boolean cancelled = true;
 

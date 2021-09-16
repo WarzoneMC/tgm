@@ -3,13 +3,17 @@ package network.warzone.tgm.modules;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import network.warzone.tgm.map.SpawnPoint;
+import network.warzone.tgm.map.spawnpoints.AbsoluteRegionSpawnPoint;
+import network.warzone.tgm.map.spawnpoints.LocationSpawnPoint;
+import network.warzone.tgm.map.spawnpoints.RelativeRegionSpawnPoint;
+import network.warzone.tgm.map.spawnpoints.SpawnPoint;
 import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchModule;
+import network.warzone.tgm.modules.region.Region;
+import network.warzone.tgm.modules.region.RegionManagerModule;
 import network.warzone.tgm.modules.team.MatchTeam;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.util.Parser;
-import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,14 +39,25 @@ public class SpawnPointLoaderModule extends MatchModule {
                 }
             }
 
-            Location location;
+            SpawnPoint spawnPoint = null;
             if (spawnJson.has("coords")) {
-                location = Parser.convertLocation(match.getWorld(), spawnJson.get("coords"));
-            } else {
-                location = Parser.convertLocation(match.getWorld(), spawnJson);
+                spawnPoint = new LocationSpawnPoint(Parser.convertLocation(match.getWorld(), spawnJson.get("coords")));
+            } else if (spawnJson.has("region")) {
+                Region region = match.getModule(RegionManagerModule.class).getRegion(match, spawnJson.get("region"));
+
+                if (spawnJson.has("face-coordinates")) {
+                    spawnPoint = new RelativeRegionSpawnPoint(region, Parser.convertLocation(match.getWorld(), spawnJson.get("face-coordinates")));
+                } else {
+                    float yaw = 0; float pitch = 0;
+                    if (spawnJson.has("yaw")) yaw = spawnJson.get("yaw").getAsFloat();
+                    if (spawnJson.has("pitch")) pitch = spawnJson.get("pitch").getAsFloat();
+
+                    spawnPoint = new AbsoluteRegionSpawnPoint(region, yaw, pitch);
+                }
             }
-            SpawnPoint spawnPoint = new SpawnPoint(location);
+
             for (MatchTeam matchTeam : teams) {
+                if (spawnPoint == null) continue;
                 matchTeam.addSpawnPoint(spawnPoint);
             }
         }

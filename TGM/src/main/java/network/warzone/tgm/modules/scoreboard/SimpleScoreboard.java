@@ -39,14 +39,21 @@ public class SimpleScoreboard {
     }
 
     public void add(String text, Integer score) {
-        text = ChatColor.translateAlternateColorCodes('&', text);
-        while (scores.containsKey(text)) text += ChatColor.RESET;
+        String formattedText = ChatColor.translateAlternateColorCodes('&', text);
+        while (scores.containsKey(formattedText)) formattedText += ChatColor.RESET;
 
-        if (remove(score, text, false) || !scores.containsValue(score)) {
-            updated.add(text);
+        if (remove(score, formattedText, false) || !scores.containsValue(score)) {
+            updated.add(formattedText);
         }
 
-        scores.put(text, score);
+        scores.put(formattedText, score);
+    }
+
+    public void removeAll(Set<Integer> exclusions) {
+        for (Map.Entry<String, Integer> score : scores.entrySet()) {
+            if (exclusions.contains(score.getValue())) continue;
+            remove(score.getValue());
+        }
     }
 
     public boolean remove(Integer score, String text) {
@@ -139,6 +146,16 @@ public class SimpleScoreboard {
 
         if (text.length() > 16) {
             String prefixColor = ChatColor.getLastColors(prefix);
+            ChatColor finalColor = null;
+            if (prefixColor.length() >= 2) {
+                
+                // can be null
+                finalColor = ChatColor.getByChar(prefixColor.substring(1,2));
+            }
+            if (finalColor != null) {
+                team.setColor(finalColor);
+            }
+
             String suffix = iterator.next();
 
             if (prefix.endsWith(String.valueOf(ChatColor.COLOR_CHAR))) {
@@ -155,7 +172,7 @@ public class SimpleScoreboard {
                 suffix = suffix.substring(0, (13 - prefixColor.length())); // cut off suffix, done if text is over 30 characters
             }
 
-            team.setSuffix((prefixColor.equals("") ? ChatColor.RESET : prefixColor) + suffix);
+            team.setSuffix(("".equals(prefixColor) ? ChatColor.RESET : prefixColor) + suffix);
         }
     }
 
@@ -173,7 +190,7 @@ public class SimpleScoreboard {
         removed.stream().forEach((remove) -> {
             for (String s : scoreboard.getEntries()) {
                 Score score = obj.getScore(s);
-                
+
                 if (score == null) continue;
                 if (score.getScore() != remove) continue;
 

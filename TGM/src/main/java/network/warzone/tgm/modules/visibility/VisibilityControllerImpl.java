@@ -1,7 +1,7 @@
 package network.warzone.tgm.modules.visibility;
 
-import network.warzone.tgm.modules.SpectatorModule;
 import lombok.AllArgsConstructor;
+import network.warzone.tgm.modules.SpectatorModule;
 import org.bukkit.entity.Player;
 
 /**
@@ -17,20 +17,9 @@ public class VisibilityControllerImpl implements VisibilityController {
 
     @Override
     public boolean canSee(Player eyes, Player target) {
-
         if (spectatorModule.getSpectators().containsPlayer(target)) {
-
-            // eyes = spectator & target = spectator
-            if (spectatorModule.getSpectators().containsPlayer(eyes)) {
-                return true;
-            }
-            // eyes = player & target = spectator
-            else {
-                return false;
-            }
+            return spectatorModule.getSpectators().containsPlayer(eyes);
         } else {
-
-            //target = player
             return true;
         }
     }

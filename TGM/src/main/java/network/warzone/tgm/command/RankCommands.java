@@ -1,42 +1,177 @@
 package network.warzone.tgm.command;
 
-import com.sk89q.minecraft.util.commands.Command;
-import com.sk89q.minecraft.util.commands.CommandContext;
-import com.sk89q.minecraft.util.commands.CommandNumberFormatException;
-import com.sk89q.minecraft.util.commands.CommandPermissions;
+import cl.bgmp.minecraft.util.commands.CommandContext;
+import cl.bgmp.minecraft.util.commands.annotations.Command;
+import cl.bgmp.minecraft.util.commands.annotations.CommandPermissions;
+import cl.bgmp.minecraft.util.commands.exceptions.CommandNumberFormatException;
 import joptsimple.internal.Strings;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import network.warzone.tgm.TGM;
-import network.warzone.tgm.modules.ChatModule;
+import network.warzone.tgm.chat.ChatListener;
 import network.warzone.tgm.user.PlayerContext;
 import network.warzone.tgm.util.Ranks;
 import network.warzone.warzoneapi.models.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jorge on 2/23/2018.
  */
 public class RankCommands {
 
+    @Command(aliases = {"viewstaff", "staff"}, desc = "View online staff members")
+    @CommandPermissions({"tgm.viewstaff"})
+    public static void viewstaff(CommandContext cmd, CommandSender sender) {
+        List<PlayerContext> onlineStaff = new ArrayList<>();
+
+        boolean skipNickedStaff = !sender.hasPermission("tgm.command.whois");
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+
+            if (playerContext.getUserProfile().isStaff()) {
+                if (skipNickedStaff && playerContext.isNicked()) continue;
+                onlineStaff.add(playerContext);
+            }
+        }
+
+        if (onlineStaff.isEmpty()) {
+            sender.sendMessage(ChatColor.RED + "There are no staff members online.");
+            return;
+        }
+
+        LinkedHashMap<Rank, List<PlayerContext>> onlineRanks = new LinkedHashMap<>();
+
+        for (PlayerContext playerContext : onlineStaff) {
+            Rank rank = playerContext.getUserProfile().getHighestRank();
+            if (rank == null) continue;
+            if (rank.getPrefix() == null) continue;
+
+            Rank existingRank = null;
+            for (Rank comparableRank : onlineRanks.keySet()) {
+                if (rank.getId().equals(comparableRank.getId())) {
+                    existingRank = comparableRank;
+                    break;
+                }
+            }
+
+            if (existingRank != null) {
+                onlineRanks.get(existingRank).add(playerContext);
+            } else {
+                onlineRanks.put(rank, new ArrayList<>(Collections.singletonList(playerContext)));
+            }
+        }
+
+        onlineRanks = onlineRanks.entrySet().stream().sorted((o1, o2) -> {
+            if (o1.getKey().getPriority() == o2.getKey().getPriority()) return 0;
+            return o1.getKey().getPriority() < o2.getKey().getPriority() ? 1 : -1;
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+
+        StringBuilder stringBuilder = new StringBuilder(ChatColor.GOLD + "Online Staff (" + onlineStaff.size() + "):");
+
+        for (Rank rank : onlineRanks.keySet()) {
+            List<PlayerContext> rankPlayers = onlineRanks.get(rank);
+
+            stringBuilder.append("\n");
+            stringBuilder.append(ChatColor.RESET);
+            stringBuilder.append(ChatColor.DARK_GRAY);
+            stringBuilder.append("[");
+            stringBuilder.append(rankPlayers.size());
+            stringBuilder.append("] ");
+            stringBuilder.append(ChatColor.translateAlternateColorCodes('&', rank.getPrefix().trim()));
+            stringBuilder.append(ChatColor.GRAY);
+            stringBuilder.append(" - ");
+            stringBuilder.append(ChatColor.RESET);
+
+            for (int i = 0; i < rankPlayers.size(); i++) {
+                if (i > 0) {
+                    stringBuilder.append(ChatColor.GRAY);
+                    stringBuilder.append(", ");
+                }
+                stringBuilder.append(ChatColor.WHITE);
+                stringBuilder.append(rankPlayers.get(i).getUserProfile().getName());
+            }
+        }
+
+        sender.sendMessage(stringBuilder.toString());
+    }
+
     @Command(aliases = {"sc", "staffchat", "staffc"}, desc = "Staff chat", min = 1, usage = "(message)")
     @CommandPermissions({"tgm.staffchat"})
     public static void staffchat(CommandContext cmd, CommandSender sender) {
         String prefix = "";
         if (sender instanceof Player) {
-            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext((Player) sender);
-            prefix = playerContext.getUserProfile().getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getUserProfile().getPrefix().trim()) + " " : "";
+            Player player = (Player) sender;
+
+            if (ChatListener.getDisabledStaffChats().contains(player.getUniqueId())) {
+                player.sendMessage(ChatColor.RED + "You currently have staff chat disabled.");
+                return;
+            }
+
+            PlayerContext playerContext = TGM.get().getPlayerManager().getPlayerContext(player);
+            prefix = playerContext.getPrefix() != null ? ChatColor.translateAlternateColorCodes('&', playerContext.getPrefix().trim()) + " " : "";
         }
-        ChatModule.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
+        ChatListener.sendStaffMessage(prefix, sender.getName(), Strings.join(cmd.getSlice(1), " "));
+    }
+
+    @Command(aliases = {"tsc", "togglestaffchat", "togglestaffc"}, max = 1, desc = "Toggle staff chat notifications")
+    @CommandPermissions({"tgm.staffchat"})
+    public static void togglestaffchat(CommandContext cmd, CommandSender sender) {
+        if (cmd.argsLength() == 1) {
+            if (!cmd.getString(0).equalsIgnoreCase("list")) {
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " [list]");
+                return;
+            }
+
+            List<UUID> disabledStaffChats = ChatListener.getDisabledStaffChats();
+            if (disabledStaffChats.size() == 0) {
+                sender.sendMessage(ChatColor.YELLOW + "Nobody has staff chat disabled.");
+                return;
+            }
+
+            StringBuilder stringBuilder = new StringBuilder(ChatColor.YELLOW + "Players with disabled staff chat:");
+
+            for (UUID uuid : disabledStaffChats) {
+                Player player = Bukkit.getPlayer(uuid);
+                String result;
+
+                if (player != null) {
+                    result = player.getName();
+                } else {
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+                    result = offlinePlayer.getName() + " " + ChatColor.GRAY + "(OFFLINE)";
+                }
+                stringBuilder.append("\n").append(ChatColor.WHITE).append("- ").append(ChatColor.GOLD).append(result);
+            }
+
+            sender.sendMessage(stringBuilder.toString());
+            return;
+        }
+
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(ChatColor.RED + "Only players can toggle staff chat.");
+            return;
+        }
+
+        Player player = (Player) sender;
+
+        boolean disabled = ChatListener.getDisabledStaffChats().contains(player.getUniqueId());
+
+        if (disabled) {
+            ChatListener.getDisabledStaffChats().remove(player.getUniqueId());
+        } else {
+            ChatListener.getDisabledStaffChats().add(player.getUniqueId());
+        }
+
+        player.sendMessage(ChatColor.GREEN + (disabled ? "Enabled staff chat." : "Disabled staff chat."));
     }
 
     @Command(aliases = {"rank", "ranks"}, desc = "Rank management command.", min = 1, usage = "(player|list|info|create|delete|edit|permissions)")
@@ -100,47 +235,49 @@ public class RankCommands {
             String name = cmd.getString(1);
             Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                 for (Rank rank : TGM.get().getTeamClient().retrieveRanks()) {
-                    if (rank.getName().equalsIgnoreCase(name)){
+                    if (rank.getName().equalsIgnoreCase(name)) {
                         sender.sendMessage(ChatColor.YELLOW + "Rank info for " + ChatColor.GRAY + rank.getName());
                         sender.sendMessage(ChatColor.GRAY + "ID: " + ChatColor.RESET + rank.getId().toString());
                         sender.sendMessage(ChatColor.GRAY + "Name: " + ChatColor.RESET + rank.getName());
                         sender.sendMessage(ChatColor.GRAY + "Prefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', rank.getPrefix()));
+                        sender.sendMessage(ChatColor.GRAY + "Display: " + ChatColor.RESET + rank.getDisplay());
                         sender.sendMessage(ChatColor.GRAY + "Priority: " + ChatColor.RESET + rank.getPriority());
                         sender.sendMessage(ChatColor.GRAY + "Staff: " + ChatColor.RESET + rank.isStaff());
+                        sender.sendMessage(ChatColor.GRAY + "Default: " + ChatColor.RESET + rank.isDef());
                         sender.sendMessage(ChatColor.GRAY + "Permissions: ");
                         for (String permission : rank.getPermissions()) {
                             sender.spigot().sendMessage(permissionToTextComponent(rank.getName(), permission));
                         }
-                        break;
+                        return;
                     }
-                    sender.sendMessage(ChatColor.RED + "Rank not found.");
                 }
+                sender.sendMessage(ChatColor.RED + "Rank not found.");
             });
 
         } else if (cmd.getString(0).equalsIgnoreCase("create")) {
 
             if (cmd.argsLength() < 2) {
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " create <name> [prefix] [staff(true|false)] [priority]");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " create <name> [prefix] [staff(true|false)] [priority] [default(true|false)]");
                 return;
             }
 
             String name = cmd.getString(1);
             String prefix = cmd.argsLength() >= 3 ? cmd.getString(2) : null;
-            boolean staff = cmd.argsLength() >= 4 ? Boolean.valueOf(cmd.getString(3)) : null;
-            int priority = 0;
+            boolean staff = cmd.argsLength() >= 4 && Boolean.parseBoolean(cmd.getString(3));
+            int priority;
             try {
                 priority = cmd.argsLength() >= 5 ? cmd.getInteger(4) : 0;
             } catch (CommandNumberFormatException e) {
-                sender.sendMessage(ChatColor.RED + "Unknown priority \"" + cmd.getString(0) + "\"");
+                sender.sendMessage(ChatColor.RED + "Not a number \"" + cmd.getString(0) + "\"");
                 return;
             }
-            RankManageRequest request = new RankManageRequest(name, priority, prefix, new ArrayList<>(), staff);
+            boolean def = cmd.argsLength() >= 6 && Boolean.parseBoolean(cmd.getString(5));
+            RankManageRequest request = new RankManageRequest(name, priority, prefix, new ArrayList<>(), staff, def);
 
             Bukkit.getScheduler().runTaskAsynchronously(TGM.get(), () -> {
                 RankManageResponse response = TGM.get().getTeamClient().manageRank(RankManageRequest.Action.CREATE, request);
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.GRAY + "Created rank " + ChatColor.RESET + response.getRank().getName());
                 }
@@ -156,7 +293,6 @@ public class RankCommands {
                 RankManageResponse response = TGM.get().getTeamClient().manageRank(RankManageRequest.Action.DELETE, new RankManageRequest(name));
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.GRAY + "Deleted rank " + ChatColor.RESET + response.getRank().getName());
                 }
@@ -165,7 +301,7 @@ public class RankCommands {
         } else if (cmd.getString(0).equalsIgnoreCase("edit")) {
 
             if (cmd.argsLength() < 4) {
-                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <name> <prefix|staff|priority|permissions> <value>");
+                sender.sendMessage(ChatColor.RED + "Usage: /" + cmd.getCommand() + " edit <name> <" + Arrays.stream(RankEditRequest.EditableField.values()).map(field -> field.name().toLowerCase()).collect(Collectors.joining("|")) + "> <value>");
                 return;
             }
             String name = cmd.getString(1);
@@ -176,7 +312,6 @@ public class RankCommands {
                 RankManageResponse response = TGM.get().getTeamClient().editRank(field, new RankEditRequest(name, value));
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     sender.sendMessage(ChatColor.GRAY + "Set value of " + ChatColor.RESET + field.toString().toLowerCase() + ChatColor.GRAY + " to " + ChatColor.RESET + value.toString() + ChatColor.GRAY + " for " + ChatColor.RESET + name);
                     Ranks.update(response.getRank());
@@ -203,13 +338,12 @@ public class RankCommands {
                 RankManageResponse response = TGM.get().getTeamClient().editPermissions(action, new RankPermissionsUpdateRequest(name, permissions));
                 if (response.isError()) {
                     sender.sendMessage(ChatColor.RED + response.getMessage());
-                    return;
                 } else {
                     switch (action) {
                         case ADD:
                             sender.sendMessage(ChatColor.GRAY + "Added permissions " + ChatColor.RESET + permissions.toString() + ChatColor.GRAY + " to rank " + ChatColor.RESET + response.getRank().getName());
                             break;
-                        case REMOVE:
+                        default:
                             sender.sendMessage(ChatColor.GRAY + "Removed permissions " + ChatColor.RESET + permissions.toString() + ChatColor.GRAY + " from rank " + ChatColor.RESET + response.getRank().getName());
                             break;
                     }
@@ -222,13 +356,16 @@ public class RankCommands {
     }
 
     private static TextComponent rankToTextComponent(Rank rank) {
-        TextComponent main = new TextComponent(ChatColor.GRAY + " - " + ChatColor.RESET + rank.getPriority() + ChatColor.GRAY + ": " + ChatColor.RESET + rank.getName() + ChatColor.GRAY + " - " + ChatColor.translateAlternateColorCodes('&', rank.getPrefix()));
+        String prefix = rank.getPrefix() == null ? "" : rank.getPrefix();
+        TextComponent main = new TextComponent(ChatColor.GRAY + " - " + ChatColor.RESET + rank.getPriority() + ChatColor.GRAY + ": " + ChatColor.RESET + rank.getName() + ChatColor.GRAY + " - " + ChatColor.translateAlternateColorCodes('&', prefix));
         main.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
                 new TextComponent(ChatColor.GRAY + "ID: " + ChatColor.RESET + rank.getId().toString()),
                 new TextComponent(ChatColor.GRAY + "\nName: " + ChatColor.RESET + rank.getName()),
-                new TextComponent(ChatColor.GRAY + "\nPrefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', rank.getPrefix())),
+                new TextComponent(ChatColor.GRAY + "\nPrefix: " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', prefix)),
+                new TextComponent(ChatColor.GRAY + "\nDisplay: " + ChatColor.RESET + rank.getDisplay()),
                 new TextComponent(ChatColor.GRAY + "\nPriority: " + ChatColor.RESET + rank.getPriority()),
                 new TextComponent(ChatColor.GRAY + "\nStaff: " + ChatColor.RESET + rank.isStaff()),
+                new TextComponent(ChatColor.GRAY + "\nDefault: " + ChatColor.RESET + rank.isDef()),
                 new TextComponent(ChatColor.YELLOW + "\n\nClick for full info"),
         }));
         main.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rank info " + rank.getName()));

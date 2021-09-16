@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 
 class SoundKillstreakAction implements KillstreakAction {
+
     private Sound sound;
     private SoundTarget soundTarget;
     private float volume;
@@ -20,12 +21,12 @@ class SoundKillstreakAction implements KillstreakAction {
 
     @Override
     public void apply(Player killer) {
-        if(soundTarget == SoundTarget.EVERYONE) {
-            for(Player p : Bukkit.getOnlinePlayers()) {
+        if (soundTarget == SoundTarget.EVERYONE) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
                 p.playSound(p.getLocation().clone().add(0.0, 100.0, 0.0), sound, volume, pitch);
             }
         } else {
-            if(killer == null) return;
+            if (killer == null) return;
             killer.playSound(killer.getLocation().clone().add(0.0, 100.0, 0.0), sound, volume, pitch);
         }
     }
@@ -33,4 +34,5 @@ class SoundKillstreakAction implements KillstreakAction {
     enum SoundTarget {
         EVERYONE, PLAYER
     }
+
 }

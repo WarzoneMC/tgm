@@ -7,39 +7,40 @@ import org.bukkit.Material;
 
 public class ColorConverter {
 
-    public static String filterString(String text) {
-        return ChatColor.translateAlternateColorCodes('&' , text);
-    }
-
     private static Material[] orderedWool = {Material.WHITE_WOOL, Material.LIGHT_BLUE_WOOL, Material.ORANGE_WOOL, Material.MAGENTA_WOOL, Material.YELLOW_WOOL, Material.LIME_WOOL, Material.RED_WOOL, Material.LIGHT_GRAY_WOOL, Material.GRAY_WOOL, Material.CYAN_WOOL, Material.PURPLE_WOOL, Material.BLUE_WOOL, Material.GREEN_WOOL, Material.BLACK_WOOL};
     private static Material[] orderedCarpet = {Material.WHITE_CARPET, Material.LIGHT_BLUE_CARPET, Material.ORANGE_CARPET, Material.MAGENTA_CARPET, Material.YELLOW_CARPET, Material.LIME_CARPET, Material.RED_CARPET, Material.LIGHT_GRAY_CARPET, Material.GRAY_CARPET, Material.CYAN_CARPET, Material.PURPLE_CARPET, Material.BLUE_CARPET, Material.GREEN_CARPET, Material.BLACK_CARPET};
     private static Material[] orderedTerracotta = {Material.WHITE_TERRACOTTA, Material.LIGHT_BLUE_TERRACOTTA, Material.ORANGE_TERRACOTTA, Material.MAGENTA_TERRACOTTA, Material.YELLOW_TERRACOTTA, Material.LIME_TERRACOTTA, Material.RED_TERRACOTTA, Material.LIGHT_GRAY_TERRACOTTA, Material.GRAY_TERRACOTTA, Material.CYAN_TERRACOTTA, Material.PURPLE_TERRACOTTA, Material.BLUE_TERRACOTTA, Material.GREEN_TERRACOTTA, Material.BLACK_TERRACOTTA};
     private static Material[] orderedStainedGlass = {Material.WHITE_STAINED_GLASS, Material.LIGHT_BLUE_STAINED_GLASS, Material.ORANGE_STAINED_GLASS, Material.MAGENTA_STAINED_GLASS, Material.YELLOW_STAINED_GLASS, Material.LIME_STAINED_GLASS, Material.RED_STAINED_GLASS, Material.LIGHT_GRAY_STAINED_GLASS, Material.GRAY_STAINED_GLASS, Material.CYAN_STAINED_GLASS, Material.PURPLE_STAINED_GLASS, Material.BLUE_STAINED_GLASS, Material.GREEN_STAINED_GLASS, Material.BLACK_STAINED_GLASS};
     private static Material[] orderedStainedGlassPane = {Material.WHITE_STAINED_GLASS_PANE, Material.LIGHT_BLUE_STAINED_GLASS_PANE, Material.ORANGE_STAINED_GLASS_PANE, Material.MAGENTA_STAINED_GLASS_PANE, Material.YELLOW_STAINED_GLASS_PANE, Material.LIME_STAINED_GLASS_PANE, Material.RED_STAINED_GLASS_PANE, Material.LIGHT_GRAY_STAINED_GLASS_PANE, Material.GRAY_STAINED_GLASS_PANE, Material.CYAN_STAINED_GLASS_PANE, Material.PURPLE_STAINED_GLASS_PANE, Material.BLUE_STAINED_GLASS_PANE, Material.GREEN_STAINED_GLASS_PANE, Material.BLACK_STAINED_GLASS_PANE};
 
+    public static String filterString(String text) {
+        return ChatColor.translateAlternateColorCodes('&' , text);
+    }
+
     public static Color getColor(ChatColor color) {
-        if (color == ChatColor.RED) {
-            return Color.RED;
-        } else if (color == ChatColor.BLUE) {
-            return Color.BLUE;
-        } else if (color == ChatColor.LIGHT_PURPLE) {
-            return Color.FUCHSIA;
-        } else if (color == ChatColor.GREEN) {
-            return Color.LIME;
-        } else if (color == ChatColor.DARK_GREEN) {
-            return Color.GREEN;
-        } else if (color == ChatColor.YELLOW) {
-            return Color.YELLOW;
-        } else if (color == ChatColor.GOLD) {
-            return Color.ORANGE;
-        } else if (color == ChatColor.AQUA) {
-            return Color.AQUA;
-        } else if (color == ChatColor.DARK_PURPLE) {
-            return Color.PURPLE;
-        } else if (color == ChatColor.DARK_AQUA) {
-            return Color.TEAL;
-        } else {
-            return Color.WHITE;
+        switch (color) {
+            case RED:
+                return Color.RED;
+            case BLUE:
+                return Color.BLUE;
+            case LIGHT_PURPLE:
+                return Color.FUCHSIA;
+            case GREEN:
+                return Color.LIME;
+            case DARK_GREEN:
+                return Color.GREEN;
+            case YELLOW:
+                return Color.YELLOW;
+            case GOLD:
+                return Color.ORANGE;
+            case AQUA:
+                return Color.AQUA;
+            case DARK_AQUA:
+                return Color.TEAL;
+            case DARK_PURPLE:
+                return Color.PURPLE;
+            default:
+                return getColorAll(color);
         }
     }
 
@@ -75,11 +76,9 @@ public class ColorConverter {
                 return Color.fromRGB(255, 85, 255);
             case YELLOW:
                 return Color.fromRGB(255, 255, 85);
-            case WHITE:
-                return Color.fromRGB(255, 255, 255);
+            default:
+                return Color.WHITE;
         }
-
-        return Color.WHITE;
     }
 
     public static ChatColor getChatColor(Color color) {
@@ -100,10 +99,6 @@ public class ColorConverter {
 
     public static ChatColor convertDyeColorToChatColor(DyeColor dye) {
         switch (dye) {
-            case WHITE:
-                return ChatColor.WHITE;
-            case ORANGE:
-                return ChatColor.GOLD;
             case MAGENTA:
                 return ChatColor.LIGHT_PURPLE;
             case LIGHT_BLUE:
@@ -124,17 +119,18 @@ public class ColorConverter {
                 return ChatColor.DARK_PURPLE;
             case BLUE:
                 return ChatColor.DARK_BLUE;
-            case BROWN:
-                return ChatColor.GOLD;
             case GREEN:
                 return ChatColor.DARK_GREEN;
             case RED:
                 return ChatColor.DARK_RED;
             case BLACK:
                 return ChatColor.BLACK;
+            case BROWN:
+            case ORANGE:
+                return ChatColor.GOLD;
+            default:
+                return ChatColor.WHITE;
         }
-
-        return ChatColor.WHITE;
     }
 
     public static Material convertChatColorToColoredBlock(Material oldMaterial, ChatColor chatColor) {
@@ -186,32 +182,22 @@ public class ColorConverter {
                 targetIndex = 0;
                 break;
         }
-        Material targetMaterial = null;
         switch (Blocks.whichVisualMaterial(oldMaterial)) {
             case "WOOL":
-                targetMaterial = orderedWool[targetIndex];
-                break;
+                return orderedWool[targetIndex];
             case "CARPET":
-                targetMaterial = orderedCarpet[targetIndex];
-                break;
-            case "STAINED_GLASS":
-                targetMaterial = orderedStainedGlass[targetIndex];
-                break;
+                return orderedCarpet[targetIndex];
             case "STAINED_GLASS_PANE":
-                targetMaterial = orderedStainedGlassPane[targetIndex];
-                break;
-            case "TERRACOTTA":
+                return orderedStainedGlassPane[targetIndex];
+            case "STAINED_GLASS":
+                return orderedStainedGlass[targetIndex];
             default:
-                targetMaterial = orderedTerracotta[targetIndex];
-                break;
+                return orderedTerracotta[targetIndex];
         }
-        return targetMaterial;
     }
 
     public static DyeColor convertChatColorToDyeColor(ChatColor chatColor) {
         switch (chatColor) {
-            case WHITE:
-                return DyeColor.WHITE;
             case AQUA:
                 return DyeColor.LIGHT_BLUE;
             case GOLD:
@@ -222,8 +208,6 @@ public class ColorConverter {
                 return DyeColor.YELLOW;
             case GREEN:
                 return DyeColor.LIME;
-            case RED:
-                return DyeColor.RED;
             case GRAY:
                 return DyeColor.LIGHT_GRAY;
             case DARK_GRAY:
@@ -232,20 +216,23 @@ public class ColorConverter {
                 return DyeColor.CYAN;
             case DARK_PURPLE:
                 return DyeColor.PURPLE;
-            case DARK_BLUE:
-                return DyeColor.BLUE;
-            case BLUE:
-                return DyeColor.BLUE;
             case DARK_GREEN:
                 return DyeColor.GREEN;
-            case DARK_RED:
-                return DyeColor.RED;
             case BLACK:
                 return DyeColor.BLACK;
+            case DARK_BLUE:
+            case BLUE:
+                return DyeColor.BLUE;
+            case RED:
+            case DARK_RED:
+                return DyeColor.RED;
+            default:
+                return DyeColor.WHITE;
         }
-
-        return DyeColor.WHITE;
     }
 
+    public static String format(String message) {
+        return ChatColor.translateAlternateColorCodes('&', message);
+    }
 
 }

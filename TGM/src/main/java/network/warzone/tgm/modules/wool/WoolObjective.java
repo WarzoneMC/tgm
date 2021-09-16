@@ -3,12 +3,15 @@ package network.warzone.tgm.modules.wool;
 import lombok.Getter;
 import lombok.Setter;
 import network.warzone.tgm.TGM;
+import network.warzone.tgm.match.Match;
 import network.warzone.tgm.match.MatchStatus;
 import network.warzone.tgm.modules.region.Region;
 import network.warzone.tgm.modules.team.MatchTeam;
-import network.warzone.tgm.modules.team.TeamChangeEvent;
+import network.warzone.tgm.modules.team.event.TeamChangeEvent;
 import network.warzone.tgm.modules.team.TeamManagerModule;
 import network.warzone.tgm.modules.time.TimeModule;
+import network.warzone.tgm.player.event.TGMPlayerDeathEvent;
+import network.warzone.tgm.util.itemstack.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,10 +21,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +42,7 @@ public class WoolObjective implements Listener {
     private final String name;
 
     private final Material block;
+    private final Match match;
     private final MatchTeam owner;
     private final Region podium; //where players place wool to complete objective.
     private final ChatColor color;
@@ -51,40 +55,49 @@ public class WoolObjective implements Listener {
     public WoolObjective(String name, Material block, MatchTeam owner, Region podium, ChatColor color) {
         this.name = name;
         this.block = block;
+        this.match = TGM.get().getMatchManager().getMatch();
         this.owner = owner;
         this.podium = podium;
         this.color = color;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlace(BlockPlaceEvent event) {
-        if (event.getBlockPlaced().getType() == block) { //TODO 1.13 Temp fix
-            if (!completed) {
-
-                if (!podium.contains(event.getBlockPlaced().getLocation())) {
-                    return;
-                }
-
-                if (!owner.containsPlayer(event.getPlayer())) {
-                    return;
-                }
-
-                event.setCancelled(false); //override filter
-                setCompleted(true);
-
-                TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
-                MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
-
-                for (WoolObjectiveService woolObjectiveService : services) {
-                    woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
-                }
-            }
+        if (event.getBlockPlaced().getType() == block) {
+            if (!completed && podium.contains(event.getBlockPlaced().getLocation()) && owner.containsPlayer(event.getPlayer()))
+                event.setCancelled(true);
         } else {
             if (podium.contains(event.getBlockPlaced().getLocation())) {
                 event.setCancelled(true);
+                event.getPlayer().sendMessage(ChatColor.RED + "You may only place " + ChatColor.YELLOW + ItemUtils.materialToString(block) + ChatColor.RED + " in the podium!");
             }
         }
     }
+
+    /*
+    Prevents filter messages
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlaceHighest(BlockPlaceEvent event) {
+        if (!completed && event.getBlockPlaced().getType() == block) {
+            if (!podium.contains(event.getBlockPlaced().getLocation())) {
+                return;
+            }
+            if (!owner.containsPlayer(event.getPlayer())) {
+                return;
+            }
+            event.setCancelled(false); //override filter
+            setCompleted(true);
+
+            TeamManagerModule teamManagerModule = TGM.get().getModule(TeamManagerModule.class);
+            MatchTeam matchTeam = teamManagerModule.getTeam(event.getPlayer());
+
+            for (WoolObjectiveService woolObjectiveService : services) {
+                woolObjectiveService.place(event.getPlayer(), matchTeam, event.getBlock());
+            }
+        }
+    }
+
 
     @EventHandler
     public void onWoolCraft(CraftItemEvent event) {
@@ -103,7 +116,7 @@ public class WoolObjective implements Listener {
     }
 
     private void handleWoolPickup(Player player) {
-        if (completed) return;
+        if (match.getMatchStatus() != MatchStatus.MID || completed) return;
 
         if (!owner.containsPlayer(player)) {
             return;
@@ -125,21 +138,16 @@ public class WoolObjective implements Listener {
 
     @EventHandler
     public void onPickup(EntityPickupItemEvent event) {
-        if (event.getEntity() instanceof Player) {
-            if (event.getItem() != null && event.getItem().getItemStack().getType().name().contains("WOOL")) { //TODO 1.13 Temp fix
-                if (event.getItem().getItemStack().getType() == block) {
-                    handleWoolPickup(((Player) event.getEntity()).getPlayer());
-                }
-            }
+        if (event.getEntity() instanceof Player && event.getItem().getItemStack().getType() == block) {
+            handleWoolPickup(((Player) event.getEntity()).getPlayer());
         }
     }
 
     @EventHandler
     public void onCollect(InventoryClickEvent event) {
-        if (event.getCurrentItem() != null && event.getCurrentItem().getType().name().contains("WOOL")) { //TODO 1.13 Temp fix
-            if (event.getCurrentItem().getType() == block) {
-                handleWoolPickup((Player) event.getWhoClicked());
-            }
+        ItemStack item = event.getCurrentItem();
+        if (item != null && item.getType() == block) {
+            handleWoolPickup((Player) event.getWhoClicked());
         }
     }
 
@@ -168,12 +176,13 @@ public class WoolObjective implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
-        handleWoolDrop(event.getEntity());
+    public void onDeath(TGMPlayerDeathEvent event) {
+        handleWoolDrop(event.getVictim());
     }
 
     @EventHandler
     public void onTeamChange(TeamChangeEvent event) {
+        if (completed || event.isCancelled()) return;
         //handleWoolDrop(event.getPlayerContext().getPlayer());
         if (!touches.containsKey(event.getPlayerContext().getPlayer().getUniqueId())) return;
 
