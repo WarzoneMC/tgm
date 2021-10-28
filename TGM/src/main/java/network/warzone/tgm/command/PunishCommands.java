@@ -476,7 +476,7 @@ public class PunishCommands {
             TGM.get().getTeamClient().createReport(new ReportCreateRequest(amount, reportedName, reporter.getName(), reporter.getUniqueId(), reported.getUniqueId(), report.getReason(), report.getTimestamp() / 1000, onlineStaff))
         );
 
-        reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff.");
+        reporter.sendMessage(ChatColor.GREEN + "Your report has been sent to online staff. You can also report players in our Discord server if staff are unavailable.");
     }
 
     @Command(aliases = {"reports"}, desc = "View reports", max = 1, usage = "[page]")
