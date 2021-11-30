@@ -50,8 +50,10 @@ public class TabListModule extends MatchModule implements Listener {
             timeColor = ChatColor.RED;
         }
 
+        TimeModule timeModule = TGM.get().getMatchManager().getMatch().getModule(TimeModule.class);
+        String timeRemaining = timeModule.isTimeLimited() ? Strings.formatTime(timeModule.getRemainingTime()) : Strings.formatTime(timeModule.getTimeElapsed());
         String header = ChatColor.WHITE + ChatColor.BOLD.toString() + TGM.get().getMatchManager().getMatch().getMapContainer().getMapInfo().getGametype().toString() +
-                        ChatColor.DARK_GRAY + " - " + timeColor + Strings.formatTime(TGM.get().getMatchManager().getMatch().getModule(TimeModule.class).getTimeElapsed()) +
+                        ChatColor.DARK_GRAY + " - " + timeColor + timeRemaining +
                         ChatColor.DARK_GRAY + " - " + ChatColor.WHITE + ChatColor.BOLD.toString() + ChatColor.translateAlternateColorCodes('&', TGM.get().getConfig().getString("server.tablist-name") == null ? "&f&lWARZONE" : TGM.get().getConfig().getString("server.tablist-name"));
 
         String footer = "";
