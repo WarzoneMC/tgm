@@ -63,7 +63,7 @@ Here's a basic example of what map configuration files look like:
 
 1. Clone the repo to your computer.
 
-2. Compile CraftBukkit by downloading and running the BuildTools jar from [here](https://hub.spigotmc.org/jenkins/job/BuildTools). Make sure you include the `-compile craftbukkit` flag when compiling it, otherwise you might receive errors when later compiling the plugin.
+2. Compile Spigot by downloading and running the BuildTools jar from [here](https://hub.spigotmc.org/jenkins/job/BuildTools). Make sure you include the `--remapped` flag when compiling it, otherwise you might receive errors when later compiling the plugin.
 
 3. Make sure you have Maven installed and run `mvn clean install` in the top-level folder to generate the required libraries. You can then download the jar from the `target` folder.
 
