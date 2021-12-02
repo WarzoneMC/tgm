@@ -1,7 +1,7 @@
 package network.warzone.tgm.util;
 
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.util.itemstack.Effects;
@@ -114,17 +114,17 @@ public class InventoryUtil {
             meta.addItemFlags(ItemFlag.values());
             itemStack.setItemMeta(meta);
             net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
-            if (nmsItem.s() != null) {
-                NBTTagList nmsLore = new NBTTagList();
+            if (nmsItem.getTag() != null) {
+                ListTag nmsLore = new ListTag();
                 for (PotionEffect potionEffect : potionEffects) {
-                    nmsLore.add(NBTTagString.a(String.format("[\"%s\",{\"translate\": \"effect.minecraft.%s\"},\" \",{\"translate\":\"%s\"},\" (%s)\"]",
+                    nmsLore.add(StringTag.valueOf(String.format("[\"%s\",{\"translate\": \"effect.minecraft.%s\"},\" \",{\"translate\":\"%s\"},\" (%s)\"]",
                             ChatColor.GRAY.toString(),
                             Effects.toMinecraftID(potionEffect.getType()),
                             potionEffect.getAmplifier() > 10 ? "" + potionEffect.getAmplifier() : "enchantment.level." + (potionEffect.getAmplifier() + 1),
                             Strings.formatTime(potionEffect.getDuration() / 20)
                     )));
                 }
-                nmsItem.s().p("display").a("Lore", nmsLore);
+                nmsItem.getTag().getCompound("display").put("Lore", nmsLore);
             }
             return CraftItemStack.asBukkitCopy(nmsItem);
         }

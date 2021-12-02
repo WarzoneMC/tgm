@@ -7,10 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.network.protocol.game.*;
-import net.minecraft.network.syncher.DataWatcherObject;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.world.entity.EnumItemSlot;
-import net.minecraft.world.entity.player.EntityHuman;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.match.Match;
@@ -161,9 +160,9 @@ public class NickManager implements Listener {
     }
 
     public void setSkin(PlayerContext context, Skin skin) {
-        EntityPlayer entityPlayer = getEntityPlayer(context.getPlayer());
+        ServerPlayer entityPlayer = getEntityPlayer(context.getPlayer());
 
-        entityPlayer.fp().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
+        entityPlayer.getGameProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
 
         updatePlayers(context.getPlayer());
     }
@@ -180,73 +179,73 @@ public class NickManager implements Listener {
     }
 
     private void updatePlayers(Player toExclude) {
-        EntityPlayer entityPlayer = getEntityPlayer(toExclude);
+        ServerPlayer entityPlayer = getEntityPlayer(toExclude);
 
-        List<Pair<EnumItemSlot, ItemStack>> inventory = new ArrayList<>();
+        List<Pair<EquipmentSlot, ItemStack>> inventory = new ArrayList<>();
         if (toExclude.getEquipment() != null) {
-            inventory.add(new Pair<>(EnumItemSlot.f, CraftItemStack.asNMSCopy(toExclude.getEquipment().getHelmet())));
-            inventory.add(new Pair<>(EnumItemSlot.e, CraftItemStack.asNMSCopy(toExclude.getEquipment().getChestplate())));
-            inventory.add(new Pair<>(EnumItemSlot.d, CraftItemStack.asNMSCopy(toExclude.getEquipment().getLeggings())));
-            inventory.add(new Pair<>(EnumItemSlot.c, CraftItemStack.asNMSCopy(toExclude.getEquipment().getBoots())));
-            inventory.add(new Pair<>(EnumItemSlot.a, CraftItemStack.asNMSCopy(toExclude.getEquipment().getItemInMainHand())));
-            inventory.add(new Pair<>(EnumItemSlot.b, CraftItemStack.asNMSCopy(toExclude.getEquipment().getItemInOffHand())));
+            inventory.add(new Pair<>(EquipmentSlot.HEAD, CraftItemStack.asNMSCopy(toExclude.getEquipment().getHelmet())));
+            inventory.add(new Pair<>(EquipmentSlot.CHEST, CraftItemStack.asNMSCopy(toExclude.getEquipment().getChestplate())));
+            inventory.add(new Pair<>(EquipmentSlot.LEGS, CraftItemStack.asNMSCopy(toExclude.getEquipment().getLeggings())));
+            inventory.add(new Pair<>(EquipmentSlot.FEET, CraftItemStack.asNMSCopy(toExclude.getEquipment().getBoots())));
+            inventory.add(new Pair<>(EquipmentSlot.MAINHAND, CraftItemStack.asNMSCopy(toExclude.getEquipment().getItemInMainHand())));
+            inventory.add(new Pair<>(EquipmentSlot.OFFHAND, CraftItemStack.asNMSCopy(toExclude.getEquipment().getItemInOffHand())));
         }
 
-        PacketPlayOutPlayerInfo playerInfoRemovePacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.b, entityPlayer);
-        PacketPlayOutPlayerInfo playerInfoAddPacket = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, entityPlayer);
-        PacketPlayOutEntityDestroy entityDestroyPacket = new PacketPlayOutEntityDestroy(toExclude.getEntityId());
-        PacketPlayOutNamedEntitySpawn namedEntitySpawnPacket = new PacketPlayOutNamedEntitySpawn(entityPlayer);
-        PacketPlayOutEntityEquipment entityEquipmentPacket = new PacketPlayOutEntityEquipment(toExclude.getEntityId(), inventory);
+        ClientboundPlayerInfoPacket playerInfoRemovePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, entityPlayer);
+        ClientboundPlayerInfoPacket playerInfoAddPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, entityPlayer);
+        ClientboundRemoveEntitiesPacket entityDestroyPacket = new ClientboundRemoveEntitiesPacket(toExclude.getEntityId());
+        ClientboundAddPlayerPacket namedEntitySpawnPacket = new ClientboundAddPlayerPacket(entityPlayer);
+        ClientboundSetEquipmentPacket entityEquipmentPacket = new ClientboundSetEquipmentPacket(toExclude.getEntityId(), inventory);
 
         Location l = toExclude.getLocation();
-        PacketPlayOutPosition positionPacket = new PacketPlayOutPosition(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), -1, false);
-        PacketPlayOutEntityHeadRotation entityHeadRotationPacket = new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) ((l.getYaw() * 256.0F) / 360.0F));
+        ClientboundPlayerPositionPacket positionPacket = new ClientboundPlayerPositionPacket(l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch(), new HashSet<>(), -1, false);
+        ClientboundRotateHeadPacket entityHeadRotationPacket = new ClientboundRotateHeadPacket(entityPlayer, (byte) ((l.getYaw() * 256.0F) / 360.0F));
 
-        DataWatcherObject<Byte> dataWatcherObject;
+        EntityDataAccessor<Byte> dataWatcherObject;
         try {
-            Field field = EntityHuman.class.getDeclaredField("bP");
+            Field field = net.minecraft.world.entity.player.Player.class.getDeclaredField("bP");
             field.setAccessible(true);
-            dataWatcherObject = (DataWatcherObject<Byte>) field.get(null);
+            dataWatcherObject = (EntityDataAccessor<Byte>) field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
             return;
         }
 
-        entityPlayer.ai().b(dataWatcherObject, (byte) (0x40 | 0x20 | 0x10 | 0x08 | 0x04 | 0x02 | 0x01));
-        PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(toExclude.getEntityId(), entityPlayer.ai(), true);
+        entityPlayer.getEntityData().set(dataWatcherObject, (byte) (0x40 | 0x20 | 0x10 | 0x08 | 0x04 | 0x02 | 0x01));
+        ClientboundSetEntityDataPacket entityMetadataPacket = new ClientboundSetEntityDataPacket(toExclude.getEntityId(), entityPlayer.getEntityData(), true);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            EntityPlayer entityOther = getEntityPlayer(p);
+            ServerPlayer entityOther = getEntityPlayer(p);
             CraftPlayer craftHandle = (CraftPlayer) p;
             if (p.equals(toExclude)) {
-                entityOther.b.a.a(playerInfoRemovePacket);
-                entityOther.b.a.a(playerInfoAddPacket);
+                entityOther.connection.connection.send(playerInfoRemovePacket);
+                entityOther.connection.connection.send(playerInfoAddPacket);
 
                 toExclude.spigot().respawn();
 
-                entityOther.b.a.a(positionPacket);
+                entityOther.connection.connection.send(positionPacket);
 
                 craftHandle.updateScaledHealth();
                 craftHandle.updateCommands();
                 p.updateInventory();
-                entityOther.w();
+                entityOther.onUpdateAbilities();
             } else if (visibilityController == null || visibilityController.canSee(p, toExclude)) {
                 // Remove the old player.
-                entityOther.b.a.a(playerInfoRemovePacket);
-                entityOther.b.a.a(entityDestroyPacket);
+                entityOther.connection.connection.send(playerInfoRemovePacket);
+                entityOther.connection.connection.send(entityDestroyPacket);
 
                 // Add the player back.
-                entityOther.b.a.a(playerInfoAddPacket);
-                entityOther.b.a.a(namedEntitySpawnPacket);
+                entityOther.connection.connection.send(playerInfoAddPacket);
+                entityOther.connection.connection.send(namedEntitySpawnPacket);
 
                 // Send the player's inventory.
-                entityOther.b.a.a(entityEquipmentPacket);
+                entityOther.connection.connection.send(entityEquipmentPacket);
                 // Send the data metadata, this displays the second layer of the skin.
-                entityOther.b.a.a(entityMetadataPacket);
-                entityOther.b.a.a(entityHeadRotationPacket);
+                entityOther.connection.connection.send(entityMetadataPacket);
+                entityOther.connection.connection.send(entityHeadRotationPacket);
             } else {
-                entityPlayer.b.a.a(playerInfoRemovePacket);
-                entityPlayer.b.a.a(playerInfoAddPacket);
+                entityPlayer.connection.connection.send(playerInfoRemovePacket);
+                entityPlayer.connection.connection.send(playerInfoAddPacket);
             }
         }
     }
@@ -293,7 +292,7 @@ public class NickManager implements Listener {
         }
     }
 
-    private EntityPlayer getEntityPlayer(Player player) {
+    private ServerPlayer getEntityPlayer(Player player) {
         return ((CraftPlayer) player).getHandle();
     }
 
