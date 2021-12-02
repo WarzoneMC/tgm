@@ -30,7 +30,7 @@ public class ItemBookParser implements ItemMetaParser {
             classChatSerializer = Class.forName("net.minecraft.network.chat.IChatBaseComponent$ChatSerializer");
             methodA = classChatSerializer.getDeclaredMethod("a", String.class);
 
-            classCraftMetaBook = Class.forName("org.bukkit.craftbukkit.v1_17_R1.inventory.CraftMetaBook");
+            classCraftMetaBook = Class.forName("org.bukkit.craftbukkit.v1_18_R1.inventory.CraftMetaBook");
             fieldPages = classCraftMetaBook.getDeclaredField("pages");
 
         } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException e) {

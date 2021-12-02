@@ -11,7 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -114,7 +114,7 @@ public class InventoryUtil {
             meta.addItemFlags(ItemFlag.values());
             itemStack.setItemMeta(meta);
             net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
-            if (nmsItem.getTag() != null) {
+            if (nmsItem.s() != null) {
                 NBTTagList nmsLore = new NBTTagList();
                 for (PotionEffect potionEffect : potionEffects) {
                     nmsLore.add(NBTTagString.a(String.format("[\"%s\",{\"translate\": \"effect.minecraft.%s\"},\" \",{\"translate\":\"%s\"},\" (%s)\"]",
@@ -124,7 +124,7 @@ public class InventoryUtil {
                             Strings.formatTime(potionEffect.getDuration() / 20)
                     )));
                 }
-                nmsItem.getTag().getCompound("display").set("Lore", nmsLore);
+                nmsItem.s().p("display").a("Lore", nmsLore);
             }
             return CraftItemStack.asBukkitCopy(nmsItem);
         }

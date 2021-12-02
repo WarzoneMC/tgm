@@ -28,8 +28,8 @@ import network.warzone.warzoneapi.models.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -163,7 +163,7 @@ public class NickManager implements Listener {
     public void setSkin(PlayerContext context, Skin skin) {
         EntityPlayer entityPlayer = getEntityPlayer(context.getPlayer());
 
-        entityPlayer.getProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
+        entityPlayer.fp().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
 
         updatePlayers(context.getPlayer());
     }
@@ -212,41 +212,41 @@ public class NickManager implements Listener {
             return;
         }
 
-        entityPlayer.getDataWatcher().set(dataWatcherObject, (byte) (0x40 | 0x20 | 0x10 | 0x08 | 0x04 | 0x02 | 0x01));
-        PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(toExclude.getEntityId(), entityPlayer.getDataWatcher(), true);
+        entityPlayer.ai().b(dataWatcherObject, (byte) (0x40 | 0x20 | 0x10 | 0x08 | 0x04 | 0x02 | 0x01));
+        PacketPlayOutEntityMetadata entityMetadataPacket = new PacketPlayOutEntityMetadata(toExclude.getEntityId(), entityPlayer.ai(), true);
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             EntityPlayer entityOther = getEntityPlayer(p);
             CraftPlayer craftHandle = (CraftPlayer) p;
             if (p.equals(toExclude)) {
-                entityOther.b.sendPacket(playerInfoRemovePacket);
-                entityOther.b.sendPacket(playerInfoAddPacket);
+                entityOther.b.a.a(playerInfoRemovePacket);
+                entityOther.b.a.a(playerInfoAddPacket);
 
                 toExclude.spigot().respawn();
 
-                entityOther.b.sendPacket(positionPacket);
+                entityOther.b.a.a(positionPacket);
 
                 craftHandle.updateScaledHealth();
                 craftHandle.updateCommands();
                 p.updateInventory();
-                entityOther.updateAbilities();
+                entityOther.w();
             } else if (visibilityController == null || visibilityController.canSee(p, toExclude)) {
                 // Remove the old player.
-                entityOther.b.sendPacket(playerInfoRemovePacket);
-                entityOther.b.sendPacket(entityDestroyPacket);
+                entityOther.b.a.a(playerInfoRemovePacket);
+                entityOther.b.a.a(entityDestroyPacket);
 
                 // Add the player back.
-                entityOther.b.sendPacket(playerInfoAddPacket);
-                entityOther.b.sendPacket(namedEntitySpawnPacket);
+                entityOther.b.a.a(playerInfoAddPacket);
+                entityOther.b.a.a(namedEntitySpawnPacket);
 
                 // Send the player's inventory.
-                entityOther.b.sendPacket(entityEquipmentPacket);
+                entityOther.b.a.a(entityEquipmentPacket);
                 // Send the data metadata, this displays the second layer of the skin.
-                entityOther.b.sendPacket(entityMetadataPacket);
-                entityOther.b.sendPacket(entityHeadRotationPacket);
+                entityOther.b.a.a(entityMetadataPacket);
+                entityOther.b.a.a(entityHeadRotationPacket);
             } else {
-                entityPlayer.b.sendPacket(playerInfoRemovePacket);
-                entityPlayer.b.sendPacket(playerInfoAddPacket);
+                entityPlayer.b.a.a(playerInfoRemovePacket);
+                entityPlayer.b.a.a(playerInfoAddPacket);
             }
         }
     }
