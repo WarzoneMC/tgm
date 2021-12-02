@@ -162,6 +162,7 @@ public class NickManager implements Listener {
     public void setSkin(PlayerContext context, Skin skin) {
         ServerPlayer entityPlayer = getEntityPlayer(context.getPlayer());
 
+        entityPlayer.getGameProfile().getProperties().removeAll("textures");
         entityPlayer.getGameProfile().getProperties().put("textures", new Property("textures", skin.value, skin.signature));
 
         updatePlayers(context.getPlayer());
@@ -203,7 +204,7 @@ public class NickManager implements Listener {
 
         EntityDataAccessor<Byte> dataWatcherObject;
         try {
-            Field field = net.minecraft.world.entity.player.Player.class.getDeclaredField("bP");
+            Field field = net.minecraft.world.entity.player.Player.class.getDeclaredField("bQ");
             field.setAccessible(true);
             dataWatcherObject = (EntityDataAccessor<Byte>) field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {

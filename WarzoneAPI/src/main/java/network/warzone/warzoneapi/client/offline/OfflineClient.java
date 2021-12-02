@@ -1,5 +1,6 @@
 package network.warzone.warzoneapi.client.offline;
 
+import kong.unirest.*;
 import network.warzone.warzoneapi.client.TeamClient;
 import network.warzone.warzoneapi.models.*;
 import org.bson.types.ObjectId;
@@ -12,7 +13,11 @@ import java.util.List;
 /**
  * Created by luke on 4/27/17.
  */
-public class OfflineClient implements TeamClient {
+public class OfflineClient extends TeamClient {
+
+    public OfflineClient() {
+        super();
+    }
 
     @Override
     public void heartbeat(Heartbeat heartbeat) {
@@ -117,9 +122,4 @@ public class OfflineClient implements TeamClient {
     public PlayerTagsUpdateResponse updateTag(String username, String tag, PlayerTagsUpdateRequest.Action action) {
         return new PlayerTagsUpdateResponse(false, "", "", new ArrayList<>(), null);
     }
-
-    public MojangProfile getMojangProfile(String username) {
-        return null;
-    }
-
 }
