@@ -86,7 +86,6 @@ public class TimeModule extends MatchModule {
     @Override
     public void disable() {
         endedTimeStamp = System.currentTimeMillis();
-        setTimeLimited(false);
         Bukkit.getScheduler().cancelTask(taskID);
 
         matchBroadcasts.clear();
@@ -106,4 +105,9 @@ public class TimeModule extends MatchModule {
         }
     }
 
+    public double getRemainingTime() {
+        if (!isTimeLimited()) return 0;
+        double elapsedTime = this.getTimeElapsed();
+        return Math.max(0, this.timeLimit - this.getTimeElapsed());
+    }
 }
