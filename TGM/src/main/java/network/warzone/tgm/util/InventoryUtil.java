@@ -1,7 +1,7 @@
 package network.warzone.tgm.util;
 
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import network.warzone.tgm.TGM;
 import network.warzone.tgm.modules.killstreak.KillstreakModule;
 import network.warzone.tgm.util.itemstack.Effects;
@@ -11,7 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -115,16 +115,16 @@ public class InventoryUtil {
             itemStack.setItemMeta(meta);
             net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
             if (nmsItem.getTag() != null) {
-                NBTTagList nmsLore = new NBTTagList();
+                ListTag nmsLore = new ListTag();
                 for (PotionEffect potionEffect : potionEffects) {
-                    nmsLore.add(NBTTagString.a(String.format("[\"%s\",{\"translate\": \"effect.minecraft.%s\"},\" \",{\"translate\":\"%s\"},\" (%s)\"]",
+                    nmsLore.add(StringTag.valueOf(String.format("[\"%s\",{\"translate\": \"effect.minecraft.%s\"},\" \",{\"translate\":\"%s\"},\" (%s)\"]",
                             ChatColor.GRAY.toString(),
                             Effects.toMinecraftID(potionEffect.getType()),
                             potionEffect.getAmplifier() > 10 ? "" + potionEffect.getAmplifier() : "enchantment.level." + (potionEffect.getAmplifier() + 1),
                             Strings.formatTime(potionEffect.getDuration() / 20)
                     )));
                 }
-                nmsItem.getTag().getCompound("display").set("Lore", nmsLore);
+                nmsItem.getTag().getCompound("display").put("Lore", nmsLore);
             }
             return CraftItemStack.asBukkitCopy(nmsItem);
         }
