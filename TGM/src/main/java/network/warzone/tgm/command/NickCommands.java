@@ -125,9 +125,11 @@ public class NickCommands {
             if (!name.matches(NAME_REGEX)) {
                 sender.sendMessage(ChatColor.RED + "Invalid name.");
                 name = null;
+                return;
             } else if (Bukkit.getPlayer(name) != null) {
                 sender.sendMessage(ChatColor.RED + "That player is online.");
                 name = null;
+                return;
             }
         }
         String skin = null;
@@ -136,6 +138,7 @@ public class NickCommands {
             if (nickManager.getUUID(skin) == null) {
                 sender.sendMessage(ChatColor.RED + "Invalid skin.");
                 skin = null;
+                return;
             }
         }
         NickManager.NickDetails details = new NickManager.NickDetails(

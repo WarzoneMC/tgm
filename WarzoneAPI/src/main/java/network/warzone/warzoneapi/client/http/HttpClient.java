@@ -11,52 +11,13 @@ import org.bson.types.ObjectId;
  * Created by luke on 4/27/17.
  */
 @Getter
-public class HttpClient implements TeamClient {
+public class HttpClient extends TeamClient {
 
     private HttpClientConfig config;
-    private final Gson gson;
-    private final UnirestInstance unirest;
 
     public HttpClient(HttpClientConfig config) {
+        super();
         this.config = config;
-
-
-        GsonBuilder builder = new GsonBuilder();
-
-        // ObjectId
-        builder.registerTypeAdapter(ObjectId.class, (JsonDeserializer<ObjectId>) (json, typeOfT, context) -> new ObjectId(json.getAsJsonPrimitive().getAsString()));
-        builder.registerTypeAdapter(ObjectId.class, (JsonSerializer<ObjectId>) (src, typeOfT, context) -> new JsonPrimitive(src.toString()));
-
-        builder.setFieldNamingPolicy(FieldNamingPolicy.IDENTITY);
-
-        this.gson = builder.create();
-
-        Config unirestConfig = new Config();
-        
-        //serialize objects using gson
-        unirestConfig.setObjectMapper(new ObjectMapper() {
-
-            public <T> T readValue(String s, Class<T> aClass) {
-                try {
-                    return gson.fromJson(s, aClass);
-                } catch(Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            public String writeValue(Object o) {
-                try {
-                    return gson.toJson(o);
-                } catch(Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        unirestConfig.addDefaultHeader("accept", "application/json");
-        unirestConfig.addDefaultHeader("Content-Type", "application/json");
-        
-        this.unirest = new UnirestInstance(unirestConfig);
     }
 
     @Override
@@ -332,18 +293,4 @@ public class HttpClient implements TeamClient {
             return null;
         }
     }
-
-    public MojangProfile getMojangProfile(String username) {
-        try {
-            HttpResponse<MojangProfile> response = unirest.get("https://api.ashcon.app/mojang/v2/user/" + username)
-                    .asObject(MojangProfile.class);
-            if (response.getStatus() != 200) {
-                return null;
-            }
-            return response.getBody();
-        } catch (UnirestException e) {
-            return null;
-        }
-    }
-
 }
